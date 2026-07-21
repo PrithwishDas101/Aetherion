@@ -1,10 +1,11 @@
 import express from "express";
-import dotenv from "dotenv";
 
-dotenv.config({
-    quiet: true,
-});
+import authRoutes from "./routes/authRoute.js";
 
 const app = express();
+
+app.use(express.json());
+
+app.use("/api/v1/auth", authRoutes);
 
 export default app;
