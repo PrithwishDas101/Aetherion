@@ -27,3 +27,26 @@ export const getLoggedUser = async (req, res) => {
         });
     }
 };
+
+// GET ALL USERS EXCEPT LOGGED-IN USER
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({
+            _id: {
+                $ne: req.user.userId,
+            },
+        }).select("-password");
+
+        return res.status(200).json({
+            success: true,
+            users,
+        });
+    } catch (error) {
+        console.error("Get all users error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+};
