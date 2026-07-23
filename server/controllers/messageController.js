@@ -37,3 +37,27 @@ export const sendMessage = async (req, res) => {
         });
     }
 };
+
+// GET ALL MESSAGES OF A CHAT
+export const getAllMessages = async (req, res) => {
+    try {
+        const messages = await Message.find({
+            chatId: req.params.chatId,
+        }).sort({
+            createdAt: 1,
+        });
+
+        return res.status(200).send({
+            success: true,
+            message: "Messages fetched successfully!",
+            data: messages,
+        });
+    } catch (error) {
+        console.error("Get all messages error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+};
