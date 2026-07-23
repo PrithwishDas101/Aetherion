@@ -23,3 +23,27 @@ export const createChat = async (req, res) => {
         });
     }
 };
+
+// GET ALL CHATS OF LOGGED-IN USER
+export const getAllChats = async (req, res) => {
+    try {
+        const chats = await Chat.find({
+            members: {
+                $in: [req.user.userId],
+            },
+        });
+
+        return res.status(200).send({
+            success: true,
+            message: "Chats fetched successfully!",
+            data: chats,
+        });
+    } catch (error) {
+        console.error("Get all chats error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+};
