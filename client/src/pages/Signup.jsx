@@ -3,14 +3,15 @@ import { Link } from "react-router-dom";
 
 function Signup() {
     const [user, setUser] = React.useState({
-        firstname: "",
-        lastname: "",
+        firstName: "",
+        lastName: "",
         email: "",
         password: "",
     });
 
     function onFormSubmit(event) {
         event.preventDefault();
+
         console.log(user);
     }
 
@@ -32,7 +33,7 @@ function Signup() {
                 <div className="w-full max-w-[520px] rounded-[28px] border border-[#d8f45a]/25 bg-[#111612]/90 shadow-[0_25px_80px_rgba(0,0,0,0.65)] backdrop-blur-md">
 
                     {/* Card content */}
-                    <div className="px-10 pb-5 pt-5">
+                    <div className="px-5 pb-5 pt-5 sm:px-10">
 
                         {/* Logo */}
                         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#d8f45a]/50 bg-[#080d09] text-4xl text-[#d8f45a] shadow-[0_0_30px_rgba(216,244,90,0.12)]">
@@ -42,6 +43,7 @@ function Signup() {
                                 className="h-full w-full object-contain"
                             />
                         </div>
+
                         {/* Aetherion */}
                         <div className="mt-3 text-center text-lg tracking-[0.35em] text-[#f1eee8]">
                             <span className="mr-3 text-[#d8f45a]">
@@ -57,11 +59,11 @@ function Signup() {
 
                         {/* Heading */}
                         <div className="mt-2 text-center">
-                            <h1 className="text-4xl font-semibold text-[#f1eee8]">
+                            <h1 className="text-3xl font-semibold text-[#f1eee8] sm:text-4xl">
                                 Create Your Account
                             </h1>
 
-                            <p className="mt-1 text-base text-[#9ca39a]">
+                            <p className="mt-1 text-sm text-[#9ca39a] sm:text-base">
                                 Create your account and start connecting with people.
                             </p>
                         </div>
@@ -73,48 +75,52 @@ function Signup() {
                         >
 
                             {/* First + Last Name */}
-                            <div className="grid grid-cols-2 gap-5">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
 
+                                {/* First Name */}
                                 <div>
                                     <label
-                                        htmlFor="firstname"
+                                        htmlFor="firstName"
                                         className="mb-1 block text-sm text-[#d0d4cc]"
                                     >
                                         First Name
                                     </label>
 
                                     <input
-                                        id="firstname"
+                                        id="firstName"
+                                        name="firstName"
                                         type="text"
                                         placeholder="John"
-                                        value={user.firstname}
+                                        value={user.firstName}
                                         onChange={(e) =>
                                             setUser({
                                                 ...user,
-                                                firstname: e.target.value,
+                                                firstName: e.target.value,
                                             })
                                         }
                                         className="h-12 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
                                     />
                                 </div>
 
+                                {/* Last Name */}
                                 <div>
                                     <label
-                                        htmlFor="lastname"
+                                        htmlFor="lastName"
                                         className="mb-1 block text-sm text-[#d0d4cc]"
                                     >
                                         Last Name
                                     </label>
 
                                     <input
-                                        id="lastname"
+                                        id="lastName"
+                                        name="lastName"
                                         type="text"
                                         placeholder="Doe"
-                                        value={user.lastname}
+                                        value={user.lastName}
                                         onChange={(e) =>
                                             setUser({
                                                 ...user,
-                                                lastname: e.target.value,
+                                                lastName: e.target.value,
                                             })
                                         }
                                         className="h-12 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
@@ -135,6 +141,7 @@ function Signup() {
 
                                 <input
                                     id="email"
+                                    name="email"
                                     type="email"
                                     placeholder="you@example.com"
                                     value={user.email}
@@ -161,6 +168,7 @@ function Signup() {
 
                                 <input
                                     id="password"
+                                    name="password"
                                     type="password"
                                     placeholder="Create a password"
                                     value={user.password}
