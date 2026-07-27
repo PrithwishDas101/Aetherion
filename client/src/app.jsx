@@ -7,6 +7,7 @@ import {
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
+import ProtectedRoute from "./components/protectedRoute.jsx";
 
 function App() {
     return (
@@ -15,7 +16,11 @@ function App() {
                 <Routes>
                     <Route
                         path="/"
-                        element={<Home />}
+                        element={
+                            <ProtectedRoute>
+                                <Home />
+                            </ProtectedRoute>
+                        }
                     />
 
                     <Route
