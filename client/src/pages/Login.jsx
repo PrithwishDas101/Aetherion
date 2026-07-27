@@ -1,17 +1,29 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+import { loginUser } from "../apiCalls/authApi.js";
+
 function Login() {
     const [user, setUser] = React.useState({
         email: "",
         password: "",
     });
 
-    function onFormSubmit(event) {
-        event.preventDefault();
-
-        console.log(user);
-    }
+    async function onFormSubmit(event) {
+            event.preventDefault();
+    
+            try {
+                const response = await loginUser(user);
+    
+                alert(response.message);
+    
+            } catch (error) {
+                alert(
+                    error.response?.data?.message ||
+                    "Something went wrong. Please try again."
+                );
+            }
+        }
 
     return (
         <div className="relative min-h-screen w-full overflow-hidden">
