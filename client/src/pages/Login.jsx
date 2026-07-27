@@ -1,29 +1,42 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { loginUser } from "../apiCalls/authApi.js";
 
 function Login() {
+
+    const navigate = useNavigate();
+
     const [user, setUser] = React.useState({
         email: "",
         password: "",
     });
 
     async function onFormSubmit(event) {
-            event.preventDefault();
-    
-            try {
-                const response = await loginUser(user);
-    
+        event.preventDefault();
+
+        try {
+            const response = await loginUser(user);
+
+            if (response.success) {
                 alert(response.message);
-    
-            } catch (error) {
-                alert(
-                    error.response?.data?.message ||
-                    "Something went wrong. Please try again."
+
+                localStorage.setItem(
+                    "token",
+                    response.token
                 );
+
+                navigate("/");
             }
+
+        } catch (error) {
+            alert(
+                error.response?.data?.message ||
+                "Something went wrong. Please try again."
+            );
         }
+    }
 
     return (
         <div className="relative min-h-screen w-full overflow-hidden">
