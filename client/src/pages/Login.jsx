@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { loginUser } from "../apiCalls/authApi.js";
 
@@ -14,29 +15,23 @@ function Login() {
     });
 
     async function onFormSubmit(event) {
-        event.preventDefault();
+    event.preventDefault();
 
-        try {
-            const response = await loginUser(user);
+    const response = await loginUser(user);
 
-            if (response.success) {
-                alert(response.message);
+    if (response.success) {
+        localStorage.setItem(
+            "token",
+            response.token
+        );
 
-                localStorage.setItem(
-                    "token",
-                    response.token
-                );
+        toast.success(response.message);
 
-                navigate("/");
-            }
-
-        } catch (error) {
-            alert(
-                error.response?.data?.message ||
-                "Something went wrong. Please try again."
-            );
-        }
+        navigate("/");
+    } else {
+        toast.error(response.message);
     }
+}
 
     return (
         <div className="relative min-h-screen w-full overflow-hidden">

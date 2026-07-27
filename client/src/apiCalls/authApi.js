@@ -10,7 +10,7 @@ export const signupUser = async (userData) => {
 
         return response.data;
     } catch (error) {
-        return (error);
+        return error.response.data;
     }
 };
 
@@ -25,7 +25,7 @@ export const loginUser = async (userData) => {
 
         return response.data;
     } catch (error) {
-        return (error);
+        return error.response.data;
     }
 };
 
@@ -42,7 +42,7 @@ export const logoutUser = async () => {
 
         return response.data;
     } catch (error) {
-        return (error);
+        return error.response.data;
     }
 
 };

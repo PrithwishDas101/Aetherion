@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { signupUser } from "../apiCalls/authApi.js"
 
 function Signup() {
+
     const [user, setUser] = React.useState({
         firstName: "",
         lastName: "",
@@ -14,16 +16,12 @@ function Signup() {
     async function onFormSubmit(event) {
         event.preventDefault();
 
-        try {
-            const response = await signupUser(user);
+        const response = await signupUser(user);
 
-            alert(response.message);
-
-        } catch (error) {
-            alert(
-                error.response?.data?.message ||
-                "Something went wrong. Please try again."
-            );
+        if (response.success) {
+            toast.success(response.message);
+        } else {
+            toast.error(response.message);
         }
     }
 

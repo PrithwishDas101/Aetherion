@@ -10,24 +10,26 @@ import Signup from "./pages/Signup.jsx";
 
 function App() {
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route
-                    path="/"
-                    element={<Home />}
-                />
+        <div>
+            <BrowserRouter>
+                <Routes>
+                    <Route
+                        path="/"
+                        element={<Home />}
+                    />
 
-                <Route
-                    path="/login"
-                    element={<Login />}
-                />
+                    <Route
+                        path="/login"
+                        element={<Login />}
+                    />
 
-                <Route
-                    path="/signup"
-                    element={<Signup />}
-                />
-            </Routes>
-        </BrowserRouter>
+                    <Route
+                        path="/signup"
+                        element={<Signup />}
+                    />
+                </Routes>
+            </BrowserRouter>
+        </div>
     );
 }
 
