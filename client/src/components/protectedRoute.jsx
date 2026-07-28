@@ -42,9 +42,6 @@ function ProtectedRoute({ children }) {
                     <p>
                         Email: {user.email}
                     </p>
-                    <p>
-                        Password: {user.password}
-                    </p>
                 </>
             )}
 
