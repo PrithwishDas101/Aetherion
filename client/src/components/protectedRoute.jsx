@@ -35,7 +35,7 @@ function ProtectedRoute({ children }) {
         } else {
             navigate("/login");
         }
-    }, [token, navigate]);
+    }, []);
 
     return (
         <div>
