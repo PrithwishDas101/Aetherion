@@ -1,10 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 
 import { signupUser } from "../apiCalls/authApi.js"
+import { hideLoader, showLoader } from "../redux/sliceLoader.js"
 
 function Signup() {
+
+    const dispatch = useDispatch();
 
     const [user, setUser] = React.useState({
         firstName: "",
@@ -16,12 +20,25 @@ function Signup() {
     async function onFormSubmit(event) {
         event.preventDefault();
 
-        const response = await signupUser(user);
+        try {
+            dispatch(showLoader());
 
-        if (response.success) {
-            toast.success(response.message);
-        } else {
-            toast.error(response.message);
+            const response = await signupUser(user);
+
+            if (response.success) {
+                toast.success(response.message);
+            } else {
+                toast.error(response.message);
+            }
+
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                "Something went wrong. Please try again."
+            );
+
+        } finally {
+            dispatch(hideLoader());
         }
     }
 

@@ -2,10 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 
 import { loginUser } from "../apiCalls/authApi.js";
+import { hideLoader, showLoader } from "../redux/sliceLoader.js"
 
 function Login() {
+
+    const dispatch = useDispatch();
 
     const navigate = useNavigate();
 
@@ -15,23 +19,37 @@ function Login() {
     });
 
     async function onFormSubmit(event) {
-    event.preventDefault();
+        event.preventDefault();
 
-    const response = await loginUser(user);
+        dispatch(showLoader());
 
-    if (response.success) {
-        localStorage.setItem(
-            "token",
-            response.token
-        );
+        try {
+            const response = await loginUser(user);
 
-        toast.success(response.message);
+            if (response.success) {
+                localStorage.setItem(
+                    "token",
+                    response.token
+                );
 
-        navigate("/");
-    } else {
-        toast.error(response.message);
+                toast.success(response.message);
+
+                navigate("/");
+            } else {
+                toast.error(response.message);
+            }
+
+        } catch (error) {
+            toast.error(
+                "Something went wrong. Please try again."
+            );
+
+        } finally {
+            dispatch(hideLoader());
+        }
+
     }
-}
+
 
     return (
         <div className="relative min-h-screen w-full overflow-hidden">

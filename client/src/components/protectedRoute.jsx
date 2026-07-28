@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getLoggedUser } from "../apiCalls/userApi.js";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../redux/sliceLoader.js";
 
 function ProtectedRoute({ children }) {
     const [user, setUser] = useState(null);
+    const dispatch = useDispatch();
 
     const navigate = useNavigate();
 
@@ -12,7 +15,9 @@ function ProtectedRoute({ children }) {
 
     const getLoggedinUser = async () => {
         try {
+            dispatch(showLoader());
             const response = await getLoggedUser();
+            dispatch(hideLoader());
 
             if (response.success) {
                 setUser(response.data);

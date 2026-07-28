@@ -3,15 +3,23 @@ import {
     Routes,
     Route,
 } from "react-router-dom";
+import { useSelector } from "react-redux"
 
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
-import ProtectedRoute from "./components/protectedRoute.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Loader from "./components/Loader.jsx";
 
 function App() {
+
+    const loader = useSelector(
+        (state) => state.loaderReducer.loader
+    );
+    
     return (
         <div>
+            {loader && <Loader />}
             <BrowserRouter>
                 <Routes>
                     <Route
