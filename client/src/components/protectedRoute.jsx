@@ -1,58 +1,58 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 
 import { getLoggedUser } from "../apiCalls/userApi.js";
-import { useDispatch } from "react-redux";
-import { hideLoader, showLoader } from "../redux/sliceLoader.js";
+import {
+    showLoader,
+    hideLoader,
+} from "../redux/sliceLoader.js";
+import { setUser } from "../redux/userSlice.js";
 
 function ProtectedRoute({ children }) {
-    const [user, setUser] = useState(null);
     const dispatch = useDispatch();
-
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
 
-    const getLoggedinUser = async () => {
+    const getLoggedInUser = async () => {
         try {
             dispatch(showLoader());
+
             const response = await getLoggedUser();
-            dispatch(hideLoader());
 
             if (response.success) {
-                setUser(response.data);
+                dispatch(
+                    setUser(response.data)
+                );
             } else {
+                localStorage.removeItem("token");
+
+                toast.error(response.message);
+
                 navigate("/login");
             }
+
         } catch (error) {
+            localStorage.removeItem("token");
+
             navigate("/login");
+
+        } finally {
+            dispatch(hideLoader());
         }
     };
 
     useEffect(() => {
         if (token) {
-            getLoggedinUser();
+            getLoggedInUser();
         } else {
             navigate("/login");
         }
     }, []);
 
-    return (
-        <div>
-            {user && (
-                <>
-                    <p>
-                        Name: {user.firstName + " " + user.lastName}
-                    </p>
-                    <p>
-                        Email: {user.email}
-                    </p>
-                </>
-            )}
-
-            {children}
-        </div>
-    );
+    return children;
 }
 
 export default ProtectedRoute;
