@@ -1,6 +1,7 @@
 import React from "react";
 
 import Header from "../components/Header.jsx";
+import Sidebar from "../components/SideBar.jsx";
 
 const Home = () => {
   return (
@@ -8,8 +9,8 @@ const Home = () => {
       <Header />
       <div className="m-[10px] flex w-[90%] flex-1 p-[10px]">
 
-        {/* SIDEBAR LAYOUT */}
-
+        < Sidebar />
+        
         {/* CHAT AREA LAYOUT */}
 
       </div>

@@ -3,12 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
-import { getLoggedUser } from "../apiCalls/userApi.js";
+import {
+    getLoggedUser,
+    getAllUsers,
+} from "../apiCalls/userApi.js";
+
 import {
     showLoader,
     hideLoader,
 } from "../redux/sliceLoader.js";
-import { setUser } from "../redux/userSlice.js";
+
+import {
+    setUser,
+    setAllUser,
+} from "../redux/userSlice.js";
 
 function ProtectedRoute({ children }) {
     const dispatch = useDispatch();
@@ -44,9 +52,39 @@ function ProtectedRoute({ children }) {
         }
     };
 
+    const getAllUser = async () => {
+        try {
+            dispatch(showLoader());
+
+            const response = await getAllUsers();
+
+            if (response.success) {
+                dispatch(
+                    setAllUser(response.data)
+                );
+            } else {
+                localStorage.removeItem("token");
+
+                toast.error(response.message);
+
+                navigate("/login");
+            }
+
+        } catch (error) {
+            localStorage.removeItem("token");
+
+            navigate("/login");
+
+        } finally {
+            dispatch(hideLoader());
+        }
+    };
+
     useEffect(() => {
         if (token) {
             getLoggedInUser();
+
+            getAllUser();
         } else {
             navigate("/login");
         }
