@@ -53,32 +53,32 @@ function ProtectedRoute({ children }) {
     };
 
     const getAllUser = async () => {
-        try {
-            dispatch(showLoader());
+    try {
+        dispatch(showLoader());
 
-            const response = await getAllUsers();
+        const response = await getAllUsers();
 
-            if (response.success) {
-                dispatch(
-                    setAllUser(response.data)
-                );
-            } else {
-                localStorage.removeItem("token");
-
-                toast.error(response.message);
-
-                navigate("/login");
-            }
-
-        } catch (error) {
+        if (response.success) {
+            dispatch(
+                setAllUser(response.users)
+            );
+        } else {
             localStorage.removeItem("token");
 
-            navigate("/login");
+            toast.error(response.message);
 
-        } finally {
-            dispatch(hideLoader());
+            navigate("/login");
         }
-    };
+
+    } catch (error) {
+        localStorage.removeItem("token");
+
+        navigate("/login");
+
+    } finally {
+        dispatch(hideLoader());
+    }
+};
 
     useEffect(() => {
         if (token) {
