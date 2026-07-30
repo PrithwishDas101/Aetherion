@@ -9,6 +9,10 @@ import {
 } from "../apiCalls/userApi.js";
 
 import {
+    getAllChats,
+} from "../apiCalls/chatApi.js";
+
+import {
     showLoader,
     hideLoader,
 } from "../redux/sliceLoader.js";
@@ -16,81 +20,156 @@ import {
 import {
     setUser,
     setAllUser,
+    setAllChats,
 } from "../redux/userSlice.js";
 
 function ProtectedRoute({ children }) {
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
 
     const getLoggedInUser = async () => {
+
         try {
+
             dispatch(showLoader());
 
             const response = await getLoggedUser();
 
             if (response.success) {
+
                 dispatch(
                     setUser(response.data)
                 );
+
             } else {
+
                 localStorage.removeItem("token");
 
-                toast.error(response.message);
+                toast.error(
+                    response.message
+                );
 
                 navigate("/login");
+
             }
 
         } catch (error) {
+
             localStorage.removeItem("token");
 
             navigate("/login");
 
         } finally {
+
             dispatch(hideLoader());
+
         }
+
     };
 
     const getAllUser = async () => {
-    try {
-        dispatch(showLoader());
 
-        const response = await getAllUsers();
+        try {
 
-        if (response.success) {
-            dispatch(
-                setAllUser(response.users)
-            );
-        } else {
+            dispatch(showLoader());
+
+            const response = await getAllUsers();
+
+            if (response.success) {
+
+                dispatch(
+                    setAllUser(response.users)
+                );
+
+            } else {
+
+                localStorage.removeItem("token");
+
+                toast.error(
+                    response.message
+                );
+
+                navigate("/login");
+
+            }
+
+        } catch (error) {
+
             localStorage.removeItem("token");
 
-            toast.error(response.message);
-
             navigate("/login");
+
+        } finally {
+
+            dispatch(hideLoader());
+
         }
 
-    } catch (error) {
-        localStorage.removeItem("token");
+    };
 
-        navigate("/login");
+    const getAllUserChats = async () => {
 
-    } finally {
-        dispatch(hideLoader());
-    }
-};
+        try {
+
+            dispatch(showLoader());
+
+            const response = await getAllChats();
+
+            if (response.success) {
+
+                dispatch(
+                    setAllChats(response.data)
+                );
+
+            } else {
+
+                localStorage.removeItem("token");
+
+                toast.error(
+                    response.message
+                );
+
+                navigate("/login");
+
+            }
+
+        } catch (error) {
+
+            localStorage.removeItem("token");
+
+            navigate("/login");
+
+        } finally {
+
+            dispatch(hideLoader());
+
+        }
+
+    };
 
     useEffect(() => {
+
         if (token) {
+
             getLoggedInUser();
 
             getAllUser();
+
+            getAllUserChats();
+
         } else {
+
             navigate("/login");
+
         }
+
     }, []);
 
     return children;
+
 }
 
 export default ProtectedRoute;
