@@ -20,8 +20,9 @@ body {
 }
 
 /* AETHERION SCROLLBAR */
+
 .scrollbar-aetherion::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .scrollbar-aetherion::-webkit-scrollbar-track {
@@ -29,15 +30,18 @@ body {
 }
 
 .scrollbar-aetherion::-webkit-scrollbar-thumb {
-    background-color: #475569;
+    background: #475569;
+    border: 2px solid transparent;
+    background-clip: content-box;
     border-radius: 999px;
 }
 
 .scrollbar-aetherion::-webkit-scrollbar-thumb:hover {
-    background-color: #64748b;
+    background: #64748b;
+    background-clip: content-box;
 }
 
 .scrollbar-aetherion {
     scrollbar-width: thin;
-    scrollbar-color: #9da4ae transparent;
+    scrollbar-color: #9ea5af transparent;
 }

@@ -17,14 +17,15 @@ const Home = () => {
 
             <Header />
 
-            <div className="flex min-h-0 flex-1 gap-5 px-5 py-[10px]">
+            <div className="flex min-h-0 flex-1 gap-3 px-0 py-[10px] md:px-5">
 
                 {/* CHAT LIST */}
                 <div
-                    className={`min-h-0 w-full ${selectedChat
+                    className={`min-h-0 w-full ${
+                        selectedChat
                             ? "hidden"
                             : "block"
-                        } md:block md:w-[30%] md:min-w-[320px]`}
+                    } md:block md:w-[30%] md:min-w-[320px]`}
                 >
 
                     <Sidebar />
@@ -33,10 +34,11 @@ const Home = () => {
 
                 {/* CHAT AREA */}
                 <div
-                    className={`min-h-0 flex-1 overflow-hidden ${selectedChat
+                    className={`min-h-0 flex-1 overflow-hidden ${
+                        selectedChat
                             ? "block"
                             : "hidden"
-                        } md:block`}
+                    } md:block`}
                 >
 
                     {selectedChat && <Chat />}

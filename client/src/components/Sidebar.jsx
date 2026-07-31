@@ -10,16 +10,20 @@ function Sidebar() {
 
     return (
 
-        <div className="flex h-full w-[30%] min-w-[320px] flex-col overflow-hidden">
+        <div className="flex h-full w-full min-w-0 flex-col overflow-hidden">
 
-            {/* SEARCH STAYS FIXED */}
-            <Search
-                searchKey={searchKey}
-                setSearchKey={setSearchKey}
-            />
+            {/* SEARCH */}
+            <div className="shrink-0">
 
-            {/* ONLY USER LIST SCROLLS */}
-            <div className="min-h-0 flex-1 overflow-y-auto scrollbar-aetherion">
+                <Search
+                    searchKey={searchKey}
+                    setSearchKey={setSearchKey}
+                />
+
+            </div>
+
+            {/* USER LIST — ONLY THIS AREA SCROLLS */}
+            <div className="scrollbar-aetherion min-h-0 flex-1 overflow-y-auto">
 
                 <UserList
                     searchKey={searchKey}
