@@ -19,11 +19,25 @@ const Home = () => {
 
             <div className="flex min-h-0 flex-1 gap-5 px-5 py-[10px]">
 
-                {/* LEFT SIDE */}
-                <Sidebar />
+                {/* CHAT LIST */}
+                <div
+                    className={`min-h-0 w-full ${selectedChat
+                            ? "hidden"
+                            : "block"
+                        } md:block md:w-[30%] md:min-w-[320px]`}
+                >
 
-                {/* RIGHT SIDE — FIXED */}
-                <div className="min-h-0 flex-1 overflow-hidden">
+                    <Sidebar />
+
+                </div>
+
+                {/* CHAT AREA */}
+                <div
+                    className={`min-h-0 flex-1 overflow-hidden ${selectedChat
+                            ? "block"
+                            : "hidden"
+                        } md:block`}
+                >
 
                     {selectedChat && <Chat />}
 

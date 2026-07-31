@@ -3,12 +3,18 @@ import Chat from "../models/Chat.js";
 
 // SEND MESSAGE
 export const sendMessage = async (req, res) => {
+
     try {
+
         // 1. Create message
-        const message = new Message(req.body);
+        const message = new Message({
+            ...req.body,
+            sender: req.user.userId,
+        });
 
         // 2. Save message
-        const savedMessage = await message.save();
+        const savedMessage =
+            await message.save();
 
         // 3. Update chat
         await Chat.findOneAndUpdate(
@@ -16,7 +22,9 @@ export const sendMessage = async (req, res) => {
                 _id: req.body.chatId,
             },
             {
-                lastMessage: savedMessage._id,
+                lastMessage:
+                    savedMessage._id,
+
                 $inc: {
                     unreadMessageCount: 1,
                 },
@@ -25,17 +33,26 @@ export const sendMessage = async (req, res) => {
 
         return res.status(201).send({
             success: true,
-            message: "Message sent successfully!",
+            message:
+                "Message sent successfully!",
             data: savedMessage,
         });
+
     } catch (error) {
-        console.error("Send message error:", error);
+
+        console.error(
+            "Send message error:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: "Internal server error",
+            message:
+                "Internal server error",
         });
+
     }
+
 };
 
 // GET ALL MESSAGES OF A CHAT
