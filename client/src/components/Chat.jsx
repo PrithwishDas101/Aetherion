@@ -1,11 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
+
 import {
     useEffect,
     useRef,
     useState,
 } from "react";
+
 import { FiArrowLeft } from "react-icons/fi";
 import { FaPaperPlane } from "react-icons/fa";
+
 import toast from "react-hot-toast";
 
 import {
@@ -22,6 +25,7 @@ import {
     setSelectedChat,
 } from "../redux/userSlice.js";
 
+
 const Chat = () => {
 
     const dispatch = useDispatch();
@@ -33,18 +37,32 @@ const Chat = () => {
         state => state.userReducer
     );
 
+
     const selectedUser =
         selectedChat.members.find(
             u => u._id !== user._id
         );
 
-    const [message, setMessage] =
-        useState("");
+
+    const [
+        message,
+        setMessage,
+    ] = useState("");
+
+
+    const [
+        allMessages,
+        setAllMessages,
+    ] = useState([]);
+
 
     const messageInputRef =
         useRef(null);
 
-    const [allMessages, setAllMessages] = useState([]);
+
+    const messagesEndRef =
+        useRef(null);
+
 
     const handleMessageChange = (
         event
@@ -54,11 +72,14 @@ const Chat = () => {
             event.target.value
         );
 
+
         const textarea =
             event.target;
 
+
         textarea.style.height =
             "auto";
+
 
         textarea.style.height =
             `${Math.min(
@@ -68,11 +89,17 @@ const Chat = () => {
 
     };
 
+
     const sendMessage = async () => {
 
-        if (!message.trim()) {
+        const messageText =
+            message.trim();
+
+
+        if (!messageText) {
             return;
         }
+
 
         try {
 
@@ -82,22 +109,32 @@ const Chat = () => {
                     selectedChat._id,
 
                 text:
-                    message.trim(),
+                    messageText,
 
             };
 
-            dispatch(
-                showLoader()
-            );
 
             const response =
                 await createMessage(
                     messageData
                 );
 
-            if (response.success) {
+
+            if (response?.success) {
+
+                setAllMessages(
+                    previousMessages => [
+
+                        ...previousMessages,
+
+                        response.data,
+
+                    ]
+                );
+
 
                 setMessage("");
+
 
                 if (
                     messageInputRef.current
@@ -113,12 +150,22 @@ const Chat = () => {
             } else {
 
                 toast.error(
-                    response.message
+
+                    response?.message ||
+
+                    "Unable to send message."
+
                 );
 
             }
 
         } catch (error) {
+
+            console.error(
+                "Send message error:",
+                error
+            );
+
 
             toast.error(
 
@@ -130,15 +177,10 @@ const Chat = () => {
 
             );
 
-        } finally {
-
-            dispatch(
-                hideLoader()
-            );
-
         }
 
     };
+
 
     const getMessages = async () => {
 
@@ -148,22 +190,31 @@ const Chat = () => {
                 showLoader()
             );
 
+
             const response =
                 await getAllMessages(
                     selectedChat._id
                 );
 
-            if (response?.success) {
+
+            if (
+                response?.success
+            ) {
 
                 setAllMessages(
+
                     response.data || []
+
                 );
 
             } else {
 
                 toast.error(
+
                     response?.message ||
+
                     "Unable to fetch messages."
+
                 );
 
             }
@@ -174,6 +225,7 @@ const Chat = () => {
                 "Get messages error:",
                 error
             );
+
 
             toast.error(
                 "Unable to fetch messages."
@@ -189,38 +241,77 @@ const Chat = () => {
 
     };
 
+
+    /* FETCH MESSAGES
+    WHEN CHAT CHANGES */
+
     useEffect(() => {
 
-        if (selectedChat?._id) {
+        if (
+            selectedChat?._id
+        ) {
 
             getMessages();
 
         }
 
-    }, [selectedChat?._id]);
+    }, [
+        selectedChat?._id
+    ]);
+
+
+    /* AUTO-SCROLL TO
+    THE NEWEST MESSAGE */
+
+    useEffect(() => {
+
+        messagesEndRef
+            .current
+            ?.scrollIntoView({
+
+                behavior:
+                    "smooth",
+
+                block:
+                    "end",
+
+            });
+
+    }, [
+        allMessages
+    ]);
+
 
     return (
 
         <div className="flex h-full flex-col rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-8 py-5">
 
+
             {/* RECEIVER DATA */}
+
             <div className="mb-5 flex items-center border-b border-[#d8f45a]/15 px-7 py-3">
 
+
                 {/* MOBILE BACK BUTTON */}
+
                 <button
+
                     type="button"
 
                     onClick={() =>
+
                         dispatch(
                             setSelectedChat(
                                 null
                             )
                         )
+
                     }
 
                     className="mr-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#f9fbf2] transition hover:bg-[#d8f45a]/10 md:hidden"
 
                     aria-label="Back to chats"
+
                 >
 
                     <FiArrowLeft
@@ -229,7 +320,9 @@ const Chat = () => {
 
                 </button>
 
+
                 {/* SELECTED USER */}
+
                 <div className="flex-1 text-right font-bold text-[#edefe5]">
 
                     {
@@ -240,17 +333,126 @@ const Chat = () => {
 
                 </div>
 
+
             </div>
+
 
             {/* CHAT AREA */}
-            <div className="flex-1 overflow-y-auto px-2 py-3">
 
-                Chat Area
+            <div className="scrollbar-aetherion flex-1 overflow-y-auto px-2 py-3">
+
+
+                <div className="flex flex-col gap-2">
+
+
+                    {
+                        allMessages.length === 0 && (
+
+                            <div className="flex h-full items-center justify-center">
+
+                                <p className="text-sm text-[#70786f]">
+
+                                    No messages yet.
+
+                                </p>
+
+                            </div>
+
+                        )
+                    }
+
+
+                    {
+                        allMessages.map(
+                            msg => {
+
+                                const senderId =
+
+                                    typeof msg.sender ===
+                                    "object"
+
+                                        ? msg.sender._id
+
+                                        : msg.sender;
+
+
+                                const isMyMessage =
+
+                                    String(
+                                        senderId
+                                    ) ===
+
+                                    String(
+                                        user._id
+                                    );
+
+
+                                return (
+
+                                    <div
+
+                                        key={
+                                            msg._id
+                                        }
+
+                                        className={`flex ${
+                                            isMyMessage
+
+                                                ? "justify-end"
+
+                                                : "justify-start"
+                                        }`}
+
+                                    >
+
+
+                                        <div
+
+                                            className={`w-fit max-w-[75%] break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                                                isMyMessage
+
+                                                    ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
+
+                                                    : "rounded-bl-sm border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
+                                            }`}
+
+                                        >
+
+                                            {
+                                                msg.text
+                                            }
+
+                                        </div>
+
+
+                                    </div>
+
+                                );
+
+                            }
+                        )
+                    }
+
+
+                    {/* AUTO-SCROLL TARGET */}
+
+                    <div
+                        ref={
+                            messagesEndRef
+                        }
+                    />
+
+
+                </div>
+
 
             </div>
 
+
             {/* SEND MESSAGE */}
+
             <div className="mt-5 flex items-end gap-3">
+
 
                 <textarea
 
@@ -271,8 +473,12 @@ const Chat = () => {
                     ) => {
 
                         if (
-                            event.key === "Enter" &&
+
+                            event.key ===
+                            "Enter" &&
+
                             !event.shiftKey
+
                         ) {
 
                             event.preventDefault();
@@ -287,11 +493,13 @@ const Chat = () => {
 
                     rows="1"
 
-                    className="max-h-[120px] min-h-12 flex-1 resize-none overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-5 py-3 text-sm text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50"
+                    className="scrollbar-aetherion max-h-[120px] min-h-12 flex-1 resize-none overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-5 py-3 text-sm text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50"
 
                 />
 
+
                 {/* SEND BUTTON */}
+
                 <button
 
                     type="button"
@@ -307,17 +515,20 @@ const Chat = () => {
                 >
 
                     <FaPaperPlane
-                        className="ml-0.5 text-1xl"
+                        className="ml-0.5 text-xl"
                     />
 
                 </button>
 
+
             </div>
+
 
         </div>
 
     );
 
 };
+
 
 export default Chat;
