@@ -18,3 +18,22 @@ body,
 body {
     font-family: Georgia, "Times New Roman", serif;
 }
+
+/* AETHERION SCROLLBAR */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080d09;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c6da6e;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cfe377;
+}

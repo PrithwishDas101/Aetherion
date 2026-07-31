@@ -9,11 +9,14 @@ export const createChat = async (req, res) => {
         const chat = new Chat(req.body);
         const savedChat = await chat.save();
 
+        await savedChat.populate("members");
+
         res.status(201).send({
             success: true,
-            message: "Chat created succesfully!",
+            message: "Chat created successfully!",
             data: savedChat
-        })
+        });
+        
     } catch (error) {
         console.error("Create chat error:", error);
 
@@ -27,11 +30,14 @@ export const createChat = async (req, res) => {
 // GET ALL CHATS OF LOGGED-IN USER
 export const getAllChats = async (req, res) => {
     try {
-        const chats = await Chat.find({
-            members: {
-                $in: [req.user.userId],
-            },
-        });
+        const chats = await Chat.
+            find({
+                members: {
+                    $in: [req.user.userId],
+                },
+            }).
+            populate('members').
+            sort({ updatedAt: -1 });
 
         return res.status(200).send({
             success: true,

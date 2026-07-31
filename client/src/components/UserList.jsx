@@ -10,11 +10,17 @@ import {
 
 import {
     setAllChats,
-} from "../redux/userSlice.js"; 
+    setSelectedChat,
+} from "../redux/userSlice.js";
 
 function UserList({ searchKey }) {
 
-    const { allUsers, allChats, user: currentUser } = useSelector(
+    const {
+        allUsers,
+        allChats,
+        user: currentUser,
+        selectedChat,
+    } = useSelector(
         state => state.userReducer
     );
 
@@ -51,6 +57,12 @@ function UserList({ searchKey }) {
                     )
                 );
 
+                dispatch(
+                    setSelectedChat(
+                        newChat
+                    )
+                );
+
             } else {
 
                 toast.error(
@@ -73,7 +85,37 @@ function UserList({ searchKey }) {
 
     };
 
+    const openChat = (selectedUserId) => {
+
+        const chat = allChats?.find(
+            chat =>
+                chat.members
+                    .map(m => m._id)
+                    .includes(
+                        currentUser._id
+                    ) &&
+
+                chat.members
+                    .map(m => m._id)
+                    .includes(
+                        selectedUserId
+                    )
+        );
+
+        if (chat) {
+
+            dispatch(
+                setSelectedChat(
+                    chat
+                )
+            );
+
+        }
+
+    };
+
     return (
+
         <div>
 
             {allUsers
@@ -97,24 +139,51 @@ function UserList({ searchKey }) {
 
                         allChats?.some(
                             chat =>
-                                chat.members.includes(
-                                    user._id
-                                )
+                                chat.members
+                                    .map(m => m._id)
+                                    .includes(
+                                        user._id
+                                    )
                         );
 
                     return (
-                        matchesSearch &&
-                        searchKey
-                    ) || alreadyHasChat;
 
-                }).
-                map(user => {
+                        (
+                            matchesSearch &&
+                            searchKey
+                        ) ||
+
+                        alreadyHasChat
+
+                    );
+
+                })
+                .map(user => {
+
+                    const isSelected =
+
+                        selectedChat?.members.some(
+                            member =>
+                                member._id ===
+                                user._id
+                        );
+
+                    const userClass = isSelected
+
+                        ? "border-l-[3px] border-l-[#d8f45a] bg-[#182018] shadow-[inset_0_0_18px_rgba(216,244,90,0.035)]"
+
+                        : "border-l-[3px] border-l-transparent hover:bg-[#101710]";
 
                     return (
 
                         <div
                             key={user._id}
-                            className="cursor-pointer border-b border-[#d8f45a]/10 px-3 py-4 transition hover:bg-[#d8f45a]/5"
+                            onClick={() =>
+                                openChat(
+                                    user._id
+                                )
+                            }
+                            className={`group relative cursor-pointer border-b border-[#d8f45a]/10 px-3 py-4 transition-all duration-200 ${userClass}`}
                         >
 
                             <div className="flex items-center gap-3">
@@ -123,7 +192,9 @@ function UserList({ searchKey }) {
                                 {user.profilePic && (
 
                                     <img
-                                        src={user.profilePic}
+                                        src={
+                                            user.profilePic
+                                        }
                                         alt="Profile Pic"
                                         className="h-12 w-12 shrink-0 rounded-full bg-[#cacfb4] object-cover"
                                     />
@@ -151,7 +222,14 @@ function UserList({ searchKey }) {
                                 {/* User details */}
                                 <div className="min-w-0 flex-1">
 
-                                    <div className="truncate text-sm font-semibold text-[#f1eee8]">
+                                    <div
+                                        className={`truncate text-sm font-semibold transition-colors ${isSelected
+
+                                                ? "text-[#f7f7d0]"
+
+                                                : "text-[#f1eee8]"
+                                            }`}
+                                    >
 
                                         {
                                             user.firstName +
@@ -161,7 +239,14 @@ function UserList({ searchKey }) {
 
                                     </div>
 
-                                    <div className="mt-1 truncate text-xs text-[#858d84]">
+                                    <div
+                                        className={`mt-1 truncate text-xs transition-colors ${isSelected
+
+                                                ? "text-[#b4bcae]"
+
+                                                : "text-[#858d84]"
+                                            }`}
+                                    >
 
                                         {
                                             user.email
@@ -175,17 +260,33 @@ function UserList({ searchKey }) {
                                 {
                                     !allChats?.find(
                                         chat =>
-                                            chat.members.includes(
-                                                user._id
-                                            )
+                                            chat.members
+                                                .map(
+                                                    m => m._id
+                                                )
+                                                .includes(
+                                                    user._id
+                                                )
                                     ) && (
 
                                         <button
                                             type="button"
-                                            className="shrink-0 rounded-lg bg-[#d8f45a] px-3 py-2 text-xs font-semibold text-[#10120d]"
-                                            onClick={() => startNewChat(user._id)}
+                                            className="shrink-0 rounded-lg bg-[#d8f45a] px-3 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e4ff6c]"
+                                            onClick={
+                                                event => {
+
+                                                    event.stopPropagation();
+
+                                                    startNewChat(
+                                                        user._id
+                                                    );
+
+                                                }
+                                            }
                                         >
+
                                             Start Chat
+
                                         </button>
 
                                     )
@@ -200,7 +301,9 @@ function UserList({ searchKey }) {
                 })}
 
         </div>
+
     );
+
 }
 
 export default UserList;

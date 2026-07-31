@@ -1,22 +1,40 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
 import Header from "../components/Header.jsx";
 import Sidebar from "../components/SideBar.jsx";
+import Chat from "../components/Chat.jsx";
 
 const Home = () => {
-  return (
-    <div className="flex min-h-screen flex-col bg-[#080d09]">
-      <Header />
-      <div className="m-[10px] flex w-[90%] flex-1 p-[10px]">
 
-        < Sidebar />
-        
-        {/* CHAT AREA LAYOUT */}
+    const { selectedChat } = useSelector(
+        state => state.userReducer
+    );
 
-      </div>
+    return (
 
-    </div>
-  );
+        <div className="flex h-screen flex-col overflow-hidden bg-[#080d09]">
+
+            <Header />
+
+            <div className="flex min-h-0 flex-1 gap-5 px-5 py-[10px]">
+
+                {/* LEFT SIDE */}
+                <Sidebar />
+
+                {/* RIGHT SIDE — FIXED */}
+                <div className="min-h-0 flex-1 overflow-hidden">
+
+                    {selectedChat && <Chat />}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
+
 };
 
 export default Home;

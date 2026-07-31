@@ -4,22 +4,31 @@ import Search from "./Search.jsx";
 import UserList from "./UserList.jsx";
 
 function Sidebar() {
-    const [searchKey, setSearchKey] = useState("");
+
+    const [searchKey, setSearchKey] =
+        useState("");
 
     return (
-        <div className="w-[30%] min-w-[320px] px-5">
+
+        <div className="flex min-h-0 w-[30%] min-w-[320px] flex-col overflow-hidden">
 
             <Search
                 searchKey={searchKey}
                 setSearchKey={setSearchKey}
             />
 
-            <UserList
-                searchKey={searchKey}
-            />
+            <div className="min-h-0 flex-1 overflow-y-auto">
+
+                <UserList
+                    searchKey={searchKey}
+                />
+
+            </div>
 
         </div>
+
     );
+
 }
 
 export default Sidebar;
