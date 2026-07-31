@@ -1,10 +1,77 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
+
+import { createChat } from "../apiCalls/chatApi.js";
+
+import {
+    hideLoader,
+    showLoader,
+} from "../redux/sliceLoader.js";
+
+import {
+    setAllChats,
+} from "../redux/userSlice.js"; 
 
 function UserList({ searchKey }) {
 
-    const { allUsers, allChats } = useSelector(
+    const { allUsers, allChats, user: currentUser } = useSelector(
         state => state.userReducer
     );
+
+    const dispatch = useDispatch();
+
+    const startNewChat = async (searchedUserId) => {
+
+        try {
+
+            dispatch(showLoader());
+
+            const response = await createChat([
+                currentUser._id,
+                searchedUserId,
+            ]);
+
+            if (response.success) {
+
+                toast.success(
+                    response.message
+                );
+
+                const newChat =
+                    response.data;
+
+                const updatedChats = [
+                    ...(allChats || []),
+                    newChat,
+                ];
+
+                dispatch(
+                    setAllChats(
+                        updatedChats
+                    )
+                );
+
+            } else {
+
+                toast.error(
+                    response.message
+                );
+
+            }
+
+        } catch (error) {
+
+            toast.error(
+                "Unable to create chat."
+            );
+
+        } finally {
+
+            dispatch(hideLoader());
+
+        }
+
+    };
 
     return (
         <div>
@@ -116,6 +183,7 @@ function UserList({ searchKey }) {
                                         <button
                                             type="button"
                                             className="shrink-0 rounded-lg bg-[#d8f45a] px-3 py-2 text-xs font-semibold text-[#10120d]"
+                                            onClick={() => startNewChat(user._id)}
                                         >
                                             Start Chat
                                         </button>

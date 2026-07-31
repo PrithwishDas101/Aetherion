@@ -1,12 +1,12 @@
 import { axiosInstance } from "./index.js";
 
 // CREATE CHAT
-export const createChat = async (userId) => {
+export const createChat = async (members) => {
     try {
         const response = await axiosInstance.post(
-            "/api/v1/chat/create-chat",
+            "/api/v1/chat/create",
             {
-                userId,
+                members,
             }
         );
 
