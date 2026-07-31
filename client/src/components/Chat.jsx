@@ -1,10 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useRef, useState } from "react";
+import {
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { FaPaperPlane } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-import { createMessage } from "../apiCalls/messageApi.js";
+import {
+    createMessage,
+    getAllMessages,
+} from "../apiCalls/messageApi.js";
 
 import {
     showLoader,
@@ -36,6 +43,8 @@ const Chat = () => {
 
     const messageInputRef =
         useRef(null);
+
+    const [allMessages, setAllMessages] = useState([]);
 
     const handleMessageChange = (
         event
@@ -130,6 +139,65 @@ const Chat = () => {
         }
 
     };
+
+    const getMessages = async () => {
+
+        try {
+
+            dispatch(
+                showLoader()
+            );
+
+            const response =
+                await getAllMessages(
+                    selectedChat._id
+                );
+
+            if (response?.success) {
+
+                setAllMessages(
+                    response.data || []
+                );
+
+            } else {
+
+                toast.error(
+                    response?.message ||
+                    "Unable to fetch messages."
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Get messages error:",
+                error
+            );
+
+            toast.error(
+                "Unable to fetch messages."
+            );
+
+        } finally {
+
+            dispatch(
+                hideLoader()
+            );
+
+        }
+
+    };
+
+    useEffect(() => {
+
+        if (selectedChat?._id) {
+
+            getMessages();
+
+        }
+
+    }, [selectedChat?._id]);
 
     return (
 
