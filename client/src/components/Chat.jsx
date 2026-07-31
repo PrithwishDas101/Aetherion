@@ -69,11 +69,8 @@ const Chat = () => {
 
             const messageData = {
 
-                chat:
+                chatId:
                     selectedChat._id,
-
-                sender:
-                    user._id,
 
                 text:
                     message.trim(),
@@ -185,7 +182,7 @@ const Chat = () => {
             </div>
 
             {/* SEND MESSAGE */}
-            <div className="relative mt-5">
+            <div className="mt-5 flex items-end gap-3">
 
                 <textarea
 
@@ -206,12 +203,8 @@ const Chat = () => {
                     ) => {
 
                         if (
-
-                            event.key ===
-                            "Enter" &&
-
+                            event.key === "Enter" &&
                             !event.shiftKey
-
                         ) {
 
                             event.preventDefault();
@@ -226,7 +219,7 @@ const Chat = () => {
 
                     rows="1"
 
-                    className="max-h-[120px] min-h-12 w-full resize-none overflow-y-auto rounded-xl border border-[#d8f45a]/15 bg-[#080d09] py-3 pl-5 pr-14 text-sm text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50"
+                    className="max-h-[120px] min-h-12 flex-1 resize-none overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-5 py-3 text-sm text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50"
 
                 />
 
@@ -239,14 +232,14 @@ const Chat = () => {
                         sendMessage
                     }
 
-                    className="absolute right-2 bottom-1.5 flex h-9 w-9 items-center justify-center rounded-lg text-[#d8f45a] transition hover:bg-[#d8f45a]/10"
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95"
 
                     aria-label="Send message"
 
                 >
 
                     <FaPaperPlane
-                        className="text-lg"
+                        className="ml-0.5 text-1xl"
                     />
 
                 </button>
