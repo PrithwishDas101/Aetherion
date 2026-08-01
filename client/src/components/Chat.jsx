@@ -1,13 +1,21 @@
-import { useDispatch, useSelector } from "react-redux";
-
 import {
     useEffect,
     useRef,
     useState,
 } from "react";
 
-import { FiArrowLeft } from "react-icons/fi";
-import { FaPaperPlane } from "react-icons/fa";
+import {
+    useDispatch,
+    useSelector,
+} from "react-redux";
+
+import {
+    FiArrowLeft,
+} from "react-icons/fi";
+
+import {
+    FaPaperPlane,
+} from "react-icons/fa";
 
 import toast from "react-hot-toast";
 
@@ -25,6 +33,14 @@ import {
     setSelectedChat,
 } from "../redux/userSlice.js";
 
+import {
+    formatDateLabel,
+    shouldShowDateSeparator,
+} from "../utils/messageDate.js";
+
+import MessageBubble from "./MessageBubble.jsx";
+import DateSeparator from "./DateSeparator.jsx";
+
 
 const Chat = () => {
 
@@ -37,31 +53,29 @@ const Chat = () => {
         state => state.userReducer
     );
 
-
-    const selectedUser =
-        selectedChat.members.find(
-            u => u._id !== user._id
-        );
-
-
     const [
         message,
         setMessage,
     ] = useState("");
-
 
     const [
         allMessages,
         setAllMessages,
     ] = useState([]);
 
-
     const messageInputRef =
         useRef(null);
 
-
     const messagesEndRef =
         useRef(null);
+
+
+    const selectedUser =
+        selectedChat?.members?.find(
+            member =>
+                String(member._id) !==
+                String(user._id)
+        );
 
 
     const handleMessageChange = (
@@ -72,14 +86,11 @@ const Chat = () => {
             event.target.value
         );
 
-
         const textarea =
             event.target;
 
-
         textarea.style.height =
             "auto";
-
 
         textarea.style.height =
             `${Math.min(
@@ -95,32 +106,25 @@ const Chat = () => {
         const messageText =
             message.trim();
 
-
         if (!messageText) {
             return;
         }
 
-
         try {
 
-            const messageData = {
-
-                chatId:
-                    selectedChat._id,
-
-                text:
-                    messageText,
-
-            };
-
-
             const response =
-                await createMessage(
-                    messageData
-                );
+                await createMessage({
+                    chatId:
+                        selectedChat._id,
+
+                    text:
+                        messageText,
+                });
 
 
-            if (response?.success) {
+            if (
+                response?.success
+            ) {
 
                 setAllMessages(
                     previousMessages => [
@@ -166,7 +170,6 @@ const Chat = () => {
                 error
             );
 
-
             toast.error(
 
                 error.response
@@ -184,12 +187,17 @@ const Chat = () => {
 
     const getMessages = async () => {
 
+        if (
+            !selectedChat?._id
+        ) {
+            return;
+        }
+
         try {
 
             dispatch(
                 showLoader()
             );
-
 
             const response =
                 await getAllMessages(
@@ -202,9 +210,7 @@ const Chat = () => {
             ) {
 
                 setAllMessages(
-
                     response.data || []
-
                 );
 
             } else {
@@ -226,7 +232,6 @@ const Chat = () => {
                 error
             );
 
-
             toast.error(
                 "Unable to fetch messages."
             );
@@ -242,26 +247,14 @@ const Chat = () => {
     };
 
 
-    /* FETCH MESSAGES
-    WHEN CHAT CHANGES */
-
     useEffect(() => {
 
-        if (
-            selectedChat?._id
-        ) {
-
-            getMessages();
-
-        }
+        getMessages();
 
     }, [
         selectedChat?._id
     ]);
 
-
-    /* AUTO-SCROLL TO
-    THE NEWEST MESSAGE */
 
     useEffect(() => {
 
@@ -282,14 +275,21 @@ const Chat = () => {
     ]);
 
 
+    if (
+        !selectedChat
+    ) {
+        return null;
+    }
+
+
     return (
 
-        <div className="flex h-full flex-col rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-8 py-5">
+        <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
 
 
-            {/* RECEIVER DATA */}
+            {/* CHAT HEADER */}
 
-            <div className="mb-5 flex items-center border-b border-[#d8f45a]/15 px-7 py-3">
+            <div className="mb-4 flex shrink-0 items-center border-b border-[#d8f45a]/15 px-2 py-3 sm:mb-5 sm:px-4">
 
 
                 {/* MOBILE BACK BUTTON */}
@@ -308,7 +308,7 @@ const Chat = () => {
 
                     }
 
-                    className="mr-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#f9fbf2] transition hover:bg-[#d8f45a]/10 md:hidden"
+                    className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#f9fbf2] transition hover:bg-[#d8f45a]/10 md:hidden"
 
                     aria-label="Back to chats"
 
@@ -323,13 +323,19 @@ const Chat = () => {
 
                 {/* SELECTED USER */}
 
-                <div className="flex-1 text-right font-bold text-[#edefe5]">
+                <div className="min-w-0 flex-1 text-right font-bold text-[#edefe5]">
 
-                    {
-                        selectedUser.firstName +
-                        " " +
-                        selectedUser.lastName
-                    }
+                    <span className="truncate">
+
+                        {
+                            selectedUser
+
+                                ? `${selectedUser.firstName} ${selectedUser.lastName}`
+
+                                : "Chat"
+                        }
+
+                    </span>
 
                 </div>
 
@@ -337,18 +343,18 @@ const Chat = () => {
             </div>
 
 
-            {/* CHAT AREA */}
+            {/* CHAT MESSAGES */}
 
-            <div className="scrollbar-aetherion flex-1 overflow-y-auto px-2 py-3">
+            <div className="scrollbar-aetherion min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2">
 
 
-                <div className="flex flex-col gap-2">
+                <div className="flex min-h-full min-w-0 flex-col gap-2">
 
 
                     {
                         allMessages.length === 0 && (
 
-                            <div className="flex h-full items-center justify-center">
+                            <div className="flex flex-1 items-center justify-center">
 
                                 <p className="text-sm text-[#70786f]">
 
@@ -364,16 +370,29 @@ const Chat = () => {
 
                     {
                         allMessages.map(
-                            msg => {
+                            (
+                                currentMessage,
+                                index
+                            ) => {
+
+                                const previousMessage =
+
+                                    allMessages[
+                                        index - 1
+                                    ];
+
 
                                 const senderId =
 
-                                    typeof msg.sender ===
+                                    typeof currentMessage.sender ===
                                     "object"
 
-                                        ? msg.sender._id
+                                        ? currentMessage
+                                            .sender
+                                            ?._id
 
-                                        : msg.sender;
+                                        : currentMessage
+                                            .sender;
 
 
                                 const isMyMessage =
@@ -387,42 +406,57 @@ const Chat = () => {
                                     );
 
 
+                                const showDate =
+
+                                    shouldShowDateSeparator(
+
+                                        currentMessage,
+
+                                        previousMessage
+
+                                    );
+
+
                                 return (
 
                                     <div
-
                                         key={
-                                            msg._id
+                                            currentMessage._id
                                         }
-
-                                        className={`flex ${
-                                            isMyMessage
-
-                                                ? "justify-end"
-
-                                                : "justify-start"
-                                        }`}
-
                                     >
 
 
-                                        <div
+                                        {
+                                            showDate && (
 
-                                            className={`w-fit max-w-[75%] break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                                                isMyMessage
+                                                <DateSeparator
 
-                                                    ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
+                                                    label={
+                                                        formatDateLabel(
 
-                                                    : "rounded-bl-sm border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
-                                            }`}
+                                                            currentMessage
+                                                                .createdAt
 
-                                        >
+                                                        )
+                                                    }
 
-                                            {
-                                                msg.text
+                                                />
+
+                                            )
+                                        }
+
+
+                                        <MessageBubble
+
+                                            message={
+                                                currentMessage
                                             }
 
-                                        </div>
+                                            isMyMessage={
+                                                isMyMessage
+                                            }
+
+                                        />
 
 
                                     </div>
@@ -449,9 +483,9 @@ const Chat = () => {
             </div>
 
 
-            {/* SEND MESSAGE */}
+            {/* MESSAGE INPUT */}
 
-            <div className="mt-5 flex items-end gap-3">
+            <div className="mt-4 flex shrink-0 items-end gap-2 sm:mt-5 sm:gap-3">
 
 
                 <textarea
@@ -493,7 +527,7 @@ const Chat = () => {
 
                     rows="1"
 
-                    className="scrollbar-aetherion max-h-[120px] min-h-12 flex-1 resize-none overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-5 py-3 text-sm text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50"
+                    className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-4 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50 sm:px-5"
 
                 />
 
