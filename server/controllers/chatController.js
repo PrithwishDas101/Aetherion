@@ -4,31 +4,115 @@ import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 
 
-// CREATE OR GET ONE-TO-ONE CHAT
-
+// CREATE ONE-TO-ONE CHAT
 export const createChat = async (req, res) => {
 
     try {
 
-        const chat = new Chat(
-            req.body
-        );
+        const {
+            members,
+        } = req.body;
 
-        const savedChat = await chat.save();
 
-        await savedChat.populate(
+        if (
+            !Array.isArray(members) ||
+            members.length !== 2
+        ) {
+
+            return res.status(400).json({
+
+                success:
+                    false,
+
+                message:
+                    "A chat must have exactly two members.",
+
+            });
+
+        }
+
+
+        const existingChat =
+            await Chat.findOne({
+
+                members: {
+                    $all:
+                        members,
+                },
+
+                $expr: {
+                    $eq: [
+                        {
+                            $size:
+                                "$members",
+                        },
+                        2,
+                    ],
+                },
+
+            })
+                .populate(
+                    "members"
+                )
+                .populate(
+                    "lastMessage"
+                );
+
+
+        if (existingChat) {
+
+            return res.status(200).json({
+
+                success:
+                    true,
+
+                message:
+                    "Chat already exists.",
+
+                data:
+                    existingChat,
+
+            });
+
+        }
+
+
+        const unreadMessageCount = {
+
+            [String(members[0])]:
+                0,
+
+            [String(members[1])]:
+                0,
+
+        };
+
+
+        const chat =
+            await Chat.create({
+
+                members,
+
+                unreadMessageCount,
+
+            });
+
+
+        await chat.populate(
             "members"
         );
 
-        return res.status(201).send({
 
-            success: true,
+        return res.status(201).json({
+
+            success:
+                true,
 
             message:
                 "Chat created successfully!",
 
             data:
-                savedChat,
+                chat,
 
         });
 
@@ -41,7 +125,8 @@ export const createChat = async (req, res) => {
 
         return res.status(500).json({
 
-            success: false,
+            success:
+                false,
 
             message:
                 "Internal server error",
@@ -54,17 +139,10 @@ export const createChat = async (req, res) => {
 
 
 // GET ALL CHATS OF LOGGED-IN USER
-
-export const getAllChats = async (
-    req,
-    res
-) => {
-
+export const getAllChats = async (req, res) => {
     try {
-
-        const chats = await Chat
-
-            .find({
+        const chats =
+            await Chat.find({
 
                 members: {
 
@@ -75,26 +153,24 @@ export const getAllChats = async (
                 },
 
             })
+                .populate(
+                    "members"
+                )
+                .populate(
+                    "lastMessage"
+                )
+                .sort({
 
-            .populate(
-                "members"
-            )
+                    updatedAt:
+                        -1,
 
-            .populate(
-                "lastMessage"
-            )
-
-            .sort({
-
-                updatedAt:
-                    -1,
-
-            });
+                });
 
 
-        return res.status(200).send({
+        return res.status(200).json({
 
-            success: true,
+            success:
+                true,
 
             message:
                 "Chats fetched successfully!",
@@ -113,7 +189,8 @@ export const getAllChats = async (
 
         return res.status(500).json({
 
-            success: false,
+            success:
+                false,
 
             message:
                 "Internal server error",
@@ -125,174 +202,86 @@ export const getAllChats = async (
 };
 
 
-// CLEAR UNREAD MESSAGES
-
-export const clearUnreadMessages = async (
-    req,
-    res
-) => {
-
+// CLEAR LOGGED-IN USER'S UNREAD MESSAGES
+export const clearUnreadMessages = async (req, res) => {
     try {
+        const { chatId } = req.body;
 
-        const {
-            chatId,
-        } = req.body;
-
-
-        if (
-            !chatId
-        ) {
-
+        if (!chatId) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Chat ID is required.",
-
+                message: "Chat ID is required.",
             });
-
         }
-
 
         if (
             !mongoose.Types.ObjectId.isValid(
                 chatId
             )
         ) {
-
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Invalid chat ID.",
-
+                message: "Invalid chat ID.",
             });
-
         }
-
 
         const chat = await Chat.findOne({
-
-            _id:
-                chatId,
-
-            members:
-                req.user.userId,
-
+            _id: chatId,
+            members: req.user.userId,
         });
 
-
-        if (
-            !chat
-        ) {
-
+        if (!chat) {
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Chat not found.",
-
+                message: "Chat not found.",
             });
-
         }
 
-
-        const updatedChat =
-            await Chat
-
-                .findByIdAndUpdate(
-
-                    chatId,
-
-                    {
-
-                        unreadMessageCount:
-                            0,
-
-                    },
-
-                    {
-
-                        new:
-                            true,
-
-                    }
-
-                )
-
-                .populate(
-                    "members"
-                )
-
-                .populate(
-                    "lastMessage"
-                );
-
-
         await Message.updateMany(
-
             {
-
-                chatId:
-                    chatId,
-
-                read:
-                    false,
-
+                chatId,
                 sender: {
-
-                    $ne:
-                        req.user.userId,
-
+                    $ne: req.user.userId,
                 },
-
+                read: false,
             },
-
             {
-
                 $set: {
-
-                    read:
-                        true,
-
+                    read: true,
                 },
-
             }
-
         );
 
+        const updatedChat = await Chat
+            .findByIdAndUpdate(
+                chatId,
+                {
+                    $set: {
+                        unreadMessageCount: 0,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+            .populate("members")
+            .populate("lastMessage");
 
         return res.status(200).json({
-
             success: true,
-
             message:
                 "Unread messages cleared successfully.",
-
-            data:
-                updatedChat,
-
+            data: updatedChat,
         });
-
     } catch (error) {
-
         console.error(
             "Clear unread messages error:",
             error
         );
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Internal server error",
-
+            message: error.message,
         });
-
     }
-
 };

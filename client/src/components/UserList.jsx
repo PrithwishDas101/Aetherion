@@ -38,16 +38,8 @@ function UserList({ searchKey }) {
     const dispatch = useDispatch();
 
 
-    /*
-    WAIT UNTIL THE
-    LOGGED-IN USER
-    IS AVAILABLE
-    */
-
     if (!currentUser?._id) {
-
         return null;
-
     }
 
 
@@ -61,26 +53,20 @@ function UserList({ searchKey }) {
                 showLoader()
             );
 
-
             const response =
                 await createChat([
                     currentUser._id,
                     searchedUserId,
                 ]);
 
-
-            if (
-                response?.success
-            ) {
-
-                toast.success(
-                    response.message
-                );
-
+            if (response?.success) {
 
                 const newChat =
                     response.data;
 
+                toast.success(
+                    response.message
+                );
 
                 dispatch(
                     setAllChats([
@@ -88,7 +74,6 @@ function UserList({ searchKey }) {
                         newChat,
                     ])
                 );
-
 
                 dispatch(
                     setSelectedChat(
@@ -99,11 +84,8 @@ function UserList({ searchKey }) {
             } else {
 
                 toast.error(
-
                     response?.message ||
-
                     "Unable to create chat."
-
                 );
 
             }
@@ -114,7 +96,6 @@ function UserList({ searchKey }) {
                 "Create chat error:",
                 error
             );
-
 
             toast.error(
                 "Unable to create chat."
@@ -141,35 +122,26 @@ function UserList({ searchKey }) {
             chat => {
 
                 const memberIds =
-
-                    (
-                        chat.members || []
-                    )
-                        .filter(
-                            Boolean
-                        )
+                    (chat.members || [])
+                        .filter(Boolean)
                         .map(
                             member =>
                                 String(
-                                    member._id
+                                    member?._id
                                 )
                         );
 
-
                 return (
-
                     memberIds.includes(
                         String(
                             currentUser._id
                         )
                     ) &&
-
                     memberIds.includes(
                         String(
                             userId
                         )
                     )
-
                 );
 
             }
@@ -183,11 +155,9 @@ function UserList({ searchKey }) {
     ) => {
 
         const chat =
-
             findChatWithUser(
                 selectedUserId
             );
-
 
         if (chat) {
 
@@ -212,82 +182,58 @@ function UserList({ searchKey }) {
                     .filter(
                         user => {
 
-                            /*
-                            DO NOT SHOW THE
-                            CURRENT USER
-                            */
-
                             if (
-
                                 String(
                                     user?._id
                                 ) ===
-
                                 String(
                                     currentUser._id
                                 )
-
                             ) {
-
                                 return false;
-
                             }
 
-
                             const searchValue =
-
                                 (
                                     searchKey || ""
                                 )
                                     .toLowerCase();
 
+                            const firstName =
+                                user?.firstName ||
+                                "";
+
+                            const lastName =
+                                user?.lastName ||
+                                "";
 
                             const matchesSearch =
-
-                                (
-                                    user?.firstName ||
-                                    ""
-                                )
+                                firstName
                                     .toLowerCase()
                                     .includes(
                                         searchValue
                                     ) ||
-
-                                (
-                                    user?.lastName ||
-                                    ""
-                                )
+                                lastName
                                     .toLowerCase()
                                     .includes(
                                         searchValue
                                     );
 
-
                             const alreadyHasChat =
-
                                 Boolean(
-
                                     findChatWithUser(
                                         user._id
                                     )
-
                                 );
 
-
                             return (
-
                                 (
-
                                     Boolean(
                                         searchValue
                                     ) &&
-
                                     matchesSearch
-
                                 ) ||
-
                                 alreadyHasChat
-
                             );
 
                         }
@@ -296,47 +242,72 @@ function UserList({ searchKey }) {
                     .map(
                         user => {
 
-
                             const userChat =
-
                                 findChatWithUser(
                                     user._id
                                 );
 
-
                             const lastMessage =
-
                                 userChat
                                     ?.lastMessage
                                     ?.text ||
-
                                 "";
 
-
                             const lastMessageTime =
-
                                 formatChatPreviewTime(
-
                                     userChat
                                         ?.lastMessage
                                         ?.createdAt
-
                                 );
 
+                            const lastMessageSenderId =
+                                typeof userChat
+                                    ?.lastMessage
+                                    ?.sender ===
+                                "object"
+
+                                    ? userChat
+                                        ?.lastMessage
+                                        ?.sender
+                                        ?._id
+
+                                    : userChat
+                                        ?.lastMessage
+                                        ?.sender;
+
+                            /*
+                            SHOW UNREAD COUNT
+                            ONLY TO THE RECEIVER
+
+                            THE SENDER NEVER
+                            SEES THEIR OWN
+                            UNREAD COUNT
+                            */
+
+                            const unreadCount =
+                                String(
+                                    lastMessageSenderId
+                                ) !==
+                                String(
+                                    currentUser._id
+                                )
+
+                                    ? Number(
+                                        userChat
+                                            ?.unreadMessageCount
+                                    ) || 0
+
+                                    : 0;
 
                             const isSelected =
-
                                 String(
                                     selectedChat?._id
                                 ) ===
-
                                 String(
                                     userChat?._id
                                 );
 
-
                             const userClass =
-
                                 isSelected
 
                                     ? "border-l-[3px] border-l-[#d8f45a] bg-[#182018] shadow-[inset_0_0_18px_rgba(216,244,90,0.035)]"
@@ -347,28 +318,20 @@ function UserList({ searchKey }) {
                             return (
 
                                 <div
-
                                     key={
                                         user._id
                                     }
 
                                     onClick={() =>
-
                                         openChat(
                                             user._id
                                         )
-
                                     }
 
                                     className={`group relative cursor-pointer border-b border-[#d8f45a]/10 px-3 py-4 transition-all duration-200 ${userClass}`}
-
                                 >
 
-
                                     <div className="flex items-center gap-3">
-
-
-                                        {/* AVATAR */}
 
                                         {
                                             user.profilePic
@@ -376,7 +339,6 @@ function UserList({ searchKey }) {
                                                 ? (
 
                                                     <img
-
                                                         src={
                                                             user.profilePic
                                                         }
@@ -384,7 +346,6 @@ function UserList({ searchKey }) {
                                                         alt={`${user.firstName} ${user.lastName}`}
 
                                                         className="h-12 w-12 shrink-0 rounded-full bg-[#cacfb4] object-cover"
-
                                                     />
 
                                                 )
@@ -417,26 +378,22 @@ function UserList({ searchKey }) {
                                         }
 
 
-                                        {/* USER DETAILS */}
-
                                         <div className="min-w-0 flex-1">
-
-
-                                            {/* NAME + TIME */}
 
                                             <div className="flex items-center gap-3">
 
-
                                                 <div
-
-                                                    className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${isSelected
+                                                    className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${
+                                                        isSelected
 
                                                             ? "text-[#f7f7d0]"
 
-                                                            : "text-[#f1eee8]"
+                                                            : unreadCount > 0
 
-                                                        }`}
+                                                                ? "text-[#f7f7d0]"
 
+                                                                : "text-[#f1eee8]"
+                                                    }`}
                                                 >
 
                                                     {
@@ -445,20 +402,22 @@ function UserList({ searchKey }) {
 
                                                 </div>
 
-
                                                 {
                                                     lastMessageTime && (
 
                                                         <span
+                                                            className={`shrink-0 text-[10px] font-medium transition-colors ${
+                                                                unreadCount > 0 &&
+                                                                !isSelected
 
-                                                            className={`shrink-0 text-[10px] font-medium transition-colors ${isSelected
+                                                                    ? "text-[#d8f45a]"
 
-                                                                    ? "text-[#c8d17c]"
+                                                                    : isSelected
 
-                                                                    : "text-[#7f8a7c]"
+                                                                        ? "text-[#c8d17c]"
 
-                                                                }`}
-
+                                                                        : "text-[#7f8a7c]"
+                                                            }`}
                                                         >
 
                                                             {
@@ -470,53 +429,70 @@ function UserList({ searchKey }) {
                                                     )
                                                 }
 
-
                                             </div>
 
 
-                                            {/* LAST MESSAGE OR EMAIL */}
+                                            <div className="mt-1 flex items-center gap-2">
 
-                                            <div
+                                                <p
+                                                    className={`min-w-0 flex-1 truncate text-xs transition-colors ${
+                                                        unreadCount > 0 &&
+                                                        !isSelected
 
-                                                className={`mt-1 truncate text-xs transition-colors ${isSelected
+                                                            ? "font-semibold text-[#999999]"
 
-                                                        ? "text-[#b4bcae]"
+                                                            : isSelected
 
-                                                        : "text-[#858d84]"
+                                                                ? "text-[#b4bcae]"
 
+                                                                : "text-[#858d84]"
                                                     }`}
+                                                >
 
-                                            >
+                                                    {
+                                                        userChat
+
+                                                            ? (
+                                                                lastMessage ||
+                                                                "No messages yet."
+                                                            )
+
+                                                            : (
+                                                                user.email
+                                                            )
+                                                    }
+
+                                                </p>
+
 
                                                 {
-                                                    userChat
+                                                    unreadCount > 0 &&
+                                                    !isSelected && (
 
-                                                        ? (
+                                                        <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#f1ffb5] px-1.5 text-[10px] font-bold text-[#10120d]">
 
-                                                            lastMessage
+                                                            {
+                                                                unreadCount > 99
 
-                                                        )
+                                                                    ? "99+"
 
-                                                        : (
+                                                                    : unreadCount
+                                                            }
 
-                                                            user.email
+                                                        </span>
 
-                                                        )
+                                                    )
                                                 }
 
                                             </div>
 
-
                                         </div>
 
-
-                                        {/* START CHAT */}
 
                                         {
                                             !userChat && (
 
                                                 <button
-
                                                     type="button"
 
                                                     className="shrink-0 rounded-lg bg-[#d8f45a] px-3 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e4ff6c]"
@@ -532,7 +508,6 @@ function UserList({ searchKey }) {
 
                                                         }
                                                     }
-
                                                 >
 
                                                     Start Chat
@@ -542,9 +517,7 @@ function UserList({ searchKey }) {
                                             )
                                         }
 
-
                                     </div>
-
 
                                 </div>
 

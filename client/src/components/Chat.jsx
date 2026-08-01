@@ -1,14 +1,33 @@
-import { useEffect, useRef, useState, } from "react";
-import { useDispatch, useSelector, } from "react-redux";
-import { FiArrowLeft, } from "react-icons/fi";
-import { FaPaperPlane, } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { FiArrowLeft } from "react-icons/fi";
+import { FaPaperPlane } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-import { createMessage, getAllMessages } from "../apiCalls/messageApi.js";
-import { clearUnreadMessage } from "../apiCalls/chatApi.js"
-import { showLoader, hideLoader, } from "../redux/sliceLoader.js";
-import { setAllChats, setSelectedChat, } from "../redux/userSlice.js";
-import { formatDateLabel, shouldShowDateSeparator, } from "../utils/messageDate.js";
+import {
+    createMessage,
+    getAllMessages,
+} from "../apiCalls/messageApi.js";
+
+import {
+    clearUnreadMessage,
+} from "../apiCalls/chatApi.js";
+
+import {
+    showLoader,
+    hideLoader,
+} from "../redux/sliceLoader.js";
+
+import {
+    setAllChats,
+    setSelectedChat,
+} from "../redux/userSlice.js";
+
+import {
+    formatDateLabel,
+    shouldShowDateSeparator,
+} from "../utils/messageDate.js";
+
 import MessageBubble from "./MessageBubble.jsx";
 import DateSeparator from "./DateSeparator.jsx";
 
@@ -24,15 +43,11 @@ const Chat = () => {
         state => state.userReducer
     );
 
-    const [
-        message,
-        setMessage,
-    ] = useState("");
+    const [message, setMessage] =
+        useState("");
 
-    const [
-        allMessages,
-        setAllMessages,
-    ] = useState([]);
+    const [allMessages, setAllMessages] =
+        useState([]);
 
     const messageInputRef =
         useRef(null);
@@ -46,6 +61,9 @@ const Chat = () => {
                 String(member._id) !==
                 String(user._id)
         );
+
+    const unreadMessageCount =
+        selectedChat?.unreadMessageCount || 0;
 
     const handleMessageChange = event => {
 
@@ -102,8 +120,7 @@ const Chat = () => {
                     messageInputRef.current
                 ) {
 
-                    messageInputRef
-                        .current
+                    messageInputRef.current
                         .style.height =
                         "48px";
 
@@ -191,7 +208,10 @@ const Chat = () => {
 
     const clearUnreadMessages = async () => {
 
-        if (!selectedChat?._id) {
+        if (
+            !selectedChat?._id ||
+            unreadMessageCount === 0
+        ) {
             return;
         }
 
@@ -202,39 +222,40 @@ const Chat = () => {
                     selectedChat._id
                 );
 
-            if (response?.success) {
-
-                const updatedChats =
-                    (allChats || []).map(
-                        chat =>
-
-                            String(
-                                chat._id
-                            ) ===
-
-                                String(
-                                    selectedChat._id
-                                )
-
-                                ? response.data
-
-                                : chat
-                    );
-
-                dispatch(
-                    setAllChats(
-                        updatedChats
-                    )
-                );
-
-            } else {
+            if (!response?.success) {
 
                 console.error(
                     response?.message ||
                     "Unable to clear unread messages."
                 );
 
+                return;
+
             }
+
+            const updatedChats =
+                (allChats || []).map(
+                    chat =>
+
+                        String(chat._id) ===
+                        String(selectedChat._id)
+
+                            ? response.data
+
+                            : chat
+                );
+
+            dispatch(
+                setAllChats(
+                    updatedChats
+                )
+            );
+
+            dispatch(
+                setSelectedChat(
+                    response.data
+                )
+            );
 
         } catch (error) {
 
@@ -263,8 +284,7 @@ const Chat = () => {
 
     useEffect(() => {
 
-        messagesEndRef
-            .current
+        messagesEndRef.current
             ?.scrollIntoView({
                 behavior:
                     "smooth",
@@ -290,23 +310,16 @@ const Chat = () => {
 
                 <button
                     type="button"
-
                     onClick={() =>
                         dispatch(
-                            setSelectedChat(
-                                null
-                            )
+                            setSelectedChat(null)
                         )
                     }
-
                     className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#f9fbf2] transition hover:bg-[#d8f45a]/10 md:hidden"
-
                     aria-label="Back to chats"
                 >
 
-                    <FiArrowLeft
-                        className="text-xl"
-                    />
+                    <FiArrowLeft className="text-xl" />
 
                 </button>
 
@@ -359,13 +372,13 @@ const Chat = () => {
 
                                 const previousMessage =
                                     allMessages[
-                                    index - 1
+                                        index - 1
                                     ];
 
                                 const senderId =
 
                                     typeof currentMessage.sender ===
-                                        "object"
+                                    "object"
 
                                         ? currentMessage
                                             .sender
@@ -376,13 +389,8 @@ const Chat = () => {
 
                                 const isMyMessage =
 
-                                    String(
-                                        senderId
-                                    ) ===
-
-                                    String(
-                                        user._id
-                                    );
+                                    String(senderId) ===
+                                    String(user._id);
 
                                 const showDate =
 
@@ -403,29 +411,24 @@ const Chat = () => {
                                             showDate && (
 
                                                 <DateSeparator
-
                                                     label={
                                                         formatDateLabel(
                                                             currentMessage
                                                                 .createdAt
                                                         )
                                                     }
-
                                                 />
 
                                             )
                                         }
 
                                         <MessageBubble
-
                                             message={
                                                 currentMessage
                                             }
-
                                             isMyMessage={
                                                 isMyMessage
                                             }
-
                                         />
 
                                     </div>
@@ -437,9 +440,7 @@ const Chat = () => {
                     }
 
                     <div
-                        ref={
-                            messagesEndRef
-                        }
+                        ref={messagesEndRef}
                     />
 
                 </div>
@@ -451,65 +452,36 @@ const Chat = () => {
             <div className="mt-4 flex shrink-0 items-end gap-2 sm:mt-5 sm:gap-3">
 
                 <textarea
+                    ref={messageInputRef}
+                    value={message}
+                    onChange={handleMessageChange}
+                    onKeyDown={event => {
 
-                    ref={
-                        messageInputRef
-                    }
+                        if (
+                            event.key === "Enter" &&
+                            !event.shiftKey
+                        ) {
 
-                    value={
-                        message
-                    }
+                            event.preventDefault();
 
-                    onChange={
-                        handleMessageChange
-                    }
-
-                    onKeyDown={
-                        event => {
-
-                            if (
-
-                                event.key ===
-                                "Enter" &&
-
-                                !event.shiftKey
-
-                            ) {
-
-                                event.preventDefault();
-
-                                sendMessage();
-
-                            }
+                            sendMessage();
 
                         }
-                    }
 
+                    }}
                     placeholder="Message"
-
                     rows="1"
-
                     className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-4 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50 sm:px-5"
-
                 />
 
                 <button
-
                     type="button"
-
-                    onClick={
-                        sendMessage
-                    }
-
+                    onClick={sendMessage}
                     className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95"
-
                     aria-label="Send message"
-
                 >
 
-                    <FaPaperPlane
-                        className="ml-0.5 text-xl"
-                    />
+                    <FaPaperPlane className="ml-0.5 text-xl" />
 
                 </button>
 

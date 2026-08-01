@@ -7,19 +7,16 @@ const messageSchema = new mongoose.Schema(
             ref: "Chat",
             required: true,
         },
-
         sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-
         text: {
             type: String,
             required: true,
             trim: true,
         },
-
         read: {
             type: Boolean,
             default: false,
@@ -30,6 +27,9 @@ const messageSchema = new mongoose.Schema(
     }
 );
 
-const Message = mongoose.model("Message", messageSchema);
+const Message = mongoose.model(
+    "Message",
+    messageSchema
+);
 
 export default Message;

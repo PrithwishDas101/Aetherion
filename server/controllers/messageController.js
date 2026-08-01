@@ -3,43 +3,60 @@ import Chat from "../models/Chat.js";
 
 // SEND MESSAGE
 export const sendMessage = async (req, res) => {
-
     try {
+        const { chatId, text } = req.body;
 
-        // 1. Create message
-        const message = new Message({
-            ...req.body,
+        if (!chatId || !text?.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Chat ID and message text are required.",
+            });
+        }
+
+        const chat = await Chat.findOne({
+            _id: chatId,
+            members: req.user.userId,
+        });
+
+        if (!chat) {
+            return res.status(404).json({
+                success: false,
+                message: "Chat not found.",
+            });
+        }
+
+        const savedMessage = await Message.create({
+            chatId,
+            text: text.trim(),
             sender: req.user.userId,
+            read: false,
         });
 
-        // 2. Save message
-        const savedMessage =
-            await message.save();
-
-        // 3. Update chat
-        await Chat.findOneAndUpdate(
-            {
-                _id: req.body.chatId,
-            },
-            {
-                lastMessage:
-                    savedMessage._id,
-
-                $inc: {
-                    unreadMessageCount: 1,
+        const updatedChat = await Chat
+            .findByIdAndUpdate(
+                chatId,
+                {
+                    $set: {
+                        lastMessage: savedMessage._id,
+                    },
+                    $inc: {
+                        unreadMessageCount: 1,
+                    },
                 },
-            }
-        );
+                {
+                    new: true,
+                }
+            )
+            .populate("members")
+            .populate("lastMessage");
 
-        return res.status(201).send({
+        return res.status(201).json({
             success: true,
-            message:
-                "Message sent successfully!",
+            message: "Message sent successfully!",
             data: savedMessage,
+            chat: updatedChat,
         });
-
     } catch (error) {
-
         console.error(
             "Send message error:",
             error
@@ -47,34 +64,50 @@ export const sendMessage = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message:
-                "Internal server error",
+            message: error.message,
         });
-
     }
-
 };
 
 // GET ALL MESSAGES OF A CHAT
 export const getAllMessages = async (req, res) => {
     try {
-        const messages = await Message.find({
-            chatId: req.params.chatId,
-        }).sort({
-            createdAt: 1,
+        const { chatId } = req.params;
+
+        const chat = await Chat.findOne({
+            _id: chatId,
+            members: req.user.userId,
         });
 
-        return res.status(200).send({
+        if (!chat) {
+            return res.status(404).json({
+                success: false,
+                message: "Chat not found.",
+            });
+        }
+
+        const messages = await Message
+            .find({
+                chatId,
+            })
+            .sort({
+                createdAt: 1,
+            });
+
+        return res.status(200).json({
             success: true,
             message: "Messages fetched successfully!",
             data: messages,
         });
     } catch (error) {
-        console.error("Get all messages error:", error);
+        console.error(
+            "Get all messages error:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: "Internal server error",
+            message: error.message,
         });
     }
 };
