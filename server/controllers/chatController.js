@@ -16,7 +16,7 @@ export const createChat = async (req, res) => {
             message: "Chat created successfully!",
             data: savedChat
         });
-        
+
     } catch (error) {
         console.error("Create chat error:", error);
 
@@ -30,13 +30,14 @@ export const createChat = async (req, res) => {
 // GET ALL CHATS OF LOGGED-IN USER
 export const getAllChats = async (req, res) => {
     try {
-        const chats = await Chat.
-            find({
+        const chats = await Chat
+            .find({
                 members: {
                     $in: [req.user.userId],
                 },
             }).
             populate('members').
+            populate('lastMessage').
             sort({ updatedAt: -1 });
 
         return res.status(200).send({

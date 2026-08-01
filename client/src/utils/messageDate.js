@@ -141,3 +141,112 @@ export const shouldShowDateSeparator = (
     );
 
 };
+
+export const formatChatPreviewTime = (
+    dateValue
+) => {
+
+    if (!dateValue) {
+        return "";
+    }
+
+    const messageDate =
+        new Date(dateValue);
+
+    const currentDate =
+        new Date();
+
+
+    const isToday =
+
+        messageDate
+            .toDateString() ===
+
+        currentDate
+            .toDateString();
+
+
+    if (isToday) {
+
+        return messageDate
+            .toLocaleTimeString(
+
+                "en-US",
+
+                {
+                    hour:
+                        "numeric",
+
+                    minute:
+                        "2-digit",
+                }
+
+            );
+
+    }
+
+
+    const yesterday =
+        new Date();
+
+    yesterday.setDate(
+        currentDate.getDate() - 1
+    );
+
+
+    const isYesterday =
+
+        messageDate
+            .toDateString() ===
+
+        yesterday
+            .toDateString();
+
+
+    if (isYesterday) {
+
+        return "Yesterday";
+
+    }
+
+
+    const isCurrentYear =
+
+        messageDate.getFullYear() ===
+
+        currentDate.getFullYear();
+
+
+    return messageDate
+        .toLocaleDateString(
+
+            "en-US",
+
+            isCurrentYear
+
+                ? {
+
+                    month:
+                        "short",
+
+                    day:
+                        "numeric",
+
+                }
+
+                : {
+
+                    month:
+                        "short",
+
+                    day:
+                        "numeric",
+
+                    year:
+                        "numeric",
+
+                }
+
+        );
+
+};
