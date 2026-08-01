@@ -1,46 +1,16 @@
-import {
-    useEffect,
-    useRef,
-    useState,
-} from "react";
-
-import {
-    useDispatch,
-    useSelector,
-} from "react-redux";
-
-import {
-    FiArrowLeft,
-} from "react-icons/fi";
-
-import {
-    FaPaperPlane,
-} from "react-icons/fa";
-
+import { useEffect, useRef, useState, } from "react";
+import { useDispatch, useSelector, } from "react-redux";
+import { FiArrowLeft, } from "react-icons/fi";
+import { FaPaperPlane, } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-import {
-    createMessage,
-    getAllMessages,
-} from "../apiCalls/messageApi.js";
-
-import {
-    showLoader,
-    hideLoader,
-} from "../redux/sliceLoader.js";
-
-import {
-    setSelectedChat,
-} from "../redux/userSlice.js";
-
-import {
-    formatDateLabel,
-    shouldShowDateSeparator,
-} from "../utils/messageDate.js";
-
+import { createMessage, getAllMessages } from "../apiCalls/messageApi.js";
+import { clearUnreadMessage } from "../apiCalls/chatApi.js"
+import { showLoader, hideLoader, } from "../redux/sliceLoader.js";
+import { setAllChats, setSelectedChat, } from "../redux/userSlice.js";
+import { formatDateLabel, shouldShowDateSeparator, } from "../utils/messageDate.js";
 import MessageBubble from "./MessageBubble.jsx";
 import DateSeparator from "./DateSeparator.jsx";
-
 
 const Chat = () => {
 
@@ -49,6 +19,7 @@ const Chat = () => {
     const {
         selectedChat,
         user,
+        allChats,
     } = useSelector(
         state => state.userReducer
     );
@@ -69,7 +40,6 @@ const Chat = () => {
     const messagesEndRef =
         useRef(null);
 
-
     const selectedUser =
         selectedChat?.members?.find(
             member =>
@@ -77,10 +47,7 @@ const Chat = () => {
                 String(user._id)
         );
 
-
-    const handleMessageChange = (
-        event
-    ) => {
+    const handleMessageChange = event => {
 
         setMessage(
             event.target.value
@@ -99,7 +66,6 @@ const Chat = () => {
             )}px`;
 
     };
-
 
     const sendMessage = async () => {
 
@@ -121,24 +87,16 @@ const Chat = () => {
                         messageText,
                 });
 
-
-            if (
-                response?.success
-            ) {
+            if (response?.success) {
 
                 setAllMessages(
                     previousMessages => [
-
                         ...previousMessages,
-
                         response.data,
-
                     ]
                 );
 
-
                 setMessage("");
-
 
                 if (
                     messageInputRef.current
@@ -154,11 +112,8 @@ const Chat = () => {
             } else {
 
                 toast.error(
-
                     response?.message ||
-
                     "Unable to send message."
-
                 );
 
             }
@@ -171,25 +126,19 @@ const Chat = () => {
             );
 
             toast.error(
-
                 error.response
                     ?.data
                     ?.message ||
-
                 "Unable to send message."
-
             );
 
         }
 
     };
 
-
     const getMessages = async () => {
 
-        if (
-            !selectedChat?._id
-        ) {
+        if (!selectedChat?._id) {
             return;
         }
 
@@ -204,10 +153,7 @@ const Chat = () => {
                     selectedChat._id
                 );
 
-
-            if (
-                response?.success
-            ) {
+            if (response?.success) {
 
                 setAllMessages(
                     response.data || []
@@ -216,11 +162,8 @@ const Chat = () => {
             } else {
 
                 toast.error(
-
                     response?.message ||
-
                     "Unable to fetch messages."
-
                 );
 
             }
@@ -246,72 +189,119 @@ const Chat = () => {
 
     };
 
+    const clearUnreadMessages = async () => {
+
+        if (!selectedChat?._id) {
+            return;
+        }
+
+        try {
+
+            const response =
+                await clearUnreadMessage(
+                    selectedChat._id
+                );
+
+            if (response?.success) {
+
+                const updatedChats =
+                    (allChats || []).map(
+                        chat =>
+
+                            String(
+                                chat._id
+                            ) ===
+
+                                String(
+                                    selectedChat._id
+                                )
+
+                                ? response.data
+
+                                : chat
+                    );
+
+                dispatch(
+                    setAllChats(
+                        updatedChats
+                    )
+                );
+
+            } else {
+
+                console.error(
+                    response?.message ||
+                    "Unable to clear unread messages."
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Clear unread messages error:",
+                error
+            );
+
+        }
+
+    };
 
     useEffect(() => {
 
+        if (!selectedChat?._id) {
+            return;
+        }
+
         getMessages();
+
+        clearUnreadMessages();
 
     }, [
         selectedChat?._id
     ]);
-
 
     useEffect(() => {
 
         messagesEndRef
             .current
             ?.scrollIntoView({
-
                 behavior:
                     "smooth",
-
                 block:
                     "end",
-
             });
 
     }, [
         allMessages
     ]);
 
-
-    if (
-        !selectedChat
-    ) {
+    if (!selectedChat) {
         return null;
     }
-
 
     return (
 
         <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
 
-
             {/* CHAT HEADER */}
 
             <div className="mb-4 flex shrink-0 items-center border-b border-[#d8f45a]/15 px-2 py-3 sm:mb-5 sm:px-4">
 
-
-                {/* MOBILE BACK BUTTON */}
-
                 <button
-
                     type="button"
 
                     onClick={() =>
-
                         dispatch(
                             setSelectedChat(
                                 null
                             )
                         )
-
                     }
 
                     className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#f9fbf2] transition hover:bg-[#d8f45a]/10 md:hidden"
 
                     aria-label="Back to chats"
-
                 >
 
                     <FiArrowLeft
@@ -319,9 +309,6 @@ const Chat = () => {
                     />
 
                 </button>
-
-
-                {/* SELECTED USER */}
 
                 <div className="min-w-0 flex-1 text-right font-bold text-[#edefe5]">
 
@@ -339,17 +326,13 @@ const Chat = () => {
 
                 </div>
 
-
             </div>
-
 
             {/* CHAT MESSAGES */}
 
             <div className="scrollbar-aetherion min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2">
 
-
                 <div className="flex min-h-full min-w-0 flex-col gap-2">
-
 
                     {
                         allMessages.length === 0 && (
@@ -367,7 +350,6 @@ const Chat = () => {
                         )
                     }
 
-
                     {
                         allMessages.map(
                             (
@@ -376,16 +358,14 @@ const Chat = () => {
                             ) => {
 
                                 const previousMessage =
-
                                     allMessages[
-                                        index - 1
+                                    index - 1
                                     ];
-
 
                                 const senderId =
 
                                     typeof currentMessage.sender ===
-                                    "object"
+                                        "object"
 
                                         ? currentMessage
                                             .sender
@@ -393,7 +373,6 @@ const Chat = () => {
 
                                         : currentMessage
                                             .sender;
-
 
                                 const isMyMessage =
 
@@ -405,17 +384,12 @@ const Chat = () => {
                                         user._id
                                     );
 
-
                                 const showDate =
 
                                     shouldShowDateSeparator(
-
                                         currentMessage,
-
                                         previousMessage
-
                                     );
-
 
                                 return (
 
@@ -425,7 +399,6 @@ const Chat = () => {
                                         }
                                     >
 
-
                                         {
                                             showDate && (
 
@@ -433,10 +406,8 @@ const Chat = () => {
 
                                                     label={
                                                         formatDateLabel(
-
                                                             currentMessage
                                                                 .createdAt
-
                                                         )
                                                     }
 
@@ -444,7 +415,6 @@ const Chat = () => {
 
                                             )
                                         }
-
 
                                         <MessageBubble
 
@@ -458,7 +428,6 @@ const Chat = () => {
 
                                         />
 
-
                                     </div>
 
                                 );
@@ -467,26 +436,19 @@ const Chat = () => {
                         )
                     }
 
-
-                    {/* AUTO-SCROLL TARGET */}
-
                     <div
                         ref={
                             messagesEndRef
                         }
                     />
 
-
                 </div>
 
-
             </div>
-
 
             {/* MESSAGE INPUT */}
 
             <div className="mt-4 flex shrink-0 items-end gap-2 sm:mt-5 sm:gap-3">
-
 
                 <textarea
 
@@ -502,26 +464,26 @@ const Chat = () => {
                         handleMessageChange
                     }
 
-                    onKeyDown={(
-                        event
-                    ) => {
+                    onKeyDown={
+                        event => {
 
-                        if (
+                            if (
 
-                            event.key ===
-                            "Enter" &&
+                                event.key ===
+                                "Enter" &&
 
-                            !event.shiftKey
+                                !event.shiftKey
 
-                        ) {
+                            ) {
 
-                            event.preventDefault();
+                                event.preventDefault();
 
-                            sendMessage();
+                                sendMessage();
+
+                            }
 
                         }
-
-                    }}
+                    }
 
                     placeholder="Message"
 
@@ -530,9 +492,6 @@ const Chat = () => {
                     className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-4 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50 sm:px-5"
 
                 />
-
-
-                {/* SEND BUTTON */}
 
                 <button
 
@@ -554,15 +513,12 @@ const Chat = () => {
 
                 </button>
 
-
             </div>
-
 
         </div>
 
     );
 
 };
-
 
 export default Chat;
