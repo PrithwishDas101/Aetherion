@@ -72,12 +72,11 @@ const Chat = () => {
             String(user._id)
     );
 
-    const unreadMessageCount =
-        Number(
-            selectedChat
-                ?.unreadMessageCount
-            ?.[String(user._id)]
-        ) || 0;
+    const unreadMessageCount = Number(
+        selectedChat
+            ?.unreadMessageCount
+        ?.[String(user._id)]
+    ) || 0;
 
 
     const handleMessageChange = event => {
@@ -195,7 +194,6 @@ const Chat = () => {
 
                 setMessage("");
 
-
                 if (
                     messageInputRef.current
                 ) {
@@ -204,6 +202,7 @@ const Chat = () => {
                         .style.height =
                         "48px";
 
+                    messageInputRef.current.focus();
                 }
 
             } else {
@@ -381,7 +380,6 @@ const Chat = () => {
             return;
         }
 
-
         getMessages();
 
         clearUnreadMessages();
@@ -404,6 +402,8 @@ const Chat = () => {
                     "end",
 
             });
+
+        messageInputRef.current.focus();
 
     }, [
         allMessages
