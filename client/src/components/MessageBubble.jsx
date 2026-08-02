@@ -1,7 +1,11 @@
 import {
+    IoCheckmark,
+    IoCheckmarkDone,
+} from "react-icons/io5";
+
+import {
     formatMessageTime,
 } from "../utils/messageDate.js";
-
 
 const MessageBubble = ({
     message,
@@ -12,7 +16,6 @@ const MessageBubble = ({
         formatMessageTime(
             message.createdAt
         );
-
 
     return (
 
@@ -27,9 +30,7 @@ const MessageBubble = ({
             <div
                 className={`w-fit max-w-[75%] break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                     isMyMessage
-
                         ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
-
                         : "rounded-bl-sm border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
                 }`}
             >
@@ -40,18 +41,39 @@ const MessageBubble = ({
 
                 </div>
 
-
                 <div
-                    className={`mt-1 flex justify-end text-[10px] leading-none ${
+                    className={`mt-1 flex items-center justify-end gap-1 text-[10px] leading-none ${
                         isMyMessage
-
                             ? "text-[#10120d]/60"
-
                             : "text-[#aab3a8]"
                     }`}
                 >
 
-                    {messageTime}
+                    <span>
+
+                        {messageTime}
+
+                    </span>
+
+                    {
+                        isMyMessage && (
+
+                            message.read
+
+                                ? (
+                                    <IoCheckmarkDone
+                                        className="text-sm text-[#2196f3]"
+                                    />
+                                )
+
+                                : (
+                                    <IoCheckmark
+                                        className="text-sm text-[#5d654f]"
+                                    />
+                                )
+
+                        )
+                    }
 
                 </div>
 
@@ -62,6 +84,5 @@ const MessageBubble = ({
     );
 
 };
-
 
 export default MessageBubble;

@@ -15,7 +15,17 @@ const Home = () => {
 
         <div className="flex h-screen flex-col overflow-hidden bg-[#080d09]">
 
-            <Header />
+            <div
+                className={
+                    selectedChat
+                        ? "hidden md:block"
+                        : "block"
+                }
+            >
+
+                <Header />
+
+            </div>
 
             <div className="flex min-h-0 flex-1 gap-3 px-0 py-[10px] md:px-5">
 
