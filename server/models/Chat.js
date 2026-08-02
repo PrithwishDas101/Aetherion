@@ -4,32 +4,49 @@ const chatSchema = new mongoose.Schema(
     {
         members: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-                required: true,
+                type:
+                    mongoose.Schema.Types.ObjectId,
+
+                ref:
+                    "User",
+
+                required:
+                    true,
             },
         ],
 
         lastMessage: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Message",
-            default: null,
+            type:
+                mongoose.Schema.Types.ObjectId,
+
+            ref:
+                "Message",
+
+            default:
+                null,
         },
 
         unreadMessageCount: {
-            type: Number,
-            default: 0,
-            min: 0,
+            type:
+                Map,
+
+            of:
+                Number,
+
+            default:
+                () => new Map(),
         },
     },
     {
-        timestamps: true,
+        timestamps:
+            true,
     }
 );
 
-const Chat = mongoose.model(
-    "Chat",
-    chatSchema
-);
+const Chat =
+    mongoose.model(
+        "Chat",
+        chatSchema
+    );
 
 export default Chat;

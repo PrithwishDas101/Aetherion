@@ -264,7 +264,7 @@ function UserList({ searchKey }) {
                                 typeof userChat
                                     ?.lastMessage
                                     ?.sender ===
-                                "object"
+                                    "object"
 
                                     ? userChat
                                         ?.lastMessage
@@ -284,17 +284,21 @@ function UserList({ searchKey }) {
                             UNREAD COUNT
                             */
 
+                            const currentUserId =
+                                String(
+                                    currentUser._id
+                                );
+
                             const unreadCount =
                                 String(
                                     lastMessageSenderId
                                 ) !==
-                                String(
-                                    currentUser._id
-                                )
+                                    currentUserId
 
                                     ? Number(
                                         userChat
                                             ?.unreadMessageCount
+                                        ?.[currentUserId]
                                     ) || 0
 
                                     : 0;
@@ -383,8 +387,7 @@ function UserList({ searchKey }) {
                                             <div className="flex items-center gap-3">
 
                                                 <div
-                                                    className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${
-                                                        isSelected
+                                                    className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${isSelected
 
                                                             ? "text-[#f7f7d0]"
 
@@ -393,7 +396,7 @@ function UserList({ searchKey }) {
                                                                 ? "text-[#f7f7d0]"
 
                                                                 : "text-[#f1eee8]"
-                                                    }`}
+                                                        }`}
                                                 >
 
                                                     {
@@ -406,9 +409,8 @@ function UserList({ searchKey }) {
                                                     lastMessageTime && (
 
                                                         <span
-                                                            className={`shrink-0 text-[10px] font-medium transition-colors ${
-                                                                unreadCount > 0 &&
-                                                                !isSelected
+                                                            className={`shrink-0 text-[10px] font-medium transition-colors ${unreadCount > 0 &&
+                                                                    !isSelected
 
                                                                     ? "text-[#d8f45a]"
 
@@ -417,7 +419,7 @@ function UserList({ searchKey }) {
                                                                         ? "text-[#c8d17c]"
 
                                                                         : "text-[#7f8a7c]"
-                                                            }`}
+                                                                }`}
                                                         >
 
                                                             {
@@ -435,9 +437,8 @@ function UserList({ searchKey }) {
                                             <div className="mt-1 flex items-center gap-2">
 
                                                 <p
-                                                    className={`min-w-0 flex-1 truncate text-xs transition-colors ${
-                                                        unreadCount > 0 &&
-                                                        !isSelected
+                                                    className={`min-w-0 flex-1 truncate text-xs transition-colors ${unreadCount > 0 &&
+                                                            !isSelected
 
                                                             ? "font-semibold text-[#999999]"
 
@@ -446,7 +447,7 @@ function UserList({ searchKey }) {
                                                                 ? "text-[#b4bcae]"
 
                                                                 : "text-[#858d84]"
-                                                    }`}
+                                                        }`}
                                                 >
 
                                                     {

@@ -13,9 +13,11 @@ export const sendMessage = async (req, res) => {
             });
         }
 
+        const senderId = String(req.user.userId);
+
         const chat = await Chat.findOne({
             _id: chatId,
-            members: req.user.userId,
+            members: senderId,
         });
 
         if (!chat) {
@@ -25,26 +27,43 @@ export const sendMessage = async (req, res) => {
             });
         }
 
+        const receiver = chat.members.find(
+            member => String(member) !== senderId
+        );
+
+        if (!receiver) {
+            return res.status(400).json({
+                success: false,
+                message: "Message receiver not found.",
+            });
+        }
+
+        const receiverId = String(receiver);
+
         const savedMessage = await Message.create({
             chatId,
             text: text.trim(),
-            sender: req.user.userId,
+            sender: senderId,
             read: false,
         });
 
-        const updatedChat = await Chat
-            .findByIdAndUpdate(
+        const unreadField =
+            `unreadMessageCount.${receiverId}`;
+
+        const updatedChat =
+            await Chat.findByIdAndUpdate(
                 chatId,
                 {
                     $set: {
                         lastMessage: savedMessage._id,
                     },
                     $inc: {
-                        unreadMessageCount: 1,
+                        [unreadField]: 1,
                     },
                 },
                 {
-                    new: true,
+                    returnDocument: "after",
+                    runValidators: true,
                 }
             )
             .populate("members")
@@ -64,12 +83,14 @@ export const sendMessage = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error.message,
+            message:
+                error.message ||
+                "Internal server error",
         });
     }
 };
 
-// GET ALL MESSAGES OF A CHAT
+// GET ALL MESSAGES
 export const getAllMessages = async (req, res) => {
     try {
         const { chatId } = req.params;
@@ -96,7 +117,8 @@ export const getAllMessages = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Messages fetched successfully!",
+            message:
+                "Messages fetched successfully!",
             data: messages,
         });
     } catch (error) {
@@ -107,7 +129,9 @@ export const getAllMessages = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error.message,
+            message:
+                error.message ||
+                "Internal server error",
         });
     }
 };

@@ -6,7 +6,6 @@ import Message from "../models/Message.js";
 
 // CREATE ONE-TO-ONE CHAT
 export const createChat = async (req, res) => {
-
     try {
 
         const {
@@ -15,42 +14,52 @@ export const createChat = async (req, res) => {
 
 
         if (
-            !Array.isArray(members) ||
+            !Array.isArray(
+                members
+            ) ||
             members.length !== 2
         ) {
 
-            return res.status(400).json({
+            return res
+                .status(400)
+                .json({
 
-                success:
-                    false,
+                    success:
+                        false,
 
-                message:
-                    "A chat must have exactly two members.",
+                    message:
+                        "A chat must have exactly two members.",
 
-            });
+                });
 
         }
 
 
         const existingChat =
-            await Chat.findOne({
+            await Chat
+                .findOne({
 
-                members: {
-                    $all:
-                        members,
-                },
+                    members: {
+                        $all:
+                            members,
+                    },
 
-                $expr: {
-                    $eq: [
-                        {
-                            $size:
-                                "$members",
-                        },
-                        2,
-                    ],
-                },
+                    $expr: {
 
-            })
+                        $eq: [
+
+                            {
+                                $size:
+                                    "$members",
+                            },
+
+                            2,
+
+                        ],
+
+                    },
+
+                })
                 .populate(
                     "members"
                 )
@@ -59,33 +68,46 @@ export const createChat = async (req, res) => {
                 );
 
 
-        if (existingChat) {
+        if (
+            existingChat
+        ) {
 
-            return res.status(200).json({
+            return res
+                .status(200)
+                .json({
 
-                success:
-                    true,
+                    success:
+                        true,
 
-                message:
-                    "Chat already exists.",
+                    message:
+                        "Chat already exists.",
 
-                data:
-                    existingChat,
+                    data:
+                        existingChat,
 
-            });
+                });
 
         }
 
 
-        const unreadMessageCount = {
+        const unreadMessageCount =
+            new Map([
 
-            [String(members[0])]:
-                0,
+                [
+                    String(
+                        members[0]
+                    ),
+                    0,
+                ],
 
-            [String(members[1])]:
-                0,
+                [
+                    String(
+                        members[1]
+                    ),
+                    0,
+                ],
 
-        };
+            ]);
 
 
         const chat =
@@ -103,56 +125,65 @@ export const createChat = async (req, res) => {
         );
 
 
-        return res.status(201).json({
+        return res
+            .status(201)
+            .json({
 
-            success:
-                true,
+                success:
+                    true,
 
-            message:
-                "Chat created successfully!",
+                message:
+                    "Chat created successfully!",
 
-            data:
-                chat,
+                data:
+                    chat,
 
-        });
+            });
 
-    } catch (error) {
+    } catch (
+    error
+    ) {
 
         console.error(
             "Create chat error:",
             error
         );
 
-        return res.status(500).json({
 
-            success:
-                false,
+        return res
+            .status(500)
+            .json({
 
-            message:
-                "Internal server error",
+                success:
+                    false,
 
-        });
+                message:
+                    error.message,
+
+            });
 
     }
 
 };
 
-
-// GET ALL CHATS OF LOGGED-IN USER
+// GET ALL CHATS
 export const getAllChats = async (req, res) => {
     try {
+
         const chats =
-            await Chat.find({
+            await Chat
+                .find({
 
-                members: {
+                    members: {
 
-                    $in: [
-                        req.user.userId,
-                    ],
+                        $in: [
+                            req.user
+                                .userId,
+                        ],
 
-                },
+                    },
 
-            })
+                })
                 .populate(
                     "members"
                 )
@@ -167,121 +198,244 @@ export const getAllChats = async (req, res) => {
                 });
 
 
-        return res.status(200).json({
+        return res
+            .status(200)
+            .json({
 
-            success:
-                true,
+                success:
+                    true,
 
-            message:
-                "Chats fetched successfully!",
+                message:
+                    "Chats fetched successfully!",
 
-            data:
-                chats,
+                data:
+                    chats,
 
-        });
+            });
 
-    } catch (error) {
+    } catch (
+    error
+    ) {
 
         console.error(
             "Get all chats error:",
             error
         );
 
-        return res.status(500).json({
 
-            success:
-                false,
+        return res
+            .status(500)
+            .json({
 
-            message:
-                "Internal server error",
+                success:
+                    false,
 
-        });
+                message:
+                    error.message,
+
+            });
 
     }
 
 };
 
-
-// CLEAR LOGGED-IN USER'S UNREAD MESSAGES
+// CLEAR ONLY CURRENT USER'S UNREAD COUNT
 export const clearUnreadMessages = async (req, res) => {
-    try {
-        const { chatId } = req.body;
 
-        if (!chatId) {
-            return res.status(400).json({
-                success: false,
-                message: "Chat ID is required.",
-            });
-        }
+    try {
+
+        const {
+            chatId,
+        } = req.body;
+
 
         if (
-            !mongoose.Types.ObjectId.isValid(
-                chatId
-            )
+            !chatId
         ) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid chat ID.",
-            });
+
+            return res
+                .status(400)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Chat ID is required.",
+
+                });
+
         }
 
-        const chat = await Chat.findOne({
-            _id: chatId,
-            members: req.user.userId,
-        });
 
-        if (!chat) {
-            return res.status(404).json({
-                success: false,
-                message: "Chat not found.",
-            });
+        if (
+            !mongoose
+                .Types
+                .ObjectId
+                .isValid(
+                    chatId
+                )
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Invalid chat ID.",
+
+                });
+
         }
+
+
+        const userId =
+            String(
+                req.user
+                    .userId
+            );
+
+
+        const chat =
+            await Chat.findOne({
+
+                _id:
+                    chatId,
+
+                members:
+                    userId,
+
+            });
+
+
+        if (
+            !chat
+        ) {
+
+            return res
+                .status(404)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Chat not found.",
+
+                });
+
+        }
+
 
         await Message.updateMany(
+
             {
+
                 chatId,
+
                 sender: {
-                    $ne: req.user.userId,
+
+                    $ne:
+                        userId,
+
                 },
-                read: false,
+
+                read:
+                    false,
+
             },
+
             {
+
                 $set: {
-                    read: true,
+
+                    read:
+                        true,
+
                 },
+
             }
+
         );
 
-        const updatedChat = await Chat
-            .findByIdAndUpdate(
-                chatId,
-                {
-                    $set: {
-                        unreadMessageCount: 0,
-                    },
-                },
-                {
-                    new: true,
-                }
-            )
-            .populate("members")
-            .populate("lastMessage");
 
-        return res.status(200).json({
-            success: true,
-            message:
-                "Unread messages cleared successfully.",
-            data: updatedChat,
-        });
-    } catch (error) {
+        const unreadField =
+            `unreadMessageCount.${userId}`;
+
+
+        const updatedChat =
+            await Chat
+                .findByIdAndUpdate(
+
+                    chatId,
+
+                    {
+
+                        $set: {
+
+                            [unreadField]:
+                                0,
+
+                        },
+
+                    },
+
+                    {
+
+                        returnDocument:
+                            "after",
+
+                    }
+
+                )
+                .populate(
+                    "members"
+                )
+                .populate(
+                    "lastMessage"
+                );
+
+
+        return res
+            .status(200)
+            .json({
+
+                success:
+                    true,
+
+                message:
+                    "Unread messages cleared successfully.",
+
+                data:
+                    updatedChat,
+
+            });
+
+    } catch (
+    error
+    ) {
+
         console.error(
             "Clear unread messages error:",
             error
         );
 
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+
+        return res
+            .status(500)
+            .json({
+
+                success:
+                    false,
+
+                message:
+                    error.message,
+
+            });
+
     }
+
 };
