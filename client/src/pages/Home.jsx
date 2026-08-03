@@ -15,12 +15,11 @@ const Home = () => {
 
         <div className="flex h-screen flex-col overflow-hidden bg-[#080d09]">
 
-            <div
-                className={
-                    selectedChat
-                        ? "hidden md:block"
-                        : "block"
-                }
+            <div className={
+                selectedChat
+                    ? "hidden md:block"
+                    : "block"
+            }
             >
 
                 <Header />
@@ -30,11 +29,9 @@ const Home = () => {
             <div className="flex min-h-0 flex-1 gap-3 px-0 py-[10px] md:px-5">
 
                 {/* CHAT LIST */}
-                <div
-                    className={`min-h-0 w-full ${
-                        selectedChat
-                            ? "hidden"
-                            : "block"
+                <div className={`min-h-0 w-full ${selectedChat
+                    ? "hidden"
+                    : "block"
                     } md:block md:w-[30%] md:min-w-[320px]`}
                 >
 
@@ -43,11 +40,9 @@ const Home = () => {
                 </div>
 
                 {/* CHAT AREA */}
-                <div
-                    className={`min-h-0 flex-1 overflow-hidden ${
-                        selectedChat
-                            ? "block"
-                            : "hidden"
+                <div className={`min-h-0 flex-1 overflow-hidden ${selectedChat
+                    ? "block"
+                    : "hidden"
                     } md:block`}
                 >
 

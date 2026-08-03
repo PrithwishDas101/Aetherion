@@ -347,21 +347,24 @@ function UserList({ searchKey }) {
                                             )
                                             : (
                                                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#cacfb4] text-sm font-bold text-[#10120d]">
-                                                    {
-                                                        (
-                                                            user.firstName ||
-                                                            ""
-                                                        )
-                                                            .charAt(0)
-                                                            .toUpperCase()
-                                                    }
 
                                                     {
-                                                        (
-                                                            user.lastName ||
-                                                            ""
-                                                        )
-                                                            .charAt(0)
+                                                        [
+                                                            (user.firstName || "")
+                                                                .trim()
+                                                                .charAt(0),
+
+                                                            ...(user.lastName || "")
+                                                                .trim()
+                                                                .split(/\s+/)
+                                                                .map(
+                                                                    name =>
+                                                                        name.charAt(0)
+                                                                ),
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .slice(0, 3)
+                                                            .join("")
                                                             .toUpperCase()
                                                     }
                                                 </div>
@@ -372,10 +375,10 @@ function UserList({ searchKey }) {
                                         <div className="flex items-center gap-3">
                                             <div
                                                 className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${isSelected
+                                                    ? "text-[#f7f7d0]"
+                                                    : unreadCount > 0
                                                         ? "text-[#f7f7d0]"
-                                                        : unreadCount > 0
-                                                            ? "text-[#f7f7d0]"
-                                                            : "text-[#f1eee8]"
+                                                        : "text-[#f1eee8]"
                                                     }`}
                                             >
                                                 {
@@ -387,9 +390,9 @@ function UserList({ searchKey }) {
                                                 lastMessageTime && (
                                                     <span
                                                         className={`shrink-0 text-[10px] font-medium transition-colors ${unreadCount > 0 &&
-                                                                !isSelected
-                                                                ? "text-[#e9fb95]"
-                                                                : "text-[#7f8a7c]"
+                                                            !isSelected
+                                                            ? "text-[#e9fb95]"
+                                                            : "text-[#7f8a7c]"
                                                             }`}
                                                     >
                                                         {
@@ -403,11 +406,11 @@ function UserList({ searchKey }) {
                                         <div className="mt-1 flex items-center gap-2">
                                             <p
                                                 className={`min-w-0 flex-1 truncate text-xs transition-colors ${unreadCount > 0 &&
-                                                        !isSelected
-                                                        ? "font-semibold text-[#999999]"
-                                                        : isSelected
-                                                            ? "text-[#b4bcae]"
-                                                            : "text-[#858d84]"
+                                                    !isSelected
+                                                    ? "font-semibold text-[#999999]"
+                                                    : isSelected
+                                                        ? "text-[#b4bcae]"
+                                                        : "text-[#858d84]"
                                                     }`}
                                             >
                                                 {
