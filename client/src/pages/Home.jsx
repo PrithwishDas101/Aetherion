@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
 import Header from "../components/Header.jsx";
 import Sidebar from "../components/SideBar.jsx";
@@ -7,9 +8,9 @@ import Chat from "../components/Chat.jsx";
 
 const Home = () => {
 
-    const { selectedChat } = useSelector(
-        state => state.userReducer
-    );
+    const { selectedChat } = useSelector(state => state.userReducer);
+
+    const socket = io('http://localhost:8000');
 
     return (
 
