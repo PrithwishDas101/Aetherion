@@ -4,7 +4,7 @@ import Chat from "../models/Chat.js";
 // SEND MESSAGE
 export const sendMessage = async (req, res) => {
     try {
-        const { chatId, text } = req.body;
+        const { chatId, text, replyTo } = req.body;
 
         if (!chatId || !text?.trim()) {
             return res.status(400).json({
@@ -44,7 +44,13 @@ export const sendMessage = async (req, res) => {
             chatId,
             text: text.trim(),
             sender: senderId,
+            replyTo: replyTo || null,
             read: false,
+        });
+
+        await savedMessage.populate({
+            path: "replyTo",
+            select: "text sender",
         });
 
         const unreadField =
@@ -66,8 +72,8 @@ export const sendMessage = async (req, res) => {
                     runValidators: true,
                 }
             )
-            .populate("members")
-            .populate("lastMessage");
+                .populate("members")
+                .populate("lastMessage");
 
         return res.status(201).json({
             success: true,
@@ -110,6 +116,10 @@ export const getAllMessages = async (req, res) => {
         const messages = await Message
             .find({
                 chatId,
+            })
+            .populate({
+                path: "replyTo",
+                select: "text sender",
             })
             .sort({
                 createdAt: 1,

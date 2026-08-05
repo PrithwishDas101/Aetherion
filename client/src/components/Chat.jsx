@@ -1,51 +1,18 @@
-import {
-    useEffect,
-    useRef,
-    useState,
-} from "react";
-
-import {
-    useDispatch,
-    useSelector,
-} from "react-redux";
-
-import {
-    FiArrowLeft,
-} from "react-icons/fi";
-
-import {
-    FaPaperPlane,
-} from "react-icons/fa";
-
+import { useEffect, useRef, useState, } from "react";
+import { useDispatch, useSelector, } from "react-redux";
+import { FiArrowLeft, } from "react-icons/fi";
+import { FaPaperPlane, } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-import {
-    createMessage,
-    getAllMessages,
-} from "../apiCalls/messageApi.js";
+import { createMessage, getAllMessages, } from "../apiCalls/messageApi.js";
 
-import {
-    clearUnreadMessage,
-} from "../apiCalls/chatApi.js";
-
-import {
-    showLoader,
-    hideLoader,
-} from "../redux/sliceLoader.js";
-
-import {
-    setAllChats,
-    setSelectedChat,
-} from "../redux/userSlice.js";
-
-import {
-    formatDateLabel,
-    shouldShowDateSeparator,
-} from "../utils/messageDate.js";
-
+import { clearUnreadMessage, } from "../apiCalls/chatApi.js";
+import { showLoader, hideLoader, } from "../redux/sliceLoader.js";
+import { setAllChats, setSelectedChat, } from "../redux/userSlice.js";
+import { formatDateLabel, shouldShowDateSeparator, } from "../utils/messageDate.js";
 import MessageBubble from "./MessageBubble.jsx";
 import DateSeparator from "./DateSeparator.jsx";
-
+import ReplyPreview from "./ReplyPreview.jsx";
 
 const Chat = () => {
 
@@ -63,6 +30,7 @@ const Chat = () => {
     const [message, setMessage] = useState("");
     const [allMessages, setAllMessages] = useState([]);
     const [isSending, setIsSending] = useState(false);
+    const [replyingTo, setReplyingTo] = useState(null);
     const messageInputRef = useRef(null);
     const messagesEndRef = useRef(null);
 
@@ -99,6 +67,33 @@ const Chat = () => {
 
     };
 
+    const startReply = selectedMessage => {
+
+        setReplyingTo(
+            selectedMessage
+        );
+
+        requestAnimationFrame(
+            () => {
+
+                messageInputRef.current
+                    ?.focus();
+
+            }
+        );
+
+    };
+
+    const cancelReply = () => {
+
+        setReplyingTo(
+            null
+        );
+
+        messageInputRef.current
+            ?.focus();
+
+    };
 
     const updateChatInRedux = updatedChat => {
 
@@ -132,7 +127,6 @@ const Chat = () => {
 
     };
 
-
     const sendMessage = async () => {
 
         const messageText =
@@ -161,6 +155,10 @@ const Chat = () => {
 
                     text:
                         messageText,
+
+                    replyTo:
+                        replyingTo?._id ||
+                        null,
 
                 });
 
@@ -193,6 +191,8 @@ const Chat = () => {
 
 
                 setMessage("");
+
+                setReplyingTo(null);
 
                 if (
                     messageInputRef.current
@@ -471,9 +471,7 @@ const Chat = () => {
 
             <div className="scrollbar-aetherion min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2">
 
-
                 <div className="flex min-h-full min-w-0 flex-col gap-2">
-
 
                     {
                         allMessages.length === 0 && (
@@ -568,7 +566,6 @@ const Chat = () => {
 
 
                                         <MessageBubble
-
                                             message={
                                                 currentMessage
                                             }
@@ -577,6 +574,9 @@ const Chat = () => {
                                                 isMyMessage
                                             }
 
+                                            onReply={
+                                                startReply
+                                            }
                                         />
 
                                     </div>
@@ -602,81 +602,102 @@ const Chat = () => {
 
             {/* MESSAGE INPUT */}
 
-            <div className="mt-4 flex shrink-0 items-end gap-2 sm:mt-5 sm:gap-3">
+            <div className="mt-4 shrink-0 sm:mt-5">
 
-
-                <textarea
-
-                    ref={
-                        messageInputRef
+                <ReplyPreview
+                    message={
+                        replyingTo
                     }
 
-                    value={
-                        message
+                    isMyMessage={
+                        String(
+                            replyingTo?.sender?._id ||
+                            replyingTo?.sender
+                        ) ===
+                        String(
+                            user._id
+                        )
                     }
 
-                    onChange={
-                        handleMessageChange
+                    otherUserName={
+                        selectedUser
+                            ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                            : "User"
                     }
 
-                    onKeyDown={
-                        event => {
-
-                            if (
-
-                                event.key ===
-                                "Enter" &&
-
-                                !event.shiftKey
-
-                            ) {
-
-                                event.preventDefault();
-
-                                sendMessage();
-
-                            }
-
-                        }
+                    onCancel={
+                        cancelReply
                     }
-
-                    placeholder="Message"
-
-                    rows="1"
-
-                    disabled={
-                        isSending
-                    }
-
-                    className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-4 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50 disabled:cursor-not-allowed disabled:opacity-60 sm:px-5"
-
                 />
 
+                <div className="flex items-end gap-2 sm:gap-3">
 
-                <button
+                    <textarea
+                        ref={
+                            messageInputRef
+                        }
 
-                    type="button"
+                        value={
+                            message
+                        }
 
-                    onClick={
-                        sendMessage
-                    }
+                        onChange={
+                            handleMessageChange
+                        }
 
-                    disabled={
-                        isSending ||
-                        !message.trim()
-                    }
+                        onKeyDown={
+                            event => {
 
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                                if (
+                                    event.key ===
+                                    "Enter" &&
+                                    !event.shiftKey
+                                ) {
 
-                    aria-label="Send message"
+                                    event.preventDefault();
 
-                >
+                                    sendMessage();
 
-                    <FaPaperPlane
-                        className="ml-0.5 text-xl"
+                                }
+
+                            }
+                        }
+
+                        placeholder="Message"
+
+                        rows="1"
+
+                        disabled={
+                            isSending
+                        }
+
+                        className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-4 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50 disabled:cursor-not-allowed disabled:opacity-60 sm:px-5"
                     />
 
-                </button>
+                    <button
+                        type="button"
+
+                        onClick={
+                            sendMessage
+                        }
+
+                        disabled={
+                            isSending ||
+                            !message.trim()
+                        }
+
+                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+
+                        aria-label="Send message"
+                    >
+
+                        <FaPaperPlane
+                            className="ml-0.5 text-xl"
+                        />
+
+                    </button>
+
+                </div>
 
             </div>
 
