@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 
@@ -11,6 +11,10 @@ const Home = () => {
     const { selectedChat } = useSelector(state => state.userReducer);
 
     const socket = io('http://localhost:8000');
+
+    useEffect(() => {
+        
+    }, [])
 
     return (
 

@@ -8,21 +8,17 @@ import "./index.css";
 import store from "./redux/store.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <React.StrictMode>
+    <Provider store={store}>
 
-        <Provider store={store}>
+        <Toaster
+            position="top-center"
+            reverseOrder={false}
+            toastOptions={{
+                duration: 3000,
+            }}
+        />
 
-            <Toaster
-                position="top-center"
-                reverseOrder={false}
-                toastOptions={{
-                    duration: 3000,
-                }}
-            />
+        <App />
 
-            <App />
-
-        </Provider>
-
-    </React.StrictMode>
+    </Provider>
 );

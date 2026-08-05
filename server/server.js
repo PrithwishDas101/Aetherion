@@ -25,24 +25,16 @@ const io = new Server(server, {
 }
 );
 
-io.on(
-    "connection", socket => {
+io.on("connection", socket => {
+    
+});
 
-        console.log("Client connected:", socket.id);
-
-        socket.on("disconnect", () => {
-
-            console.log("Client disconnected:", socket.id);
-        }
-        );
-    }
-);
-
-connectDB().then(() => {
-    server.listen(PORT, () => {
-        console.log(`Server started at PORT: ${PORT}`);
-    });
-})
+connectDB()
+    .then(() => {
+        server.listen(PORT, () => {
+            console.log(`Server started at PORT: ${PORT}`);
+        });
+    })
     .catch(error => {
         console.error("Database connection failed:", error);
         process.exit(1);
