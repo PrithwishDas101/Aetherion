@@ -1,27 +1,11 @@
-import {
-    useDispatch,
-    useSelector,
-} from "react-redux";
-
+import { useDispatch, useSelector, } from "react-redux";
 import toast from "react-hot-toast";
+import { IoCheckmark, IoCheckmarkDone, } from "react-icons/io5";
 
-import {
-    createChat,
-} from "../apiCalls/chatApi.js";
-
-import {
-    hideLoader,
-    showLoader,
-} from "../redux/sliceLoader.js";
-
-import {
-    setAllChats,
-    setSelectedChat,
-} from "../redux/userSlice.js";
-
-import {
-    formatChatPreviewTime,
-} from "../utils/messageDate.js";
+import { createChat } from "../apiCalls/chatApi.js";
+import { hideLoader, showLoader, } from "../redux/sliceLoader.js";
+import { setAllChats, setSelectedChat, } from "../redux/userSlice.js";
+import { formatChatPreviewTime, } from "../utils/messageDate.js";
 
 function UserList({ searchKey }) {
     const {
@@ -155,103 +139,99 @@ function UserList({ searchKey }) {
         }
     };
 
-    const normalizedSearchKey =
-        (searchKey || "")
-            .trim()
-            .toLowerCase();
+    const normalizedSearchKey = (searchKey || "").trim()
+        .toLowerCase();
 
-    const visibleUsers =
-        (allUsers || [])
-            .filter(
-                user => {
-                    if (
-                        String(
-                            user?._id
-                        ) ===
-                        String(
-                            currentUser._id
-                        )
-                    ) {
-                        return false;
-                    }
+    const visibleUsers = (allUsers || []).filter(
+        user => {
+            if (
+                String(
+                    user?._id
+                ) ===
+                String(
+                    currentUser._id
+                )
+            ) {
+                return false;
+            }
 
-                    const firstName =
-                        (
-                            user?.firstName ||
-                            ""
-                        )
-                            .toLowerCase();
+            const firstName =
+                (
+                    user?.firstName ||
+                    ""
+                )
+                    .toLowerCase();
 
-                    const lastName =
-                        (
-                            user?.lastName ||
-                            ""
-                        )
-                            .toLowerCase();
+            const lastName =
+                (
+                    user?.lastName ||
+                    ""
+                )
+                    .toLowerCase();
 
-                    const fullName =
-                        `${firstName} ${lastName}`
-                            .trim();
+            const fullName =
+                `${firstName} ${lastName}`
+                    .trim();
 
-                    const matchesSearch =
-                        firstName.includes(
-                            normalizedSearchKey
-                        ) ||
-                        lastName.includes(
-                            normalizedSearchKey
-                        ) ||
-                        fullName.includes(
-                            normalizedSearchKey
-                        );
+            const matchesSearch =
+                firstName.includes(
+                    normalizedSearchKey
+                ) ||
+                lastName.includes(
+                    normalizedSearchKey
+                ) ||
+                fullName.includes(
+                    normalizedSearchKey
+                );
 
-                    const alreadyHasChat =
-                        Boolean(
-                            findChatWithUser(
-                                user._id
-                            )
-                        );
+            const alreadyHasChat =
+                Boolean(
+                    findChatWithUser(
+                        user._id
+                    )
+                );
 
-                    if (
-                        normalizedSearchKey
-                    ) {
-                        return matchesSearch;
-                    }
+            if (
+                normalizedSearchKey
+            ) {
+                return matchesSearch;
+            }
 
-                    return alreadyHasChat;
-                }
-            )
-            .sort(
-                (firstUser, secondUser) => {
-                    const firstUserChat =
-                        findChatWithUser(
-                            firstUser._id
-                        );
-
-                    const secondUserChat =
-                        findChatWithUser(
-                            secondUser._id
-                        );
-
-                    if (
-                        normalizedSearchKey
-                    ) {
-                        return 0;
-                    }
-
-                    return (
-                        new Date(
-                            secondUserChat
-                                ?.updatedAt ||
-                            0
-                        ) -
-                        new Date(
-                            firstUserChat
-                                ?.updatedAt ||
-                            0
-                        )
+            return alreadyHasChat;
+        }
+    )
+        .sort(
+            (firstUser, secondUser) => {
+                const firstUserChat =
+                    findChatWithUser(
+                        firstUser._id
                     );
+
+                const secondUserChat =
+                    findChatWithUser(
+                        secondUser._id
+                    );
+
+                if (
+                    normalizedSearchKey
+                ) {
+                    return 0;
                 }
-            );
+
+                return (
+                    new Date(
+                        secondUserChat
+                            ?.updatedAt ||
+                        0
+                    ) -
+                    new Date(
+                        firstUserChat
+                            ?.updatedAt ||
+                        0
+                    )
+                );
+            }
+        );
 
     return (
         <div>
@@ -293,6 +273,12 @@ function UserList({ searchKey }) {
                             String(
                                 currentUser._id
                             );
+
+                        const isLastMessageMine =
+                            String(
+                                lastMessageSenderId
+                            ) ===
+                            currentUserId;
 
                         const unreadCount =
                             String(
@@ -404,26 +390,54 @@ function UserList({ searchKey }) {
                                         </div>
 
                                         <div className="mt-1 flex items-center gap-2">
-                                            <p
-                                                className={`min-w-0 flex-1 truncate text-xs transition-colors ${unreadCount > 0 &&
-                                                    !isSelected
-                                                    ? "font-semibold text-[#999999]"
-                                                    : isSelected
-                                                        ? "text-[#b4bcae]"
-                                                        : "text-[#858d84]"
-                                                    }`}
-                                            >
+                                            <div className="flex min-w-0 flex-1 items-center gap-1.5">
+
                                                 {
-                                                    userChat
-                                                        ? (
-                                                            lastMessage ||
-                                                            "No messages yet."
-                                                        )
-                                                        : (
-                                                            user.email
-                                                        )
+                                                    userChat &&
+                                                    lastMessage &&
+                                                    isLastMessageMine && (
+
+                                                        userChat
+                                                            ?.lastMessage
+                                                            ?.read
+
+                                                            ? (
+                                                                <IoCheckmarkDone
+                                                                    className="shrink-0 text-sm text-[#2196f3]"
+                                                                />
+                                                            )
+
+                                                            : (
+                                                                <IoCheckmark
+                                                                    className="shrink-0 text-sm text-[#858d84]"
+                                                                />
+                                                            )
+
+                                                    )
                                                 }
-                                            </p>
+
+                                                <p
+                                                    className={`min-w-0 flex-1 truncate text-xs transition-colors ${unreadCount > 0 &&
+                                                            !isSelected
+                                                            ? "font-semibold text-[#999999]"
+                                                            : isSelected
+                                                                ? "text-[#b4bcae]"
+                                                                : "text-[#858d84]"
+                                                        }`}
+                                                >
+                                                    {
+                                                        userChat
+                                                            ? (
+                                                                lastMessage ||
+                                                                "No messages yet."
+                                                            )
+                                                            : (
+                                                                user.email
+                                                            )
+                                                    }
+                                                </p>
+
+                                            </div>
 
                                             {
                                                 unreadCount > 0 &&
