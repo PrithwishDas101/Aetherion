@@ -8,13 +8,23 @@ import Chat from "../components/Chat.jsx";
 
 const Home = () => {
 
-    const { selectedChat } = useSelector(state => state.userReducer);
+    const { selectedChat, user } = useSelector(state => state.userReducer);
 
     const socket = io('http://localhost:8000');
 
     useEffect(() => {
-        
-    }, [])
+
+        if (user?._id) {
+            socket.emit('join-room', user._id);
+
+            socket.emit('send-message', { text: 'Hi!', recipient: '6a6e3d27d0e187cbb6307d4b' })
+
+            socket.on('recieve-message', data => {
+                console.log(data)
+            })
+        }
+
+    }, [user])
 
     return (
 

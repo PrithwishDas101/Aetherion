@@ -26,7 +26,14 @@ const io = new Server(server, {
 );
 
 io.on("connection", socket => {
-    
+    socket.on('join-room', userid => {
+        socket.join(userid)
+        console.log("user joined: " + userid)
+    })
+
+    socket.on('send-message', (data) => {
+        socket.to(data.recipient).emit('recieve-message', data.text)
+    })
 });
 
 connectDB()
