@@ -40,15 +40,18 @@ io.on("connection", socket => {
 
     });
 
-    socket.on("send-message", message => {
+    socket.on("send-message", ({ message, chat, members }) => {
 
-        message.members.forEach(memberId => {
+        members.forEach(memberId => {
 
             if (memberId !== String(message.sender)) {
 
                 socket.to(memberId).emit(
                     "receive-message",
-                    message
+                    {
+                        message,
+                        chat,
+                    }
                 );
             }
         });

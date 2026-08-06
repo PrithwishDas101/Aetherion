@@ -46,27 +46,6 @@ const Chat = ({ socket }) => {
         ?.[String(user._id)]
     ) || 0;
 
-
-    const handleMessageChange = event => {
-
-        setMessage(
-            event.target.value
-        );
-
-        const textarea =
-            event.target;
-
-        textarea.style.height =
-            "auto";
-
-        textarea.style.height =
-            `${Math.min(
-                textarea.scrollHeight,
-                120
-            )}px`;
-
-    };
-
     const startReply = selectedMessage => {
 
         setReplyingTo(
@@ -161,20 +140,13 @@ const Chat = ({ socket }) => {
 
             if (response?.success) {
 
-                socket.emit(
-                    "send-message",
-                    {
-
-                        ...response.data,
-
-                        members:
-                            selectedChat.members.map(
-                                member =>
-                                    String(member._id)
-                            ),
-
-                    }
-                );
+                socket.emit("send-message", {
+                    message: response.data,
+                    chat: response.chat,
+                    members: selectedChat.members.map(
+                        member => String(member._id)
+                    ),
+                });
 
                 setAllMessages(
                     previousMessages => [
@@ -372,6 +344,26 @@ const Chat = ({ socket }) => {
 
     };
 
+    const handleMessageChange = event => {
+
+        setMessage(
+            event.target.value
+        );
+
+        const textarea =
+            event.target;
+
+        textarea.style.height =
+            "auto";
+
+        textarea.style.height =
+            `${Math.min(
+                textarea.scrollHeight,
+                120
+            )}px`;
+
+    };
+
     useEffect(() => {
 
         if (
@@ -391,22 +383,33 @@ const Chat = ({ socket }) => {
 
         const handleReceiveMessage = data => {
 
-            if (String(data.chatId) !== String(selectedChat?._id)) {
+            if (String(data.message.chatId) !== String(selectedChat?._id)) {
                 return;
             }
 
             setAllMessages(previous => {
 
                 const alreadyExists = previous.some(
-                    message => String(message._id) === String(data._id)
+                    message =>
+                        String(message._id) ===
+                        String(data.message._id)
                 );
 
                 if (alreadyExists) {
                     return previous;
                 }
 
-                return [...previous, data,];
+                return [
+                    ...previous,
+                    data.message,
+                ];
+
             });
+
+            if (data.chat) {
+                updateChatInRedux(data.chat);
+            }
+
         };
 
         socket.on(
