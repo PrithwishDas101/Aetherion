@@ -14,7 +14,7 @@ import MessageBubble from "./MessageBubble.jsx";
 import DateSeparator from "./DateSeparator.jsx";
 import ReplyPreview from "./ReplyPreview.jsx";
 
-const Chat = () => {
+const Chat = ({ socket }) => {
 
     const dispatch = useDispatch();
 
@@ -132,7 +132,6 @@ const Chat = () => {
         const messageText =
             message.trim();
 
-
         if (
             !messageText ||
             !selectedChat?._id ||
@@ -141,11 +140,9 @@ const Chat = () => {
             return;
         }
 
-
         try {
 
             setIsSending(true);
-
 
             const response =
                 await createMessage({
@@ -162,8 +159,22 @@ const Chat = () => {
 
                 });
 
-
             if (response?.success) {
+
+                socket.emit(
+                    "send-message",
+                    {
+
+                        ...response.data,
+
+                        members:
+                            selectedChat.members.map(
+                                member =>
+                                    String(member._id)
+                            ),
+
+                    }
+                );
 
                 setAllMessages(
                     previousMessages => [
@@ -175,12 +186,6 @@ const Chat = () => {
                     ]
                 );
 
-
-                /*
-                    Update lastMessage and
-                    unread counts in Redux.
-                */
-
                 if (response?.chat) {
 
                     updateChatInRedux(
@@ -188,7 +193,6 @@ const Chat = () => {
                     );
 
                 }
-
 
                 setMessage("");
 
@@ -198,11 +202,11 @@ const Chat = () => {
                     messageInputRef.current
                 ) {
 
-                    messageInputRef.current
-                        .style.height =
+                    messageInputRef.current.style.height =
                         "48px";
 
                     messageInputRef.current.focus();
+
                 }
 
             } else {
@@ -224,7 +228,6 @@ const Chat = () => {
                 error
             );
 
-
             toast.error(
 
                 error.response
@@ -242,7 +245,6 @@ const Chat = () => {
         }
 
     };
-
 
     const getMessages = async () => {
 
@@ -310,7 +312,6 @@ const Chat = () => {
 
     };
 
-
     const clearUnreadMessages = async () => {
 
         if (
@@ -371,7 +372,6 @@ const Chat = () => {
 
     };
 
-
     useEffect(() => {
 
         if (
@@ -385,10 +385,45 @@ const Chat = () => {
         clearUnreadMessages();
 
 
-    }, [
-        selectedChat?._id
-    ]);
+    }, [selectedChat?._id]);
 
+    useEffect(() => {
+
+        const handleReceiveMessage = data => {
+
+            if (String(data.chatId) !== String(selectedChat?._id)) {
+                return;
+            }
+
+            setAllMessages(previous => {
+
+                const alreadyExists = previous.some(
+                    message => String(message._id) === String(data._id)
+                );
+
+                if (alreadyExists) {
+                    return previous;
+                }
+
+                return [...previous, data,];
+            });
+        };
+
+        socket.on(
+            "receive-message",
+            handleReceiveMessage
+        );
+
+        return () => {
+
+            socket.off(
+                "receive-message",
+                handleReceiveMessage
+            );
+
+        };
+
+    }, [selectedChat?._id]);
 
     useEffect(() => {
 
@@ -405,9 +440,7 @@ const Chat = () => {
 
         messageInputRef.current.focus();
 
-    }, [
-        allMessages
-    ]);
+    }, [allMessages]);
 
 
     if (!selectedChat) {

@@ -26,14 +26,33 @@ const io = new Server(server, {
 );
 
 io.on("connection", socket => {
-    socket.on('join-room', userid => {
-        socket.join(userid)
-        console.log("user joined: " + userid)
-    })
 
-    socket.on('send-message', (data) => {
-        socket.to(data.recipient).emit('recieve-message', data.text)
-    })
+    socket.on("join-room", userId => {
+
+        socket.join(String(userId));
+
+        console.log(
+            "User joined:",
+            userId,
+            "Rooms:",
+            [...socket.rooms]
+        );
+
+    });
+
+    socket.on("send-message", message => {
+
+        message.members.forEach(memberId => {
+
+            if (memberId !== String(message.sender)) {
+
+                socket.to(memberId).emit(
+                    "receive-message",
+                    message
+                );
+            }
+        });
+    });
 });
 
 connectDB()
