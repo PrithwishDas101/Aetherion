@@ -22,10 +22,10 @@ const Chat = ({ socket }) => {
         selectedChat,
         user,
         allChats,
+        typingChats,
     } = useSelector(
         state => state.userReducer
     );
-
 
     const [message, setMessage] = useState("");
     const [allMessages, setAllMessages] = useState([]);
@@ -33,6 +33,13 @@ const Chat = ({ socket }) => {
     const [replyingTo, setReplyingTo] = useState(null);
     const messageInputRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const typingTimeout = useRef(null);
+
+    const isTyping =
+        !!selectedChat?._id &&
+        !!typingChats[selectedChat._id] &&
+        String(typingChats[selectedChat._id]) !==
+        String(user._id);
 
     const selectedUser = selectedChat?.members?.find(
         member =>
@@ -168,6 +175,21 @@ const Chat = ({ socket }) => {
 
                 setMessage("");
 
+                clearTimeout(
+                    typingTimeout.current
+                );
+
+                socket.emit(
+                    "stop-typing",
+                    {
+                        sender: user._id,
+                        chatId: selectedChat._id,
+                        members: selectedChat.members.map(
+                            member => String(member._id)
+                        ),
+                    }
+                );
+
                 setReplyingTo(null);
 
                 if (
@@ -177,7 +199,7 @@ const Chat = ({ socket }) => {
                     messageInputRef.current.style.height =
                         "48px";
 
-                    messageInputRef.current.focus();
+                    messageInputRef.current?.focus();
 
                 }
 
@@ -346,9 +368,43 @@ const Chat = ({ socket }) => {
 
     const handleMessageChange = event => {
 
-        setMessage(
-            event.target.value
+        const value = event.target.value;
+
+        setMessage(value);
+
+        console.log("EMIT TYPING", {
+            sender: user._id,
+            chatId: selectedChat._id,
+        });
+
+        if (!selectedChat?._id) return;
+
+        socket.emit("typing", {
+            sender: user._id,
+            chatId: selectedChat._id,
+            members: selectedChat.members.map(
+                member => String(member._id)
+            ),
+        });
+
+        clearTimeout(
+            typingTimeout.current
         );
+
+        typingTimeout.current = setTimeout(() => {
+
+            socket.emit(
+                "stop-typing",
+                {
+                    sender: user._id,
+                    chatId: selectedChat._id,
+                    members: selectedChat.members.map(
+                        member => String(member._id)
+                    ),
+                }
+            );
+
+        }, 1000);
 
         const textarea =
             event.target;
@@ -430,6 +486,28 @@ const Chat = ({ socket }) => {
 
     useEffect(() => {
 
+        return () => {
+
+            clearTimeout(typingTimeout.current);
+
+            if (selectedChat?._id) {
+
+                socket.emit("stop-typing", {
+                    sender: user._id,
+                    chatId: selectedChat._id,
+                    members: selectedChat.members.map(
+                        member => String(member._id)
+                    ),
+                });
+
+            }
+
+        };
+
+    }, [selectedChat?._id]);
+
+    useEffect(() => {
+
         messagesEndRef.current
             ?.scrollIntoView({
 
@@ -441,15 +519,16 @@ const Chat = ({ socket }) => {
 
             });
 
-        messageInputRef.current.focus();
+        messageInputRef.current?.focus();
 
-    }, [allMessages]);
+    }, [allMessages, isTyping]);
 
 
     if (!selectedChat) {
         return null;
     }
 
+    console.log("isTyping =", isTyping);
 
     return (
 
@@ -484,24 +563,27 @@ const Chat = ({ socket }) => {
                 </button>
 
 
-                <div className="min-w-0 flex-1 text-right font-bold text-[#edefe5]">
+                <div className="min-w-0 flex-1">
 
-                    <span className="truncate">
-
+                    <p className="truncate text-right font-bold text-[#edefe5]">
                         {
                             selectedUser
-
                                 ? `${selectedUser.firstName} ${selectedUser.lastName}`
-
                                 : "Chat"
                         }
+                    </p>
 
-                    </span>
+                    {
+                        isTyping && (
+                            <p className="text-right text-xs text-[#f1eee8]">
+                                typing...
+                            </p>
+                        )
+                    }
 
                 </div>
 
             </div>
-
 
             {/* CHAT MESSAGES */}
 
@@ -624,6 +706,27 @@ const Chat = ({ socket }) => {
                         )
                     }
 
+                    {
+                        isTyping && (
+                            <div className="flex justify-start">
+                                <div className="rounded-2xl bg-[#171d17] px-3 py-2 max-w-fit transition-all duration-200 shadow-sm">
+                                    <div className="flex items-center gap-1">
+                                        <span
+                                            className="h-1.5 w-1.5 rounded-full bg-[#d8f45a] animate-bounce"
+                                        />
+                                        <span
+                                            className="h-1.5 w-1.5 rounded-full bg-[#d8f45a] animate-bounce"
+                                            style={{ animationDelay: "0.15s" }}
+                                        />
+                                        <span
+                                            className="h-1.5 w-1.5 rounded-full bg-[#d8f45a] animate-bounce"
+                                            style={{ animationDelay: "0.3s" }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
 
                     <div
                         ref={
@@ -737,7 +840,7 @@ const Chat = ({ socket }) => {
 
             </div>
 
-        </div>
+        </div >
 
     );
 

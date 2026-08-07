@@ -56,6 +56,52 @@ io.on("connection", socket => {
             }
         });
     });
+
+    socket.on("typing", ({ members, sender, chatId }) => {
+
+        members.forEach(memberId => {
+
+            if (String(memberId) !== String(sender)) {
+
+                socket.to(String(memberId)).emit(
+                    "typing",
+                    {
+                        sender,
+                        chatId,
+                    }
+                );
+
+            }
+
+        });
+
+        console.log("SERVER GOT TYPING", {
+            sender,
+            chatId,
+            members,
+        });
+
+    });
+
+    socket.on("stop-typing", ({ members, sender, chatId }) => {
+
+        members.forEach(memberId => {
+
+            if (String(memberId) !== String(sender)) {
+
+                socket.to(String(memberId)).emit(
+                    "stop-typing",
+                    {
+                        sender,
+                        chatId,
+                    }
+                );
+
+            }
+
+        });
+
+    });
 });
 
 connectDB()

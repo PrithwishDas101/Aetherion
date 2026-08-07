@@ -1,21 +1,18 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
 
 import Header from "../components/Header.jsx";
 import Sidebar from "../components/SideBar.jsx";
 import Chat from "../components/Chat.jsx";
+import { setTyping, clearTyping, } from "../redux/userSlice.js";
 
 const socket = io("http://localhost:8000");
 
 const Home = () => {
 
-    const {
-        selectedChat,
-        user,
-    } = useSelector(
-        state => state.userReducer
-    );
+    const { selectedChat, user, } = useSelector(state => state.userReducer);
+    const dispatch = useDispatch();
 
     useEffect(() => {
 
@@ -53,6 +50,41 @@ const Home = () => {
         );
 
     }, [user?._id]);
+
+    useEffect(() => {
+
+        const handleTyping = data => {
+
+            dispatch(
+                setTyping({
+                    chatId: data.chatId,
+                    userId: data.sender,
+                })
+            );
+
+        };
+
+        const handleStopTyping = data => {
+
+            dispatch(
+                clearTyping({
+                    chatId: data.chatId,
+                })
+            );
+
+        };
+
+        socket.on("typing", handleTyping);
+        socket.on("stop-typing", handleStopTyping);
+
+        return () => {
+
+            socket.off("typing", handleTyping);
+            socket.off("stop-typing", handleStopTyping);
+
+        };
+
+    }, [dispatch]);
 
     return (
 

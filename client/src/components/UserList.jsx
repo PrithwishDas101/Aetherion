@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import store from "../redux/store.js";
 
 function UserList({ searchKey, socket }) {
-    const { allUsers, allChats, user: currentUser, selectedChat, } = useSelector(state => state.userReducer);
+    const { allUsers, allChats, user: currentUser, selectedChat, typingChats } = useSelector(state => state.userReducer);
 
     const dispatch = useDispatch();
 
@@ -306,6 +306,11 @@ function UserList({ searchKey, socket }) {
                                 user._id
                             );
 
+                        const isTyping =
+                            !!userChat?._id &&
+                            !!typingChats[userChat._id] &&
+                            String(typingChats[userChat._id]) !== String(currentUser._id);
+
                         const lastMessage =
                             userChat
                                 ?.lastMessage
@@ -480,23 +485,21 @@ function UserList({ searchKey, socket }) {
                                                 }
 
                                                 <p
-                                                    className={`min-w-0 flex-1 truncate text-xs transition-colors ${unreadCount > 0 &&
-                                                        !isSelected
-                                                        ? "font-semibold text-[#999999]"
-                                                        : isSelected
-                                                            ? "text-[#b4bcae]"
-                                                            : "text-[#858d84]"
+                                                    className={`min-w-0 flex-1 truncate text-xs transition-colors ${isTyping
+                                                            ? "font-semibold text-[#d8f45a] italic"
+                                                            : unreadCount > 0 && !isSelected
+                                                                ? "font-semibold text-[#999999]"
+                                                                : isSelected
+                                                                    ? "text-[#b4bcae]"
+                                                                    : "text-[#858d84]"
                                                         }`}
                                                 >
                                                     {
-                                                        userChat
-                                                            ? (
-                                                                lastMessage ||
-                                                                "No messages yet."
-                                                            )
-                                                            : (
-                                                                user.email
-                                                            )
+                                                        isTyping
+                                                            ? "typing..."
+                                                            : userChat
+                                                                ? (lastMessage || "No messages yet.")
+                                                                : user.email
                                                     }
                                                 </p>
 
