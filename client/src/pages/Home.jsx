@@ -5,33 +5,14 @@ import { io } from "socket.io-client";
 import Header from "../components/Header.jsx";
 import Sidebar from "../components/SideBar.jsx";
 import Chat from "../components/Chat.jsx";
-import { setTyping, clearTyping, } from "../redux/userSlice.js";
+import { setTyping, clearTyping, setAllChats, setSelectedChat, } from "../redux/userSlice.js";
 
 const socket = io("http://localhost:8000");
 
 const Home = () => {
 
-    const { selectedChat, user, } = useSelector(state => state.userReducer);
+    const { selectedChat, user, allChats } = useSelector(state => state.userReducer);
     const dispatch = useDispatch();
-
-    useEffect(() => {
-
-        socket.on("connect", () => {
-
-            console.log(
-                "Socket connected:",
-                socket.id
-            );
-
-        });
-
-        return () => {
-
-            socket.off("connect");
-
-        };
-
-    }, []);
 
     useEffect(() => {
 
@@ -39,15 +20,36 @@ const Home = () => {
             return;
         }
 
-        console.log(
-            "Joining room:",
-            user._id
+        const joinUserRoom = () => {
+
+            
+
+            socket.emit(
+                "join-room",
+                user._id
+            );
+
+        };
+
+        if (socket.connected) {
+
+            joinUserRoom();
+
+        }
+
+        socket.on(
+            "connect",
+            joinUserRoom
         );
 
-        socket.emit(
-            "join-room",
-            user._id
-        );
+        return () => {
+
+            socket.off(
+                "connect",
+                joinUserRoom
+            );
+
+        };
 
     }, [user?._id]);
 
@@ -74,17 +76,78 @@ const Home = () => {
 
         };
 
-        socket.on("typing", handleTyping);
-        socket.on("stop-typing", handleStopTyping);
+        const handleMessagesRead = data => {
 
-        return () => {
+            const updatedChat = data.chat;
 
-            socket.off("typing", handleTyping);
-            socket.off("stop-typing", handleStopTyping);
+            if (!updatedChat) {
+                return;
+            }
+
+            const updatedChats = (allChats || []).map(
+                chat =>
+                    String(chat._id) ===
+                        String(updatedChat._id)
+                        ? updatedChat
+                        : chat
+            );
+
+            dispatch(
+                setAllChats(
+                    updatedChats
+                )
+            );
+
+            if (
+                String(selectedChat?._id) ===
+                String(updatedChat._id)
+            ) {
+
+                dispatch(
+                    setSelectedChat(
+                        updatedChat
+                    )
+                );
+
+            }
 
         };
 
-    }, [dispatch]);
+        socket.on(
+            "typing",
+            handleTyping
+        );
+
+        socket.on(
+            "stop-typing",
+            handleStopTyping
+        );
+
+        socket.on(
+            "messages-read",
+            handleMessagesRead
+        );
+
+        return () => {
+
+            socket.off(
+                "typing",
+                handleTyping
+            );
+
+            socket.off(
+                "stop-typing",
+                handleStopTyping
+            );
+
+            socket.off(
+                "messages-read",
+                handleMessagesRead
+            );
+
+        };
+
+    }, [dispatch, allChats, selectedChat]);
 
     return (
 

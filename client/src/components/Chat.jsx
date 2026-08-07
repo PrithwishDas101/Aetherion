@@ -417,9 +417,7 @@ const Chat = ({ socket }) => {
 
     useEffect(() => {
 
-        if (
-            !selectedChat?._id
-        ) {
+        if (!selectedChat?._id) {
             return;
         }
 
@@ -427,14 +425,16 @@ const Chat = ({ socket }) => {
 
         clearUnreadMessages();
 
-
     }, [selectedChat?._id]);
 
     useEffect(() => {
 
-        const handleReceiveMessage = data => {
+        const handleReceiveMessage = async data => {
 
-            if (String(data.message.chatId) !== String(selectedChat?._id)) {
+            if (
+                String(data.message.chatId) !==
+                String(selectedChat?._id)
+            ) {
                 return;
             }
 
@@ -458,7 +458,41 @@ const Chat = ({ socket }) => {
             });
 
             if (data.chat) {
-                updateChatInRedux(data.chat);
+
+                updateChatInRedux(
+                    data.chat
+                );
+
+            }
+
+            // CHAT IS CURRENTLY OPEN
+            // Mark the incoming message as read immediately.
+
+            try {
+
+                const response =
+                    await clearUnreadMessage(
+                        selectedChat._id
+                    );
+
+                if (
+                    response?.success &&
+                    response?.data
+                ) {
+
+                    updateChatInRedux(
+                        response.data
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Instant read receipt error:",
+                    error
+                );
+
             }
 
         };
@@ -477,7 +511,66 @@ const Chat = ({ socket }) => {
 
         };
 
-    }, [selectedChat?._id]);
+    }, [
+        socket,
+        selectedChat?._id,
+    ]);
+
+    useEffect(() => {
+
+        const handleMessagesRead = data => {
+
+            if (
+                String(data.chatId) !==
+                String(selectedChat?._id)
+            ) {
+                return;
+            }
+
+            setAllMessages(previousMessages =>
+                previousMessages.map(message => {
+
+                    const senderId =
+                        typeof message.sender === "object"
+                            ? message.sender?._id
+                            : message.sender;
+
+                    if (
+                        String(senderId) ===
+                        String(user._id)
+                    ) {
+                        return {
+                            ...message,
+                            read: true,
+                        };
+                    }
+
+                    return message;
+
+                })
+            );
+
+        };
+
+        socket.on(
+            "messages-read",
+            handleMessagesRead
+        );
+
+        return () => {
+
+            socket.off(
+                "messages-read",
+                handleMessagesRead
+            );
+
+        };
+
+    }, [
+        socket,
+        selectedChat?._id,
+        user?._id,
+    ]);
 
     useEffect(() => {
 

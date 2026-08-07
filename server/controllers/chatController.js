@@ -398,6 +398,26 @@ export const clearUnreadMessages = async (req, res) => {
                     "lastMessage"
                 );
 
+        const io = req.app.get("io");
+
+        const otherMember = updatedChat.members.find(
+            member =>
+                String(member._id) !==
+                String(userId)
+        );
+
+        if (otherMember) {
+
+            io.to(String(otherMember._id)).emit(
+                "messages-read",
+                {
+                    chatId: String(chatId),
+                    userId: String(userId),
+                    chat: updatedChat,
+                }
+            );
+
+        }
 
         return res
             .status(200)
