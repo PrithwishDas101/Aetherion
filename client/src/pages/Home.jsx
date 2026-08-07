@@ -71,7 +71,7 @@ const Home = () => {
                     className={`min-h-0 w-full ${selectedChat ? "hidden" : "block"} md:block md:w-[30%] md:min-w-[320px]`}
                 >
 
-                    <Sidebar />
+                    <Sidebar socket={socket} />
 
                 </div>
 
@@ -80,9 +80,7 @@ const Home = () => {
                     className={`min-h-0 flex-1 overflow-hidden ${selectedChat ? "block" : "hidden"} md:block`}
                 >
 
-                    {selectedChat && (
-                        <Chat socket={socket} />
-                    )}
+                    {selectedChat && (<Chat socket={socket} />)}
 
                 </div>
 

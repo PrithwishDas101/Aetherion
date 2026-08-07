@@ -6,18 +6,82 @@ import { createChat } from "../apiCalls/chatApi.js";
 import { hideLoader, showLoader, } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat, } from "../redux/userSlice.js";
 import { formatChatPreviewTime, } from "../utils/messageDate.js";
+import { useEffect } from "react";
+import store from "../redux/store.js";
 
-function UserList({ searchKey }) {
-    const {
-        allUsers,
-        allChats,
-        user: currentUser,
-        selectedChat,
-    } = useSelector(
-        state => state.userReducer
-    );
+function UserList({ searchKey, socket }) {
+    const { allUsers, allChats, user: currentUser, selectedChat, } = useSelector(state => state.userReducer);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+
+        const handleReceiveMessage = data => {
+
+            const updatedChat = data.chat;
+
+            if (!updatedChat) {
+                return;
+            }
+
+            const chats =
+                store.getState().userReducer.allChats || [];
+
+            const chatExists = chats.some(
+                chat =>
+                    String(chat._id) ===
+                    String(updatedChat._id)
+            );
+
+            const updatedChats = chatExists
+
+                ? chats.map(chat =>
+
+                    String(chat._id) ===
+                        String(updatedChat._id)
+
+                        ? updatedChat
+
+                        : chat
+
+                )
+
+                : [
+                    ...chats,
+                    updatedChat,
+                ];
+
+            dispatch(
+                setAllChats([
+
+                    updatedChat,
+
+                    ...updatedChats.filter(
+                        chat =>
+                            String(chat._id) !==
+                            String(updatedChat._id)
+                    ),
+
+                ])
+            );
+
+        };
+
+        socket.on(
+            "receive-message",
+            handleReceiveMessage
+        );
+
+        return () => {
+
+            socket.off(
+                "receive-message",
+                handleReceiveMessage
+            );
+
+        };
+
+    }, [socket, dispatch]);
 
     if (!currentUser?._id) {
         return null;
@@ -139,66 +203,65 @@ function UserList({ searchKey }) {
         }
     };
 
-    const normalizedSearchKey = (searchKey || "").trim()
-        .toLowerCase();
+    const normalizedSearchKey = (searchKey || "").trim().toLowerCase();
 
-    const visibleUsers = (allUsers || []).filter(
-        user => {
-            if (
-                String(
-                    user?._id
-                ) ===
-                String(
-                    currentUser._id
-                )
-            ) {
-                return false;
-            }
+    const visibleUsers = (allUsers || []).filter(user => {
 
-            const firstName =
-                (
-                    user?.firstName ||
-                    ""
-                )
-                    .toLowerCase();
-
-            const lastName =
-                (
-                    user?.lastName ||
-                    ""
-                )
-                    .toLowerCase();
-
-            const fullName =
-                `${firstName} ${lastName}`
-                    .trim();
-
-            const matchesSearch =
-                firstName.includes(
-                    normalizedSearchKey
-                ) ||
-                lastName.includes(
-                    normalizedSearchKey
-                ) ||
-                fullName.includes(
-                    normalizedSearchKey
-                );
-
-            const alreadyHasChat =
-                Boolean(
-                    findChatWithUser(
-                        user._id
-                    )
-                );
-
-            if (
-                normalizedSearchKey
-            ) {
-                return matchesSearch;
-            }
-
-            return alreadyHasChat;
+        if (
+            String(
+                user?._id
+            ) ===
+            String(
+                currentUser._id
+            )
+        ) {
+            return false;
         }
+
+        const firstName =
+            (
+                user?.firstName ||
+                ""
+            )
+                .toLowerCase();
+
+        const lastName =
+            (
+                user?.lastName ||
+                ""
+            )
+                .toLowerCase();
+
+        const fullName =
+            `${firstName} ${lastName}`
+                .trim();
+
+        const matchesSearch =
+            firstName.includes(
+                normalizedSearchKey
+            ) ||
+            lastName.includes(
+                normalizedSearchKey
+            ) ||
+            fullName.includes(
+                normalizedSearchKey
+            );
+
+        const alreadyHasChat =
+            Boolean(
+                findChatWithUser(
+                    user._id
+                )
+            );
+
+        if (
+            normalizedSearchKey
+        ) {
+            return matchesSearch;
+        }
+
+        return alreadyHasChat;
+    }
     )
         .sort(
             (firstUser, secondUser) => {
@@ -418,11 +481,11 @@ function UserList({ searchKey }) {
 
                                                 <p
                                                     className={`min-w-0 flex-1 truncate text-xs transition-colors ${unreadCount > 0 &&
-                                                            !isSelected
-                                                            ? "font-semibold text-[#999999]"
-                                                            : isSelected
-                                                                ? "text-[#b4bcae]"
-                                                                : "text-[#858d84]"
+                                                        !isSelected
+                                                        ? "font-semibold text-[#999999]"
+                                                        : isSelected
+                                                            ? "text-[#b4bcae]"
+                                                            : "text-[#858d84]"
                                                         }`}
                                                 >
                                                     {
