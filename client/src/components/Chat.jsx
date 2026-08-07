@@ -372,11 +372,6 @@ const Chat = ({ socket }) => {
 
         setMessage(value);
 
-        console.log("EMIT TYPING", {
-            sender: user._id,
-            chatId: selectedChat._id,
-        });
-
         if (!selectedChat?._id) return;
 
         socket.emit("typing", {
@@ -527,8 +522,6 @@ const Chat = ({ socket }) => {
     if (!selectedChat) {
         return null;
     }
-
-    console.log("isTyping =", isTyping);
 
     return (
 

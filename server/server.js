@@ -31,13 +31,6 @@ io.on("connection", socket => {
 
         socket.join(String(userId));
 
-        console.log(
-            "User joined:",
-            userId,
-            "Rooms:",
-            [...socket.rooms]
-        );
-
     });
 
     socket.on("send-message", ({ message, chat, members }) => {
@@ -70,17 +63,8 @@ io.on("connection", socket => {
                         chatId,
                     }
                 );
-
             }
-
         });
-
-        console.log("SERVER GOT TYPING", {
-            sender,
-            chatId,
-            members,
-        });
-
     });
 
     socket.on("stop-typing", ({ members, sender, chatId }) => {
