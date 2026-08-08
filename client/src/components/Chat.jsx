@@ -87,15 +87,45 @@ const Chat = ({ socket }) => {
             return;
         }
 
+        const existingChats =
+            allChats || [];
+
+        const updatedChats = [
+            updatedChat,
+
+            ...existingChats.filter(
+                chat =>
+                    String(chat._id) !==
+                    String(updatedChat._id)
+            ),
+        ];
+
+        dispatch(
+            setAllChats(
+                updatedChats
+            )
+        );
+
+        dispatch(
+            setSelectedChat(
+                updatedChat
+            )
+        );
+
+    };
+
+    const updateChatWithoutReordering = updatedChat => {
+
+        if (!updatedChat) {
+            return;
+        }
+
         const updatedChats =
             (allChats || []).map(
                 chat =>
-
                     String(chat._id) ===
                         String(updatedChat._id)
-
                         ? updatedChat
-
                         : chat
             );
 
@@ -346,7 +376,7 @@ const Chat = ({ socket }) => {
                 response?.data
             ) {
 
-                updateChatInRedux(
+                updateChatWithoutReordering(
                     response.data
                 );
 
@@ -480,7 +510,7 @@ const Chat = ({ socket }) => {
                     response?.data
                 ) {
 
-                    updateChatInRedux(
+                    updateChatWithoutReordering(
                         response.data
                     );
 

@@ -388,6 +388,9 @@ export const clearUnreadMessages = async (req, res) => {
                         returnDocument:
                             "after",
 
+                        timestamps:
+                            false,
+
                     }
 
                 )

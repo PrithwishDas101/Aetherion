@@ -34,35 +34,31 @@ function UserList({ searchKey, socket }) {
             );
 
             const updatedChats = chatExists
-
                 ? chats.map(chat =>
-
                     String(chat._id) ===
                         String(updatedChat._id)
-
                         ? updatedChat
-
                         : chat
-
                 )
-
                 : [
                     ...chats,
                     updatedChat,
                 ];
 
+            updatedChats.sort(
+                (firstChat, secondChat) =>
+                    new Date(
+                        secondChat.updatedAt || 0
+                    ) -
+                    new Date(
+                        firstChat.updatedAt || 0
+                    )
+            );
+
             dispatch(
-                setAllChats([
-
-                    updatedChat,
-
-                    ...updatedChats.filter(
-                        chat =>
-                            String(chat._id) !==
-                            String(updatedChat._id)
-                    ),
-
-                ])
+                setAllChats(
+                    updatedChats
+                )
             );
 
         };
@@ -486,12 +482,12 @@ function UserList({ searchKey, socket }) {
 
                                                 <p
                                                     className={`min-w-0 flex-1 truncate text-xs transition-colors ${isTyping
-                                                            ? "font-semibold text-[#d8f45a] italic"
-                                                            : unreadCount > 0 && !isSelected
-                                                                ? "font-semibold text-[#999999]"
-                                                                : isSelected
-                                                                    ? "text-[#b4bcae]"
-                                                                    : "text-[#858d84]"
+                                                        ? "font-semibold text-[#d8f45a] italic"
+                                                        : unreadCount > 0 && !isSelected
+                                                            ? "font-semibold text-[#999999]"
+                                                            : isSelected
+                                                                ? "text-[#b4bcae]"
+                                                                : "text-[#858d84]"
                                                         }`}
                                                 >
                                                     {
