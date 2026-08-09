@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { io } from "socket.io-client";
 
 import Header from "../components/Header.jsx";
 import Sidebar from "../components/SideBar.jsx";
 import Chat from "../components/Chat.jsx";
 import { setTyping, clearTyping, setAllChats, setSelectedChat, } from "../redux/userSlice.js";
+import socket from "../sockets/socket.js";
+import { joinRoom, } from "../sockets/socketEmitters.js";
+import registerSocketListeners from "../sockets/socketListeners.js";
 
-const socket = io("http://localhost:8000");
 
 const Home = () => {
 
@@ -20,12 +21,10 @@ const Home = () => {
             return;
         }
 
-        const joinUserRoom = () => {
+        const handleConnect = () => {
 
-            
-
-            socket.emit(
-                "join-room",
+            joinRoom(
+                socket,
                 user._id
             );
 
@@ -33,20 +32,20 @@ const Home = () => {
 
         if (socket.connected) {
 
-            joinUserRoom();
+            handleConnect();
 
         }
 
         socket.on(
             "connect",
-            joinUserRoom
+            handleConnect
         );
 
         return () => {
 
             socket.off(
                 "connect",
-                joinUserRoom
+                handleConnect
             );
 
         };
@@ -78,19 +77,21 @@ const Home = () => {
 
         const handleMessagesRead = data => {
 
-            const updatedChat = data.chat;
+            const updatedChat =
+                data.chat;
 
             if (!updatedChat) {
                 return;
             }
 
-            const updatedChats = (allChats || []).map(
-                chat =>
-                    String(chat._id) ===
-                        String(updatedChat._id)
-                        ? updatedChat
-                        : chat
-            );
+            const updatedChats =
+                (allChats || []).map(
+                    chat =>
+                        String(chat._id) ===
+                            String(updatedChat._id)
+                            ? updatedChat
+                            : chat
+                );
 
             dispatch(
                 setAllChats(
@@ -113,42 +114,28 @@ const Home = () => {
 
         };
 
-        socket.on(
-            "typing",
-            handleTyping
-        );
+        const cleanup =
+            registerSocketListeners(
+                socket,
+                {
+                    onTyping:
+                        handleTyping,
 
-        socket.on(
-            "stop-typing",
-            handleStopTyping
-        );
+                    onStopTyping:
+                        handleStopTyping,
 
-        socket.on(
-            "messages-read",
-            handleMessagesRead
-        );
-
-        return () => {
-
-            socket.off(
-                "typing",
-                handleTyping
+                    onMessagesRead:
+                        handleMessagesRead,
+                }
             );
 
-            socket.off(
-                "stop-typing",
-                handleStopTyping
-            );
+        return cleanup;
 
-            socket.off(
-                "messages-read",
-                handleMessagesRead
-            );
-
-        };
-
-    }, [dispatch, allChats, selectedChat]);
-
+    }, [
+        dispatch,
+        allChats,
+        selectedChat,
+    ]);
     return (
 
         <div className="flex h-screen flex-col overflow-hidden bg-[#080d09]">

@@ -8,6 +8,7 @@ import { setAllChats, setSelectedChat, } from "../redux/userSlice.js";
 import { formatChatPreviewTime, } from "../utils/messageDate.js";
 import { useEffect } from "react";
 import store from "../redux/store.js";
+import registerSocketListeners from "../sockets/socketListeners.js";
 
 function UserList({ searchKey, socket }) {
     const { allUsers, allChats, user: currentUser, selectedChat, typingChats } = useSelector(state => state.userReducer);
@@ -63,19 +64,13 @@ function UserList({ searchKey, socket }) {
 
         };
 
-        socket.on(
-            "receive-message",
-            handleReceiveMessage
+        return registerSocketListeners(
+            socket,
+            {
+                onReceiveMessage:
+                    handleReceiveMessage,
+            }
         );
-
-        return () => {
-
-            socket.off(
-                "receive-message",
-                handleReceiveMessage
-            );
-
-        };
 
     }, [socket, dispatch]);
 

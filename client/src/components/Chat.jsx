@@ -13,6 +13,8 @@ import { formatDateLabel, shouldShowDateSeparator, } from "../utils/messageDate.
 import MessageBubble from "./MessageBubble.jsx";
 import DateSeparator from "./DateSeparator.jsx";
 import ReplyPreview from "./ReplyPreview.jsx";
+import { sendMessage as emitSendMessage, sendTyping, sendStopTyping, } from "../sockets/socketEmitters.js";
+import registerSocketListeners from "../sockets/socketListeners.js";
 
 const Chat = ({ socket }) => {
 
@@ -177,7 +179,7 @@ const Chat = ({ socket }) => {
 
             if (response?.success) {
 
-                socket.emit("send-message", {
+                emitSendMessage(socket, {
                     message: response.data,
                     chat: response.chat,
                     members: selectedChat.members.map(
@@ -209,16 +211,13 @@ const Chat = ({ socket }) => {
                     typingTimeout.current
                 );
 
-                socket.emit(
-                    "stop-typing",
-                    {
-                        sender: user._id,
-                        chatId: selectedChat._id,
-                        members: selectedChat.members.map(
-                            member => String(member._id)
-                        ),
-                    }
-                );
+                sendStopTyping(socket, {
+                    sender: user._id,
+                    chatId: selectedChat._id,
+                    members: selectedChat.members.map(
+                        member => String(member._id)
+                    ),
+                });
 
                 setReplyingTo(null);
 
@@ -404,7 +403,7 @@ const Chat = ({ socket }) => {
 
         if (!selectedChat?._id) return;
 
-        socket.emit("typing", {
+        sendTyping(socket, {
             sender: user._id,
             chatId: selectedChat._id,
             members: selectedChat.members.map(
@@ -418,16 +417,13 @@ const Chat = ({ socket }) => {
 
         typingTimeout.current = setTimeout(() => {
 
-            socket.emit(
-                "stop-typing",
-                {
-                    sender: user._id,
-                    chatId: selectedChat._id,
-                    members: selectedChat.members.map(
-                        member => String(member._id)
-                    ),
-                }
-            );
+            sendStopTyping(socket, {
+                sender: user._id,
+                chatId: selectedChat._id,
+                members: selectedChat.members.map(
+                    member => String(member._id)
+                ),
+            });
 
         }, 1000);
 
@@ -527,20 +523,13 @@ const Chat = ({ socket }) => {
 
         };
 
-        socket.on(
-            "receive-message",
-            handleReceiveMessage
+        return registerSocketListeners(
+            socket,
+            {
+                onReceiveMessage:
+                    handleReceiveMessage,
+            }
         );
-
-        return () => {
-
-            socket.off(
-                "receive-message",
-                handleReceiveMessage
-            );
-
-        };
-
     }, [
         socket,
         selectedChat?._id,
@@ -582,20 +571,13 @@ const Chat = ({ socket }) => {
 
         };
 
-        socket.on(
-            "messages-read",
-            handleMessagesRead
+        return registerSocketListeners(
+            socket,
+            {
+                onMessagesRead:
+                    handleMessagesRead,
+            }
         );
-
-        return () => {
-
-            socket.off(
-                "messages-read",
-                handleMessagesRead
-            );
-
-        };
-
     }, [
         socket,
         selectedChat?._id,
@@ -610,7 +592,7 @@ const Chat = ({ socket }) => {
 
             if (selectedChat?._id) {
 
-                socket.emit("stop-typing", {
+                sendStopTyping(socket, {
                     sender: user._id,
                     chatId: selectedChat._id,
                     members: selectedChat.members.map(

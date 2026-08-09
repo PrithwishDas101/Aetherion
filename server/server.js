@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 
 import app from "./app.js";
 import connectDB from "./config/db.js";
+import initializeSocket from "./socket/socket.js";
 
 dotenv.config({
     quiet: true,
@@ -13,82 +14,9 @@ const PORT = process.env.PORT || 8000;
 
 const server = http.createServer(app);
 
-const io = new Server(server, {
-    cors: {
-        origin:
-            process.env.CLIENT_URL ||
-            "http://localhost:5173",
-
-        methods: ["GET", "POST"],
-
-        credentials: true,
-    },
-});
+const io = initializeSocket(server);
 
 app.set("io", io);
-
-io.on("connection", socket => {
-
-    socket.on("join-room", userId => {
-
-        socket.join(String(userId));
-
-    });
-
-    socket.on("send-message", ({ message, chat, members }) => {
-
-        members.forEach(memberId => {
-
-            if (memberId !== String(message.sender)) {
-
-                socket.to(memberId).emit(
-                    "receive-message",
-                    {
-                        message,
-                        chat,
-                    }
-                );
-            }
-        });
-    });
-
-    socket.on("typing", ({ members, sender, chatId }) => {
-
-        members.forEach(memberId => {
-
-            if (String(memberId) !== String(sender)) {
-
-                socket.to(String(memberId)).emit(
-                    "typing",
-                    {
-                        sender,
-                        chatId,
-                    }
-                );
-            }
-        });
-    });
-
-    socket.on("stop-typing", ({ members, sender, chatId }) => {
-
-        members.forEach(memberId => {
-
-            if (String(memberId) !== String(sender)) {
-
-                socket.to(String(memberId)).emit(
-                    "stop-typing",
-                    {
-                        sender,
-                        chatId,
-                    }
-                );
-
-            }
-
-        });
-
-    });
-});
 
 connectDB()
     .then(() => {
