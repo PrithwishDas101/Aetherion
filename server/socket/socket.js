@@ -1,6 +1,8 @@
 import { Server } from "socket.io";
 
 import { registerSocketHandlers } from "./socketHandlers.js";
+import registerPresenceHandlers from "./presenceHandlers.js";
+
 
 const initializeSocket = server => {
 
@@ -22,9 +24,8 @@ const initializeSocket = server => {
         }
     );
 
-    registerSocketHandlers(
-        io
-    );
+    registerSocketHandlers(io);
+    registerPresenceHandlers(io);
 
     return io;
 

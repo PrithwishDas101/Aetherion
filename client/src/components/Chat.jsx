@@ -9,7 +9,7 @@ import { createMessage, getAllMessages, } from "../apiCalls/messageApi.js";
 import { clearUnreadMessage, } from "../apiCalls/chatApi.js";
 import { showLoader, hideLoader, } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat, } from "../redux/userSlice.js";
-import { formatDateLabel, shouldShowDateSeparator, } from "../utils/messageDate.js";
+import { formatDateLabel, shouldShowDateSeparator, formatLastSeen } from "../utils/messageDate.js";
 import MessageBubble from "./MessageBubble.jsx";
 import DateSeparator from "./DateSeparator.jsx";
 import ReplyPreview from "./ReplyPreview.jsx";
@@ -25,6 +25,7 @@ const Chat = ({ socket }) => {
         user,
         allChats,
         typingChats,
+        presence,
     } = useSelector(
         state => state.userReducer
     );
@@ -48,6 +49,23 @@ const Chat = ({ socket }) => {
             String(member._id) !==
             String(user._id)
     );
+
+    const selectedUserPresence =
+        selectedUser?._id
+            ? presence[
+            String(selectedUser._id)
+            ]
+            : null;
+
+    const isSelectedUserOnline =
+        !!selectedUserPresence?.online;
+
+    const selectedUserLastSeen =
+        selectedUser?._id
+            ? presence[
+                String(selectedUser._id)
+            ]?.lastSeen
+            : null;
 
     const unreadMessageCount = Number(
         selectedChat
@@ -663,13 +681,34 @@ const Chat = ({ socket }) => {
 
                 <div className="min-w-0 flex-1">
 
-                    <p className="truncate text-right font-bold text-[#edefe5]">
-                        {
-                            selectedUser
-                                ? `${selectedUser.firstName} ${selectedUser.lastName}`
-                                : "Chat"
-                        }
-                    </p>
+                    <div className="text-right">
+
+                        <p className="truncate font-bold text-[#edefe5]">
+                            {
+                                selectedUser
+                                    ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                                    : "Chat"
+                            }
+                        </p>
+
+                        <p className="flex items-center justify-end gap-1 text-xs text-[#8a9385]">
+
+                            {
+                                isSelectedUserOnline && (
+                                    <span className="h-1.5 w-1.5 rounded-full bg-[#d8f45a]" />
+                                )
+                            }
+
+                            {
+                                isSelectedUserOnline
+                                    ? "online"
+                                    : formatLastSeen(
+                                        selectedUserLastSeen
+                                    )}
+
+                        </p>
+
+                    </div>
 
                     {
                         isTyping && (

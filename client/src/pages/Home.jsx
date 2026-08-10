@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header.jsx";
 import Sidebar from "../components/SideBar.jsx";
 import Chat from "../components/Chat.jsx";
-import { setTyping, clearTyping, setAllChats, setSelectedChat, } from "../redux/userSlice.js";
+import { setTyping, clearTyping, setAllChats, setSelectedChat, setUserOnline, setUserOffline, setPresenceState } from "../redux/userSlice.js";
 import socket from "../sockets/socket.js";
-import { joinRoom, } from "../sockets/socketEmitters.js";
+import { joinRoom, getPresence, } from "../sockets/socketEmitters.js";
 import registerSocketListeners from "../sockets/socketListeners.js";
 
 
@@ -26,6 +26,10 @@ const Home = () => {
             joinRoom(
                 socket,
                 user._id
+            );
+
+            getPresence(
+                socket
             );
 
         };
@@ -131,11 +135,68 @@ const Home = () => {
 
         return cleanup;
 
-    }, [
-        dispatch,
-        allChats,
-        selectedChat,
-    ]);
+    }, [dispatch, allChats, selectedChat,]);
+
+    useEffect(() => {
+
+        const handleUserOnline = data => {
+
+            if (!data?.userId) {
+                return;
+            }
+
+            dispatch(
+                setUserOnline(
+                    data.userId
+                )
+            );
+
+        };
+
+        const handleUserOffline = data => {
+
+            if (!data?.userId) {
+                return;
+            }
+
+            dispatch(
+                setUserOffline({
+                    userId:
+                        data.userId,
+
+                    lastSeen:
+                        data.lastSeen,
+                })
+            );
+
+        };
+
+        const handlePresenceState = data => {
+
+            dispatch(
+                setPresenceState(
+                    data?.userIds || []
+                )
+            );
+
+        };
+
+        return registerSocketListeners(
+            socket,
+            {
+                onUserOnline:
+                    handleUserOnline,
+
+                onUserOffline:
+                    handleUserOffline,
+
+                onPresenceState:
+                    handlePresenceState,
+            }
+        );
+
+    }, [dispatch]);
+
     return (
 
         <div className="flex h-screen flex-col overflow-hidden bg-[#080d09]">

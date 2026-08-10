@@ -13,7 +13,6 @@ const isSameDay = (firstDate, secondDate) => {
 
 };
 
-
 export const formatMessageTime = (
     dateString
 ) => {
@@ -33,7 +32,6 @@ export const formatMessageTime = (
     );
 
 };
-
 
 export const formatDateLabel = (
     dateString
@@ -107,7 +105,6 @@ export const formatDateLabel = (
     );
 
 };
-
 
 export const shouldShowDateSeparator = (
     currentMessage,
@@ -249,4 +246,86 @@ export const formatChatPreviewTime = (
 
         );
 
+};
+
+export const formatLastSeen = date => {
+
+    if (!date) {
+        return "last seen recently";
+    }
+
+    const lastSeenDate = new Date(date);
+    const now = new Date();
+
+    if (Number.isNaN(lastSeenDate.getTime())) {
+        return "last seen recently";
+    }
+
+    const time = lastSeenDate.toLocaleTimeString(
+        [],
+        {
+            hour: "numeric",
+            minute: "2-digit",
+        }
+    );
+
+    const sameDay =
+        lastSeenDate.toDateString() ===
+        now.toDateString();
+
+    if (sameDay) {
+        return `last seen today at ${time}`;
+    }
+
+    const yesterday = new Date(now);
+
+    yesterday.setDate(
+        now.getDate() - 1
+    );
+
+    if (
+        lastSeenDate.toDateString() ===
+        yesterday.toDateString()
+    ) {
+        return `last seen yesterday at ${time}`;
+    }
+
+    const sameMonth =
+        lastSeenDate.getFullYear() ===
+            now.getFullYear() &&
+        lastSeenDate.getMonth() ===
+            now.getMonth();
+
+    if (sameMonth) {
+        return `last seen ${lastSeenDate.toLocaleDateString(
+            [],
+            {
+                month: "short",
+                day: "numeric",
+            }
+        )} at ${time}`;
+    }
+
+    const sameYear =
+        lastSeenDate.getFullYear() ===
+        now.getFullYear();
+
+    if (sameYear) {
+        return `last seen ${lastSeenDate.toLocaleDateString(
+            [],
+            {
+                month: "short",
+                day: "numeric",
+            }
+        )} at ${time}`;
+    }
+
+    return `last seen on ${lastSeenDate.toLocaleDateString(
+        [],
+        {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+        }
+    )}`;
 };

@@ -86,9 +86,22 @@ const sendStopTyping = (
 
 };
 
+const getPresence = socket => {
+
+    if (!socket) {
+        return;
+    }
+
+    socket.emit(
+        "get-presence"
+    );
+
+};
+
 export {
     joinRoom,
     sendMessage,
     sendTyping,
     sendStopTyping,
+    getPresence
 };

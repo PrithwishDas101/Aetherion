@@ -5,11 +5,14 @@ const registerSocketListeners = (
         onTyping,
         onStopTyping,
         onMessagesRead,
+        onUserOnline,
+        onUserOffline,
+        onPresenceState,
     } = {}
 ) => {
 
     if (!socket) {
-        return () => {};
+        return () => { };
     }
 
     if (onReceiveMessage) {
@@ -48,6 +51,33 @@ const registerSocketListeners = (
 
     }
 
+    if (onUserOnline) {
+
+        socket.on(
+            "user-online",
+            onUserOnline
+        );
+
+    }
+
+    if (onUserOffline) {
+
+        socket.on(
+            "user-offline",
+            onUserOffline
+        );
+
+    }
+
+    if (onPresenceState) {
+
+        socket.on(
+            "presence-state",
+            onPresenceState
+        );
+
+    }
+
     return () => {
 
         if (onReceiveMessage) {
@@ -82,6 +112,33 @@ const registerSocketListeners = (
             socket.off(
                 "messages-read",
                 onMessagesRead
+            );
+
+        }
+
+        if (onUserOnline) {
+
+            socket.off(
+                "user-online",
+                onUserOnline
+            );
+
+        }
+
+        if (onUserOffline) {
+
+            socket.off(
+                "user-offline",
+                onUserOffline
+            );
+
+        }
+
+        if (onPresenceState) {
+
+            socket.off(
+                "presence-state",
+                onPresenceState
             );
 
         }

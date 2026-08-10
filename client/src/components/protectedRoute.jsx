@@ -3,25 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
-import {
-    getLoggedUser,
-    getAllUsers,
-} from "../apiCalls/userApi.js";
-
-import {
-    getAllChats,
-} from "../apiCalls/chatApi.js";
-
-import {
-    showLoader,
-    hideLoader,
-} from "../redux/sliceLoader.js";
-
-import {
-    setUser,
-    setAllUser,
-    setAllChats,
-} from "../redux/userSlice.js";
+import { getLoggedUser, getAllUsers, } from "../apiCalls/userApi.js";
+import { getAllChats, } from "../apiCalls/chatApi.js";
+import { showLoader, hideLoader, } from "../redux/sliceLoader.js";
+import { setUser, setAllUser, setAllChats, setInitialPresence } from "../redux/userSlice.js";
 
 function ProtectedRoute({ children }) {
 
@@ -81,7 +66,15 @@ function ProtectedRoute({ children }) {
             if (response.success) {
 
                 dispatch(
-                    setAllUser(response.users)
+                    setAllUser(
+                        response.users
+                    )
+                );
+
+                dispatch(
+                    setInitialPresence(
+                        response.users
+                    )
                 );
 
             } else {
