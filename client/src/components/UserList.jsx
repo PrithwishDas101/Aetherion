@@ -11,7 +11,7 @@ import store from "../redux/store.js";
 import registerSocketListeners from "../sockets/socketListeners.js";
 
 function UserList({ searchKey, socket }) {
-    const { allUsers, allChats, user: currentUser, selectedChat, typingChats } = useSelector(state => state.userReducer);
+    const { allUsers, allChats, user: currentUser, selectedChat, typingChats, presence } = useSelector(state => state.userReducer);
 
     const dispatch = useDispatch();
 
@@ -379,42 +379,52 @@ function UserList({ searchKey, socket }) {
                                 className={`group relative cursor-pointer border-b border-[#d8f45a]/10 px-3 py-4 transition-all duration-200 ${userClass}`}
                             >
                                 <div className="flex items-center gap-3">
-                                    {
-                                        user.profilePic
-                                            ? (
-                                                <img
-                                                    src={
-                                                        user.profilePic
-                                                    }
-                                                    alt={`${user.firstName} ${user.lastName}`}
-                                                    className="h-12 w-12 shrink-0 rounded-full bg-[#cacfb4] object-cover"
+                                    <div className="relative shrink-0">
+
+                                        {
+                                            user.profilePic
+                                                ? (
+                                                    <img
+                                                        src={user.profilePic}
+                                                        alt={`${user.firstName} ${user.lastName}`}
+                                                        className="h-12 w-12 rounded-full bg-[#cacfb4] object-cover"
+                                                    />
+                                                )
+                                                : (
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#cacfb4] text-sm font-bold text-[#10120d]">
+                                                        {
+                                                            [
+                                                                (user.firstName || "")
+                                                                    .trim()
+                                                                    .charAt(0),
+
+                                                                ...(user.lastName || "")
+                                                                    .trim()
+                                                                    .split(/\s+/)
+                                                                    .map(
+                                                                        name =>
+                                                                            name.charAt(0)
+                                                                    ),
+                                                            ]
+                                                                .filter(Boolean)
+                                                                .slice(0, 3)
+                                                                .join("")
+                                                                .toUpperCase()
+                                                        }
+                                                    </div>
+                                                )
+                                        }
+
+                                        {
+                                            !!presence?.[String(user._id)]?.online && (
+                                                <span
+                                                    className="  absolute bottom-0  right-0 h-3 w-3 rounded-full border-2 border-[#0b100c] bg-[#76f45a] "
+                                                    aria-label="Online"
                                                 />
                                             )
-                                            : (
-                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#cacfb4] text-sm font-bold text-[#10120d]">
+                                        }
 
-                                                    {
-                                                        [
-                                                            (user.firstName || "")
-                                                                .trim()
-                                                                .charAt(0),
-
-                                                            ...(user.lastName || "")
-                                                                .trim()
-                                                                .split(/\s+/)
-                                                                .map(
-                                                                    name =>
-                                                                        name.charAt(0)
-                                                                ),
-                                                        ]
-                                                            .filter(Boolean)
-                                                            .slice(0, 3)
-                                                            .join("")
-                                                            .toUpperCase()
-                                                    }
-                                                </div>
-                                            )
-                                    }
+                                    </div>
 
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-3">
