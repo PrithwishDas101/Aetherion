@@ -73,3 +73,27 @@ body {
 .typing-dot:nth-child(3) {
     animation-delay: 0.4s;
 }
+
+/* AETHERION MEDIA PICKER SCROLLBAR */
+
+.scrollbar-media-picker::-webkit-scrollbar {
+    width: 2px;
+}
+
+.scrollbar-media-picker::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-media-picker::-webkit-scrollbar-thumb {
+    background: #7c3aed;
+    border-radius: 999px;
+}
+
+.scrollbar-media-picker::-webkit-scrollbar-thumb:hover {
+    background: #9333ea;
+}
+
+.scrollbar-media-picker {
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed transparent;
+}

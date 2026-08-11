@@ -12,10 +12,20 @@ const messageSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
+        type: {
+            type: String,
+            enum: ["text", "gif"],
+            default: "text",
+        },
         text: {
             type: String,
-            required: true,
             trim: true,
+            default: "",
+        },
+        mediaUrl: {
+            type: String,
+            trim: true,
+            default: null,
         },
         replyTo: {
             type: mongoose.Schema.Types.ObjectId,

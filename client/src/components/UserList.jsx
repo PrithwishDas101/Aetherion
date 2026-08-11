@@ -292,79 +292,68 @@ function UserList({ searchKey, socket }) {
             {
                 visibleUsers.map(
                     user => {
-                        const userChat =
-                            findChatWithUser(
-                                user._id
-                            );
+                        const userChat = findChatWithUser(
+                            user._id
+                        );
 
-                        const isTyping =
-                            !!userChat?._id &&
+                        const isTyping = !!userChat?._id &&
                             !!typingChats[userChat._id] &&
                             String(typingChats[userChat._id]) !== String(currentUser._id);
 
-                        const lastMessage =
+                        const lastMessage = userChat?.lastMessage?.type === "gif"
+                            ? "GIF"
+                            : userChat?.lastMessage?.text || "";
+
+                        const lastMessageTime = formatChatPreviewTime(
                             userChat
                                 ?.lastMessage
-                                ?.text ||
-                            "";
+                                ?.createdAt
+                        );
 
-                        const lastMessageTime =
-                            formatChatPreviewTime(
-                                userChat
-                                    ?.lastMessage
-                                    ?.createdAt
-                            );
-
-                        const lastMessageSenderId =
-                            typeof userChat
+                        const lastMessageSenderId = typeof userChat
+                            ?.lastMessage
+                            ?.sender ===
+                            "object"
+                            ? userChat
                                 ?.lastMessage
-                                ?.sender ===
-                                "object"
-                                ? userChat
-                                    ?.lastMessage
-                                    ?.sender
-                                    ?._id
-                                : userChat
-                                    ?.lastMessage
-                                    ?.sender;
+                                ?.sender
+                                ?._id
+                            : userChat
+                                ?.lastMessage
+                                ?.sender;
 
-                        const currentUserId =
-                            String(
-                                currentUser._id
-                            );
+                        const currentUserId = String(
+                            currentUser._id
+                        );
 
-                        const isLastMessageMine =
-                            String(
-                                lastMessageSenderId
-                            ) ===
+                        const isLastMessageMine = String(
+                            lastMessageSenderId
+                        ) ===
                             currentUserId;
 
-                        const unreadCount =
-                            String(
-                                lastMessageSenderId
-                            ) !==
+                        const unreadCount = String(
+                            lastMessageSenderId
+                        ) !==
+                            currentUserId
+                            ? Number(
+                                userChat
+                                    ?.unreadMessageCount
+                                ?.[
                                 currentUserId
-                                ? Number(
-                                    userChat
-                                        ?.unreadMessageCount
-                                    ?.[
-                                    currentUserId
-                                    ]
-                                ) || 0
-                                : 0;
+                                ]
+                            ) || 0
+                            : 0;
 
-                        const isSelected =
-                            String(
-                                selectedChat?._id
-                            ) ===
+                        const isSelected = String(
+                            selectedChat?._id
+                        ) ===
                             String(
                                 userChat?._id
                             );
 
-                        const userClass =
-                            isSelected
-                                ? "border-l-[3px] border-l-[#d8f45a] bg-[#182018] shadow-[inset_0_0_18px_rgba(216,244,90,0.035)]"
-                                : "border-l-[3px] border-l-transparent hover:bg-[#101710]";
+                        const userClass = isSelected
+                            ? "border-l-[3px] border-l-[#d8f45a] bg-[#182018] shadow-[inset_0_0_18px_rgba(216,244,90,0.035)]"
+                            : "border-l-[3px] border-l-transparent hover:bg-[#101710]";
 
                         return (
                             <div

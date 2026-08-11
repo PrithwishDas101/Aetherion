@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, } from "react";
 import { useDispatch, useSelector, } from "react-redux";
-import { FiArrowLeft, } from "react-icons/fi";
+import { FiArrowLeft, FiSmile } from "react-icons/fi";
+import { MdKeyboard } from "react-icons/md";
 import { FaPaperPlane, } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 import { createMessage, getAllMessages, } from "../apiCalls/messageApi.js";
-
 import { clearUnreadMessage, } from "../apiCalls/chatApi.js";
 import { showLoader, hideLoader, } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat, } from "../redux/userSlice.js";
@@ -15,18 +15,13 @@ import DateSeparator from "./DateSeparator.jsx";
 import ReplyPreview from "./ReplyPreview.jsx";
 import { sendMessage as emitSendMessage, sendTyping, sendStopTyping, } from "../sockets/socketEmitters.js";
 import registerSocketListeners from "../sockets/socketListeners.js";
+import MessageMediaPicker from "./MessageMediaPicker.jsx";
 
 const Chat = ({ socket }) => {
 
     const dispatch = useDispatch();
 
-    const {
-        selectedChat,
-        user,
-        allChats,
-        typingChats,
-        presence,
-    } = useSelector(
+    const { selectedChat, user, allChats, typingChats, presence } = useSelector(
         state => state.userReducer
     );
 
@@ -37,6 +32,8 @@ const Chat = ({ socket }) => {
     const messageInputRef = useRef(null);
     const messagesEndRef = useRef(null);
     const typingTimeout = useRef(null);
+    const [showMediaPicker, setShowMediaPicker] =
+        useState(false);
 
     const isTyping =
         !!selectedChat?._id &&
@@ -287,6 +284,104 @@ const Chat = ({ socket }) => {
 
     };
 
+    const sendGifMessage = async gif => {
+
+        if (!gif || !selectedChat?._id || isSending
+        ) {
+            return;
+        }
+
+        const gifUrl =
+            gif.images?.original?.url ||
+            gif.images?.fixed_width?.url;
+
+        if (!gifUrl) {
+            toast.error(
+                "Unable to send this GIF."
+            );
+
+            return;
+        }
+
+        try {
+
+            setIsSending(true);
+
+            const response =
+                await createMessage({
+                    chatId:
+                        selectedChat._id,
+
+                    type:
+                        "gif",
+
+                    text:
+                        "",
+
+                    mediaUrl:
+                        gifUrl,
+
+                    replyTo:
+                        null,
+                });
+
+            if (response?.success) {
+
+                emitSendMessage(socket, {
+                    message:
+                        response.data,
+
+                    chat:
+                        response.chat,
+
+                    members:
+                        selectedChat.members.map(
+                            member =>
+                                String(
+                                    member._id
+                                )
+                        ),
+                });
+
+                setAllMessages(
+                    previousMessages => [
+                        ...previousMessages,
+                        response.data,
+                    ]
+                );
+
+                if (response?.chat) {
+
+                    updateChatInRedux(
+                        response.chat
+                    );
+
+                }
+
+                setReplyingTo(null);
+
+            } else {
+
+                toast.error(
+                    response?.message ||
+                    "Unable to send GIF."
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error("Send GIF error:", error);
+
+            toast.error(error.response?.data?.message || "Unable to send GIF.");
+
+        } finally {
+
+            setIsSending(false);
+
+        }
+    };
+
     const getMessages = async () => {
 
         if (
@@ -456,6 +551,36 @@ const Chat = ({ socket }) => {
                 textarea.scrollHeight,
                 120
             )}px`;
+
+    };
+
+    const handleEmojiClick = emojiData => {
+
+        setMessage(
+            previousMessage =>
+                previousMessage + emojiData.emoji
+        );
+    };
+
+    const toggleMediaPicker = () => {
+
+        setShowMediaPicker(
+            previous => !previous
+        );
+
+        if (!showMediaPicker) {
+
+            messageInputRef.current?.blur();
+
+        } else {
+
+            requestAnimationFrame(() => {
+
+                messageInputRef.current?.focus();
+
+            });
+
+        }
 
     };
 
@@ -637,19 +762,18 @@ const Chat = ({ socket }) => {
 
             });
 
-        messageInputRef.current?.focus();
+        if (!showMediaPicker) {
+            messageInputRef.current?.focus();
+        }
 
-    }, [allMessages, isTyping]);
-
-
+    }, [allMessages, isTyping, showMediaPicker]);
     if (!selectedChat) {
         return null;
     }
 
     return (
 
-        <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
-
+        <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
 
             {/* CHAT HEADER */}
 
@@ -724,7 +848,7 @@ const Chat = ({ socket }) => {
 
             {/* CHAT MESSAGES */}
 
-            <div className="scrollbar-aetherion min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2">
+            <div className="scrollbar-aetherion min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2">
 
                 <div className="flex min-h-full min-w-0 flex-col gap-2">
 
@@ -881,97 +1005,119 @@ const Chat = ({ socket }) => {
             <div className="mt-4 shrink-0 sm:mt-5">
 
                 <ReplyPreview
-                    message={
-                        replyingTo
-                    }
-
+                    message={replyingTo}
                     isMyMessage={
                         String(
                             replyingTo?.sender?._id ||
                             replyingTo?.sender
-                        ) ===
-                        String(
-                            user._id
-                        )
+                        ) === String(user._id)
                     }
-
                     otherUserName={
                         selectedUser
                             ? `${selectedUser.firstName} ${selectedUser.lastName}`
                             : "User"
                     }
-
-                    onCancel={
-                        cancelReply
-                    }
+                    onCancel={cancelReply}
                 />
 
-                <div className="flex items-end gap-2 sm:gap-3">
+                <div className="relative">
 
-                    <textarea
-                        ref={
+                    <div className="relative flex items-end gap-2 sm:gap-3">
+
+                        <button
+                            type="button"
+                            onClick={toggleMediaPicker}
+                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#83b47b] transition hover:bg-[#2a2a29] hover:text-[#bcf66b]"
+                            aria-label={
+                                showMediaPicker
+                                    ? "Show keyboard"
+                                    : "Open emojis and media"
+                            }
+                        >
+                            {showMediaPicker ? (
+                                <MdKeyboard className="text-xl" />
+                            ) : (
+                                <FiSmile className="text-xl" />
+                            )}
+                        </button>
+
+                        <textarea ref={
                             messageInputRef
                         }
 
-                        value={
-                            message
-                        }
+                            value={
+                                message
+                            }
 
-                        onChange={
-                            handleMessageChange
-                        }
+                            onChange={
+                                handleMessageChange
+                            }
 
-                        onKeyDown={
-                            event => {
+                            onKeyDown={
+                                event => {
 
-                                if (
-                                    event.key ===
-                                    "Enter" &&
-                                    !event.shiftKey
-                                ) {
+                                    if (
+                                        event.key ===
+                                        "Enter" &&
+                                        !event.shiftKey
+                                    ) {
 
-                                    event.preventDefault();
+                                        event.preventDefault();
 
-                                    sendMessage();
+                                        sendMessage();
+
+                                    }
 
                                 }
-
                             }
-                        }
 
-                        placeholder="Message"
+                            placeholder="Message"
 
-                        rows="1"
+                            rows="1"
 
-                        disabled={
-                            isSending
-                        }
+                            disabled={
+                                isSending
+                            }
 
-                        className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-4 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50 disabled:cursor-not-allowed disabled:opacity-60 sm:px-5"
-                    />
-
-                    <button
-                        type="button"
-
-                        onClick={
-                            sendMessage
-                        }
-
-                        disabled={
-                            isSending ||
-                            !message.trim()
-                        }
-
-                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-
-                        aria-label="Send message"
-                    >
-
-                        <FaPaperPlane
-                            className="ml-0.5 text-xl"
+                            className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-4 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50 disabled:cursor-not-allowed disabled:opacity-60 sm:px-5"
                         />
 
-                    </button>
+                        <button
+                            type="button"
+
+                            onClick={
+                                sendMessage
+                            }
+
+                            disabled={
+                                isSending ||
+                                !message.trim()
+                            }
+
+                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+
+                            aria-label="Send message"
+                        >
+
+                            <FaPaperPlane
+                                className="ml-0.5 text-xl"
+                            />
+
+                        </button>
+
+
+                    </div>
+
+                    <div className="mt-2 md:relative">
+
+                        <MessageMediaPicker
+                            isOpen={showMediaPicker}
+                            onClose={() => setShowMediaPicker(false)}
+                            onEmojiClick={handleEmojiClick}
+                            onGifClick={sendGifMessage}
+                        />
+
+                    </div>
 
                 </div>
 

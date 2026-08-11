@@ -4,12 +4,32 @@ import Chat from "../models/Chat.js";
 // SEND MESSAGE
 export const sendMessage = async (req, res) => {
     try {
-        const { chatId, text, replyTo } = req.body;
+        const { chatId, text, type = "text", mediaUrl, replyTo, } = req.body;
 
-        if (!chatId || !text?.trim()) {
+        if (!chatId) {
             return res.status(400).json({
                 success: false,
-                message: "Chat ID and message text are required.",
+                message: "Chat ID is required.",
+            });
+        }
+
+        if (
+            type === "text" &&
+            !text?.trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Message text is required.",
+            });
+        }
+
+        if (
+            type === "gif" &&
+            !mediaUrl
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "GIF URL is required.",
             });
         }
 
@@ -28,7 +48,9 @@ export const sendMessage = async (req, res) => {
         }
 
         const receiver = chat.members.find(
-            member => String(member) !== senderId
+            member =>
+                String(member) !==
+                senderId
         );
 
         if (!receiver) {
@@ -42,38 +64,52 @@ export const sendMessage = async (req, res) => {
 
         const savedMessage = await Message.create({
             chatId,
-            text: text.trim(),
             sender: senderId,
-            replyTo: replyTo || null,
+
+            type,
+
+            text:
+                type === "text"
+                    ? text.trim()
+                    : "",
+
+            mediaUrl:
+                type === "gif"
+                    ? mediaUrl
+                    : null,
+
+            replyTo:
+                replyTo || null,
+
             read: false,
         });
 
         await savedMessage.populate({
             path: "replyTo",
-            select: "text sender",
-        });
+            select: "text sender type mediaUrl",
+        })
 
-        const unreadField =
-            `unreadMessageCount.${receiverId}`;
+        const unreadField = `unreadMessageCount.${receiverId}`;
 
-        const updatedChat =
-            await Chat.findByIdAndUpdate(
-                chatId,
-                {
-                    $set: {
-                        lastMessage: savedMessage._id,
-                    },
-                    $inc: {
-                        [unreadField]: 1,
-                    },
+        const updatedChat = await Chat.findByIdAndUpdate(
+            chatId,
+            {
+                $set: {
+                    lastMessage:
+                        savedMessage._id,
                 },
-                {
-                    returnDocument: "after",
-                    runValidators: true,
-                }
-            )
-                .populate("members")
-                .populate("lastMessage");
+
+                $inc: {
+                    [unreadField]: 1,
+                },
+            },
+            {
+                returnDocument: "after",
+                runValidators: true,
+            }
+        )
+            .populate("members")
+            .populate("lastMessage");
 
         return res.status(201).json({
             success: true,
@@ -81,17 +117,16 @@ export const sendMessage = async (req, res) => {
             data: savedMessage,
             chat: updatedChat,
         });
+
     } catch (error) {
+
         console.error(
-            "Send message error:",
-            error
+            "Send message error:", error
         );
 
         return res.status(500).json({
             success: false,
-            message:
-                error.message ||
-                "Internal server error",
+            message: error.message || "Internal server error",
         });
     }
 };
@@ -119,7 +154,7 @@ export const getAllMessages = async (req, res) => {
             })
             .populate({
                 path: "replyTo",
-                select: "text sender",
+                select: "text sender type mediaUrl",
             })
             .sort({
                 createdAt: 1,
