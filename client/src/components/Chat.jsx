@@ -673,10 +673,7 @@ const Chat = ({ socket }) => {
                     handleReceiveMessage,
             }
         );
-    }, [
-        socket,
-        selectedChat?._id,
-    ]);
+    }, [socket, selectedChat?._id,]);
 
     useEffect(() => {
 
@@ -721,11 +718,7 @@ const Chat = ({ socket }) => {
                     handleMessagesRead,
             }
         );
-    }, [
-        socket,
-        selectedChat?._id,
-        user?._id,
-    ]);
+    }, [socket, selectedChat?._id, user?._id,]);
 
     useEffect(() => {
 
