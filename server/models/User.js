@@ -37,7 +37,12 @@ const userSchema = new mongoose.Schema(
 
     profilePic: {
       type: String,
-      default: "",
+      default: null,
+    },
+
+    profilePicPublicId: {
+      type: String,
+      default: null,
     },
 
     lastSeen: {
