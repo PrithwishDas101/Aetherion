@@ -2,17 +2,22 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import User from "../models/User.js";
+import { uploadImage, deleteImage } from "../services/cloudinaryService.js";
 
 // SIGNUP
+// SIGNUP
 export const signup = async (req, res) => {
+
+    let uploadedProfilePicPublicId = "";
+
     try {
+
         // 1. Get data from request body
         const {
             firstName,
             lastName,
             email,
             password,
-            profilePic,
         } = req.body;
 
         // 2. Check required fields
@@ -80,18 +85,40 @@ export const signup = async (req, res) => {
         }
 
         // 8. Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(
+            password,
+            10
+        );
 
-        // 9. Create user
+        // 9. Upload optional profile picture
+        let profilePic = "";
+        let profilePicPublicId = "";
+
+        if (req.file) {
+
+            const uploadResult = await uploadImage(
+                req.file.buffer,
+                "aetherion/profile-pictures"
+            );
+
+            profilePic = uploadResult.secure_url;
+            profilePicPublicId = uploadResult.public_id;
+
+            uploadedProfilePicPublicId =
+                uploadResult.public_id;
+        }
+
+        // 10. Create user
         const newUser = await User.create({
             firstName: normalizedFirstName,
             lastName: normalizedLastName,
             email: normalizedEmail,
             password: hashedPassword,
-            profilePic: profilePic?.trim() || "",
+            profilePic,
+            profilePicPublicId,
         });
 
-        // 10. Return safe user data
+        // 11. Return safe user data
         return res.status(201).json({
             success: true,
             message: "User created successfully",
@@ -103,8 +130,34 @@ export const signup = async (req, res) => {
                 profilePic: newUser.profilePic,
             },
         });
+
     } catch (error) {
+
         console.error("Signup error:", error);
+
+        // Clean up Cloudinary image if
+        // MongoDB/user creation failed
+        if (uploadedProfilePicPublicId) {
+
+            try {
+
+                await deleteImage(
+                    uploadedProfilePicPublicId
+                );
+
+                console.log(
+                    "Cloudinary signup cleanup completed."
+                );
+
+            } catch (cleanupError) {
+
+                console.error(
+                    "Cloudinary signup cleanup error:",
+                    cleanupError
+                );
+
+            }
+        }
 
         // Duplicate email
         if (error.code === 11000) {
@@ -134,8 +187,12 @@ export const signup = async (req, res) => {
 // LOGIN
 export const login = async (req, res) => {
     try {
+
         // 1. Get credentials from request body
-        const { email, password } = req.body;
+        const {
+            email,
+            password,
+        } = req.body;
 
         // 2. Validate required fields
         if (!email || !password) {
@@ -146,10 +203,12 @@ export const login = async (req, res) => {
         }
 
         // 3. Normalize email
-        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedEmail =
+            email.trim().toLowerCase();
 
         // 4. Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!emailRegex.test(normalizedEmail)) {
             return res.status(400).json({
@@ -171,10 +230,11 @@ export const login = async (req, res) => {
         }
 
         // 6. Compare password
-        const isPasswordCorrect = await bcrypt.compare(
-            password,
-            user.password
-        );
+        const isPasswordCorrect =
+            await bcrypt.compare(
+                password,
+                user.password
+            );
 
         if (!isPasswordCorrect) {
             return res.status(401).json({
@@ -207,7 +267,9 @@ export const login = async (req, res) => {
                 profilePic: user.profilePic,
             },
         });
+
     } catch (error) {
+
         console.error("Login error:", error);
 
         return res.status(500).json({
@@ -220,12 +282,18 @@ export const login = async (req, res) => {
 // LOGOUT
 export const logout = async (req, res) => {
     try {
+
         return res.status(200).json({
             success: true,
             message: "Logout successful",
         });
+
     } catch (error) {
-        console.error("Logout error:", error);
+
+        console.error(
+            "Logout error:",
+            error
+        );
 
         return res.status(500).json({
             success: false,

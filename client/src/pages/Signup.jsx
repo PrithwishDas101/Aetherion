@@ -1,21 +1,28 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
 import { signupUser } from "../apiCalls/authApi.js"
 import { hideLoader, showLoader } from "../redux/sliceLoader.js"
+import compressImage from "../utils/compressImage.js";
 
 function Signup() {
 
     const dispatch = useDispatch();
 
-    const [user, setUser] = React.useState({
+    const [user, setUser] = useState({
         firstName: "",
         lastName: "",
         email: "",
         password: "",
     });
+
+    const fileInputRef = useRef(null);
+
+    const [profilePreview, setProfilePreview] = useState(null);
+    const [profileFile, setProfileFile] = useState(null);
+    const [profileUploadError, setProfileUploadError] = useState("");
 
     async function onFormSubmit(event) {
         event.preventDefault();
@@ -23,7 +30,18 @@ function Signup() {
         try {
             dispatch(showLoader());
 
-            const response = await signupUser(user);
+            const formData = new FormData();
+
+            formData.append("firstName", user.firstName);
+            formData.append("lastName", user.lastName);
+            formData.append("email", user.email);
+            formData.append("password", user.password);
+
+            if (profileFile) {
+                formData.append("profilePic", profileFile);
+            }
+
+            const response = await signupUser(formData);
 
             if (response.success) {
                 toast.success(response.message);
@@ -41,6 +59,40 @@ function Signup() {
             dispatch(hideLoader());
         }
     }
+
+    const handleProfilePictureChange = async event => {
+
+        const file = event.target.files?.[0];
+
+        if (!file) {
+            return;
+        }
+
+        setProfileUploadError("");
+
+        try {
+
+            const compressedFile = await compressImage(file);
+
+            console.log("Signup original image:", `${(file.size / 1024 / 1024).toFixed(2)} MB`);
+
+            console.log("Signup compressed image:", `${(compressedFile.size / 1024).toFixed(2)} KB`);
+
+            setProfileFile(compressedFile);
+
+            const previewUrl = URL.createObjectURL(compressedFile);
+
+            setProfilePreview(previewUrl);
+
+        } catch (error) {
+
+            console.error("Signup profile image compression error:", error);
+
+            setProfileUploadError("Couldn't process that image. Please try another one.");
+
+        }
+
+    };
 
     return (
         <div className="relative min-h-screen w-full overflow-hidden">
@@ -93,6 +145,60 @@ function Signup() {
                             <p className="mt-1 text-sm text-[#9ca39a] sm:text-base">
                                 Create your account and start connecting with people.
                             </p>
+                        </div>
+
+                        <div className="flex flex-col items-center">
+
+                            <div className="relative">
+
+                                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[#171d17] text-2xl font-bold text-[#d8f45a] ring-2 ring-[#d8f45a]/20 sm:h-24 sm:w-24">
+
+                                    {profilePreview ? (
+                                        <img
+                                            src={profilePreview}
+                                            alt="Profile preview"
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-[#858d84]">
+                                            +
+                                        </span>
+                                    )}
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#080d09] bg-[#d8f45a] text-xs font-bold text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 sm:h-7 sm:w-7 sm:text-sm"
+                                    aria-label="Add profile picture"
+                                >
+                                    +
+                                </button>
+
+                            </div>
+
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={handleProfilePictureChange}
+                                className="hidden"
+                            />
+
+                            <p className="mt-2 text-xs text-[#858d84]">
+                                Profile picture <span className="text-[#60685f]">(optional)</span>
+                            </p>
+
+                            {profileUploadError && (
+                                <p
+                                    role="alert"
+                                    className="mt-2 max-w-xs text-center text-xs text-red-400"
+                                >
+                                    {profileUploadError}
+                                </p>
+                            )}
+
                         </div>
 
                         {/* Form */}

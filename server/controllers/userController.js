@@ -54,7 +54,11 @@ export const getAllUsers = async (req, res) => {
 
 // UPDATE PROFILE PICTURE
 export const updateProfilePicture = async (req, res) => {
+
+    let newProfilePicPublicId = "";
+
     try {
+
         if (!req.file) {
             return res.status(400).json({
                 success: false,
@@ -71,6 +75,10 @@ export const updateProfilePicture = async (req, res) => {
             });
         }
 
+        // Keeping the old image until the new image has been successfully saved to MongoDB.
+        const oldPublicId = user.profilePicPublicId;
+
+        // Upload new image
         console.time("Cloudinary profile upload");
 
         const uploadResult = await uploadImage(
@@ -79,10 +87,11 @@ export const updateProfilePicture = async (req, res) => {
         );
 
         console.timeEnd("Cloudinary profile upload");
-        const oldPublicId = user.profilePicPublicId;
 
+        newProfilePicPublicId = uploadResult.public_id;
+
+        // Update user with new image
         user.profilePic = uploadResult.secure_url;
-
         user.profilePicPublicId = uploadResult.public_id;
 
         console.time("MongoDB profile save");
@@ -91,20 +100,31 @@ export const updateProfilePicture = async (req, res) => {
 
         console.timeEnd("MongoDB profile save");
 
+        // MongoDB succeeded.
+        // NOW it is safe to delete the old image.
         if (oldPublicId) {
+
             try {
+
                 console.time("Old Cloudinary image delete");
 
                 await deleteImage(oldPublicId);
 
                 console.timeEnd("Old Cloudinary image delete");
+
             } catch (deleteError) {
+
                 console.error(
                     "Old profile picture deletion error:",
                     deleteError
                 );
+
             }
         }
+
+        // New image is now safely stored in MongoDB,
+        // so don't delete it in the catch block.
+        newProfilePicPublicId = "";
 
         const updatedUser = user.toObject();
 
@@ -117,10 +137,35 @@ export const updateProfilePicture = async (req, res) => {
         });
 
     } catch (error) {
+
         console.error(
             "Update profile picture error:",
             error
         );
+
+        // If Cloudinary upload succeeded but
+        // MongoDB save failed, remove the NEW image.
+        if (newProfilePicPublicId) {
+
+            try {
+
+                await deleteImage(
+                    newProfilePicPublicId
+                );
+
+                console.log(
+                    "New Cloudinary image cleanup completed."
+                );
+
+            } catch (cleanupError) {
+
+                console.error(
+                    "New Cloudinary image cleanup error:",
+                    cleanupError
+                );
+
+            }
+        }
 
         return res.status(500).json({
             success: false,

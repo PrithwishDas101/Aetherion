@@ -1,16 +1,16 @@
 import { axiosInstance } from "./index.js";
 
 // SIGNUP
-export const signupUser = async (userData) => {
+export const signupUser = async (formData) => {
     try {
         const response = await axiosInstance.post(
             "/api/v1/auth/signup",
-            userData
+            formData
         );
 
         return response.data;
     } catch (error) {
-        return error.response.data;
+        return error.response?.data;
     }
 };
 
@@ -25,7 +25,7 @@ export const loginUser = async (userData) => {
 
         return response.data;
     } catch (error) {
-        return error.response.data;
+        return error.response?.data;
     }
 };
 
@@ -42,7 +42,7 @@ export const logoutUser = async () => {
 
         return response.data;
     } catch (error) {
-        return error.response.data;
+        return error.response?.data;
     }
 
 };
