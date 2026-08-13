@@ -71,19 +71,33 @@ export const updateProfilePicture = async (req, res) => {
             });
         }
 
-        const uploadResult = await uploadImage(req.file.buffer, "aetherion/profile-pictures");
+        console.time("Cloudinary profile upload");
 
+        const uploadResult = await uploadImage(
+            req.file.buffer,
+            "aetherion/profile-pictures"
+        );
+
+        console.timeEnd("Cloudinary profile upload");
         const oldPublicId = user.profilePicPublicId;
 
         user.profilePic = uploadResult.secure_url;
 
         user.profilePicPublicId = uploadResult.public_id;
 
+        console.time("MongoDB profile save");
+
         await user.save();
+
+        console.timeEnd("MongoDB profile save");
 
         if (oldPublicId) {
             try {
+                console.time("Old Cloudinary image delete");
+
                 await deleteImage(oldPublicId);
+
+                console.timeEnd("Old Cloudinary image delete");
             } catch (deleteError) {
                 console.error(
                     "Old profile picture deletion error:",
@@ -92,10 +106,14 @@ export const updateProfilePicture = async (req, res) => {
             }
         }
 
+        const updatedUser = user.toObject();
+
+        delete updatedUser.password;
+
         return res.status(200).json({
             success: true,
             message: "Profile picture updated successfully.",
-            data: user,
+            data: updatedUser,
         });
 
     } catch (error) {

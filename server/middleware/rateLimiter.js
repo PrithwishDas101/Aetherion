@@ -14,3 +14,18 @@ export const authLimiter = rateLimit({
 
     legacyHeaders: false,
 });
+
+export const profilePictureLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+
+    max: 5,
+
+    message: {
+        success: false,
+        message: "Too many profile picture uploads. Please try again after 15 minutes.",
+    },
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+});

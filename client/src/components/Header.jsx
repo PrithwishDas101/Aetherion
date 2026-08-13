@@ -52,26 +52,41 @@ function Header() {
                 </div>
 
                 {/* Logged-in user profile */}
-                <div className="flex items-center">
+                <div className="flex items-center gap-[5px]">
 
-                    <div className="mr-4 font-bold text-[#d0d4cc]">
+                    {/* User name — desktop only */}
+                    <div className="mr-4 hidden font-bold text-[#d0d4cc] sm:block">
                         {user?.firstName} {user?.lastName}
                     </div>
 
+                    {/* Profile avatar */}
                     <button
                         type="button"
                         onClick={() => {
                             dismissProfileHint();
                             navigate("/profile");
                         }}
-                        className={`relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#d8f45a] text-base font-bold text-[#10120d] transition ${showProfileHint
-                            ? "z-[60] ring-4 ring-[#d8f45a]/40 shadow-[0_0_25px_rgba(216,244,90,0.6)]"
-                            : ""
+                        className={`relative flex h-8 w-8 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-[#d8f45a] text-sm font-bold text-[#10120d] transition sm:h-10 sm:w-10 sm:text-base ${showProfileHint
+                                ? "z-[60] ring-4 ring-[#d8f45a]/40 shadow-[0_0_25px_rgba(216,244,90,0.6)]"
+                                : ""
                             }`}
                         aria-label="Open profile"
                     >
-                        {user?.firstName?.[0]}
-                        {user?.lastName?.[0]}
+                        {user?.profilePic ? (
+                            <img
+                                src={user.profilePic}
+                                alt={
+                                    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+                                    "Profile"
+                                }
+                                className="h-full w-full object-cover"
+                            />
+                        ) : (
+                            <>
+                                {user?.firstName?.[0]}
+                                {user?.lastName?.[0]}
+                            </>
+                        )}
                     </button>
 
                 </div>

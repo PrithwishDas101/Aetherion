@@ -27,3 +27,21 @@ export const getAllUsers = async () => {
         return error.response?.data;
     }
 };
+
+// UPDATE PROFILE PICTURE
+export const updateProfilePicture = async profileFile => {
+    try {
+        const formData = new FormData();
+
+        formData.append("profilePic", profileFile);
+
+        const response = await axiosInstance.post(
+            "/api/v1/user/profile-picture", formData
+        );
+
+        return response.data;
+
+    } catch (error) {
+        return error.response?.data;
+    }
+};

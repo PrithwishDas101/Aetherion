@@ -8,6 +8,15 @@ export const uploadImage = (buffer, folder = "aetherion/profile-pictures") => {
             {
                 folder,
                 resource_type: "image",
+                transformation: [
+                    {
+                        width: 512,
+                        height: 512,
+                        crop: "limit",
+                        quality: "auto",
+                        fetch_format: "auto",
+                    },
+                ],
             },
             (error, result) => {
 
