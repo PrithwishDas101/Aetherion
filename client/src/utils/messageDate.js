@@ -1,331 +1,185 @@
 const isSameDay = (firstDate, secondDate) => {
-
-    return (
-        firstDate.getFullYear() ===
-        secondDate.getFullYear() &&
-
-        firstDate.getMonth() ===
-        secondDate.getMonth() &&
-
-        firstDate.getDate() ===
-        secondDate.getDate()
-    );
-
+  return (
+    firstDate.getFullYear() === secondDate.getFullYear() &&
+    firstDate.getMonth() === secondDate.getMonth() &&
+    firstDate.getDate() === secondDate.getDate()
+  );
 };
 
-export const formatMessageTime = (
-    dateString
-) => {
+export const formatMessageTime = (dateString) => {
+  if (!dateString) {
+    return "";
+  }
 
-    if (!dateString) {
-        return "";
-    }
+  return new Date(dateString).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
-    return new Date(
-        dateString
-    ).toLocaleTimeString(
-        [],
-        {
-            hour: "2-digit",
-            minute: "2-digit",
+export const formatDateLabel = (dateString) => {
+  if (!dateString) {
+    return "";
+  }
+
+  const messageDate = new Date(dateString);
+
+  const today = new Date();
+
+  const yesterday = new Date();
+
+  yesterday.setDate(today.getDate() - 1);
+
+  if (isSameDay(messageDate, today)) {
+    return "Today";
+  }
+
+  if (isSameDay(messageDate, yesterday)) {
+    return "Yesterday";
+  }
+
+  const isCurrentYear = messageDate.getFullYear() === today.getFullYear();
+
+  return messageDate.toLocaleDateString(
+    [],
+    isCurrentYear
+      ? {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
         }
-    );
-
+      : {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        },
+  );
 };
 
-export const formatDateLabel = (
-    dateString
-) => {
+export const shouldShowDateSeparator = (currentMessage, previousMessage) => {
+  if (!currentMessage) {
+    return false;
+  }
 
-    if (!dateString) {
-        return "";
-    }
+  if (!previousMessage) {
+    return true;
+  }
 
-    const messageDate =
-        new Date(
-            dateString
-        );
+  const currentDate = new Date(currentMessage.createdAt);
 
-    const today =
-        new Date();
+  const previousDate = new Date(previousMessage.createdAt);
 
-    const yesterday =
-        new Date();
-
-    yesterday.setDate(
-        today.getDate() - 1
-    );
-
-
-    if (
-        isSameDay(
-            messageDate,
-            today
-        )
-    ) {
-
-        return "Today";
-
-    }
-
-
-    if (
-        isSameDay(
-            messageDate,
-            yesterday
-        )
-    ) {
-
-        return "Yesterday";
-
-    }
-
-
-    const isCurrentYear =
-
-        messageDate.getFullYear() ===
-        today.getFullYear();
-
-
-    return messageDate.toLocaleDateString(
-        [],
-        isCurrentYear
-
-            ? {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-            }
-
-            : {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-            }
-    );
-
+  return !isSameDay(currentDate, previousDate);
 };
 
-export const shouldShowDateSeparator = (
-    currentMessage,
-    previousMessage
-) => {
+export const formatChatPreviewTime = (dateValue) => {
+  if (!dateValue) {
+    return "";
+  }
 
-    if (!currentMessage) {
-        return false;
-    }
+  const messageDate = new Date(dateValue);
 
+  const currentDate = new Date();
 
-    if (!previousMessage) {
-        return true;
-    }
+  const isToday = messageDate.toDateString() === currentDate.toDateString();
 
+  if (isToday) {
+    return messageDate.toLocaleTimeString(
+      "en-US",
 
-    const currentDate =
-        new Date(
-            currentMessage.createdAt
-        );
+      {
+        hour: "numeric",
 
-    const previousDate =
-        new Date(
-            previousMessage.createdAt
-        );
-
-
-    return !isSameDay(
-        currentDate,
-        previousDate
+        minute: "2-digit",
+      },
     );
+  }
 
-};
+  const yesterday = new Date();
 
-export const formatChatPreviewTime = (
-    dateValue
-) => {
+  yesterday.setDate(currentDate.getDate() - 1);
 
-    if (!dateValue) {
-        return "";
-    }
+  const isYesterday = messageDate.toDateString() === yesterday.toDateString();
 
-    const messageDate =
-        new Date(dateValue);
+  if (isYesterday) {
+    return "Yesterday";
+  }
 
-    const currentDate =
-        new Date();
+  const isCurrentYear = messageDate.getFullYear() === currentDate.getFullYear();
 
+  return messageDate.toLocaleDateString(
+    "en-US",
 
-    const isToday =
+    isCurrentYear
+      ? {
+          month: "short",
 
-        messageDate
-            .toDateString() ===
-
-        currentDate
-            .toDateString();
-
-
-    if (isToday) {
-
-        return messageDate
-            .toLocaleTimeString(
-
-                "en-US",
-
-                {
-                    hour:
-                        "numeric",
-
-                    minute:
-                        "2-digit",
-                }
-
-            );
-
-    }
-
-
-    const yesterday =
-        new Date();
-
-    yesterday.setDate(
-        currentDate.getDate() - 1
-    );
-
-
-    const isYesterday =
-
-        messageDate
-            .toDateString() ===
-
-        yesterday
-            .toDateString();
-
-
-    if (isYesterday) {
-
-        return "Yesterday";
-
-    }
-
-
-    const isCurrentYear =
-
-        messageDate.getFullYear() ===
-
-        currentDate.getFullYear();
-
-
-    return messageDate
-        .toLocaleDateString(
-
-            "en-US",
-
-            isCurrentYear
-
-                ? {
-
-                    month:
-                        "short",
-
-                    day:
-                        "numeric",
-
-                }
-
-                : {
-
-                    month:
-                        "short",
-
-                    day:
-                        "numeric",
-
-                    year:
-                        "numeric",
-
-                }
-
-        );
-
-};
-
-export const formatLastSeen = date => {
-
-    if (!date) {
-        return "last seen recently";
-    }
-
-    const lastSeenDate = new Date(date);
-    const now = new Date();
-
-    if (Number.isNaN(lastSeenDate.getTime())) {
-        return "last seen recently";
-    }
-
-    const time = lastSeenDate.toLocaleTimeString(
-        [],
-        {
-            hour: "numeric",
-            minute: "2-digit",
+          day: "numeric",
         }
-    );
+      : {
+          month: "short",
 
-    const sameDay =
-        lastSeenDate.toDateString() ===
-        now.toDateString();
+          day: "numeric",
 
-    if (sameDay) {
-        return `last seen today at ${time}`;
-    }
+          year: "numeric",
+        },
+  );
+};
 
-    const yesterday = new Date(now);
+export const formatLastSeen = (date) => {
+  if (!date) {
+    return "last seen recently";
+  }
 
-    yesterday.setDate(
-        now.getDate() - 1
-    );
+  const lastSeenDate = new Date(date);
+  const now = new Date();
 
-    if (
-        lastSeenDate.toDateString() ===
-        yesterday.toDateString()
-    ) {
-        return `last seen yesterday at ${time}`;
-    }
+  if (Number.isNaN(lastSeenDate.getTime())) {
+    return "last seen recently";
+  }
 
-    const sameMonth =
-        lastSeenDate.getFullYear() ===
-            now.getFullYear() &&
-        lastSeenDate.getMonth() ===
-            now.getMonth();
+  const time = lastSeenDate.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 
-    if (sameMonth) {
-        return `last seen ${lastSeenDate.toLocaleDateString(
-            [],
-            {
-                month: "short",
-                day: "numeric",
-            }
-        )} at ${time}`;
-    }
+  const sameDay = lastSeenDate.toDateString() === now.toDateString();
 
-    const sameYear =
-        lastSeenDate.getFullYear() ===
-        now.getFullYear();
+  if (sameDay) {
+    return `last seen today at ${time}`;
+  }
 
-    if (sameYear) {
-        return `last seen ${lastSeenDate.toLocaleDateString(
-            [],
-            {
-                month: "short",
-                day: "numeric",
-            }
-        )} at ${time}`;
-    }
+  const yesterday = new Date(now);
 
-    return `last seen on ${lastSeenDate.toLocaleDateString(
-        [],
-        {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        }
-    )}`;
+  yesterday.setDate(now.getDate() - 1);
+
+  if (lastSeenDate.toDateString() === yesterday.toDateString()) {
+    return `last seen yesterday at ${time}`;
+  }
+
+  const sameMonth =
+    lastSeenDate.getFullYear() === now.getFullYear() &&
+    lastSeenDate.getMonth() === now.getMonth();
+
+  if (sameMonth) {
+    return `last seen ${lastSeenDate.toLocaleDateString([], {
+      month: "short",
+      day: "numeric",
+    })} at ${time}`;
+  }
+
+  const sameYear = lastSeenDate.getFullYear() === now.getFullYear();
+
+  if (sameYear) {
+    return `last seen ${lastSeenDate.toLocaleDateString([], {
+      month: "short",
+      day: "numeric",
+    })} at ${time}`;
+  }
+
+  return `last seen on ${lastSeenDate.toLocaleDateString([], {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })}`;
 };

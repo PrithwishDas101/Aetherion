@@ -1,52 +1,38 @@
 import mongoose from "mongoose";
 
 const chatSchema = new mongoose.Schema(
-    {
-        members: [
-            {
-                type:
-                    mongoose.Schema.Types.ObjectId,
+  {
+    members: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
 
-                ref:
-                    "User",
+        ref: "User",
 
-                required:
-                    true,
-            },
-        ],
+        required: true,
+      },
+    ],
 
-        lastMessage: {
-            type:
-                mongoose.Schema.Types.ObjectId,
+    lastMessage: {
+      type: mongoose.Schema.Types.ObjectId,
 
-            ref:
-                "Message",
+      ref: "Message",
 
-            default:
-                null,
-        },
-
-        unreadMessageCount: {
-            type:
-                Map,
-
-            of:
-                Number,
-
-            default:
-                () => new Map(),
-        },
+      default: null,
     },
-    {
-        timestamps:
-            true,
-    }
+
+    unreadMessageCount: {
+      type: Map,
+
+      of: Number,
+
+      default: () => new Map(),
+    },
+  },
+  {
+    timestamps: true,
+  },
 );
 
-const Chat =
-    mongoose.model(
-        "Chat",
-        chatSchema
-    );
+const Chat = mongoose.model("Chat", chatSchema);
 
 export default Chat;

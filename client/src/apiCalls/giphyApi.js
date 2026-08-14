@@ -5,53 +5,37 @@ const GIPHY_BASE_URL = "https://api.giphy.com/v1/gifs";
 const GIPHY_SEARCH_URL = `${GIPHY_BASE_URL}/search`;
 
 export const searchGifs = async (query, limit = 20) => {
+  if (!query?.trim()) {
+    return [];
+  }
 
-    if (!query?.trim()) {
-        return [];
-    }
+  const response = await axios.get(GIPHY_SEARCH_URL, {
+    params: {
+      api_key: GIPHY_API_KEY,
 
-    const response =
-        await axios.get(
-            GIPHY_SEARCH_URL,
-            {
-                params: {
-                    api_key:
-                        GIPHY_API_KEY,
+      q: query.trim(),
 
-                    q:
-                        query.trim(),
+      limit,
 
-                    limit,
+      rating: "pg-13",
 
-                    rating:
-                        "pg-13",
+      lang: "en",
+    },
+  });
 
-                    lang:
-                        "en",
-                },
-            }
-        );
-
-    return response.data?.data || [];
+  return response.data?.data || [];
 };
 
 export const getTrendingGifs = async (limit = 20) => {
+  const response = await axios.get(`${GIPHY_BASE_URL}/trending`, {
+    params: {
+      api_key: GIPHY_API_KEY,
 
-    const response =
-        await axios.get(
-            `${GIPHY_BASE_URL}/trending`,
-            {
-                params: {
-                    api_key:
-                        GIPHY_API_KEY,
+      limit,
 
-                    limit,
+      rating: "pg-13",
+    },
+  });
 
-                    rating:
-                        "pg-13",
-                },
-            }
-        );
-
-    return response.data?.data || [];
+  return response.data?.data || [];
 };

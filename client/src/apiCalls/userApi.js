@@ -42,17 +42,13 @@ export const updateProfilePicture = async (profileFile) => {
 
 // REMOVE PROFILE PICTURE
 export const removeProfilePicture = async () => {
+  try {
+    const response = await axiosInstance.delete(
+      "/api/v1/user/remove-profile-picture",
+    );
 
-    try {
-
-        const response = await axiosInstance.delete(
-            "/api/v1/user/remove-profile-picture"
-        );
-
-        return response.data;
-
-    } catch (error) {
-
-        return error.response?.data;
-    }
+    return response.data;
+  } catch (error) {
+    return error.response?.data;
+  }
 };

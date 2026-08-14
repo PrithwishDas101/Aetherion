@@ -4,10 +4,10 @@ import loaderReducer from "./sliceLoader.js";
 import userReducer from "./userSlice.js";
 
 const store = configureStore({
-    reducer: {
-        loaderReducer,
-        userReducer
-    },
+  reducer: {
+    loaderReducer,
+    userReducer,
+  },
 });
 
 export default store;

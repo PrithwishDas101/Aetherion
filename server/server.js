@@ -1,9 +1,6 @@
 import dns from "dns";
 
-dns.setServers([
-    "1.1.1.1",
-    "8.8.8.8",
-]);
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 import dotenv from "dotenv";
 import http from "http";
@@ -14,7 +11,7 @@ import connectDB from "./config/db.js";
 import initializeSocket from "./socket/socket.js";
 
 dotenv.config({
-    quiet: true,
+  quiet: true,
 });
 
 const PORT = process.env.PORT || 8000;
@@ -26,13 +23,12 @@ const io = initializeSocket(server);
 app.set("io", io);
 
 connectDB()
-    .then(() => {
-        server.listen(PORT, () => {
-            console.log(`Server started at PORT: ${PORT}`);
-        });
-    })
-    .catch(error => {
-        console.error("Database connection failed:", error);
-        process.exit(1);
-    }
-    );
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`Server started at PORT: ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Database connection failed:", error);
+    process.exit(1);
+  });

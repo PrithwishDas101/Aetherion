@@ -5,7 +5,6 @@ import User from "../models/User.js";
 import { uploadImage, deleteImage } from "../services/cloudinaryService.js";
 
 // SIGNUP
-// SIGNUP
 export const signup = async (req, res) => {
   let uploadedProfilePicPublicId = "";
 
