@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
+import { IoCheckmark, IoCheckmarkDone, IoSearch } from "react-icons/io5";
 
 import { createChat } from "../apiCalls/chatApi.js";
 import { hideLoader, showLoader } from "../redux/sliceLoader.js";
@@ -157,166 +157,193 @@ function UserList({ searchKey, socket }) {
       );
     });
 
+  const hasSearchQuery = normalizedSearchKey.length > 0;
+  const hasSearchResults = visibleUsers.length > 0;
+
   return (
     <div>
-      {visibleUsers.map((user) => {
-        const userChat = findChatWithUser(user._id);
-
-        const isTyping =
-          !!userChat?._id &&
-          !!typingChats[userChat._id] &&
-          String(typingChats[userChat._id]) !== String(currentUser._id);
-
-        const lastMessage =
-          userChat?.lastMessage?.type === "gif"
-            ? "GIF"
-            : userChat?.lastMessage?.text || "";
-
-        const lastMessageTime = formatChatPreviewTime(
-          userChat?.lastMessage?.createdAt,
-        );
-
-        const lastMessageSenderId =
-          typeof userChat?.lastMessage?.sender === "object"
-            ? userChat?.lastMessage?.sender?._id
-            : userChat?.lastMessage?.sender;
-
-        const currentUserId = String(currentUser._id);
-
-        const isLastMessageMine = String(lastMessageSenderId) === currentUserId;
-
-        const unreadCount =
-          String(lastMessageSenderId) !== currentUserId
-            ? Number(userChat?.unreadMessageCount?.[currentUserId]) || 0
-            : 0;
-
-        const isSelected = String(selectedChat?._id) === String(userChat?._id);
-
-        const userClass = isSelected
-          ? "border-l-[3px] border-l-[#d8f45a] bg-[#182018] shadow-[inset_0_0_18px_rgba(216,244,90,0.035)]"
-          : "border-l-[3px] border-l-transparent hover:bg-[#101710]";
-
-        return (
-          <div
-            key={user._id}
-            onClick={() => openChat(user._id)}
-            className={`group relative cursor-pointer border-b border-[#d8f45a]/10 px-3 py-4 transition-all duration-200 ${userClass}`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="relative shrink-0">
-                {user.profilePic ? (
-                  <img
-                    src={user.profilePic}
-                    alt={`${user.firstName} ${user.lastName}`}
-                    className="h-12 w-12 rounded-full bg-[#cacfb4] object-cover"
-                  />
-                ) : (
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#cacfb4] text-sm font-bold text-[#10120d]">
-                    {[
-                      (user.firstName || "").trim().charAt(0),
-
-                      ...(user.lastName || "")
-                        .trim()
-                        .split(/\s+/)
-                        .map((name) => name.charAt(0)),
-                    ]
-                      .filter(Boolean)
-                      .slice(0, 3)
-                      .join("")
-                      .toUpperCase()}
-                  </div>
-                )}
-
-                {!!presence?.[String(user._id)]?.online && (
-                  <span
-                    className="  absolute bottom-0  right-0 h-3 w-3 rounded-full border-2 border-[#0b100c] bg-[#76f45a] "
-                    aria-label="Online"
-                  />
-                )}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${
-                      isSelected
-                        ? "text-[#f7f7d0]"
-                        : unreadCount > 0
-                          ? "text-[#f7f7d0]"
-                          : "text-[#f1eee8]"
-                    }`}
-                  >
-                    {`${user.firstName} ${user.lastName}`}
-                  </div>
-
-                  {lastMessageTime && (
-                    <span
-                      className={`shrink-0 text-[10px] font-medium transition-colors ${
-                        unreadCount > 0 && !isSelected
-                          ? "text-[#e9fb95]"
-                          : "text-[#7f8a7c]"
-                      }`}
-                    >
-                      {lastMessageTime}
-                    </span>
-                  )}
-                </div>
-
-                <div className="mt-1 flex items-center gap-2">
-                  <div className="flex min-w-0 flex-1 items-center gap-1.5">
-                    {userChat &&
-                      lastMessage &&
-                      isLastMessageMine &&
-                      (userChat?.lastMessage?.read ? (
-                        <IoCheckmarkDone className="shrink-0 text-sm text-[#2196f3]" />
-                      ) : (
-                        <IoCheckmark className="shrink-0 text-sm text-[#858d84]" />
-                      ))}
-
-                    <p
-                      className={`min-w-0 flex-1 truncate text-xs transition-colors ${
-                        isTyping
-                          ? "font-semibold text-[#d8f45a] italic"
-                          : unreadCount > 0 && !isSelected
-                            ? "font-semibold text-[#999999]"
-                            : isSelected
-                              ? "text-[#b4bcae]"
-                              : "text-[#858d84]"
-                      }`}
-                    >
-                      {isTyping
-                        ? "typing..."
-                        : userChat
-                          ? lastMessage || "No messages yet."
-                          : user.email}
-                    </p>
-                  </div>
-
-                  {unreadCount > 0 && !isSelected && (
-                    <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#f1ffb5] px-1.5 text-[10px] font-bold text-[#10120d]">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {!userChat && (
-                <button
-                  type="button"
-                  className="shrink-0 rounded-lg bg-[#d8f45a] px-3 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e4ff6c]"
-                  onClick={(event) => {
-                    event.stopPropagation();
-
-                    startNewChat(user._id);
-                  }}
-                >
-                  Start Chat
-                </button>
-              )}
-            </div>
+      {hasSearchQuery && !hasSearchResults ? (
+        <div className="flex flex-col items-center px-6 py-12 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d8f45a]/15 bg-[#111711] text-[#d8f45a]">
+            <IoSearch className="text-xl" />
           </div>
-        );
-      })}
+
+          <h3 className="mt-4 text-sm font-semibold text-[#f1eee8]">
+            No users found
+          </h3>
+
+          <p className="mt-2 max-w-[240px] text-xs leading-5 text-[#70786f]">
+            We couldn't find anyone matching{" "}
+            <span className="font-medium text-[#9da59a]">
+              "{searchKey.trim()}"
+            </span>
+            .
+          </p>
+
+          <p className="mt-1 text-xs text-[#555d54]">
+            Try checking the spelling or search for another name.
+          </p>
+        </div>
+      ) : (
+        visibleUsers.map((user) => {
+          const userChat = findChatWithUser(user._id);
+
+          const isTyping =
+            !!userChat?._id &&
+            !!typingChats[userChat._id] &&
+            String(typingChats[userChat._id]) !== String(currentUser._id);
+
+          const lastMessage =
+            userChat?.lastMessage?.type === "gif"
+              ? "GIF"
+              : userChat?.lastMessage?.text || "";
+
+          const lastMessageTime = formatChatPreviewTime(
+            userChat?.lastMessage?.createdAt,
+          );
+
+          const lastMessageSenderId =
+            typeof userChat?.lastMessage?.sender === "object"
+              ? userChat?.lastMessage?.sender?._id
+              : userChat?.lastMessage?.sender;
+
+          const currentUserId = String(currentUser._id);
+
+          const isLastMessageMine =
+            String(lastMessageSenderId) === currentUserId;
+
+          const unreadCount =
+            String(lastMessageSenderId) !== currentUserId
+              ? Number(userChat?.unreadMessageCount?.[currentUserId]) || 0
+              : 0;
+
+          const isSelected =
+            String(selectedChat?._id) === String(userChat?._id);
+
+          const userClass = isSelected
+            ? "border-l-[3px] border-l-[#d8f45a] bg-[#182018] shadow-[inset_0_0_18px_rgba(216,244,90,0.035)]"
+            : "border-l-[3px] border-l-transparent hover:bg-[#101710]";
+
+          return (
+            <div
+              key={user._id}
+              onClick={() => openChat(user._id)}
+              className={`group relative cursor-pointer border-b border-[#d8f45a]/10 px-3 py-4 transition-all duration-200 ${userClass}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative shrink-0">
+                  {user.profilePic ? (
+                    <img
+                      src={user.profilePic}
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="h-12 w-12 rounded-full bg-[#cacfb4] object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#cacfb4] text-sm font-bold text-[#10120d]">
+                      {[
+                        (user.firstName || "").trim().charAt(0),
+                        ...(user.lastName || "")
+                          .trim()
+                          .split(/\s+/)
+                          .map((name) => name.charAt(0)),
+                      ]
+                        .filter(Boolean)
+                        .slice(0, 3)
+                        .join("")
+                        .toUpperCase()}
+                    </div>
+                  )}
+
+                  {!!presence?.[String(user._id)]?.online && (
+                    <span
+                      className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#0b100c] bg-[#76f45a]"
+                      aria-label="Online"
+                    />
+                  )}
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${
+                        isSelected
+                          ? "text-[#f7f7d0]"
+                          : unreadCount > 0
+                            ? "text-[#f7f7d0]"
+                            : "text-[#f1eee8]"
+                      }`}
+                    >
+                      {`${user.firstName} ${user.lastName}`}
+                    </div>
+
+                    {lastMessageTime && (
+                      <span
+                        className={`shrink-0 text-[10px] font-medium ${
+                          unreadCount > 0 && !isSelected
+                            ? "text-[#e9fb95]"
+                            : "text-[#7f8a7c]"
+                        }`}
+                      >
+                        {lastMessageTime}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-1 flex items-center gap-2">
+                    <div className="flex min-w-0 flex-1 items-center gap-1.5">
+                      {userChat &&
+                        lastMessage &&
+                        isLastMessageMine &&
+                        (userChat?.lastMessage?.read ? (
+                          <IoCheckmarkDone className="shrink-0 text-sm text-[#2196f3]" />
+                        ) : (
+                          <IoCheckmark className="shrink-0 text-sm text-[#858d84]" />
+                        ))}
+
+                      <p
+                        className={`min-w-0 flex-1 truncate text-xs ${
+                          isTyping
+                            ? "font-semibold italic text-[#d8f45a]"
+                            : unreadCount > 0 && !isSelected
+                              ? "font-semibold text-[#999999]"
+                              : isSelected
+                                ? "text-[#b4bcae]"
+                                : "text-[#858d84]"
+                        }`}
+                      >
+                        {isTyping
+                          ? "typing..."
+                          : userChat
+                            ? lastMessage || "No messages yet."
+                            : user.email}
+                      </p>
+                    </div>
+
+                    {unreadCount > 0 && !isSelected && (
+                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#f1ffb5] px-1.5 text-[10px] font-bold text-[#10120d]">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {!userChat && (
+                  <button
+                    type="button"
+                    className="shrink-0 rounded-lg bg-[#d8f45a] px-3 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e4ff6c]"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      startNewChat(user._id);
+                    }}
+                  >
+                    Start Chat
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }
