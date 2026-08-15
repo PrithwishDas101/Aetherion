@@ -24,6 +24,7 @@ import {
 } from "../sockets/socketEmitters.js";
 import registerSocketListeners from "../sockets/socketListeners.js";
 import MessageMediaPicker from "./MessageMediaPicker.jsx";
+import MessageComposer from "./MessageComposer/MessageComposer.jsx";
 
 const Chat = ({ socket }) => {
   const dispatch = useDispatch();
@@ -563,6 +564,8 @@ const Chat = ({ socket }) => {
 
         <div className="relative">
           <div className="relative flex items-end gap-2 sm:gap-3">
+            {/* EMOJI / GIF / STICKER BUTTON */}
+
             <button
               type="button"
               onClick={toggleMediaPicker}
@@ -578,22 +581,20 @@ const Chat = ({ socket }) => {
               )}
             </button>
 
-            <textarea
-              ref={messageInputRef}
-              value={message}
-              onChange={handleMessageChange}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && !event.shiftKey) {
-                  event.preventDefault();
+            {/* TEXT AREA + ATTACHMENT + CAMERA */}
 
-                  sendMessage();
-                }
+            <MessageComposer
+              message={message}
+              messageInputRef={messageInputRef}
+              isSending={isSending}
+              onMessageChange={handleMessageChange}
+              onSendMessage={sendMessage}
+              onCamera={() => {
+                console.log("Camera button clicked");
               }}
-              placeholder="Message"
-              rows="1"
-              disabled={isSending}
-              className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-4 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] transition focus:border-[#d8f45a]/50 disabled:cursor-not-allowed disabled:opacity-60 sm:px-5"
             />
+
+            {/* SEND BUTTON */}
 
             <button
               type="button"
