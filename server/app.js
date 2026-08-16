@@ -12,7 +12,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   process.env.CLIENT_URL,
-  "https://rica-autumn-collective-staying.trycloudflare.com",
+  "https://screensaver-baseball-boots-rick.trycloudflare.com",
 ].filter(Boolean);
 
 app.use(

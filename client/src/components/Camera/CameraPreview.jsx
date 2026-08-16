@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
-const CameraPreview = ({ stream, mirrored = false }) => {
+const CameraPreview = forwardRef(({ stream, mirrored = false }, ref) => {
   const videoRef = useRef(null);
+
+  useImperativeHandle(ref, () => videoRef.current);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -19,10 +21,8 @@ const CameraPreview = ({ stream, mirrored = false }) => {
     }
 
     return () => {
-      if (video) {
-        video.pause();
-        video.srcObject = null;
-      }
+      video.pause();
+      video.srcObject = null;
     };
   }, [stream]);
 
@@ -37,6 +37,8 @@ const CameraPreview = ({ stream, mirrored = false }) => {
       }`}
     />
   );
-};
+});
+
+CameraPreview.displayName = "CameraPreview";
 
 export default CameraPreview;
