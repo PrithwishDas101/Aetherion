@@ -50,7 +50,6 @@ export const isMobileDevice = () => {
   return mobileUserAgent || mobileViewport;
 };
 
-// Returns whether the current camera track supports torch control.
 export const hasTorchSupport = (stream) => {
   if (!stream) {
     return false;
@@ -58,45 +57,63 @@ export const hasTorchSupport = (stream) => {
 
   const videoTrack = stream.getVideoTracks?.()[0];
 
-  if (!videoTrack?.getCapabilities) {
+  if (!videoTrack) {
+    console.log("TORCH DEBUG: No video track found.");
+    return false;
+  }
+
+  if (!videoTrack.getCapabilities) {
+    console.log("TORCH DEBUG: getCapabilities() unavailable.");
     return false;
   }
 
   const capabilities = videoTrack.getCapabilities();
 
+  console.log("TORCH DEBUG: track:", videoTrack);
+  console.log("TORCH DEBUG: capabilities:", capabilities);
+  console.log("TORCH DEBUG: torch:", capabilities?.torch);
+
   return capabilities?.torch === true;
 };
 
-// Turns the camera torch on/off.
 export const setTorch = async (stream, enabled) => {
   if (!stream) {
+    console.log("TORCH DEBUG: No stream.");
     return false;
   }
 
   const videoTrack = stream.getVideoTracks?.()[0];
 
-  if (!videoTrack?.applyConstraints || !videoTrack?.getCapabilities) {
+  if (!videoTrack) {
+    console.log("TORCH DEBUG: No video track.");
     return false;
   }
 
-  const capabilities = videoTrack.getCapabilities();
+  if (!videoTrack.applyConstraints) {
+    console.log("TORCH DEBUG: applyConstraints() unavailable.");
+    return false;
+  }
+
+  const capabilities = videoTrack.getCapabilities?.();
+
+  console.log("TORCH DEBUG: Trying torch:", enabled);
+  console.log("TORCH DEBUG: capabilities:", capabilities);
 
   if (capabilities?.torch !== true) {
+    console.log("TORCH DEBUG: This camera reports no torch support.");
     return false;
   }
 
   try {
     await videoTrack.applyConstraints({
-      advanced: [
-        {
-          torch: enabled,
-        },
-      ],
+      advanced: [{ torch: enabled }],
     });
+
+    console.log(`TORCH DEBUG: Torch ${enabled ? "ON" : "OFF"} successful.`);
 
     return true;
   } catch (error) {
-    console.error("Torch control error:", error);
+    console.error("TORCH DEBUG: applyConstraints failed:", error);
 
     return false;
   }
