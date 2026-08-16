@@ -6,8 +6,8 @@ const MessageCameraButton = ({ onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#e3ece27a] transition hover:bg-[#2a2a2988] hover:text-[#d6dbce]"
-      aria-label="Take a photo"
+      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#e3ece27a] transition hover:bg-[#2a2a2988] hover:text-[#d6dbce] active:scale-95"
+      aria-label="Open camera"
     >
       <FiCamera className="text-xl" />
     </button>

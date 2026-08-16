@@ -25,6 +25,7 @@ import {
 import registerSocketListeners from "../sockets/socketListeners.js";
 import MessageMediaPicker from "./MessageMediaPicker.jsx";
 import MessageComposer from "./MessageComposer/MessageComposer.jsx";
+import CameraModal from "./Camera/CameraModal.jsx";
 
 const Chat = ({ socket }) => {
   const dispatch = useDispatch();
@@ -41,6 +42,7 @@ const Chat = ({ socket }) => {
   const messagesEndRef = useRef(null);
   const typingTimeout = useRef(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [showCameraModal, setShowCameraModal] = useState(false);
 
   const isTyping =
     !!selectedChat?._id &&
@@ -63,6 +65,22 @@ const Chat = ({ socket }) => {
 
   const unreadMessageCount =
     Number(selectedChat?.unreadMessageCount?.[String(user._id)]) || 0;
+
+  const openCamera = () => {
+    setShowMediaPicker(false);
+    setShowCameraModal(true);
+  };
+
+  const closeCamera = () => {
+    setShowCameraModal(false);
+  };
+
+  const openGallery = () => {
+    setShowCameraModal(false);
+
+    // Temporary until the actual gallery uploader is implemented.
+    console.log("Gallery opened");
+  };
 
   const startReply = (selectedMessage) => {
     setReplyingTo(selectedMessage);
@@ -588,10 +606,14 @@ const Chat = ({ socket }) => {
               messageInputRef={messageInputRef}
               isSending={isSending}
               onMessageChange={handleMessageChange}
-              onSendMessage={sendMessage}
-              onCamera={() => {
-                console.log("Camera button clicked");
-              }}
+              onCamera={openCamera}
+              onGallery={openGallery}
+            />
+
+            <CameraModal
+              isOpen={showCameraModal}
+              onClose={closeCamera}
+              onGallery={openGallery}
             />
 
             {/* SEND BUTTON */}
