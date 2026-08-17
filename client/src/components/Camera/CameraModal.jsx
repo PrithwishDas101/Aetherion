@@ -41,6 +41,7 @@ const CameraModal = ({
   const [capturedPhotoUrl, setCapturedPhotoUrl] = useState(null);
   const [capturedPhotoBlob, setCapturedPhotoBlob] = useState(null);
   const [photoCaption, setPhotoCaption] = useState("");
+  const [downloadMessage, setDownloadMessage] = useState("");
 
   // PHOTO EDITOR STATE
   const [activePhotoTool, setActivePhotoTool] = useState(null);
@@ -514,18 +515,41 @@ const CameraModal = ({
 
   // PHOTO DOWNLOAD
   const downloadPhoto = () => {
-    if (!capturedPhotoUrl) {
+    if (!capturedPhotoBlob) {
       return;
     }
 
-    const link = document.createElement("a");
+    try {
+      const downloadUrl = URL.createObjectURL(capturedPhotoBlob);
 
-    link.href = capturedPhotoUrl;
-    link.download = `aetherion-photo-${Date.now()}.jpg`;
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `aetherion-photo-${Date.now()}.jpg`;
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      link.style.display = "none";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setDownloadMessage("Photo download started");
+
+      setTimeout(() => {
+        URL.revokeObjectURL(downloadUrl);
+      }, 1000);
+
+      setTimeout(() => {
+        setDownloadMessage("");
+      }, 2200);
+    } catch (error) {
+      console.error("Photo download error:", error);
+
+      setDownloadMessage("Unable to download photo");
+
+      setTimeout(() => {
+        setDownloadMessage("");
+      }, 2200);
+    }
   };
 
   // PHOTO TOOLS
@@ -657,16 +681,15 @@ const CameraModal = ({
   return createPortal(
     <div className="fixed inset-0 z-[100] h-[100dvh] w-full overflow-hidden bg-black">
       <div className="relative h-full min-h-0 w-full overflow-hidden bg-black">
-        // PHOTO PREVIEW / EDITOR
+        {/* PHOTO PREVIEW | EDITOR */}
         {showingCapturedPhoto ? (
           <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black">
-            // PHOTO
             <img
               src={capturedPhotoUrl}
               alt="Captured photo"
               className="absolute inset-0 h-full w-full object-cover"
             />
-            // TOP TOOLBAR
+            {/* TOP TOOLBAR */}
             <div className="absolute inset-x-0 top-0 z-40 flex items-start justify-between px-4 pt-[max(12px,env(safe-area-inset-top))]">
               {/*CLOSE*/}
               <button
@@ -741,7 +764,18 @@ const CameraModal = ({
                 </button>
               </div>
             </div>
-            // TOOL MESSAGE
+            {downloadMessage ? (
+              <div className="pointer-events-none absolute left-1/2 top-24 z-50 -translate-x-1/2">
+                <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-black/65 px-4 py-2.5 text-sm font-medium text-white shadow-xl backdrop-blur-xl">
+                  <span className="relative flex h-5 w-5 items-center justify-center overflow-hidden">
+                    <FiDownload className="animate-bounce text-[17px]" />
+                  </span>
+
+                  <span>{downloadMessage}</span>
+                </div>
+              </div>
+            ) : null}
+            {/* TOOL MESSAGE */}
             {activePhotoTool === "sticker" ? (
               <div className="absolute left-1/2 top-24 z-30 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-xs font-medium text-white backdrop-blur-md">
                 Stickers coming soon
