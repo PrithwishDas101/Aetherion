@@ -11,15 +11,14 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
+  "http://192.168.1.33:5173",
+  "https://nvidia-distribute-skating-motorola.trycloudflare.com",
   process.env.CLIENT_URL,
-  "https://screensaver-baseball-boots-rick.trycloudflare.com",
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests without an Origin header
-      // (Postman, server-to-server requests, etc.)
       if (!origin) {
         return callback(null, true);
       }
@@ -27,6 +26,8 @@ app.use(
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+
+      console.error("❌ CORS blocked origin:", origin);
 
       return callback(new Error(`CORS blocked origin: ${origin}`));
     },

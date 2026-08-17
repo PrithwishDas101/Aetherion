@@ -28,14 +28,16 @@ function Login() {
       if (response.success) {
         localStorage.setItem("token", response.token);
 
-        toast.success(response.message);
+        toast("Welcome back to Aetherion", {
+          icon: null,
+        });
 
         navigate("/");
       } else {
         toast.error(response.message);
       }
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again later.");
     } finally {
       dispatch(hideLoader());
     }

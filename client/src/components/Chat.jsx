@@ -614,6 +614,17 @@ const Chat = ({ socket }) => {
               isOpen={showCameraModal}
               onClose={closeCamera}
               onGallery={openGallery}
+              recipientName={
+                selectedUser
+                  ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                  : "User"
+              }
+              onPhotoCaptured={(photoData) => {
+                console.log("PHOTO FROM CAMERA:", photoData);
+              }}
+              onVideoCaptured={(videoBlob) => {
+                console.log("VIDEO FROM CAMERA:", videoBlob);
+              }}
             />
 
             {/* SEND BUTTON */}
