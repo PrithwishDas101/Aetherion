@@ -1,15 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  FiDownload,
-  FiEdit3,
-  FiRefreshCw,
-  FiSmile,
-  FiType,
-  FiX,
-  FiZap,
-  FiZapOff,
-} from "react-icons/fi";
+import { FiRefreshCw, FiX, FiZap, FiZapOff } from "react-icons/fi";
 
 import {
   getCameraStream,
@@ -19,6 +10,9 @@ import {
   setTorch,
   stopCameraStream,
 } from "./cameraUtils.js";
+
+import CameraPreview from "./CameraPreview.jsx";
+import PhotoPreview from "./PhotoPreview.jsx";
 
 const CameraModal = ({
   isOpen,
@@ -42,8 +36,6 @@ const CameraModal = ({
   const [capturedPhotoBlob, setCapturedPhotoBlob] = useState(null);
   const [photoCaption, setPhotoCaption] = useState("");
   const [downloadMessage, setDownloadMessage] = useState("");
-
-  // PHOTO EDITOR STATE
   const [activePhotoTool, setActivePhotoTool] = useState(null);
 
   // VIDEO STATE
@@ -57,17 +49,16 @@ const CameraModal = ({
   const [hasTorch, setHasTorch] = useState(false);
 
   // REFS
-  const cameraVideoRef = useRef(null);
-  const recordedVideoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const recordedChunksRef = useRef([]);
   const recordingTimerRef = useRef(null);
-  const captionInputRef = useRef(null);
+  const cameraPreviewRef = useRef(null);
 
   const isMobile = isMobileDevice();
 
-  // CAMERA INITIALIZATION
-
+  /*
+   * CAMERA INITIALIZATION
+   */
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -139,54 +130,9 @@ const CameraModal = ({
     };
   }, [isOpen, mode, facingMode, cameraRestartKey]);
 
-  // ATTACH STREAM DIRECTLY TO VIDEO
-  useEffect(() => {
-    const video = cameraVideoRef.current;
-
-    if (!video || !stream) {
-      return;
-    }
-
-    setIsVideoReady(false);
-
-    video.srcObject = stream;
-    video.muted = true;
-    video.playsInline = true;
-
-    const markReady = () => {
-      if (video.videoWidth > 0 && video.videoHeight > 0) {
-        setIsVideoReady(true);
-      }
-    };
-
-    const playVideo = async () => {
-      try {
-        await video.play();
-        markReady();
-      } catch (error) {
-        console.warn("Camera video autoplay was blocked:", error);
-      }
-    };
-
-    video.addEventListener("loadedmetadata", markReady);
-    video.addEventListener("loadeddata", markReady);
-    video.addEventListener("canplay", markReady);
-
-    playVideo();
-
-    return () => {
-      video.removeEventListener("loadedmetadata", markReady);
-      video.removeEventListener("loadeddata", markReady);
-      video.removeEventListener("canplay", markReady);
-
-      if (video.srcObject === stream) {
-        video.pause();
-        video.srcObject = null;
-      }
-    };
-  }, [stream]);
-
-  // RECORDING TIMER
+  /*
+   * RECORDING TIMER
+   */
   useEffect(() => {
     if (!isRecording) {
       if (recordingTimerRef.current) {
@@ -209,7 +155,9 @@ const CameraModal = ({
     };
   }, [isRecording]);
 
-  // CLEANUP
+  /*
+   * CLEANUP PHOTO
+   */
   const cleanupCapturedPhoto = () => {
     if (capturedPhotoUrl) {
       URL.revokeObjectURL(capturedPhotoUrl);
@@ -221,6 +169,9 @@ const CameraModal = ({
     setActivePhotoTool(null);
   };
 
+  /*
+   * CLEANUP VIDEO
+   */
   const cleanupRecordedVideo = () => {
     if (recordedVideoUrl) {
       URL.revokeObjectURL(recordedVideoUrl);
@@ -230,7 +181,9 @@ const CameraModal = ({
     setRecordedVideoBlob(null);
   };
 
-  // CLOSE
+  /*
+   * CLOSE CAMERA
+   */
   const closeCamera = () => {
     const recorder = mediaRecorderRef.current;
 
@@ -265,7 +218,9 @@ const CameraModal = ({
     onClose?.();
   };
 
-  // MODE
+  /*
+   * CAMERA MODE
+   */
   const changeMode = (nextMode) => {
     if (
       nextMode === mode ||
@@ -288,7 +243,9 @@ const CameraModal = ({
     setMode(nextMode);
   };
 
-  // SHUTTER
+  /*
+   * SHUTTER
+   */
   const handleShutter = () => {
     if (!stream || isLoading || !isVideoReady) {
       return;
@@ -307,7 +264,9 @@ const CameraModal = ({
     startVideoRecording();
   };
 
-  // CAMERA SWITCH
+  /*
+   * CAMERA SWITCH
+   */
   const switchCamera = () => {
     if (
       !isMobile ||
@@ -330,9 +289,9 @@ const CameraModal = ({
     setFacingMode((previous) => (previous === "user" ? "environment" : "user"));
   };
 
-  // GALLERY
-  // =========================================================
-
+  /*
+   * GALLERY
+   */
   const handleGallery = () => {
     if (isRecording || recordedVideoUrl || capturedPhotoUrl) {
       return;
@@ -341,7 +300,9 @@ const CameraModal = ({
     onGallery?.();
   };
 
-  // TORCH
+  /*
+   * TORCH
+   */
   const toggleTorch = async () => {
     if (
       !isMobile ||
@@ -366,7 +327,22 @@ const CameraModal = ({
     setIsTorchEnabled(nextState);
   };
 
-  // VIDEO RECORDING
+  /*
+   * PHOTO TOOL
+   */
+  const handlePhotoTool = (toolOrUpdater) => {
+    setActivePhotoTool((previous) => {
+      if (typeof toolOrUpdater === "function") {
+        return toolOrUpdater(previous);
+      }
+
+      return previous === toolOrUpdater ? null : toolOrUpdater;
+    });
+  };
+
+  /*
+   * VIDEO RECORDING
+   */
   const startVideoRecording = () => {
     if (
       mode !== "video" ||
@@ -414,7 +390,9 @@ const CameraModal = ({
 
     try {
       const recorder = mimeType
-        ? new MediaRecorder(stream, { mimeType })
+        ? new MediaRecorder(stream, {
+            mimeType,
+          })
         : new MediaRecorder(stream);
 
       mediaRecorderRef.current = recorder;
@@ -430,8 +408,10 @@ const CameraModal = ({
 
         if (!chunks.length) {
           setCameraError("No video data was recorded.");
+
           setIsRecording(false);
           mediaRecorderRef.current = null;
+
           return;
         }
 
@@ -464,6 +444,7 @@ const CameraModal = ({
         console.error("Video recording error:", event.error);
 
         setCameraError("Unable to record video.");
+
         setIsRecording(false);
         setRecordingSeconds(0);
         mediaRecorderRef.current = null;
@@ -476,6 +457,7 @@ const CameraModal = ({
       console.error("Start video recording error:", error);
 
       setCameraError("Unable to start video recording.");
+
       setIsRecording(false);
     }
   };
@@ -490,7 +472,9 @@ const CameraModal = ({
     recorder.stop();
   };
 
-  // RETAKE PHOTO
+  /*
+   * RETAKE PHOTO
+   */
   const retakePhoto = () => {
     cleanupCapturedPhoto();
 
@@ -502,7 +486,9 @@ const CameraModal = ({
     setCameraRestartKey((previous) => previous + 1);
   };
 
-  // RETAKE VIDEO
+  /*
+   * RETAKE VIDEO
+   */
   const retakeVideo = () => {
     cleanupRecordedVideo();
 
@@ -513,7 +499,9 @@ const CameraModal = ({
     setCameraRestartKey((previous) => previous + 1);
   };
 
-  // PHOTO DOWNLOAD
+  /*
+   * DOWNLOAD PHOTO
+   */
   const downloadPhoto = () => {
     if (!capturedPhotoBlob) {
       return;
@@ -523,13 +511,17 @@ const CameraModal = ({
       const downloadUrl = URL.createObjectURL(capturedPhotoBlob);
 
       const link = document.createElement("a");
+
       link.href = downloadUrl;
+
       link.download = `aetherion-photo-${Date.now()}.jpg`;
 
       link.style.display = "none";
 
       document.body.appendChild(link);
+
       link.click();
+
       document.body.removeChild(link);
 
       setDownloadMessage("Photo download started");
@@ -552,18 +544,9 @@ const CameraModal = ({
     }
   };
 
-  // PHOTO TOOLS
-  const handlePhotoTool = (tool) => {
-    setActivePhotoTool((previous) => (previous === tool ? null : tool));
-  };
-
-  const focusCaption = () => {
-    requestAnimationFrame(() => {
-      captionInputRef.current?.focus();
-    });
-  };
-
-  // SEND PHOTO
+  /*
+   * SEND PHOTO
+   */
   const sendCapturedPhoto = () => {
     if (!capturedPhotoBlob) {
       return;
@@ -577,7 +560,9 @@ const CameraModal = ({
     closeCamera();
   };
 
-  // SEND VIDEO
+  /*
+   * SEND VIDEO
+   */
   const sendRecordedVideo = () => {
     if (!recordedVideoBlob) {
       return;
@@ -588,13 +573,23 @@ const CameraModal = ({
     closeCamera();
   };
 
-  // CAPTURE PHOTO
+  /*
+   * CAPTURE PHOTO
+   */
   const capturePhoto = () => {
     if (mode !== "photo" || !stream || isLoading || !isVideoReady) {
       return;
     }
 
-    const video = cameraVideoRef.current;
+    /*
+     * CameraPreview is now responsible for
+     * rendering the actual camera element.
+     *
+     * We still need access to that element
+     * when capturing the frame, so locate it
+     * from the modal DOM.
+     */
+    const video = cameraPreviewRef.current;
 
     if (
       !video ||
@@ -603,6 +598,7 @@ const CameraModal = ({
       !video.videoHeight
     ) {
       console.warn("Camera video is not ready yet.");
+
       return;
     }
 
@@ -615,14 +611,17 @@ const CameraModal = ({
 
     if (!context) {
       console.error("Unable to create canvas context.");
+
       return;
     }
 
     /*
-     * Mirror front camera photos so they behave like the preview.
+     * Mirror front camera photos so they
+     * behave like the preview.
      */
     if (facingMode === "user") {
       context.translate(canvas.width, 0);
+
       context.scale(-1, 1);
     }
 
@@ -632,14 +631,14 @@ const CameraModal = ({
       (blob) => {
         if (!blob) {
           console.error("Unable to create captured image.");
+
           return;
         }
 
         const photoUrl = URL.createObjectURL(blob);
 
-        setCapturedPhotoBlob(blob);
         setCapturedPhotoUrl(photoUrl);
-
+        setCapturedPhotoBlob(blob);
         setPhotoCaption("");
         setActivePhotoTool(null);
 
@@ -656,9 +655,12 @@ const CameraModal = ({
     );
   };
 
-  // TIMER
+  /*
+   * RECORDING TIME
+   */
   const formatRecordingTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
+
     const remainingSeconds = seconds % 60;
 
     return `${String(minutes).padStart(2, "0")}:${String(
@@ -666,7 +668,9 @@ const CameraModal = ({
     ).padStart(2, "0")}`;
   };
 
-  // GUARDS
+  /*
+   * GUARDS
+   */
   if (!isOpen) {
     return null;
   }
@@ -677,155 +681,37 @@ const CameraModal = ({
 
   const showingPreview = showingCapturedPhoto || showingRecordedVideo;
 
-  // RENDER
   return createPortal(
     <div className="fixed inset-0 z-[100] h-[100dvh] w-full overflow-hidden bg-black">
       <div className="relative h-full min-h-0 w-full overflow-hidden bg-black">
-        {/* PHOTO PREVIEW | EDITOR */}
+        {/* ===================================================== */}
+        {/* PHOTO PREVIEW                                         */}
+        {/* ===================================================== */}
+
         {showingCapturedPhoto ? (
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black">
-            <img
-              src={capturedPhotoUrl}
-              alt="Captured photo"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            {/* TOP TOOLBAR */}
-            <div className="absolute inset-x-0 top-0 z-40 flex items-start justify-between px-4 pt-[max(12px,env(safe-area-inset-top))]">
-              {/*CLOSE*/}
-              <button
-                type="button"
-                onClick={closeCamera}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white shadow-lg backdrop-blur-xl transition active:scale-95"
-                aria-label="Discard photo"
-              >
-                <FiX className="text-[23px]" />
-              </button>
-              {/* TOOLS */}
-              <div className="flex items-center gap-2">
-                {/* DOWNLOAD */}
-                <button
-                  type="button"
-                  onClick={downloadPhoto}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white shadow-lg backdrop-blur-xl transition hover:bg-black/45 active:scale-95"
-                  aria-label="Download photo"
-                >
-                  <FiDownload className="text-[21px]" />
-                </button>
-                {/* RETAKE */}
-                <button
-                  type="button"
-                  onClick={retakePhoto}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white shadow-lg backdrop-blur-xl transition hover:bg-black/45 active:scale-95"
-                  aria-label="Retake photo"
-                >
-                  <FiRefreshCw className="text-[21px]" />
-                </button>
-                {/* STICKER */}
-                <button
-                  type="button"
-                  onClick={() => handlePhotoTool("sticker")}
-                  className={`flex h-11 w-11 items-center justify-center rounded-full border border-white/10 shadow-lg backdrop-blur-xl transition active:scale-95 ${
-                    activePhotoTool === "sticker"
-                      ? "bg-white text-black"
-                      : "bg-black/30 text-white hover:bg-black/45"
-                  }`}
-                  aria-label="Add sticker"
-                >
-                  <FiSmile className="text-[21px]" />
-                </button>
-                {/* TEXT */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    handlePhotoTool("text");
-                    focusCaption();
-                  }}
-                  className={`flex h-11 w-11 items-center justify-center rounded-full border border-white/10 shadow-lg backdrop-blur-xl transition active:scale-95 ${
-                    activePhotoTool === "text"
-                      ? "bg-white text-black"
-                      : "bg-black/30 text-white hover:bg-black/45"
-                  }`}
-                  aria-label="Add text"
-                >
-                  <FiType className="text-[21px]" />
-                </button>
-                {/* DOODLE */}
-                <button
-                  type="button"
-                  onClick={() => handlePhotoTool("doodle")}
-                  className={`flex h-11 w-11 items-center justify-center rounded-full border border-white/10 shadow-lg backdrop-blur-xl transition active:scale-95 ${
-                    activePhotoTool === "doodle"
-                      ? "bg-white text-black"
-                      : "bg-black/30 text-white hover:bg-black/45"
-                  }`}
-                  aria-label="Draw on photo"
-                >
-                  <FiEdit3 className="text-[21px]" />
-                </button>
-              </div>
-            </div>
-            {downloadMessage ? (
-              <div className="pointer-events-none absolute left-1/2 top-24 z-50 -translate-x-1/2">
-                <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-black/65 px-4 py-2.5 text-sm font-medium text-white shadow-xl backdrop-blur-xl">
-                  <span className="relative flex h-5 w-5 items-center justify-center overflow-hidden">
-                    <FiDownload className="animate-bounce text-[17px]" />
-                  </span>
-
-                  <span>{downloadMessage}</span>
-                </div>
-              </div>
-            ) : null}
-            {/* TOOL MESSAGE */}
-            {activePhotoTool === "sticker" ? (
-              <div className="absolute left-1/2 top-24 z-30 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-xs font-medium text-white backdrop-blur-md">
-                Stickers coming soon
-              </div>
-            ) : null}
-            {activePhotoTool === "doodle" ? (
-              <div className="absolute left-1/2 top-24 z-30 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-xs font-medium text-white backdrop-blur-md">
-                Doodle tool coming soon
-              </div>
-            ) : null}
-            // CAPTION
-            <div className="absolute inset-x-0 bottom-[82px] z-30 px-3">
-              <div className="mx-auto w-full max-w-xl">
-                <div className="rounded-2xl border border-white/10 bg-black/45 px-4 py-2.5 shadow-2xl backdrop-blur-xl">
-                  <textarea
-                    ref={captionInputRef}
-                    value={photoCaption}
-                    onChange={(event) => setPhotoCaption(event.target.value)}
-                    placeholder="Add a caption..."
-                    rows={1}
-                    className="scrollbar-aetherion block min-h-9 max-h-24 w-full resize-none overflow-y-auto bg-transparent py-1 text-[15px] leading-5 text-white outline-none placeholder:text-white/50"
-                  />
-                </div>
-              </div>
-            </div>
-            // SEND BAR
-            <div className="absolute inset-x-0 bottom-0 z-40 flex min-h-[72px] items-center justify-between gap-3 border-t border-white/10 bg-[#080d09] px-5 pb-[max(8px,env(safe-area-inset-bottom))] pt-2">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-white">
-                  {recipientName}
-                </p>
-
-                <p className="text-xs text-white/45">Send photo</p>
-              </div>
-
-              <button
-                type="button"
-                onClick={sendCapturedPhoto}
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] shadow-lg transition hover:bg-[#e4ff6f] active:scale-95"
-                aria-label="Send photo"
-              >
-                <span className="translate-x-[1px] text-xl">➤</span>
-              </button>
-            </div>
-          </div>
+          <PhotoPreview
+            photoUrl={capturedPhotoUrl}
+            activeTool={activePhotoTool}
+            onToolChange={handlePhotoTool}
+            onClose={closeCamera}
+            onDownload={downloadPhoto}
+            onRetake={retakePhoto}
+            onSend={sendCapturedPhoto}
+            recipientName={recipientName}
+            photoCaption={photoCaption}
+            onCaptionChange={(event) => setPhotoCaption(event.target.value)}
+            downloadMessage={downloadMessage}
+          />
         ) : null}
-        // VIDEO PREVIEW
+
+        {/* ===================================================== */}
+        {/* VIDEO PREVIEW                                         */}
+        {/* ===================================================== */}
+
         {showingRecordedVideo ? (
           <div className="relative h-full w-full overflow-hidden bg-black">
             {/* TOP */}
+
             <div className="absolute inset-x-0 top-0 z-40 flex items-center px-4 pt-[max(10px,env(safe-area-inset-top))]">
               <button
                 type="button"
@@ -847,10 +733,11 @@ const CameraModal = ({
                 <FiRefreshCw className="text-xl" />
               </button>
             </div>
-            // VIDEO
+
+            {/* VIDEO */}
+
             <div className="absolute inset-0 flex items-center justify-center">
               <video
-                ref={recordedVideoRef}
                 src={recordedVideoUrl}
                 controls
                 autoPlay
@@ -858,7 +745,9 @@ const CameraModal = ({
                 className="h-full w-full object-contain"
               />
             </div>
+
             {/* SEND */}
+
             <div className="absolute inset-x-0 bottom-0 z-40 flex items-center justify-end bg-gradient-to-t from-black/90 to-transparent px-5 pb-[max(16px,env(safe-area-inset-bottom))] pt-20">
               <button
                 type="button"
@@ -871,19 +760,21 @@ const CameraModal = ({
             </div>
           </div>
         ) : null}
-        // LIVE CAMERA
+
+        {/* ===================================================== */}
+        {/* LIVE CAMERA                                           */}
+        {/* ===================================================== */}
+
         {!showingPreview ? (
           <div className="relative h-full min-h-0 w-full overflow-hidden bg-black">
-            // CAMERA VIDEO
+            {/* CAMERA */}
+
             {stream ? (
-              <video
-                ref={cameraVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className={`absolute inset-0 h-full w-full object-cover ${
-                  facingMode === "user" ? "-scale-x-100" : ""
-                }`}
+              <CameraPreview
+                ref={cameraPreviewRef}
+                stream={stream}
+                mirrored={facingMode === "user"}
+                onReady={() => setIsVideoReady(true)}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-black px-8 text-center">
@@ -900,9 +791,14 @@ const CameraModal = ({
                 )}
               </div>
             )}
-            // TOP CONTROLS
+
+            {/* ================================================= */}
+            {/* TOP CAMERA CONTROLS                              */}
+            {/* ================================================= */}
+
             <div className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-5 pt-[max(16px,env(safe-area-inset-top))]">
               {/* CLOSE */}
+
               <button
                 type="button"
                 onClick={closeCamera}
@@ -911,7 +807,9 @@ const CameraModal = ({
               >
                 <FiX className="text-xl" />
               </button>
-              {/* RECORD TIMING */}
+
+              {/* RECORD TIMER */}
+
               {mode === "video" ? (
                 <div className="absolute left-1/2 -translate-x-1/2">
                   <div
@@ -927,7 +825,9 @@ const CameraModal = ({
                   </div>
                 </div>
               ) : null}
+
               {/* TORCH */}
+
               {isMobile ? (
                 <button
                   type="button"
@@ -954,12 +854,19 @@ const CameraModal = ({
                 </button>
               ) : null}
             </div>
-            // BOTTOM CAMERA CONTROLS
+
+            {/* ================================================= */}
+            {/* BOTTOM CAMERA CONTROLS                           */}
+            {/* ================================================= */}
+
             <div className="absolute inset-x-0 bottom-0 z-30 px-5 pb-[max(12px,env(safe-area-inset-bottom))] pt-20">
               {/* GRADIENT */}
+
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+
               <div className="relative flex items-center justify-center">
                 {/* GALLERY */}
+
                 <div className="absolute left-0">
                   {isMobile ? (
                     <button
@@ -973,7 +880,9 @@ const CameraModal = ({
                     </button>
                   ) : null}
                 </div>
-                {/* SWITCH */}
+
+                {/* SHUTTER */}
+
                 <button
                   type="button"
                   onClick={handleShutter}
@@ -997,7 +906,9 @@ const CameraModal = ({
                     }`}
                   />
                 </button>
+
                 {/* CAMERA SWITCH */}
+
                 <div className="absolute right-0">
                   {isMobile ? (
                     <button
@@ -1012,7 +923,9 @@ const CameraModal = ({
                   ) : null}
                 </div>
               </div>
+
               {/* MODE */}
+
               <div className="relative mt-4 flex items-center justify-center gap-5">
                 <button
                   type="button"
