@@ -5,6 +5,7 @@ import {
   FiAlignRight,
   FiCheck,
   FiPlus,
+  FiSettings,
 } from "react-icons/fi";
 
 const TEXT_COLORS = [
@@ -62,6 +63,10 @@ const TEXT_FONTS = [
 
 const BACKGROUNDS = [
   {
+    id: "none",
+    color: "transparent",
+  },
+  {
     id: "white",
     color: "#FFFFFF",
   },
@@ -73,16 +78,13 @@ const BACKGROUNDS = [
     id: "transparent",
     color: "rgba(0,0,0,0.45)",
   },
-  {
-    id: "none",
-    color: "transparent",
-  },
 ];
 
 const createText = () => ({
   id: `${Date.now()}-${Math.random()}`,
   text: "",
-  color: "#FFFFFF",
+  color: "#FF3B30",
+  hasCustomColor: false,
   font: "sans",
   alignment: "center",
   background: "none",
@@ -228,6 +230,7 @@ const PhotoTextEditor = ({ texts = [], onChange, onDone, onClose }) => {
 
     updateText(activeTextId, {
       color,
+      hasCustomColor: true,
     });
   };
 
@@ -281,9 +284,27 @@ const PhotoTextEditor = ({ texts = [], onChange, onDone, onClose }) => {
     const nextIndex =
       currentIndex < 0 ? 0 : (currentIndex + 1) % BACKGROUNDS.length;
 
-    updateText(activeText.id, {
-      background: BACKGROUNDS[nextIndex].id,
-    });
+    const nextBackground = BACKGROUNDS[nextIndex].id;
+
+    const changes = {
+      background: nextBackground,
+    };
+
+    /*
+     * Only automatically change text colour
+     * if the user has NOT manually selected one.
+     */
+    if (!activeText.hasCustomColor) {
+      if (nextBackground === "black") {
+        changes.color = "#FFFFFF";
+      } else if (nextBackground === "white") {
+        changes.color = "#000000";
+      } else {
+        changes.color = "#FF3B30";
+      }
+    }
+
+    updateText(activeText.id, changes);
   };
 
   /*
@@ -340,15 +361,6 @@ const PhotoTextEditor = ({ texts = [], onChange, onDone, onClose }) => {
     ) : (
       <FiAlignCenter className="text-[21px]" />
     );
-
-  /*
-   * BACKGROUND BUTTON PREVIEW
-   */
-
-  const backgroundId = activeText?.background || "none";
-
-  const background =
-    BACKGROUNDS.find((item) => item.id === backgroundId) || BACKGROUNDS[3];
 
   /*
    * DONE
@@ -434,39 +446,25 @@ const PhotoTextEditor = ({ texts = [], onChange, onDone, onClose }) => {
           type="button"
           onClick={handleBackgroundChange}
           className="
-            absolute
-            left-1/2
-            translate-x-[14px]
-            flex
-            h-11
-            w-11
-            items-center
-            justify-center
-            rounded-full
-            bg-black/40
-            text-white
-            shadow-lg
-            backdrop-blur-xl
-            transition
-            active:scale-95
-          "
+    absolute
+    left-1/2
+    translate-x-[14px]
+    flex
+    h-11
+    w-11
+    items-center
+    justify-center
+    rounded-full
+    bg-black/40
+    text-white
+    shadow-lg
+    backdrop-blur-xl
+    transition
+    active:scale-95
+  "
           aria-label="Change text background"
         >
-          <span
-            className="
-              block
-              h-5
-              w-5
-              rounded-md
-            "
-            style={{
-              backgroundColor: background.color,
-              boxShadow:
-                backgroundId === "none"
-                  ? "inset 0 0 0 1px rgba(255,255,255,0.5)"
-                  : "none",
-            }}
-          />
+          <FiSettings className="block h-5 w-5 border-2 border-white" />
         </button>
 
         {/* TICK */}
@@ -525,54 +523,77 @@ const PhotoTextEditor = ({ texts = [], onChange, onDone, onClose }) => {
             <button
               type="button"
               onPointerDown={(event) => handlePointerDown(event, text)}
-              className={`
-                block
-                max-w-[82vw]
-                cursor-grab
-                select-none
-                border-0
-                p-0
-                outline-none
-                active:cursor-grabbing
-                ${
-                  isActive
-                    ? "ring-1 ring-white/20 ring-offset-2 ring-offset-transparent"
-                    : ""
-                }
-              `}
+              className="
+  block
+  max-w-[82vw]
+  cursor-grab
+  select-none
+  border-0
+  bg-transparent
+  p-0
+  outline-none
+  shadow-none
+  ring-0
+  active:cursor-grabbing
+"
             >
               <span
                 className={`
-                  inline-block
-                  max-w-[82vw]
-                  whitespace-pre-wrap
-                  break-words
-                  rounded-md
-                  px-3
-                  py-1.5
-                  text-[30px]
-                  leading-tight
-                  drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
-                  ${fontClass}
-                `}
+    max-w-[82vw]
+    whitespace-pre-wrap
+    break-words
+    text-[30px]
+    leading-tight
+    drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
+    ${fontClass}
+  `}
                 style={{
                   color: text.color,
-
-                  backgroundColor: background?.color || "transparent",
-
                   textAlign: text.alignment,
-
-                  /*
-                   * IMPORTANT:
-                   * This prevents a full-width rectangular
-                   * background. The background belongs to
-                   * the inline text itself.
-                   */
-                  boxDecorationBreak: "clone",
-                  WebkitBoxDecorationBreak: "clone",
                 }}
               >
-                {text.text || "Type something..."}
+                {text.text ? (
+                  text.text.split("\n").map((line, index) => (
+                    <span
+                      key={`${text.id}-${index}`}
+                      className="box-decoration-clone"
+                      style={{
+                        display: "table",
+                        marginLeft:
+                          text.alignment === "center"
+                            ? "auto"
+                            : text.alignment === "right"
+                              ? "auto"
+                              : "0",
+                        marginRight:
+                          text.alignment === "center"
+                            ? "auto"
+                            : text.alignment === "left"
+                              ? "auto"
+                              : "0",
+                        padding: text.background === "none" ? "0" : "3px 8px",
+                        borderRadius: text.background === "none" ? "0" : "6px",
+                        backgroundColor:
+                          text.background === "none"
+                            ? "transparent"
+                            : background?.color || "transparent",
+                        boxDecorationBreak: "clone",
+                        WebkitBoxDecorationBreak: "clone",
+                      }}
+                    >
+                      {line || "\u00A0"}
+                    </span>
+                  ))
+                ) : (
+                  <span
+                    style={{
+                      display: "table",
+                      margin: "0 auto",
+                    }}
+                  >
+                    Add text..
+                  </span>
+                )}
               </span>
             </button>
           </div>
@@ -666,22 +687,28 @@ const PhotoTextEditor = ({ texts = [], onChange, onDone, onClose }) => {
               backdrop-blur-xl
             "
           >
-            <input
+            <textarea
               ref={inputRef}
               value={inputValue}
               onChange={handleInputChange}
               placeholder="Add text..."
+              rows={1}
               className="
-                block
-                h-9
-                w-full
-                bg-transparent
-                text-center
-                text-[16px]
-                text-white
-                outline-none
-                placeholder:text-white/45
-              "
+    block
+    min-h-9
+    max-h-24
+    w-full
+    resize-none
+    overflow-y-auto
+    bg-transparent
+    py-1
+    text-center
+    text-[16px]
+    leading-5
+    text-white
+    outline-none
+    placeholder:text-white/45
+  "
             />
           </div>
 
