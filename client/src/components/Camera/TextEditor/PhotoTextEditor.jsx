@@ -96,7 +96,13 @@ const getFontClass = (font) => {
   return TEXT_FONTS.find((item) => item.id === font)?.className || "font-sans";
 };
 
-const PhotoTextEditor = ({ texts = [], onChange, onDone, onClose }) => {
+const PhotoTextEditor = ({
+  texts = [],
+  editingTextId = null,
+  onChange,
+  onDone,
+  onClose,
+}) => {
   const [localTexts, setLocalTexts] = useState(texts);
 
   const [activeTextId, setActiveTextId] = useState(null);
@@ -117,26 +123,38 @@ const PhotoTextEditor = ({ texts = [], onChange, onDone, onClose }) => {
    */
 
   useEffect(() => {
-    setLocalTexts(texts);
-
     /*
-     * If there are existing texts, select the
-     * last one so T immediately gives the user
-     * something to edit.
+     * IMPORTANT:
+     *
+     * Opening the text editor has two different modes.
+     *
+     * 1. editingTextId exists:
+     *    The user tapped an existing text.
+     *    Edit ONLY that text.
+     *
+     * 2. editingTextId is null:
+     *    The user tapped the T tool.
+     *    Create ONE completely new text.
      */
 
-    if (texts.length > 0) {
-      const last = texts[texts.length - 1];
+    setLocalTexts(texts);
 
-      setActiveTextId(last.id);
-      setInputValue(last.text);
-    } else {
-      const first = createText();
+    if (editingTextId) {
+      const textToEdit = texts.find((text) => text.id === editingTextId);
 
-      setLocalTexts([first]);
-      setActiveTextId(first.id);
-      setInputValue("");
+      if (textToEdit) {
+        setActiveTextId(textToEdit.id);
+        setInputValue(textToEdit.text);
+        return;
+      }
     }
+
+    const newText = createText();
+
+    setLocalTexts((previous) => [...previous, newText]);
+
+    setActiveTextId(newText.id);
+    setInputValue("");
   }, []);
 
   /*
