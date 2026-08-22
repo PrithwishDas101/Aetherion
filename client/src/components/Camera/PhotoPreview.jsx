@@ -5,6 +5,7 @@ import PhotoTools from "./PhotoTools.jsx";
 import PhotoTextEditor from "./TextEditor/PhotoTextEditor.jsx";
 import DoodleEditor from "./Doodle/DoodleEditor.jsx";
 import StickerEditor from "./Sticker/StickerEditor.jsx";
+import MediaZoomSurface from "./MediaZoomSurface.jsx";
 
 const TRASH_RADIUS = 64;
 
@@ -236,13 +237,18 @@ const PhotoPreview = ({
           PHOTO
           ========================================================= */}
 
-      <div className="absolute inset-0 overflow-hidden">
+      {/* =========================================================
+    ZOOMABLE PHOTO
+    ========================================================= */}
+
+      <MediaZoomSurface>
         <img
           src={photoUrl}
           alt="Captured photo"
-          className="h-full w-full object-cover"
+          draggable={false}
+          className="h-full w-full select-none object-cover"
         />
-      </div>
+      </MediaZoomSurface>
 
       {/* =========================================================
           COMMITTED TEXT
