@@ -124,13 +124,7 @@ const PhotoTextEditor = ({
   const inputRef = useRef(null);
   const measureRef = useRef(null);
 
-  /*
-   * We only use the incoming texts when opening
-   * the editor for an existing text object.
-   *
-   * Otherwise create one new text object.
-   */
-
+  // use incoming text or create new text object
   useEffect(() => {
     if (editingTextId) {
       setLocalTexts(texts);
@@ -150,17 +144,12 @@ const PhotoTextEditor = ({
     setActiveTextId(newText.id);
   }, [editingTextId]);
 
-  /*
-   * SEND CHANGES BACK TO PHOTO PREVIEW
-   */
-
+  // sending changes back to photo preview
   useEffect(() => {
     onChange?.(localTexts);
   }, [localTexts, onChange]);
 
-  /*
-   * FOCUS ACTIVE TEXT
-   */
+  // focus on active texts
 
   useEffect(() => {
     if (!activeTextId) return;
@@ -176,21 +165,7 @@ const PhotoTextEditor = ({
 
   const activeText = localTexts.find((text) => text.id === activeTextId);
 
-  /*
-   * This is the important part.
-   *
-   * The invisible measurement element always has the
-   * same font, letter spacing and line behaviour as
-   * the textarea.
-   *
-   * Its measured width is used to resize the textarea.
-   *
-   * Therefore:
-   * - no imaginary typing box width
-   * - no premature automatic wrapping
-   * - Enter is the only thing that creates a new line
-   */
-
+  // text area
   useEffect(() => {
     const textarea = inputRef.current;
     const measure = measureRef.current;
@@ -199,12 +174,6 @@ const PhotoTextEditor = ({
 
     const lines = activeText.text.split("\n");
 
-    /*
-     * Measure the longest actual line.
-     *
-     * A textarea should never wrap a line because
-     * of an invisible fixed width.
-     */
     const longestLine =
       lines.reduce(
         (longest, line) => (line.length > longest.length ? line : longest),
@@ -215,27 +184,16 @@ const PhotoTextEditor = ({
 
     const measuredWidth = Math.ceil(measure.scrollWidth);
 
-    /*
-     * Keep a small minimum width for an empty/new text.
-     *
-     * Maximum is intentionally NOT constrained here.
-     * The text is allowed to become as wide as needed.
-     */
     const nextWidth = Math.max(40, measuredWidth + 2);
 
     textarea.style.width = `${nextWidth}px`;
 
-    /*
-     * Height follows explicit Enter-created lines only.
-     */
     textarea.style.height = "0px";
 
     textarea.style.height = `${textarea.scrollHeight}px`;
   }, [activeText?.text, activeText?.font, activeText?.alignment, activeTextId]);
 
-  /*
-   * UPDATE ONE TEXT
-   */
+  // updating a created text
 
   const updateText = (id, changes) => {
     setLocalTexts((previous) =>
@@ -250,31 +208,13 @@ const PhotoTextEditor = ({
     );
   };
 
-  /*
-   * SELECT EXISTING TEXT
-   */
+  // selecting existing texts
 
   const selectText = (text) => {
     setActiveTextId(text.id);
   };
 
-  /*
-   * ADD NEW TEXT
-   *
-   * Kept here for future use.
-   */
-
-  const handleAddText = () => {
-    const newText = createText();
-
-    setLocalTexts((previous) => [...previous, newText]);
-    setActiveTextId(newText.id);
-  };
-
-  /*
-   * COLOR
-   */
-
+  // color picker management
   const handleColorChange = (color) => {
     if (!activeTextId) return;
 
@@ -284,10 +224,7 @@ const PhotoTextEditor = ({
     });
   };
 
-  /*
-   * FONT
-   */
-
+  // Font management
   const handleFontChange = (font) => {
     if (!activeTextId) return;
 
@@ -296,12 +233,7 @@ const PhotoTextEditor = ({
     });
   };
 
-  /*
-   * ALIGNMENT
-   *
-   * CENTER → LEFT → RIGHT → CENTER
-   */
-
+  // alignment management
   const handleAlignmentChange = () => {
     if (!activeText) return;
 
@@ -318,12 +250,7 @@ const PhotoTextEditor = ({
     });
   };
 
-  /*
-   * BACKGROUND
-   *
-   * NONE → WHITE → BLACK → TRANSPARENT → NONE
-   */
-
+  // background management
   const handleBackgroundChange = () => {
     if (!activeText) return;
 
@@ -340,10 +267,7 @@ const PhotoTextEditor = ({
       background: nextBackground,
     };
 
-    /*
-     * Automatically change colour only when
-     * the user has not manually selected one.
-     */
+    // automatic color change when user picks a color
     if (!activeText.hasCustomColor) {
       if (nextBackground === "black") {
         changes.color = "#FFFFFF";
@@ -357,16 +281,7 @@ const PhotoTextEditor = ({
     updateText(activeText.id, changes);
   };
 
-  /*
-   * EDIT MODE:
-   *
-   * Existing text can be selected,
-   * but never dragged here.
-   *
-   * Dragging remains exclusively handled
-   * by PhotoPreview after pressing ✓.
-   */
-
+  // editing text, items can't be dragged, dragging happens after creating text
   const handlePointerDown = (event, text) => {
     event.preventDefault();
     event.stopPropagation();
@@ -374,10 +289,7 @@ const PhotoTextEditor = ({
     selectText(text);
   };
 
-  /*
-   * ALIGNMENT ICON
-   */
-
+  // alignment icon
   const alignmentIcon =
     activeText?.alignment === "left" ? (
       <FiAlignLeft className="text-[21px]" />
@@ -387,12 +299,7 @@ const PhotoTextEditor = ({
       <FiAlignCenter className="text-[21px]" />
     );
 
-  /*
-   * DONE
-   *
-   * Remove only empty objects.
-   */
-
+  // done
   const handleDone = () => {
     const cleanedTexts = localTexts.filter(
       (text) => text.text.trim().length > 0,
@@ -411,109 +318,40 @@ const PhotoTextEditor = ({
         touch-none
       "
     >
-      {/* =====================================================
-          TOP TOOLBAR
-          ===================================================== */}
-
-      <div
-        className="
-          absolute
-          inset-x-0
-          top-0
-          z-[90]
-          flex
-          h-11
-          items-center
-          justify-center
-          px-4
-          pt-[max(12px,env(safe-area-inset-top))]
-          box-content
-        "
-      >
+      {/* TOP TOOLBAR*/}
+      <div className=" absolute inset-x-0 top-0 z-[90] flex h-11 items-center justify-center px-4 pt-[max(12px,env(safe-area-inset-top))] box-content">
         {/* ALIGNMENT */}
-
         <button
           type="button"
           onClick={handleAlignmentChange}
-          className="
-            absolute
-            left-1/2
-            -translate-x-[58px]
-            flex
-            h-11
-            w-11
-            items-center
-            justify-center
-            rounded-full
-            bg-black/40
-            text-white
-            shadow-lg
-            backdrop-blur-xl
-            transition
-            active:scale-95
-          "
+          className=" absolute left-1/2 -translate-x-[58px] flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white shadow-lg backdrop-blur-xl transition active:scale-95"
           aria-label="Change text alignment"
         >
           {alignmentIcon}
         </button>
 
         {/* BACKGROUND */}
-
         <button
           type="button"
           onClick={handleBackgroundChange}
-          className="
-            absolute
-            left-1/2
-            translate-x-[14px]
-            flex
-            h-11
-            w-11
-            items-center
-            justify-center
-            rounded-full
-            bg-black/40
-            text-white
-            shadow-lg
-            backdrop-blur-xl
-            transition
-            active:scale-95
-          "
+          className=" absolute left-1/2 translate-x-[14px] flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white shadow-lg backdrop-blur-xl transition active:scale-95"
           aria-label="Change text background"
         >
           <FiSettings className="block h-5 w-5 border-2 border-white" />
         </button>
 
         {/* DONE */}
-
         <button
           type="button"
           onClick={handleDone}
-          className="
-            absolute
-            right-4
-            flex
-            h-11
-            w-11
-            items-center
-            justify-center
-            rounded-full
-            bg-black/40
-            text-white
-            shadow-lg
-            backdrop-blur-xl
-            transition
-            active:scale-95
-          "
+          className=" absolute right-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white shadow-lg backdrop-blur-xl transition active:scale-95"
           aria-label="Done"
         >
           <FiCheck className="text-[23px]" />
         </button>
       </div>
 
-      {/* =====================================================
-          TEXT OBJECTS
-          ===================================================== */}
+      {/* TEXT OBJECTS */}
 
       {localTexts.map((text) => {
         const fontClass = getFontClass(text.font);
@@ -523,40 +361,20 @@ const PhotoTextEditor = ({
         return (
           <div
             key={text.id}
-            className="
-              absolute
-              -translate-x-1/2
-              -translate-y-1/2
-            "
+            className=" absolute -translate-x-1/2 -translate-y-1/2"
             style={{
               left: `${text.x}%`,
               top: `${text.y}%`,
             }}
           >
             {isActive ? (
-              <div
-                className="
-                  relative
-                  inline-block
-                "
-              >
-                {/* =========================================
-                    VISUAL TEXT LAYER
-                    ========================================= */}
+              <div className=" relative inline-block">
+                {/* VISUAL TEXT COVER */}
 
                 <div
                   aria-hidden="true"
-                  className={`
-                    pointer-events-none
-                    absolute
-                    inset-0
-                    z-0
-                    text-[30px]
-                    leading-tight
-                    whitespace-pre
-                    drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
-                    ${fontClass}
-                  `}
+                  className={` pointer-events-none absolute inset-0 z-0 text-[30px] leading-tight whitespace-pre drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
+                     ${fontClass} `}
                   style={{
                     color: text.color,
                     textAlign: text.alignment,
@@ -595,32 +413,16 @@ const PhotoTextEditor = ({
                   })}
                 </div>
 
-                {/* =========================================
-                    HIDDEN WIDTH MEASUREMENT
-                    ========================================= */}
+                {/* HIDDEN WIDTH MEASUREMENT */}
 
                 <span
                   ref={isActive ? measureRef : null}
                   aria-hidden="true"
-                  className={`
-                    invisible
-                    absolute
-                    left-0
-                    top-0
-                    z-[-1]
-                    whitespace-pre
-                    text-[30px]
-                    leading-tight
-                    ${fontClass}
-                  `}
+                  className={` invisible absolute left-0 top-0 z-[-1] whitespace-pre text-[30px] leading-tight 
+                    ${fontClass} `}
                 />
 
-                {/* =========================================
-                    REAL TEXTAREA
-
-                    Width is dynamically measured.
-                    No fixed invisible typing box.
-                    ========================================= */}
+                {/* REAL TEXTAREA */}
 
                 <textarea
                   ref={isActive ? inputRef : null}
@@ -633,25 +435,8 @@ const PhotoTextEditor = ({
                   placeholder="Add text..."
                   rows={1}
                   wrap="off"
-                  className={`
-                    relative
-                    z-10
-                    block
-                    min-w-[40px]
-                    resize-none
-                    overflow-hidden
-                    border-0
-                    bg-transparent
-                    p-0
-                    text-[30px]
-                    leading-tight
-                    whitespace-pre
-                    outline-none
-                    caret-white
-                    placeholder:text-[#eef1f133]
-                    drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
-                    ${fontClass}
-                  `}
+                  className={` relative z-10 block min-w-[40px] resize-none overflow-hidden border-0 bg-transparent p-0 text-[30px] leading-tight whitespace-pre outline-none caret-white placeholder:text-[#eef1f133] drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
+                    ${fontClass} `}
                   style={{
                     color: "transparent",
                     caretColor: text.color,
@@ -666,26 +451,11 @@ const PhotoTextEditor = ({
               <button
                 type="button"
                 onPointerDown={(event) => handlePointerDown(event, text)}
-                className="
-                  block
-                  cursor-text
-                  select-none
-                  border-0
-                  bg-transparent
-                  p-0
-                  outline-none
-                  shadow-none
-                  ring-0
-                "
+                className=" block cursor-text select-none border-0 bg-transparent p-0 outline-none shadow-none ring-0 "
               >
                 <div
-                  className={`
-                    whitespace-pre
-                    text-[30px]
-                    leading-tight
-                    drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
-                    ${fontClass}
-                  `}
+                  className={` whitespace-pre text-[30px] leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] 
+                    ${fontClass} `}
                   style={{
                     color: text.color,
                     textAlign: text.alignment,
@@ -729,46 +499,20 @@ const PhotoTextEditor = ({
         );
       })}
 
-      {/* =====================================================
-          COLOR PICKER
-          ===================================================== */}
+      {/* COLOR PICKER */}
 
-      <div
-        className="
-          absolute
-          right-4
-          top-1/2
-          z-[85]
-          flex
-          -translate-y-1/2
-          flex-col
-          items-center
-          gap-2
-          rounded-full
-          bg-black/45
-          p-2
-          shadow-xl
-          backdrop-blur-xl
-        "
-      >
+      <div className=" absolute right-4 top-1/2 z-[85] flex -translate-y-1/2 flex-col items-center gap-2 rounded-full bg-black/45 p-2 shadow-xl backdrop-blur-xl ">
         {TEXT_COLORS.map((color) => (
           <button
             key={color}
             type="button"
             onClick={() => handleColorChange(color)}
-            className={`
-              h-6
-              w-6
-              rounded-full
-              border-2
-              transition
-              active:scale-90
+            className={` h-6 w-6 rounded-full border-2 transition active:scale-90
               ${
                 activeText?.color === color
                   ? "scale-110 border-white"
                   : "border-white/30"
-              }
-            `}
+              }`}
             style={{
               backgroundColor: color,
             }}
@@ -777,58 +521,23 @@ const PhotoTextEditor = ({
         ))}
       </div>
 
-      {/* =====================================================
-          FONT STRIP
-          ===================================================== */}
+      {/* FONT STRIP */}
 
-      <div
-        className="
-          absolute
-          inset-x-0
-          bottom-[max(16px,env(safe-area-inset-bottom))]
-          z-[85]
-          overflow-hidden
-          px-4
-        "
-      >
-        <div
-          className="
-            mx-auto
-            max-w-xl
-            overflow-x-auto
-            scrollbar-none
-          "
-        >
-          <div
-            className="
-              flex
-              w-max
-              min-w-full
-              justify-center
-              gap-2
-              pb-1
-            "
-          >
+      <div className=" absolute inset-x-0 bottom-[max(16px,env(safe-area-inset-bottom))] z-[85] overflow-hidden px-4 ">
+        <div className=" mx-auto max-w-xl overflow-x-auto scrollbar-none">
+          <div className=" flex w-max min-w-full justify-center gap-2 pb-1 ">
             {TEXT_FONTS.map((font) => (
               <button
                 key={font.id}
                 type="button"
                 onClick={() => handleFontChange(font.id)}
-                className={`
-                  shrink-0
-                  rounded-full
-                  px-4
-                  py-2
-                  text-sm
-                  transition
-                  active:scale-95
+                className={` shrink-0 rounded-full px-4 py-2 text-sm transition active:scale-95
                   ${
                     activeText?.font === font.id
                       ? "bg-white text-black"
                       : "bg-black/55 text-white/75 backdrop-blur-xl"
                   }
-                  ${font.className}
-                `}
+                  ${font.className}`}
               >
                 {font.label}
               </button>
