@@ -27,8 +27,10 @@ const PhotoPreview = ({
   const [draggingTextId, setDraggingTextId] = useState(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
 
+  const previewRef = useRef(null);
   const dragStartRef = useRef(null);
   const didDragRef = useRef(false);
+  const trashRef = useRef(null);
 
   const isTextEditing = activeTool === "text";
   const isDraggingCommittedText = Boolean(draggingTextId);
@@ -38,19 +40,15 @@ const PhotoPreview = ({
     onToolChange("text");
   };
 
-  const isPointerInsideTrash = (clientX, clientY, previewRect) => {
-    const trashX = previewRect.left + 42;
-    const trashY =
-      previewRect.top +
-      Math.max(
-        12,
-        Number.parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue(
-            "--safe-area-top",
-          ),
-        ) || 12,
-      ) +
-      42;
+  const isPointerInsideTrash = (clientX, clientY) => {
+    const trash = trashRef.current;
+
+    if (!trash) return false;
+
+    const rect = trash.getBoundingClientRect();
+
+    const trashX = rect.left + rect.width / 2;
+    const trashY = rect.top + rect.height / 2;
 
     const distance = Math.hypot(clientX - trashX, clientY - trashY);
 
@@ -63,9 +61,25 @@ const PhotoPreview = ({
 
     event.currentTarget.setPointerCapture?.(event.pointerId);
 
+    const preview = previewRef.current;
+
+    if (!preview) return;
+
+    const previewRect = preview.getBoundingClientRect();
+
+    const currentText = photoTexts.find((text) => text.id === textId);
+
+    if (!currentText) return;
+
     dragStartRef.current = {
-      x: event.clientX,
-      y: event.clientY,
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+
+      textX: currentText.x,
+      textY: currentText.y,
+
+      previewWidth: previewRect.width,
+      previewHeight: previewRect.height,
     };
 
     didDragRef.current = false;
@@ -77,7 +91,7 @@ const PhotoPreview = ({
   const handleCommittedTextPointerMove = (event) => {
     if (!draggingTextId) return;
 
-    const preview = event.currentTarget.closest("[data-photo-preview]");
+    const preview = previewRef.current;
 
     if (!preview) return;
 
@@ -85,8 +99,8 @@ const PhotoPreview = ({
 
     const distanceFromStart = dragStartRef.current
       ? Math.hypot(
-          event.clientX - dragStartRef.current.x,
-          event.clientY - dragStartRef.current.y,
+          event.clientX - dragStartRef.current.pointerX,
+          event.clientY - dragStartRef.current.pointerY,
         )
       : 0;
 
@@ -104,10 +118,43 @@ const PhotoPreview = ({
      * off-screen before deleting it.
      */
 
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    const draggedTextElement = document.querySelector(
+      `[data-photo-text-id="${draggingTextId}"]`,
+    );
 
-    const overTrash = isPointerInsideTrash(event.clientX, event.clientY, rect);
+    const textRect = draggedTextElement?.getBoundingClientRect();
+
+    const textWidth = textRect?.width || 0;
+    const textHeight = textRect?.height || 0;
+
+    /*
+     * Extend the allowed drag area by HALF the text's size
+     * on every side.
+     *
+     * This allows the ENTIRE text object to move outside
+     * the preview, instead of stopping when its centre
+     * reaches the edge.
+     */
+
+    const pointerDeltaX =
+      ((event.clientX - dragStartRef.current.pointerX) / rect.width) * 100;
+
+    const pointerDeltaY =
+      ((event.clientY - dragStartRef.current.pointerY) / rect.height) * 100;
+
+    const x = dragStartRef.current.textX + pointerDeltaX;
+    const y = dragStartRef.current.textY + pointerDeltaY;
+
+    const minX = -(textWidth / 2 / rect.width) * 100;
+    const maxX = 100 + (textWidth / 2 / rect.width) * 100;
+
+    const minY = -(textHeight / 2 / rect.height) * 100;
+    const maxY = 100 + (textHeight / 2 / rect.height) * 100;
+
+    const clampedX = Math.max(minX, Math.min(maxX, x));
+    const clampedY = Math.max(minY, Math.min(maxY, y));
+
+    const overTrash = isPointerInsideTrash(event.clientX, event.clientY);
 
     setIsOverTrash(overTrash);
 
@@ -116,8 +163,8 @@ const PhotoPreview = ({
         text.id === draggingTextId
           ? {
               ...text,
-              x,
-              y,
+              x: clampedX,
+              y: clampedY,
             }
           : text,
       ),
@@ -127,15 +174,9 @@ const PhotoPreview = ({
   const handleCommittedTextPointerUp = (event) => {
     if (!draggingTextId) return;
 
-    const preview = event.currentTarget.closest("[data-photo-preview]");
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
 
-    let shouldDelete = false;
-
-    if (preview) {
-      const rect = preview.getBoundingClientRect();
-
-      shouldDelete = isPointerInsideTrash(event.clientX, event.clientY, rect);
-    }
+    const shouldDelete = isPointerInsideTrash(event.clientX, event.clientY);
 
     const textIdToHandle = draggingTextId;
     const wasDragged = didDragRef.current;
@@ -184,8 +225,9 @@ const PhotoPreview = ({
 
   return (
     <div
+      ref={previewRef}
       data-photo-preview
-      className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black"
+      className="absolute inset-0 flex items-center justify-center overflow-visible bg-black"
       onPointerMove={handleCommittedTextPointerMove}
       onPointerUp={handleCommittedTextPointerUp}
       onPointerCancel={handleCommittedTextPointerUp}
@@ -194,11 +236,13 @@ const PhotoPreview = ({
           PHOTO
           ========================================================= */}
 
-      <img
-        src={photoUrl}
-        alt="Captured photo"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src={photoUrl}
+          alt="Captured photo"
+          className="h-full w-full object-cover"
+        />
+      </div>
 
       {/* =========================================================
           COMMITTED TEXT
@@ -240,6 +284,7 @@ const PhotoPreview = ({
           "
         >
           <div
+            ref={trashRef}
             className={`
               flex
               h-12
@@ -528,10 +573,12 @@ const PhotoTextBlock = ({ text, isDragging, onPointerDown }) => {
   return (
     <button
       type="button"
+      data-photo-text-id={text.id}
       onPointerDown={onPointerDown}
       className={`
         absolute
         z-20
+    max-w-[82vw]
         -translate-x-1/2
         -translate-y-1/2
         cursor-grab
@@ -551,45 +598,49 @@ const PhotoTextBlock = ({ text, isDragging, onPointerDown }) => {
       }}
       aria-label="Move or edit text"
     >
-      <span
+      <div
         className={`
-          inline-block
-          w-max
-          max-w-[82vw]
-          whitespace-pre-wrap
-          break-words
-          text-[30px]
-          leading-tight
-          drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
-          ${fontClass}
-        `}
+    w-max
+    whitespace-pre-wrap
+    break-words
+    text-[30px]
+    leading-tight
+    drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
+    ${fontClass}
+  `}
         style={{
           color: text.color,
           textAlign: text.alignment,
         }}
       >
-        {text.text
-          ? text.text.split("\n").map((line, index) => (
-              <span
-                key={`${text.id}-${index}`}
-                style={{
-                  display: "block",
-                  width: "fit-content",
-                  maxWidth: "82vw",
+        {text.text.split("\n").map((line, index, lines) => {
+          const isLastLine = index === lines.length - 1;
 
-                  padding: text.background === "none" ? "0" : "3px 8px",
+          return (
+            <span key={`${text.id}-${index}`}>
+              {line ? (
+                <span
+                  style={{
+                    display: "inline",
+                    backgroundColor:
+                      text.background === "none" ? "transparent" : background,
+                    padding: text.background === "none" ? "0" : "3px 8px",
+                    borderRadius: text.background === "none" ? "0" : "6px",
+                    boxDecorationBreak: "clone",
+                    WebkitBoxDecorationBreak: "clone",
+                  }}
+                >
+                  {line}
+                </span>
+              ) : (
+                "\u00A0"
+              )}
 
-                  borderRadius: text.background === "none" ? "0" : "6px",
-
-                  backgroundColor:
-                    text.background === "none" ? "transparent" : background,
-                }}
-              >
-                {line || "\u00A0"}
-              </span>
-            ))
-          : null}
-      </span>
+              {!isLastLine && <br />}
+            </span>
+          );
+        })}
+      </div>
     </button>
   );
 };
