@@ -7,6 +7,7 @@ import DoodleEditor from "./Doodle/DoodleEditor.jsx";
 import DoodleDisplay from "./Doodle/DoodleDisplay.jsx";
 import StickerEditor from "./Sticker/StickerEditor.jsx";
 import MediaZoomSurface from "./MediaZoomSurface.jsx";
+import { composePhoto } from "./Composition/composePhoto.js";
 
 const TRASH_RADIUS = 64;
 
@@ -210,6 +211,20 @@ const PhotoPreview = ({
     onToolChange(null);
   };
 
+  const handleDownloadPhoto = async () => {
+    try {
+      const finalBlob = await composePhoto({
+        photoUrl,
+        doodles: photoDoodles,
+        texts: photoTexts,
+      });
+
+      onDownload?.(finalBlob);
+    } catch (error) {
+      console.error("Unable to compose photo for download:", error);
+    }
+  };
+
   return (
     <div
       ref={previewRef}
@@ -286,7 +301,7 @@ const PhotoPreview = ({
           <PhotoTools
             activeTool={activeTool}
             onToolChange={onToolChange}
-            onDownload={onDownload}
+            onDownload={handleDownloadPhoto}
             onRetake={onRetake}
           />
         </div>

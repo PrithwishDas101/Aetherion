@@ -499,23 +499,19 @@ const CameraModal = ({
     setCameraRestartKey((previous) => previous + 1);
   };
 
-  /*
-   * DOWNLOAD PHOTO
-   */
-  const downloadPhoto = () => {
-    if (!capturedPhotoBlob) {
+  // DOWNLOAD PHOTO
+  const downloadPhoto = (photoBlob = capturedPhotoBlob) => {
+    if (!photoBlob) {
       return;
     }
 
     try {
-      const downloadUrl = URL.createObjectURL(capturedPhotoBlob);
+      const downloadUrl = URL.createObjectURL(photoBlob);
 
       const link = document.createElement("a");
 
       link.href = downloadUrl;
-
       link.download = `aetherion-photo-${Date.now()}.jpg`;
-
       link.style.display = "none";
 
       document.body.appendChild(link);
@@ -684,9 +680,7 @@ const CameraModal = ({
   return createPortal(
     <div className="fixed inset-0 z-[100] h-[100dvh] w-full overflow-hidden bg-black">
       <div className="relative h-full min-h-0 w-full overflow-hidden bg-black">
-        {/* ===================================================== */}
-        {/* PHOTO PREVIEW                                         */}
-        {/* ===================================================== */}
+        {/* PHOTO PREVIEW */}
 
         {showingCapturedPhoto ? (
           <PhotoPreview
