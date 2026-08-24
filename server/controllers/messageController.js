@@ -1,10 +1,13 @@
 import Message from "../models/Message.js";
 import Chat from "../models/Chat.js";
+import { uploadImage } from "../services/cloudinaryService.js";
 
 // SEND MESSAGE
 export const sendMessage = async (req, res) => {
   try {
     const { chatId, text, type = "text", mediaUrl, replyTo } = req.body;
+
+    const uploadedFile = req.file;
 
     if (!chatId) {
       return res.status(400).json({
@@ -27,6 +30,13 @@ export const sendMessage = async (req, res) => {
       });
     }
 
+    if (type === "image" && !uploadedFile) {
+      return res.status(400).json({
+        success: false,
+        message: "Image file is required.",
+      });
+    }
+
     const senderId = String(req.user.userId);
 
     const chat = await Chat.findOne({
@@ -39,6 +49,17 @@ export const sendMessage = async (req, res) => {
         success: false,
         message: "Chat not found.",
       });
+    }
+
+    let uploadedMediaUrl = null;
+
+    if (type === "image") {
+      const uploadResult = await uploadImage(
+        uploadedFile.buffer,
+        "aetherion/chat-images",
+      );
+
+      uploadedMediaUrl = uploadResult.secure_url;
     }
 
     const receiver = chat.members.find((member) => String(member) !== senderId);
@@ -60,7 +81,8 @@ export const sendMessage = async (req, res) => {
 
       text: type === "text" ? text.trim() : "",
 
-      mediaUrl: type === "gif" ? mediaUrl : null,
+      mediaUrl:
+        type === "gif" ? mediaUrl : type === "image" ? uploadedMediaUrl : null,
 
       replyTo: replyTo || null,
 

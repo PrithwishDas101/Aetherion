@@ -5,7 +5,11 @@ import { MdKeyboard } from "react-icons/md";
 import { FaPaperPlane } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-import { createMessage, getAllMessages } from "../apiCalls/messageApi.js";
+import {
+  createMessage,
+  createMediaMessage,
+  getAllMessages,
+} from "../apiCalls/messageApi.js";
 import { clearUnreadMessage } from "../apiCalls/chatApi.js";
 import { showLoader, hideLoader } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
@@ -248,6 +252,61 @@ const Chat = ({ socket }) => {
       console.error("Send GIF error:", error);
 
       toast.error(error.response?.data?.message || "Unable to send GIF.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const sendCameraPhoto = async (photoData) => {
+    if (!photoData?.blob || !selectedChat?._id || isSending) {
+      return;
+    }
+
+    try {
+      setIsSending(true);
+
+      const formData = new FormData();
+
+      formData.append("chatId", selectedChat._id);
+
+      formData.append("type", "image");
+
+      formData.append("text", photoData.caption?.trim() || "");
+
+      formData.append(
+        "media",
+        photoData.blob,
+        `aetherion-photo-${Date.now()}.jpg`,
+      );
+
+      formData.append("replyTo", replyingTo?._id || "");
+
+      const response = await createMediaMessage(formData);
+
+      if (response?.success) {
+        emitSendMessage(socket, {
+          message: response.data,
+          chat: response.chat,
+          members: selectedChat.members.map((member) => String(member._id)),
+        });
+
+        setAllMessages((previousMessages) => [
+          ...previousMessages,
+          response.data,
+        ]);
+
+        if (response?.chat) {
+          updateChatInRedux(response.chat);
+        }
+
+        setReplyingTo(null);
+      } else {
+        toast.error(response?.message || "Unable to send photo.");
+      }
+    } catch (error) {
+      console.error("Send camera photo error:", error);
+
+      toast.error("Unable to send photo.");
     } finally {
       setIsSending(false);
     }
@@ -619,9 +678,7 @@ const Chat = ({ socket }) => {
                   ? `${selectedUser.firstName} ${selectedUser.lastName}`
                   : "User"
               }
-              onPhotoCaptured={(photoData) => {
-                console.log("PHOTO FROM CAMERA:", photoData);
-              }}
+              onPhotoCaptured={sendCameraPhoto}
               onVideoCaptured={(videoBlob) => {
                 console.log("VIDEO FROM CAMERA:", videoBlob);
               }}

@@ -13,6 +13,7 @@ import {
 
 import CameraPreview from "./CameraPreview.jsx";
 import PhotoPreview from "./PhotoPreview.jsx";
+import { composePhoto } from "./Composition/composePhoto.js";
 
 const CameraModal = ({
   isOpen,
@@ -540,16 +541,15 @@ const CameraModal = ({
     }
   };
 
-  /*
-   * SEND PHOTO
-   */
-  const sendCapturedPhoto = () => {
-    if (!capturedPhotoBlob) {
+  // SEND PHOTO
+
+  const sendCapturedPhoto = (composedBlob) => {
+    if (!composedBlob) {
       return;
     }
 
     onPhotoCaptured?.({
-      blob: capturedPhotoBlob,
+      blob: composedBlob,
       caption: photoCaption.trim(),
     });
 

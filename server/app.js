@@ -12,7 +12,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://192.168.1.33:5173",
-  "https://sister-dis-civilization-walls.trycloudflare.com",
+  "http://192.168.1.38:5173",
+  "https://radios-assumption-direct-pole.trycloudflare.com",
   process.env.CLIENT_URL,
 ].filter(Boolean);
 

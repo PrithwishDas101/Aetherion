@@ -14,6 +14,20 @@ export const createMessage = async (message) => {
   }
 };
 
+// SEND MEDIA MESSAGE
+export const createMediaMessage = async (formData) => {
+  try {
+    const response = await axiosInstance.post(
+      "/api/v1/message/send-message",
+      formData,
+    );
+
+    return response.data;
+  } catch (error) {
+    return error.response?.data;
+  }
+};
+
 // GET ALL MESSAGES
 export const getAllMessages = async (chatId) => {
   try {

@@ -211,6 +211,20 @@ const PhotoPreview = ({
     onToolChange(null);
   };
 
+  const handleSendPhoto = async () => {
+    try {
+      const finalBlob = await composePhoto({
+        photoUrl,
+        doodles: photoDoodles,
+        texts: photoTexts,
+      });
+
+      onSend?.(finalBlob);
+    } catch (error) {
+      console.error("Unable to compose photo for sending:", error);
+    }
+  };
+
   const handleDownloadPhoto = async () => {
     try {
       const finalBlob = await composePhoto({
@@ -375,7 +389,7 @@ const PhotoPreview = ({
 
           <button
             type="button"
-            onClick={onSend}
+            onClick={handleSendPhoto}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] shadow-lg transition hover:bg-[#e4ff6f] active:scale-95"
             aria-label="Send photo"
           >

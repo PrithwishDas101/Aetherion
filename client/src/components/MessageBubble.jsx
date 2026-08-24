@@ -15,6 +15,10 @@ const MessageBubble = ({
 
   const isGif = message.type === "gif" && !!message.mediaUrl;
 
+  const isImage = message.type === "image" && !!message.mediaUrl;
+
+  const isMedia = isGif || isImage;
+
   return (
     <div
       className={`group flex items-center gap-2 ${
@@ -36,9 +40,9 @@ const MessageBubble = ({
 
       <div
         className={`order-1 w-fit max-w-[75%] break-words ${
-          isGif
+          isMedia
             ? ""
-            : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+            : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed  ${
                 isMyMessage
                   ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
                   : "rounded-bl-sm border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
@@ -52,11 +56,11 @@ const MessageBubble = ({
           otherUserName={otherUserName}
         />
 
-        {isGif ? (
+        {isMedia ? (
           <div className="overflow-hidden rounded-xl">
             <img
               src={message.mediaUrl}
-              alt="GIF"
+              alt={isGif ? "GIF" : "Image"}
               className="block max-h-72 max-w-full rounded-xl object-cover"
               loading="lazy"
             />
@@ -67,7 +71,7 @@ const MessageBubble = ({
 
         <div
           className={`flex items-center justify-end gap-1 text-[10px] leading-none ${
-            isGif
+            isMedia
               ? "px-1 pt-1 text-[#aab3a8]"
               : `mt-1 ${isMyMessage ? "text-[#10120d]/60" : "text-[#aab3a8]"}`
           }`}
