@@ -3,6 +3,7 @@ import { FiCornerUpLeft, FiCornerUpRight } from "react-icons/fi";
 
 import { formatMessageTime } from "../utils/messageDate.js";
 import ReplyMessage from "./ReplyMessage.jsx";
+import MediaUploadIndicator from "./MediaUploadIndicator.jsx";
 
 const MessageBubble = ({
   message,
@@ -57,13 +58,25 @@ const MessageBubble = ({
         />
 
         {isMedia ? (
-          <div className="overflow-hidden rounded-xl">
+          <div className="relative overflow-hidden rounded-xl">
             <img
               src={message.mediaUrl}
               alt={isGif ? "GIF" : "Image"}
-              className="block max-h-72 max-w-full rounded-xl object-cover"
+              className={`block max-h-72 max-w-full rounded-xl object-cover transition-all duration-300 ${
+                message.isUploading ? "scale-[1.01]" : "scale-100"
+              }`}
               loading="lazy"
             />
+
+            <div
+              className={`absolute inset-0 z-10 transition-opacity duration-300 ${
+                message.isUploading
+                  ? "opacity-100"
+                  : "pointer-events-none opacity-0"
+              }`}
+            >
+              <MediaUploadIndicator />
+            </div>
           </div>
         ) : (
           <div className="whitespace-pre-wrap">{message.text}</div>
@@ -79,7 +92,9 @@ const MessageBubble = ({
           <span>{messageTime}</span>
 
           {isMyMessage &&
-            (message.read ? (
+            (message.isUploading ? (
+              <span className="text-[10px] text-[#7b8477]">Sending...</span>
+            ) : message.read ? (
               <IoCheckmarkDone className="text-sm text-[#2196f3]" />
             ) : (
               <IoCheckmark className="text-sm text-[#5d654f]" />
