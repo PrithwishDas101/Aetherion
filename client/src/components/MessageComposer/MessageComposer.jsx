@@ -9,6 +9,7 @@ const MessageComposer = ({
   messageInputRef,
   isSending,
   onMessageChange,
+  onSendMessage,
   onCamera,
   onGallery,
 }) => {
@@ -28,6 +29,20 @@ const MessageComposer = ({
     onGallery?.();
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key !== "Enter" || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (!message.trim() || isSending) {
+      return;
+    }
+
+    onSendMessage?.();
+  };
+
   return (
     <div className="relative flex min-w-0 flex-1 items-end">
       <div className="flex min-w-0 flex-1 items-end gap-1.5 rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-2 transition focus-within:border-[#d8f45a]/50">
@@ -35,11 +50,7 @@ const MessageComposer = ({
           ref={messageInputRef}
           value={message}
           onChange={onMessageChange}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-            }
-          }}
+          onKeyDown={handleKeyDown}
           placeholder="Message"
           rows="1"
           disabled={isSending}

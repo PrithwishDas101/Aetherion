@@ -79,7 +79,7 @@ export const sendMessage = async (req, res) => {
 
       type,
 
-      text: type === "text" ? text.trim() : "",
+      text: text?.trim() || "",
 
       mediaUrl:
         type === "gif" ? mediaUrl : type === "image" ? uploadedMediaUrl : null,

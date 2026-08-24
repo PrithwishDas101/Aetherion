@@ -58,25 +58,57 @@ const MessageBubble = ({
         />
 
         {isMedia ? (
-          <div className="relative overflow-hidden rounded-xl">
-            <img
-              src={message.mediaUrl}
-              alt={isGif ? "GIF" : "Image"}
-              className={`block max-h-72 max-w-full rounded-xl object-cover transition-all duration-300 ${
-                message.isUploading ? "scale-[1.01]" : "scale-100"
-              }`}
-              loading="lazy"
-            />
+          <div
+            className={`overflow-hidden rounded-xl ${
+              isImage && message.text?.trim()
+                ? isMyMessage
+                  ? "border border-[#d8f164]"
+                  : "border border-[#18221a]"
+                : ""
+            }`}
+          >
+            {/* IMAGE / GIF */}
 
-            <div
-              className={`absolute inset-0 z-10 transition-opacity duration-300 ${
-                message.isUploading
-                  ? "opacity-100"
-                  : "pointer-events-none opacity-0"
-              }`}
-            >
-              <MediaUploadIndicator />
+            <div className="relative">
+              <img
+                src={message.mediaUrl}
+                alt={isGif ? "GIF" : "Image"}
+                className={`block max-h-72 max-w-full object-cover transition-all duration-300 ${
+                  isImage && message.text?.trim()
+                    ? "rounded-t-[11px]"
+                    : "rounded-xl"
+                } ${message.isUploading ? "scale-[1.01]" : "scale-100"}`}
+                loading="lazy"
+              />
+
+              {/* UPLOADING OVERLAY */}
+
+              <div
+                className={`absolute inset-0 z-10 transition-opacity duration-300 ${
+                  message.isUploading
+                    ? "opacity-100"
+                    : "pointer-events-none opacity-0"
+                }`}
+              >
+                <MediaUploadIndicator />
+              </div>
             </div>
+
+            {/* IMAGE CAPTION ONLY */}
+
+            {isImage && message.text?.trim() ? (
+              <div
+                className={`px-3 pb-2.5 pt-2.5 text-sm leading-relaxed ${
+                  isMyMessage
+                    ? "bg-[#d8f164] text-[#10120d]"
+                    : "bg-[#18221a] text-[#f1eee8]"
+                }`}
+              >
+                <p className="whitespace-pre-wrap break-words px-0 py-0">
+                  {message.text}
+                </p>
+              </div>
+            ) : null}
           </div>
         ) : (
           <div className="whitespace-pre-wrap">{message.text}</div>

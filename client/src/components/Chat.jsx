@@ -258,76 +258,91 @@ const Chat = ({ socket }) => {
   };
 
   const sendCameraPhoto = async (photoData) => {
-  if (!photoData?.blob || !selectedChat?._id || isSending) {
-    return;
-  }
+    if (!photoData?.blob || !selectedChat?._id || isSending) {
+      return;
+    }
 
-  const localPreviewUrl = URL.createObjectURL(photoData.blob);
-  const temporaryMessageId = `temp-image-${Date.now()}`;
+    const localPreviewUrl = URL.createObjectURL(photoData.blob);
+    const temporaryMessageId = `temp-image-${Date.now()}`;
 
-  const temporaryMessage = {
-    _id: temporaryMessageId,
-    chatId: selectedChat._id,
-    sender: user._id,
-    type: "image",
-    text: photoData.caption?.trim() || "",
-    mediaUrl: localPreviewUrl,
-    replyTo: replyingTo || null,
-    read: false,
-    createdAt: new Date().toISOString(),
-    isUploading: true,
-  };
+    const temporaryMessage = {
+      _id: temporaryMessageId,
+      chatId: selectedChat._id,
+      sender: user._id,
+      type: "image",
+      text: photoData.caption?.trim() || "",
+      mediaUrl: localPreviewUrl,
+      replyTo: replyingTo || null,
+      read: false,
+      createdAt: new Date().toISOString(),
+      isUploading: true,
+    };
 
-  // SHOW THE IMAGE IMMEDIATELY
-  setAllMessages((previousMessages) => [
-    ...previousMessages,
-    temporaryMessage,
-  ]);
+    // SHOW THE IMAGE IMMEDIATELY
+    setAllMessages((previousMessages) => [
+      ...previousMessages,
+      temporaryMessage,
+    ]);
 
-  try {
-    setIsSending(true);
+    try {
+      setIsSending(true);
 
-    const formData = new FormData();
+      const formData = new FormData();
 
-    formData.append("chatId", selectedChat._id);
-    formData.append("type", "image");
-    formData.append("text", photoData.caption?.trim() || "");
+      formData.append("chatId", selectedChat._id);
+      formData.append("type", "image");
+      formData.append("text", photoData.caption?.trim() || "");
 
-    formData.append(
-      "media",
-      photoData.blob,
-      `aetherion-photo-${Date.now()}.jpg`,
-    );
-
-    formData.append("replyTo", replyingTo?._id || "");
-
-    const response = await createMediaMessage(formData);
-
-    if (response?.success) {
-      // REPLACE LOCAL PREVIEW WITH REAL SERVER MESSAGE
-      setAllMessages((previousMessages) =>
-        previousMessages.map((currentMessage) =>
-          String(currentMessage._id) === String(temporaryMessageId)
-            ? response.data
-            : currentMessage,
-        ),
+      formData.append(
+        "media",
+        photoData.blob,
+        `aetherion-photo-${Date.now()}.jpg`,
       );
 
-      // LOCAL BLOB URL IS NO LONGER NEEDED
-      URL.revokeObjectURL(localPreviewUrl);
+      formData.append("replyTo", replyingTo?._id || "");
 
-      emitSendMessage(socket, {
-        message: response.data,
-        chat: response.chat,
-        members: selectedChat.members.map((member) => String(member._id)),
-      });
+      const response = await createMediaMessage(formData);
 
-      if (response?.chat) {
-        updateChatInRedux(response.chat);
+      if (response?.success) {
+        // REPLACE LOCAL PREVIEW WITH REAL SERVER MESSAGE
+        setAllMessages((previousMessages) =>
+          previousMessages.map((currentMessage) =>
+            String(currentMessage._id) === String(temporaryMessageId)
+              ? response.data
+              : currentMessage,
+          ),
+        );
+
+        // LOCAL BLOB URL IS NO LONGER NEEDED
+        URL.revokeObjectURL(localPreviewUrl);
+
+        emitSendMessage(socket, {
+          message: response.data,
+          chat: response.chat,
+          members: selectedChat.members.map((member) => String(member._id)),
+        });
+
+        if (response?.chat) {
+          updateChatInRedux(response.chat);
+        }
+
+        setReplyingTo(null);
+      } else {
+        // REMOVE FAILED TEMPORARY MESSAGE
+        setAllMessages((previousMessages) =>
+          previousMessages.filter(
+            (currentMessage) =>
+              String(currentMessage._id) !== String(temporaryMessageId),
+          ),
+        );
+
+        URL.revokeObjectURL(localPreviewUrl);
+
+        toast.error(response?.message || "Unable to send photo.");
       }
+    } catch (error) {
+      console.error("Send camera photo error:", error);
 
-      setReplyingTo(null);
-    } else {
       // REMOVE FAILED TEMPORARY MESSAGE
       setAllMessages((previousMessages) =>
         previousMessages.filter(
@@ -338,26 +353,11 @@ const Chat = ({ socket }) => {
 
       URL.revokeObjectURL(localPreviewUrl);
 
-      toast.error(response?.message || "Unable to send photo.");
+      toast.error("Unable to send photo.");
+    } finally {
+      setIsSending(false);
     }
-  } catch (error) {
-    console.error("Send camera photo error:", error);
-
-    // REMOVE FAILED TEMPORARY MESSAGE
-    setAllMessages((previousMessages) =>
-      previousMessages.filter(
-        (currentMessage) =>
-          String(currentMessage._id) !== String(temporaryMessageId),
-      ),
-    );
-
-    URL.revokeObjectURL(localPreviewUrl);
-
-    toast.error("Unable to send photo.");
-  } finally {
-    setIsSending(false);
-  }
-};
+  };
 
   const getMessages = async () => {
     if (!selectedChat?._id) {
@@ -712,6 +712,7 @@ const Chat = ({ socket }) => {
               messageInputRef={messageInputRef}
               isSending={isSending}
               onMessageChange={handleMessageChange}
+              onSendMessage={sendMessage}
               onCamera={openCamera}
               onGallery={openGallery}
             />
