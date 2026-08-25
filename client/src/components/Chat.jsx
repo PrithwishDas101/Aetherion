@@ -13,23 +13,28 @@ import {
 import { clearUnreadMessage } from "../apiCalls/chatApi.js";
 import { showLoader, hideLoader } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
+
 import {
   formatDateLabel,
   shouldShowDateSeparator,
   formatLastSeen,
 } from "../utils/messageDate.js";
+
 import MessageBubble from "./MessageBubble.jsx";
 import DateSeparator from "./DateSeparator.jsx";
 import ReplyPreview from "./ReplyPreview.jsx";
+import MessageMediaPicker from "./MessageMediaPicker.jsx";
+import MessageComposer from "./MessageComposer/MessageComposer.jsx";
+import CameraModal from "./Camera/CameraModal.jsx";
+import NewMessageDivider from "./NewMessageDivider.jsx";
+
 import {
   sendMessage as emitSendMessage,
   sendTyping,
   sendStopTyping,
 } from "../sockets/socketEmitters.js";
+
 import registerSocketListeners from "../sockets/socketListeners.js";
-import MessageMediaPicker from "./MessageMediaPicker.jsx";
-import MessageComposer from "./MessageComposer/MessageComposer.jsx";
-import CameraModal from "./Camera/CameraModal.jsx";
 
 const Chat = ({ socket }) => {
   const dispatch = useDispatch();
@@ -46,11 +51,29 @@ const Chat = ({ socket }) => {
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
 
+  // NEW MESSAGE DIVIDER
+  const [newMessageCount, setNewMessageCount] = useState(0);
+  const [firstNewMessageId, setFirstNewMessageId] = useState(null);
+
   const messageInputRef = useRef(null);
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+
   const typingTimeout = useRef(null);
-  const messageRefs = useRef({});
   const highlightTimeoutRef = useRef(null);
+
+  const messageRefs = useRef({});
+
+  // SCROLL STATE
+  const hasInitialScrolledRef = useRef(false);
+  const isNearBottomRef = useRef(true);
+  const previousMessageCountRef = useRef(0);
+
+  // IMPORTANT:
+  // Capture the unread count BEFORE it gets cleared in Redux.
+  const initialUnreadCountRef = useRef(0);
+
+  // Prevent duplicate read requests while scrolling.
+  const isClearingUnreadRef = useRef(false);
 
   const isTyping =
     !!selectedChat?._id &&
@@ -74,6 +97,77 @@ const Chat = ({ socket }) => {
   const unreadMessageCount =
     Number(selectedChat?.unreadMessageCount?.[String(user._id)]) || 0;
 
+  /* =========================================================
+     SCROLL HELPERS
+  ========================================================= */
+
+  const scrollToBottom = (behavior = "auto") => {
+    const container = messagesContainerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior,
+    });
+  };
+
+  /* =========================================================
+     CLEAR UNREAD MESSAGES
+  ========================================================= */
+
+  const clearUnreadMessages = async () => {
+    if (!selectedChat?._id || isClearingUnreadRef.current) {
+      return;
+    }
+
+    isClearingUnreadRef.current = true;
+
+    try {
+      const response = await clearUnreadMessage(selectedChat._id);
+
+      if (!response?.success) {
+        console.error(response?.message || "Unable to clear unread messages.");
+
+        return;
+      }
+
+      // The divider is no longer needed once the user reaches
+      // the latest messages.
+      setNewMessageCount(0);
+      setFirstNewMessageId(null);
+
+      if (response?.data) {
+        updateChatWithoutReordering(response.data);
+      }
+    } catch (error) {
+      console.error("Clear unread messages error:", error);
+    } finally {
+      isClearingUnreadRef.current = false;
+    }
+  };
+
+  const handleMessagesScroll = () => {
+    const container = messagesContainerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+
+    const isNearBottom = distanceFromBottom < 120;
+
+    isNearBottomRef.current = isNearBottom;
+  };
+
+  /* =========================================================
+     CAMERA
+  ========================================================= */
+
   const openCamera = () => {
     setShowMediaPicker(false);
     setShowCameraModal(true);
@@ -86,9 +180,12 @@ const Chat = ({ socket }) => {
   const openGallery = () => {
     setShowCameraModal(false);
 
-    // Temporary until the actual gallery uploader is implemented.
     console.log("Gallery opened");
   };
+
+  /* =========================================================
+     REPLY
+  ========================================================= */
 
   const startReply = (selectedMessage) => {
     setReplyingTo(selectedMessage);
@@ -105,16 +202,18 @@ const Chat = ({ socket }) => {
   };
 
   const scrollToMessage = (messageId) => {
-    if (!messageId) return;
+    if (!messageId) {
+      return;
+    }
 
     const targetMessage = messageRefs.current[String(messageId)];
 
-    if (!targetMessage) return;
+    if (!targetMessage) {
+      return;
+    }
 
-    // Stop previous highlight timer
     clearTimeout(highlightTimeoutRef.current);
 
-    // Remove first so clicking the same reply again restarts the animation
     setHighlightedMessageId(null);
 
     targetMessage.scrollIntoView({
@@ -122,7 +221,6 @@ const Chat = ({ socket }) => {
       block: "center",
     });
 
-    // Wait for React to remove the class, then add it again
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setHighlightedMessageId(String(messageId));
@@ -134,6 +232,26 @@ const Chat = ({ socket }) => {
     }, 1200);
   };
 
+  /* =========================================================
+     JUMP TO NEW MESSAGES
+  ========================================================= */
+
+  const jumpToNewMessages = () => {
+    isNearBottomRef.current = true;
+
+    scrollToBottom("smooth");
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        clearUnreadMessages();
+      });
+    });
+  };
+
+  /* =========================================================
+     REDUX CHAT UPDATES
+  ========================================================= */
+
   const updateChatInRedux = (updatedChat) => {
     if (!updatedChat) {
       return;
@@ -143,14 +261,12 @@ const Chat = ({ socket }) => {
 
     const updatedChats = [
       updatedChat,
-
       ...existingChats.filter(
         (chat) => String(chat._id) !== String(updatedChat._id),
       ),
     ];
 
     dispatch(setAllChats(updatedChats));
-
     dispatch(setSelectedChat(updatedChat));
   };
 
@@ -164,9 +280,12 @@ const Chat = ({ socket }) => {
     );
 
     dispatch(setAllChats(updatedChats));
-
     dispatch(setSelectedChat(updatedChat));
   };
+
+  /* =========================================================
+     SEND TEXT MESSAGE
+  ========================================================= */
 
   const sendMessage = async () => {
     const messageText = message.trim();
@@ -175,54 +294,56 @@ const Chat = ({ socket }) => {
       return;
     }
 
+    isNearBottomRef.current = true;
+
     try {
       setIsSending(true);
 
       const response = await createMessage({
         chatId: selectedChat._id,
-
         text: messageText,
-
         replyTo: replyingTo?._id || null,
       });
 
-      if (response?.success) {
-        emitSendMessage(socket, {
-          message: response.data,
-          chat: response.chat,
-          members: selectedChat.members.map((member) => String(member._id)),
-        });
-
-        setAllMessages((previousMessages) => [
-          ...previousMessages,
-
-          response.data,
-        ]);
-
-        if (response?.chat) {
-          updateChatInRedux(response.chat);
-        }
-
-        setMessage("");
-
-        clearTimeout(typingTimeout.current);
-
-        sendStopTyping(socket, {
-          sender: user._id,
-          chatId: selectedChat._id,
-          members: selectedChat.members.map((member) => String(member._id)),
-        });
-
-        setReplyingTo(null);
-
-        if (messageInputRef.current) {
-          messageInputRef.current.style.height = "48px";
-
-          messageInputRef.current?.focus();
-        }
-      } else {
+      if (!response?.success) {
         toast.error(response?.message || "Unable to send message.");
+        return;
       }
+
+      emitSendMessage(socket, {
+        message: response.data,
+        chat: response.chat,
+        members: selectedChat.members.map((member) => String(member._id)),
+      });
+
+      setAllMessages((previousMessages) => [
+        ...previousMessages,
+        response.data,
+      ]);
+
+      if (response?.chat) {
+        updateChatInRedux(response.chat);
+      }
+
+      setMessage("");
+
+      clearTimeout(typingTimeout.current);
+
+      sendStopTyping(socket, {
+        sender: user._id,
+        chatId: selectedChat._id,
+        members: selectedChat.members.map((member) => String(member._id)),
+      });
+
+      setReplyingTo(null);
+
+      if (messageInputRef.current) {
+        messageInputRef.current.style.height = "48px";
+      }
+
+      // We are the sender and therefore already at the latest message.
+      setNewMessageCount(0);
+      setFirstNewMessageId(null);
     } catch (error) {
       console.error("Send message error:", error);
 
@@ -231,6 +352,10 @@ const Chat = ({ socket }) => {
       setIsSending(false);
     }
   };
+
+  /* =========================================================
+     SEND GIF
+  ========================================================= */
 
   const sendGifMessage = async (gif) => {
     if (!gif || !selectedChat?._id || isSending) {
@@ -241,47 +366,46 @@ const Chat = ({ socket }) => {
 
     if (!gifUrl) {
       toast.error("Unable to send this GIF.");
-
       return;
     }
+
+    isNearBottomRef.current = true;
 
     try {
       setIsSending(true);
 
       const response = await createMessage({
         chatId: selectedChat._id,
-
         type: "gif",
-
         text: "",
-
         mediaUrl: gifUrl,
-
-        replyTo: null,
+        replyTo: replyingTo?._id || null,
       });
 
-      if (response?.success) {
-        emitSendMessage(socket, {
-          message: response.data,
-
-          chat: response.chat,
-
-          members: selectedChat.members.map((member) => String(member._id)),
-        });
-
-        setAllMessages((previousMessages) => [
-          ...previousMessages,
-          response.data,
-        ]);
-
-        if (response?.chat) {
-          updateChatInRedux(response.chat);
-        }
-
-        setReplyingTo(null);
-      } else {
+      if (!response?.success) {
         toast.error(response?.message || "Unable to send GIF.");
+        return;
       }
+
+      emitSendMessage(socket, {
+        message: response.data,
+        chat: response.chat,
+        members: selectedChat.members.map((member) => String(member._id)),
+      });
+
+      setAllMessages((previousMessages) => [
+        ...previousMessages,
+        response.data,
+      ]);
+
+      if (response?.chat) {
+        updateChatInRedux(response.chat);
+      }
+
+      setReplyingTo(null);
+
+      setNewMessageCount(0);
+      setFirstNewMessageId(null);
     } catch (error) {
       console.error("Send GIF error:", error);
 
@@ -291,12 +415,19 @@ const Chat = ({ socket }) => {
     }
   };
 
+  /* =========================================================
+     SEND CAMERA PHOTO
+  ========================================================= */
+
   const sendCameraPhoto = async (photoData) => {
     if (!photoData?.blob || !selectedChat?._id || isSending) {
       return;
     }
 
+    isNearBottomRef.current = true;
+
     const localPreviewUrl = URL.createObjectURL(photoData.blob);
+
     const temporaryMessageId = `temp-image-${Date.now()}`;
 
     const temporaryMessage = {
@@ -312,7 +443,6 @@ const Chat = ({ socket }) => {
       isUploading: true,
     };
 
-    // SHOW THE IMAGE IMMEDIATELY
     setAllMessages((previousMessages) => [
       ...previousMessages,
       temporaryMessage,
@@ -337,32 +467,7 @@ const Chat = ({ socket }) => {
 
       const response = await createMediaMessage(formData);
 
-      if (response?.success) {
-        // REPLACE LOCAL PREVIEW WITH REAL SERVER MESSAGE
-        setAllMessages((previousMessages) =>
-          previousMessages.map((currentMessage) =>
-            String(currentMessage._id) === String(temporaryMessageId)
-              ? response.data
-              : currentMessage,
-          ),
-        );
-
-        // LOCAL BLOB URL IS NO LONGER NEEDED
-        URL.revokeObjectURL(localPreviewUrl);
-
-        emitSendMessage(socket, {
-          message: response.data,
-          chat: response.chat,
-          members: selectedChat.members.map((member) => String(member._id)),
-        });
-
-        if (response?.chat) {
-          updateChatInRedux(response.chat);
-        }
-
-        setReplyingTo(null);
-      } else {
-        // REMOVE FAILED TEMPORARY MESSAGE
+      if (!response?.success) {
         setAllMessages((previousMessages) =>
           previousMessages.filter(
             (currentMessage) =>
@@ -373,11 +478,37 @@ const Chat = ({ socket }) => {
         URL.revokeObjectURL(localPreviewUrl);
 
         toast.error(response?.message || "Unable to send photo.");
+
+        return;
       }
+
+      setAllMessages((previousMessages) =>
+        previousMessages.map((currentMessage) =>
+          String(currentMessage._id) === String(temporaryMessageId)
+            ? response.data
+            : currentMessage,
+        ),
+      );
+
+      URL.revokeObjectURL(localPreviewUrl);
+
+      emitSendMessage(socket, {
+        message: response.data,
+        chat: response.chat,
+        members: selectedChat.members.map((member) => String(member._id)),
+      });
+
+      if (response?.chat) {
+        updateChatInRedux(response.chat);
+      }
+
+      setReplyingTo(null);
+
+      setNewMessageCount(0);
+      setFirstNewMessageId(null);
     } catch (error) {
       console.error("Send camera photo error:", error);
 
-      // REMOVE FAILED TEMPORARY MESSAGE
       setAllMessages((previousMessages) =>
         previousMessages.filter(
           (currentMessage) =>
@@ -392,6 +523,10 @@ const Chat = ({ socket }) => {
       setIsSending(false);
     }
   };
+
+  /* =========================================================
+     FETCH MESSAGES
+  ========================================================= */
 
   const getMessages = async () => {
     if (!selectedChat?._id) {
@@ -417,38 +552,18 @@ const Chat = ({ socket }) => {
     }
   };
 
-  const clearUnreadMessages = async () => {
-    if (!selectedChat?._id || unreadMessageCount <= 0) {
-      return;
-    }
-
-    try {
-      const response = await clearUnreadMessage(selectedChat._id);
-
-      if (!response?.success) {
-        console.error(response?.message || "Unable to clear unread messages.");
-
-        return;
-      }
-
-      if (response?.data) {
-        updateChatWithoutReordering(response.data);
-      }
-    } catch (error) {
-      console.error(
-        "Clear unread messages error:",
-
-        error,
-      );
-    }
-  };
+  /* =========================================================
+     TYPING
+  ========================================================= */
 
   const handleMessageChange = (event) => {
     const value = event.target.value;
 
     setMessage(value);
 
-    if (!selectedChat?._id) return;
+    if (!selectedChat?._id) {
+      return;
+    }
 
     sendTyping(socket, {
       sender: user._id,
@@ -489,56 +604,325 @@ const Chat = ({ socket }) => {
     }
   };
 
+  /* =========================================================
+     RESET WHEN CHAT CHANGES
+  ========================================================= */
+
+  useEffect(() => {
+    hasInitialScrolledRef.current = false;
+    isNearBottomRef.current = true;
+    previousMessageCountRef.current = 0;
+    isClearingUnreadRef.current = false;
+
+    // VERY IMPORTANT:
+    // Capture unread count before anything clears it.
+    initialUnreadCountRef.current = unreadMessageCount;
+
+    setAllMessages([]);
+    setNewMessageCount(0);
+    setFirstNewMessageId(null);
+    setReplyingTo(null);
+  }, [selectedChat?._id]);
+
+  /* =========================================================
+     LOAD CHAT
+  ========================================================= */
+
   useEffect(() => {
     if (!selectedChat?._id) {
       return;
     }
 
     getMessages();
-
-    clearUnreadMessages();
   }, [selectedChat?._id]);
 
   useEffect(() => {
-    const handleReceiveMessage = async (data) => {
-      if (String(data.message.chatId) !== String(selectedChat?._id)) {
+  if (isSending || showMediaPicker || showCameraModal) {
+    return;
+  }
+
+  if (!selectedChat?._id) {
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    messageInputRef.current?.focus();
+  });
+}, [isSending, selectedChat?._id, showMediaPicker, showCameraModal]);
+
+  /* =========================================================
+     INITIAL POSITION
+  ========================================================= */
+
+  useEffect(() => {
+    if (
+      !selectedChat?._id ||
+      hasInitialScrolledRef.current ||
+      allMessages.length === 0
+    ) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const container = messagesContainerRef.current;
+
+        if (!container) {
+          return;
+        }
+
+        const initialUnreadCount = Number(initialUnreadCountRef.current) || 0;
+
+        /*
+         * NORMAL CHAT:
+         * No unread messages → go directly to bottom.
+         */
+        if (initialUnreadCount <= 0) {
+          scrollToBottom("auto");
+
+          hasInitialScrolledRef.current = true;
+          previousMessageCountRef.current = allMessages.length;
+          isNearBottomRef.current = true;
+
+          return;
+        }
+
+        /*
+         * UNREAD CHAT:
+         *
+         * Messages are assumed to be returned oldest → newest.
+         *
+         * Example:
+         *
+         * [1,2,3,4,5,6]
+         * unread = 2
+         *
+         * first unread = index 4
+         *
+         * [1,2,3] read
+         * [4,5] unread
+         */
+        const firstUnreadIndex = Math.max(
+          0,
+          allMessages.length - initialUnreadCount,
+        );
+
+        const firstUnreadMessage = allMessages[firstUnreadIndex];
+
+        if (firstUnreadMessage?._id) {
+          const firstUnreadElement =
+            messageRefs.current[String(firstUnreadMessage._id)];
+
+          setNewMessageCount(Math.min(initialUnreadCount, allMessages.length));
+
+          setFirstNewMessageId(String(firstUnreadMessage._id));
+
+          if (firstUnreadElement) {
+            firstUnreadElement.scrollIntoView({
+              behavior: "auto",
+              block: "start",
+            });
+          } else {
+            container.scrollTop = container.scrollHeight;
+          }
+
+          isNearBottomRef.current = false;
+        } else {
+          scrollToBottom("auto");
+          isNearBottomRef.current = true;
+        }
+
+        hasInitialScrolledRef.current = true;
+
+        /*
+         * This is critical.
+         *
+         * The initial history must NOT be interpreted as
+         * newly received messages.
+         */
+        previousMessageCountRef.current = allMessages.length;
+      });
+    });
+  }, [selectedChat?._id, allMessages.length]);
+
+  /* =========================================================
+     KEEP BOTTOM STABLE WHEN MEDIA LOADS
+  ========================================================= */
+
+  useEffect(() => {
+    if (
+      !selectedChat?._id ||
+      !hasInitialScrolledRef.current ||
+      !isNearBottomRef.current
+    ) {
+      return;
+    }
+
+    const container = messagesContainerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
+  }, [allMessages]);
+
+  /* =========================================================
+     HANDLE NEW MESSAGES + SCROLLING
+  ========================================================= */
+
+  useEffect(() => {
+    if (!hasInitialScrolledRef.current) {
+      return;
+    }
+
+    const currentMessageCount = allMessages.length;
+    const previousMessageCount = previousMessageCountRef.current;
+
+    /*
+     * No new messages.
+     *
+     * This also prevents image temporary-message replacement
+     * and other same-length updates from being treated as
+     * incoming messages.
+     */
+    if (currentMessageCount <= previousMessageCount) {
+      previousMessageCountRef.current = currentMessageCount;
+
+      return;
+    }
+
+    const newlyAddedMessages = allMessages.slice(previousMessageCount);
+
+    previousMessageCountRef.current = currentMessageCount;
+
+    const latestNewMessage = newlyAddedMessages[newlyAddedMessages.length - 1];
+
+    if (!latestNewMessage) {
+      return;
+    }
+
+    const latestSenderId =
+      typeof latestNewMessage.sender === "object"
+        ? latestNewMessage.sender?._id
+        : latestNewMessage.sender;
+
+    const isMyLatestMessage = String(latestSenderId) === String(user._id);
+
+    /*
+     * MY MESSAGE
+     *
+     * Always follow the sender to the bottom.
+     */
+    if (isMyLatestMessage) {
+      setNewMessageCount(0);
+      setFirstNewMessageId(null);
+
+      isNearBottomRef.current = true;
+
+      requestAnimationFrame(() => {
+        scrollToBottom("smooth");
+      });
+
+      return;
+    }
+
+    /*
+     * OTHER USER SENT A MESSAGE WHILE WE ARE AT BOTTOM.
+     */
+    if (isNearBottomRef.current) {
+      requestAnimationFrame(() => {
+        scrollToBottom("smooth");
+      });
+
+      setNewMessageCount(0);
+      setFirstNewMessageId(null);
+
+      /*
+       * We are actively viewing the latest message,
+       * so mark it as read.
+       */
+      clearUnreadMessages();
+
+      return;
+    }
+
+    /*
+     * OTHER USER SENT MESSAGE WHILE WE ARE READING OLD
+     * MESSAGES.
+     *
+     * DO NOT SCROLL.
+     *
+     * DO NOT CLEAR UNREAD.
+     *
+     * Show the divider.
+     */
+    setNewMessageCount((previousCount) => {
+      if (previousCount === 0) {
+        const firstNewMessage = newlyAddedMessages[0];
+
+        if (firstNewMessage?._id) {
+          setFirstNewMessageId(String(firstNewMessage._id));
+        }
+      }
+
+      return previousCount + newlyAddedMessages.length;
+    });
+  }, [allMessages, user?._id]);
+
+  /* =========================================================
+     SOCKET: RECEIVE MESSAGE
+  ========================================================= */
+
+  useEffect(() => {
+    const handleReceiveMessage = (data) => {
+      if (
+        !data?.message ||
+        String(data.message.chatId) !== String(selectedChat?._id)
+      ) {
         return;
       }
 
-      setAllMessages((previous) => {
-        const alreadyExists = previous.some(
-          (message) => String(message._id) === String(data.message._id),
+      setAllMessages((previousMessages) => {
+        const alreadyExists = previousMessages.some(
+          (currentMessage) =>
+            String(currentMessage._id) === String(data.message._id),
         );
 
         if (alreadyExists) {
-          return previous;
+          return previousMessages;
         }
 
-        return [...previous, data.message];
+        return [...previousMessages, data.message];
       });
 
       if (data.chat) {
         updateChatInRedux(data.chat);
       }
 
-      // CHAT IS CURRENTLY OPEN
-      // Mark the incoming message as read immediately.
-
-      try {
-        const response = await clearUnreadMessage(selectedChat._id);
-
-        if (response?.success && response?.data) {
-          updateChatWithoutReordering(response.data);
-        }
-      } catch (error) {
-        console.error("Instant read receipt error:", error);
-      }
+      /*
+       * IMPORTANT:
+       *
+       * We DO NOT blindly clear unread here anymore.
+       *
+       * The allMessages effect decides whether the user is
+       * actually at the bottom.
+       *
+       * If they are reading old messages, the new message
+       * stays unread and the divider remains visible.
+       */
     };
 
     return registerSocketListeners(socket, {
       onReceiveMessage: handleReceiveMessage,
     });
   }, [socket, selectedChat?._id]);
+
+  /* =========================================================
+     SOCKET: MESSAGES READ
+  ========================================================= */
 
   useEffect(() => {
     const handleMessagesRead = (data) => {
@@ -547,20 +931,20 @@ const Chat = ({ socket }) => {
       }
 
       setAllMessages((previousMessages) =>
-        previousMessages.map((message) => {
+        previousMessages.map((currentMessage) => {
           const senderId =
-            typeof message.sender === "object"
-              ? message.sender?._id
-              : message.sender;
+            typeof currentMessage.sender === "object"
+              ? currentMessage.sender?._id
+              : currentMessage.sender;
 
           if (String(senderId) === String(user._id)) {
             return {
-              ...message,
+              ...currentMessage,
               read: true,
             };
           }
 
-          return message;
+          return currentMessage;
         }),
       );
     };
@@ -570,9 +954,14 @@ const Chat = ({ socket }) => {
     });
   }, [socket, selectedChat?._id, user?._id]);
 
+  /* =========================================================
+     CLEANUP
+  ========================================================= */
+
   useEffect(() => {
     return () => {
       clearTimeout(typingTimeout.current);
+      clearTimeout(highlightTimeoutRef.current);
 
       if (selectedChat?._id) {
         sendStopTyping(socket, {
@@ -582,26 +971,17 @@ const Chat = ({ socket }) => {
         });
       }
     };
-  }, [selectedChat?._id]);
+  }, [selectedChat?._id, socket, user?._id]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-
-      block: "end",
-    });
-
-    if (!showMediaPicker) {
-      messageInputRef.current?.focus();
-    }
-  }, [allMessages, isTyping, showMediaPicker]);
   if (!selectedChat) {
     return null;
   }
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
-      {/* CHAT HEADER */}
+      {/* =====================================================
+          CHAT HEADER
+      ===================================================== */}
 
       <div className="mb-4 flex shrink-0 items-center border-b border-[#d8f45a]/15 px-2 py-3 sm:mb-5 sm:px-4">
         <button
@@ -638,15 +1018,25 @@ const Chat = ({ socket }) => {
         </div>
       </div>
 
-      {/* CHAT MESSAGES */}
+      {/* =====================================================
+          CHAT MESSAGES
+      ===================================================== */}
 
-      <div className="scrollbar-aetherion min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2">
+      <div
+        ref={messagesContainerRef}
+        onScroll={handleMessagesScroll}
+        className="scrollbar-aetherion min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2"
+      >
         <div className="flex min-h-full min-w-0 flex-col gap-2">
+          {/* EMPTY CHAT */}
+
           {allMessages.length === 0 && (
             <div className="flex flex-1 items-center justify-center">
               <p className="text-sm text-[#70786f]">No messages yet.</p>
             </div>
           )}
+
+          {/* MESSAGES */}
 
           {allMessages.map((currentMessage, index) => {
             const previousMessage = allMessages[index - 1];
@@ -660,9 +1050,12 @@ const Chat = ({ socket }) => {
 
             const showDate = shouldShowDateSeparator(
               currentMessage,
-
               previousMessage,
             );
+
+            const showNewMessagesDivider =
+              firstNewMessageId &&
+              String(currentMessage._id) === String(firstNewMessageId);
 
             return (
               <div
@@ -680,11 +1073,24 @@ const Chat = ({ socket }) => {
                     : ""
                 }
               >
+                {/* NEW MESSAGE DIVIDER */}
+
+                {showNewMessagesDivider && newMessageCount > 0 && (
+                  <NewMessageDivider
+                    count={newMessageCount}
+                    onClick={jumpToNewMessages}
+                  />
+                )}
+
+                {/* DATE */}
+
                 {showDate && (
                   <DateSeparator
                     label={formatDateLabel(currentMessage.createdAt)}
                   />
                 )}
+
+                {/* MESSAGE */}
 
                 <MessageBubble
                   message={currentMessage}
@@ -705,29 +1111,37 @@ const Chat = ({ socket }) => {
             );
           })}
 
+          {/* TYPING INDICATOR */}
+
           {isTyping && (
             <div className="flex justify-start">
-              <div className="rounded-2xl bg-[#171d17] px-3 py-2 max-w-fit transition-all duration-200 shadow-sm">
+              <div className="max-w-fit rounded-2xl bg-[#171d17] px-3 py-2 shadow-sm transition-all duration-200">
                 <div className="flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#d8f45a] animate-bounce" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#d8f45a]" />
+
                   <span
-                    className="h-1.5 w-1.5 rounded-full bg-[#d8f45a] animate-bounce"
-                    style={{ animationDelay: "0.15s" }}
+                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#d8f45a]"
+                    style={{
+                      animationDelay: "0.15s",
+                    }}
                   />
+
                   <span
-                    className="h-1.5 w-1.5 rounded-full bg-[#d8f45a] animate-bounce"
-                    style={{ animationDelay: "0.3s" }}
+                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#d8f45a]"
+                    style={{
+                      animationDelay: "0.3s",
+                    }}
                   />
                 </div>
               </div>
             </div>
           )}
-
-          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {/* MESSAGE INPUT */}
+      {/* =====================================================
+          MESSAGE INPUT
+      ===================================================== */}
 
       <div className="mt-4 shrink-0 sm:mt-5">
         <ReplyPreview
@@ -746,7 +1160,7 @@ const Chat = ({ socket }) => {
 
         <div className="relative">
           <div className="relative flex items-end gap-2 sm:gap-3">
-            {/* EMOJI / GIF / STICKER BUTTON */}
+            {/* EMOJI / GIF / STICKER */}
 
             <button
               type="button"
@@ -763,7 +1177,7 @@ const Chat = ({ socket }) => {
               )}
             </button>
 
-            {/* TEXT AREA + ATTACHMENT + CAMERA */}
+            {/* COMPOSER */}
 
             <MessageComposer
               message={message}
@@ -774,6 +1188,8 @@ const Chat = ({ socket }) => {
               onCamera={openCamera}
               onGallery={openGallery}
             />
+
+            {/* CAMERA */}
 
             <CameraModal
               isOpen={showCameraModal}
@@ -790,7 +1206,7 @@ const Chat = ({ socket }) => {
               }}
             />
 
-            {/* SEND BUTTON */}
+            {/* SEND */}
 
             <button
               type="button"
@@ -802,6 +1218,8 @@ const Chat = ({ socket }) => {
               <FaPaperPlane className="ml-0.5 text-xl" />
             </button>
           </div>
+
+          {/* MEDIA PICKER */}
 
           <div className="mt-2 md:relative">
             <MessageMediaPicker
