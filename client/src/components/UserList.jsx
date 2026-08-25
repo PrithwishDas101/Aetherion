@@ -1,14 +1,19 @@
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { IoCheckmark, IoCheckmarkDone, IoSearch } from "react-icons/io5";
+import {
+  IoCheckmark,
+  IoCheckmarkDone,
+  IoImageOutline,
+  IoSearch,
+} from "react-icons/io5";
 
 import { createChat } from "../apiCalls/chatApi.js";
 import { hideLoader, showLoader } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
-import { formatChatPreviewTime } from "../utils/messageDate.js";
-import { useEffect } from "react";
 import store from "../redux/store.js";
 import registerSocketListeners from "../sockets/socketListeners.js";
+import { formatChatPreviewTime } from "../utils/messageDate.js";
 
 function UserList({ searchKey, socket }) {
   const {
@@ -87,7 +92,6 @@ function UserList({ searchKey, socket }) {
       }
     } catch (error) {
       console.error("Create chat error:", error);
-
       toast.error("Unable to create chat.");
     } finally {
       dispatch(hideLoader());
@@ -124,9 +128,7 @@ function UserList({ searchKey, socket }) {
       }
 
       const firstName = (user?.firstName || "").toLowerCase();
-
       const lastName = (user?.lastName || "").toLowerCase();
-
       const fullName = `${firstName} ${lastName}`.trim();
 
       const matchesSearch =
@@ -143,13 +145,12 @@ function UserList({ searchKey, socket }) {
       return alreadyHasChat;
     })
     .sort((firstUser, secondUser) => {
-      const firstUserChat = findChatWithUser(firstUser._id);
-
-      const secondUserChat = findChatWithUser(secondUser._id);
-
       if (normalizedSearchKey) {
         return 0;
       }
+
+      const firstUserChat = findChatWithUser(firstUser._id);
+      const secondUserChat = findChatWithUser(secondUser._id);
 
       return (
         new Date(secondUserChat?.updatedAt || 0) -
@@ -193,19 +194,16 @@ function UserList({ searchKey, socket }) {
             !!typingChats[userChat._id] &&
             String(typingChats[userChat._id]) !== String(currentUser._id);
 
-          const lastMessage =
-            userChat?.lastMessage?.type === "gif"
-              ? "GIF"
-              : userChat?.lastMessage?.text || "";
+          const lastMessage = userChat?.lastMessage;
+          const lastMessageType = lastMessage?.type;
+          const lastMessageText = lastMessage?.text?.trim() || "";
 
-          const lastMessageTime = formatChatPreviewTime(
-            userChat?.lastMessage?.createdAt,
-          );
+          const lastMessageTime = formatChatPreviewTime(lastMessage?.createdAt);
 
           const lastMessageSenderId =
-            typeof userChat?.lastMessage?.sender === "object"
-              ? userChat?.lastMessage?.sender?._id
-              : userChat?.lastMessage?.sender;
+            typeof lastMessage?.sender === "object"
+              ? lastMessage?.sender?._id
+              : lastMessage?.sender;
 
           const currentUserId = String(currentUser._id);
 
@@ -231,6 +229,8 @@ function UserList({ searchKey, socket }) {
               className={`group relative cursor-pointer border-b border-[#d8f45a]/10 px-3 py-4 transition-all duration-200 ${userClass}`}
             >
               <div className="flex items-center gap-3">
+                {/* PROFILE PICTURE */}
+
                 <div className="relative shrink-0">
                   {user.profilePic ? (
                     <img
@@ -263,14 +263,14 @@ function UserList({ searchKey, socket }) {
                 </div>
 
                 <div className="min-w-0 flex-1">
+                  {/* NAME + TIME */}
+
                   <div className="flex items-center gap-3">
                     <div
                       className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${
-                        isSelected
+                        isSelected || unreadCount > 0
                           ? "text-[#f7f7d0]"
-                          : unreadCount > 0
-                            ? "text-[#f7f7d0]"
-                            : "text-[#f1eee8]"
+                          : "text-[#f1eee8]"
                       }`}
                     >
                       {`${user.firstName} ${user.lastName}`}
@@ -289,19 +289,25 @@ function UserList({ searchKey, socket }) {
                     )}
                   </div>
 
+                  {/* LAST MESSAGE */}
+
                   <div className="mt-1 flex items-center gap-2">
                     <div className="flex min-w-0 flex-1 items-center gap-1.5">
+                      {/* MESSAGE STATUS */}
+
                       {userChat &&
-                        lastMessage &&
+                        lastMessage?._id &&
                         isLastMessageMine &&
-                        (userChat?.lastMessage?.read ? (
+                        (lastMessage?.read ? (
                           <IoCheckmarkDone className="shrink-0 text-sm text-[#2196f3]" />
                         ) : (
                           <IoCheckmark className="shrink-0 text-sm text-[#858d84]" />
                         ))}
 
-                      <p
-                        className={`min-w-0 flex-1 truncate text-xs ${
+                      {/* MESSAGE PREVIEW */}
+
+                      <div
+                        className={`flex min-w-0 flex-1 items-center gap-1.5 text-xs ${
                           isTyping
                             ? "font-semibold italic text-[#d8f45a]"
                             : unreadCount > 0 && !isSelected
@@ -311,13 +317,29 @@ function UserList({ searchKey, socket }) {
                                 : "text-[#858d84]"
                         }`}
                       >
-                        {isTyping
-                          ? "typing..."
-                          : userChat
-                            ? lastMessage || "No messages yet."
-                            : user.email}
-                      </p>
+                        {isTyping ? (
+                          <span className="truncate">typing...</span>
+                        ) : !userChat ? (
+                          <span className="truncate">{user.email}</span>
+                        ) : lastMessageType === "gif" ? (
+                          <span className="truncate">GIF</span>
+                        ) : lastMessageType === "image" ? (
+                          <>
+                            <IoImageOutline className="shrink-0 text-sm" />
+
+                            <span className="truncate">
+                              {lastMessageText || "Photo"}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="truncate">
+                            {lastMessageText || "No messages yet."}
+                          </span>
+                        )}
+                      </div>
                     </div>
+
+                    {/* UNREAD COUNT */}
 
                     {unreadCount > 0 && !isSelected && (
                       <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#f1ffb5] px-1.5 text-[10px] font-bold text-[#10120d]">
@@ -326,6 +348,8 @@ function UserList({ searchKey, socket }) {
                     )}
                   </div>
                 </div>
+
+                {/* START CHAT */}
 
                 {!userChat && (
                   <button
