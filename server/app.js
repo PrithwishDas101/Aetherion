@@ -13,7 +13,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "http://192.168.1.33:5173",
   "http://192.168.1.38:5173",
-  "https://loose-mere-bond-instructional.trycloudflare.com",
+  "https://fed-enables-lifetime-stability.trycloudflare.com",
   process.env.CLIENT_URL,
 ].filter(Boolean);
 

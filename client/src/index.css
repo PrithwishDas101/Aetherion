@@ -106,3 +106,48 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #7c3aed transparent;
 }
+
+.message-row-highlight {
+  animation: message-row-highlight 1.2s ease-out;
+}
+
+@keyframes message-row-highlight {
+  0% {
+    background-color: rgba(216, 244, 90, 0);
+  }
+
+  15% {
+    background-color: rgba(216, 244, 90, 0.16);
+  }
+
+  55% {
+    background-color: rgba(216, 244, 90, 0.08);
+  }
+
+  100% {
+    background-color: rgba(216, 244, 90, 0);
+  }
+}
+
+/* Makes solid text bubbles visibly participate in the highlight */
+.text-message-highlight {
+  animation: text-message-highlight 1.2s ease-out;
+}
+
+@keyframes text-message-highlight {
+  0% {
+    filter: brightness(1);
+  }
+
+  15% {
+    filter: brightness(1.18);
+  }
+
+  55% {
+    filter: brightness(1.08);
+  }
+
+  100% {
+    filter: brightness(1);
+  }
+}

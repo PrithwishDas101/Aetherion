@@ -42,11 +42,15 @@ const Chat = ({ socket }) => {
   const [allMessages, setAllMessages] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [showCameraModal, setShowCameraModal] = useState(false);
+  const [highlightedMessageId, setHighlightedMessageId] = useState(null);
+
   const messageInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const typingTimeout = useRef(null);
-  const [showMediaPicker, setShowMediaPicker] = useState(false);
-  const [showCameraModal, setShowCameraModal] = useState(false);
+  const messageRefs = useRef({});
+  const highlightTimeoutRef = useRef(null);
 
   const isTyping =
     !!selectedChat?._id &&
@@ -98,6 +102,36 @@ const Chat = ({ socket }) => {
     setReplyingTo(null);
 
     messageInputRef.current?.focus();
+  };
+
+  const scrollToMessage = (messageId) => {
+    if (!messageId) return;
+
+    const targetMessage = messageRefs.current[String(messageId)];
+
+    if (!targetMessage) return;
+
+    // Stop previous highlight timer
+    clearTimeout(highlightTimeoutRef.current);
+
+    // Remove first so clicking the same reply again restarts the animation
+    setHighlightedMessageId(null);
+
+    targetMessage.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    // Wait for React to remove the class, then add it again
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setHighlightedMessageId(String(messageId));
+      });
+    });
+
+    highlightTimeoutRef.current = setTimeout(() => {
+      setHighlightedMessageId(null);
+    }, 1200);
   };
 
   const updateChatInRedux = (updatedChat) => {
@@ -631,7 +665,21 @@ const Chat = ({ socket }) => {
             );
 
             return (
-              <div key={currentMessage._id}>
+              <div
+                key={currentMessage._id}
+                ref={(element) => {
+                  if (element) {
+                    messageRefs.current[String(currentMessage._id)] = element;
+                  } else {
+                    delete messageRefs.current[String(currentMessage._id)];
+                  }
+                }}
+                className={
+                  highlightedMessageId === String(currentMessage._id)
+                    ? "reply-target"
+                    : ""
+                }
+              >
                 {showDate && (
                   <DateSeparator
                     label={formatDateLabel(currentMessage.createdAt)}
@@ -642,6 +690,16 @@ const Chat = ({ socket }) => {
                   message={currentMessage}
                   isMyMessage={isMyMessage}
                   onReply={startReply}
+                  onReplyClick={scrollToMessage}
+                  isHighlighted={
+                    highlightedMessageId === String(currentMessage._id)
+                  }
+                  currentUserId={user._id}
+                  otherUserName={
+                    selectedUser
+                      ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                      : "User"
+                  }
                 />
               </div>
             );

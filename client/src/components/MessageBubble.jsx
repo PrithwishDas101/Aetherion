@@ -9,29 +9,39 @@ const MessageBubble = ({
   message,
   isMyMessage,
   onReply,
+  onReplyClick,
+  isHighlighted,
   currentUserId,
   otherUserName,
 }) => {
   const messageTime = formatMessageTime(message.createdAt);
 
   const isGif = message.type === "gif" && !!message.mediaUrl;
-
   const isImage = message.type === "image" && !!message.mediaUrl;
-
   const isMedia = isGif || isImage;
+
+  const handleReplyPreviewClick = () => {
+    if (!message.replyTo?._id) {
+      return;
+    }
+
+    onReplyClick?.(message.replyTo._id);
+  };
 
   return (
     <div
-      className={`group flex items-center gap-2 ${
+      className={`group relative flex w-full items-center gap-2 overflow-hidden rounded-xl transition-all duration-300 ${
         isMyMessage ? "justify-end" : "justify-start"
-      }`}
+      } ${isHighlighted ? "message-row-highlight" : ""}`}
     >
+      {/* REPLY BUTTON — RECEIVED MESSAGE */}
+
       {!isMyMessage && (
-        <div className="order-2">
+        <div className="order-2 shrink-0">
           <button
             type="button"
             onClick={() => onReply(message)}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#f4ffc3] group-hover:opacity-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#f4ffc3] group-hover:opacity-100"
             aria-label="Reply to message"
           >
             <FiCornerUpRight className="text-lg" />
@@ -39,23 +49,32 @@ const MessageBubble = ({
         </div>
       )}
 
+      {/* MESSAGE CONTENT */}
+
       <div
         className={`order-1 w-fit max-w-[75%] break-words ${
           isMedia
             ? ""
-            : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed  ${
+            : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 isMyMessage
                   ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
                   : "rounded-bl-sm border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
               }`
         }`}
       >
-        <ReplyMessage
-          replyTo={message.replyTo}
-          isMyMessage={isMyMessage}
-          currentUserId={currentUserId}
-          otherUserName={otherUserName}
-        />
+        {/* REPLIED MESSAGE PREVIEW */}
+
+        {message.replyTo && (
+          <ReplyMessage
+            replyTo={message.replyTo}
+            isMyMessage={isMyMessage}
+            currentUserId={currentUserId}
+            otherUserName={otherUserName}
+            onClick={handleReplyPreviewClick}
+          />
+        )}
+
+        {/* IMAGE / GIF MESSAGE */}
 
         {isMedia ? (
           <div
@@ -67,8 +86,6 @@ const MessageBubble = ({
                 : ""
             }`}
           >
-            {/* IMAGE / GIF */}
-
             <div className="relative">
               <img
                 src={message.mediaUrl}
@@ -81,7 +98,7 @@ const MessageBubble = ({
                 loading="lazy"
               />
 
-              {/* UPLOADING OVERLAY */}
+              {/* UPLOAD OVERLAY */}
 
               <div
                 className={`absolute inset-0 z-10 transition-opacity duration-300 ${
@@ -94,9 +111,9 @@ const MessageBubble = ({
               </div>
             </div>
 
-            {/* IMAGE CAPTION ONLY */}
+            {/* IMAGE CAPTION */}
 
-            {isImage && message.text?.trim() ? (
+            {isImage && message.text?.trim() && (
               <div
                 className={`px-3 pb-2.5 pt-2.5 text-sm leading-relaxed ${
                   isMyMessage
@@ -104,15 +121,19 @@ const MessageBubble = ({
                     : "bg-[#18221a] text-[#f1eee8]"
                 }`}
               >
-                <p className="whitespace-pre-wrap break-words px-0 py-0">
+                <p className="whitespace-pre-wrap break-words">
                   {message.text}
                 </p>
               </div>
-            ) : null}
+            )}
           </div>
         ) : (
-          <div className="whitespace-pre-wrap">{message.text}</div>
+          /* TEXT MESSAGE */
+
+          <div className="whitespace-pre-wrap break-words">{message.text}</div>
         )}
+
+        {/* MESSAGE META */}
 
         <div
           className={`flex items-center justify-end gap-1 text-[10px] leading-none ${
@@ -134,15 +155,19 @@ const MessageBubble = ({
         </div>
       </div>
 
+      {/* REPLY BUTTON — SENT MESSAGE */}
+
       {isMyMessage && (
-        <button
-          type="button"
-          onClick={() => onReply(message)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a] group-hover:opacity-100"
-          aria-label="Reply to message"
-        >
-          <FiCornerUpLeft className="text-lg" />
-        </button>
+        <div className="shrink-0">
+          <button
+            type="button"
+            onClick={() => onReply(message)}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a] group-hover:opacity-100"
+            aria-label="Reply to message"
+          >
+            <FiCornerUpLeft className="text-lg" />
+          </button>
+        </div>
       )}
     </div>
   );
