@@ -524,6 +524,111 @@ const Chat = ({ socket }) => {
     }
   };
 
+  const sendCameraVideo = async (videoData) => {
+    if (!videoData?.blob || !selectedChat?._id || isSending) {
+      return;
+    }
+
+    isNearBottomRef.current = true;
+
+    const localPreviewUrl = URL.createObjectURL(videoData.blob);
+
+    const temporaryMessageId = `temp-video-${Date.now()}`;
+
+    const temporaryMessage = {
+      _id: temporaryMessageId,
+      chatId: selectedChat._id,
+      sender: user._id,
+      type: "video",
+      text: videoData.caption?.trim() || "",
+      mediaUrl: localPreviewUrl,
+      replyTo: replyingTo || null,
+      read: false,
+      createdAt: new Date().toISOString(),
+      isUploading: true,
+    };
+
+    setAllMessages((previousMessages) => [
+      ...previousMessages,
+      temporaryMessage,
+    ]);
+
+    try {
+      setIsSending(true);
+
+      const formData = new FormData();
+
+      formData.append("chatId", selectedChat._id);
+      formData.append("type", "video");
+      formData.append("text", videoData.caption?.trim() || "");
+
+      formData.append(
+        "media",
+        videoData.blob,
+        `aetherion-video-${Date.now()}.webm`,
+      );
+
+      formData.append("replyTo", replyingTo?._id || "");
+
+      const response = await createMediaMessage(formData);
+
+      if (!response?.success) {
+        setAllMessages((previousMessages) =>
+          previousMessages.filter(
+            (currentMessage) =>
+              String(currentMessage._id) !== String(temporaryMessageId),
+          ),
+        );
+
+        URL.revokeObjectURL(localPreviewUrl);
+
+        toast.error(response?.message || "Unable to send video.");
+
+        return;
+      }
+
+      setAllMessages((previousMessages) =>
+        previousMessages.map((currentMessage) =>
+          String(currentMessage._id) === String(temporaryMessageId)
+            ? response.data
+            : currentMessage,
+        ),
+      );
+
+      URL.revokeObjectURL(localPreviewUrl);
+
+      emitSendMessage(socket, {
+        message: response.data,
+        chat: response.chat,
+        members: selectedChat.members.map((member) => String(member._id)),
+      });
+
+      if (response?.chat) {
+        updateChatInRedux(response.chat);
+      }
+
+      setReplyingTo(null);
+
+      setNewMessageCount(0);
+      setFirstNewMessageId(null);
+    } catch (error) {
+      console.error("Send camera video error:", error);
+
+      setAllMessages((previousMessages) =>
+        previousMessages.filter(
+          (currentMessage) =>
+            String(currentMessage._id) !== String(temporaryMessageId),
+        ),
+      );
+
+      URL.revokeObjectURL(localPreviewUrl);
+
+      toast.error(error.response?.data?.message || "Unable to send video.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   /* =========================================================
      FETCH MESSAGES
   ========================================================= */
@@ -637,18 +742,18 @@ const Chat = ({ socket }) => {
   }, [selectedChat?._id]);
 
   useEffect(() => {
-  if (isSending || showMediaPicker || showCameraModal) {
-    return;
-  }
+    if (isSending || showMediaPicker || showCameraModal) {
+      return;
+    }
 
-  if (!selectedChat?._id) {
-    return;
-  }
+    if (!selectedChat?._id) {
+      return;
+    }
 
-  requestAnimationFrame(() => {
-    messageInputRef.current?.focus();
-  });
-}, [isSending, selectedChat?._id, showMediaPicker, showCameraModal]);
+    requestAnimationFrame(() => {
+      messageInputRef.current?.focus();
+    });
+  }, [isSending, selectedChat?._id, showMediaPicker, showCameraModal]);
 
   /* =========================================================
      INITIAL POSITION
@@ -1201,9 +1306,7 @@ const Chat = ({ socket }) => {
                   : "User"
               }
               onPhotoCaptured={sendCameraPhoto}
-              onVideoCaptured={(videoBlob) => {
-                console.log("VIDEO FROM CAMERA:", videoBlob);
-              }}
+              onVideoCaptured={sendCameraVideo}
             />
 
             {/* SEND */}

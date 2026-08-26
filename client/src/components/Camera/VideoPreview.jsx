@@ -4,6 +4,7 @@ import { FiRefreshCw, FiVolume2, FiVolumeX, FiX } from "react-icons/fi";
 import MediaTools from "./MediaTools.jsx";
 import PhotoTextEditor from "./TextEditor/PhotoTextEditor.jsx";
 import DoodleEditor from "./Doodle/DoodleEditor.jsx";
+import DoodleDisplay from "./Doodle/DoodleDisplay.jsx";
 import StickerEditor from "./Sticker/StickerEditor.jsx";
 
 const VideoPreview = ({
@@ -55,15 +56,27 @@ const VideoPreview = ({
     <div className="relative h-full w-full overflow-hidden bg-black">
       {/* VIDEO */}
 
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 overflow-hidden bg-black">
         <video
           src={videoUrl}
           controls
           autoPlay
           playsInline
           muted={isMuted}
-          className="h-full w-full object-contain"
+          className="absolute inset-0 h-full w-full object-cover"
         />
+
+        {/* SAVED DOODLES */}
+
+        <DoodleDisplay doodles={videoDoodles} />
+
+        {/* SAVED TEXT */}
+
+        {!isTextEditing
+          ? videoTexts.map((text) => (
+              <VideoTextBlock key={text.id} text={text} />
+            ))
+          : null}
       </div>
 
       {/* CLOSE */}
@@ -88,8 +101,9 @@ const VideoPreview = ({
           <MediaTools
             activeTool={activeTool}
             onToolChange={onToolChange}
-            onDownload={onDownload}
+            onDownload={() => onDownload?.(videoBlob)}
             onRetake={onRetake}
+            mediaType="video"
           />
         </div>
       ) : null}
@@ -199,6 +213,100 @@ const VideoPreview = ({
       ) : null}
     </div>
   );
+};
+
+const VideoTextBlock = ({ text }) => {
+  const background = getBackground(text.background);
+  const fontClass = getFontClass(text.font);
+
+  return (
+    <div
+      className="absolute z-20 -translate-x-1/2 -translate-y-1/2 max-w-[82vw]"
+      style={{
+        left: `${text.x}%`,
+        top: `${text.y}%`,
+      }}
+    >
+      <div
+        className={`w-max max-w-[82vw] whitespace-pre-wrap break-words text-[30px] leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] ${fontClass}`}
+        style={{
+          color: text.color,
+          textAlign: text.alignment,
+        }}
+      >
+        {text.text.split("\n").map((line, index, lines) => {
+          const isLastLine = index === lines.length - 1;
+
+          return (
+            <span key={`${text.id}-${index}`}>
+              {line ? (
+                <span
+                  style={{
+                    display: "inline",
+                    backgroundColor:
+                      text.background === "none" ? "transparent" : background,
+                    padding: text.background === "none" ? "0" : "3px 8px",
+                    borderRadius: text.background === "none" ? "0" : "6px",
+                    boxDecorationBreak: "clone",
+                    WebkitBoxDecorationBreak: "clone",
+                  }}
+                >
+                  {line}
+                </span>
+              ) : (
+                "\u00A0"
+              )}
+
+              {!isLastLine && <br />}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const getBackground = (background) => {
+  switch (background) {
+    case "white":
+      return "#FFFFFF";
+
+    case "black":
+      return "#000000";
+
+    case "transparent":
+      return "rgba(0,0,0,0.45)";
+
+    case "none":
+    default:
+      return "transparent";
+  }
+};
+
+const getFontClass = (font) => {
+  switch (font) {
+    case "serif":
+      return "font-serif";
+
+    case "mono":
+      return "font-mono";
+
+    case "italic":
+      return "font-sans italic";
+
+    case "bold":
+      return "font-sans font-black";
+
+    case "slab":
+      return "font-serif font-bold";
+
+    case "wide":
+      return "font-sans tracking-[0.12em]";
+
+    case "sans":
+    default:
+      return "font-sans";
+  }
 };
 
 export default VideoPreview;

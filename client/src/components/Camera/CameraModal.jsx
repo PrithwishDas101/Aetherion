@@ -572,7 +572,9 @@ const CameraModal = ({
       const link = document.createElement("a");
 
       link.href = downloadUrl;
-      link.download = `aetherion-video-${Date.now()}.webm`;
+      const extension = videoBlob.type.includes("mp4") ? "mp4" : "webm";
+
+      link.download = `aetherion-video-${Date.now()}.${extension}`;
       link.style.display = "none";
 
       document.body.appendChild(link);
@@ -622,7 +624,10 @@ const CameraModal = ({
       return;
     }
 
-    onVideoCaptured?.(recordedVideoBlob);
+    onVideoCaptured?.({
+      blob: recordedVideoBlob,
+      caption: videoCaption.trim(),
+    });
 
     closeCamera();
   };

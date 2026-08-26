@@ -1,11 +1,13 @@
 import Message from "../models/Message.js";
 import Chat from "../models/Chat.js";
-import { uploadImage } from "../services/cloudinaryService.js";
+import { uploadImage, uploadVideo } from "../services/cloudinaryService.js";
 
 // SEND MESSAGE
 export const sendMessage = async (req, res) => {
   try {
-    const { chatId, text, type = "text", mediaUrl, replyTo } = req.body;
+    const { chatId, text, type = "text", replyTo } = req.body;
+
+    let { mediaUrl } = req.body;
 
     const uploadedFile = req.file;
 
@@ -37,6 +39,13 @@ export const sendMessage = async (req, res) => {
       });
     }
 
+    if (type === "video" && !uploadedFile) {
+      return res.status(400).json({
+        success: false,
+        message: "Video file is required.",
+      });
+    }
+
     const senderId = String(req.user.userId);
 
     const chat = await Chat.findOne({
@@ -51,18 +60,28 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    let uploadedMediaUrl = null;
-
+    // UPLOAD MEDIA
     if (type === "image") {
-      const uploadResult = await uploadImage(
+      const result = await uploadImage(
         uploadedFile.buffer,
         "aetherion/chat-images",
       );
 
-      uploadedMediaUrl = uploadResult.secure_url;
+      mediaUrl = result.secure_url;
     }
 
-    const receiver = chat.members.find((member) => String(member) !== senderId);
+    if (type === "video") {
+      const result = await uploadVideo(
+        uploadedFile.buffer,
+        "aetherion/chat-videos",
+      );
+
+      mediaUrl = result.secure_url;
+    }
+
+    const receiver = chat.members.find(
+      (member) => String(member) !== senderId,
+    );
 
     if (!receiver) {
       return res.status(400).json({
@@ -82,7 +101,9 @@ export const sendMessage = async (req, res) => {
       text: text?.trim() || "",
 
       mediaUrl:
-        type === "gif" ? mediaUrl : type === "image" ? uploadedMediaUrl : null,
+        type === "gif" || type === "image" || type === "video"
+          ? mediaUrl
+          : null,
 
       replyTo: replyTo || null,
 

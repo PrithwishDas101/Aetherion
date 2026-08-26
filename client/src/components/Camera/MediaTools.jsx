@@ -6,7 +6,13 @@ import {
   FiType,
 } from "react-icons/fi";
 
-const MediaTools  = ({ activeTool, onToolChange, onDownload, onRetake }) => {
+const MediaTools = ({
+  activeTool,
+  onToolChange,
+  onDownload,
+  onRetake,
+  mediaType = "photo",
+}) => {
   const toggleTool = (tool) => {
     onToolChange?.((previous) => (previous === tool ? null : tool));
   };
@@ -18,7 +24,7 @@ const MediaTools  = ({ activeTool, onToolChange, onDownload, onRetake }) => {
         type="button"
         onClick={onDownload}
         className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white shadow-lg backdrop-blur-xl transition hover:bg-black/45 active:scale-95"
-        aria-label="Download photo"
+        aria-label={`Download ${mediaType}`}
       >
         <FiDownload className="text-[21px]" />
       </button>
@@ -28,7 +34,7 @@ const MediaTools  = ({ activeTool, onToolChange, onDownload, onRetake }) => {
         type="button"
         onClick={onRetake}
         className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white shadow-lg backdrop-blur-xl transition hover:bg-black/45 active:scale-95"
-        aria-label="Retake photo"
+        aria-label={`Retake ${mediaType}`}
       >
         <FiRefreshCw className="text-[21px]" />
       </button>
@@ -70,7 +76,7 @@ const MediaTools  = ({ activeTool, onToolChange, onDownload, onRetake }) => {
             ? "bg-white text-black"
             : "bg-black/30 text-white hover:bg-black/45"
         }`}
-        aria-label="Draw on photo"
+        aria-label={`Draw on ${mediaType}`}
       >
         <FiEdit3 className="text-[21px]" />
       </button>
@@ -78,4 +84,4 @@ const MediaTools  = ({ activeTool, onToolChange, onDownload, onRetake }) => {
   );
 };
 
-export default MediaTools ;
+export default MediaTools;

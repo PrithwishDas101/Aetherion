@@ -39,3 +39,24 @@ export const deleteImage = async (publicId) => {
     resource_type: "image",
   });
 };
+
+export const uploadVideo = (buffer, folder = "aetherion/chat-videos") => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: "video",
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve(result);
+      },
+    );
+
+    uploadStream.end(buffer);
+  });
+};
