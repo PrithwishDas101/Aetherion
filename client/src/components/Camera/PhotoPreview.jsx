@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { FiTrash2, FiX } from "react-icons/fi";
 
-import PhotoTools from "./PhotoTools.jsx";
+import MediaTools  from "./MediaTools.jsx";
 import PhotoTextEditor from "./TextEditor/PhotoTextEditor.jsx";
 import DoodleEditor from "./Doodle/DoodleEditor.jsx";
 import DoodleDisplay from "./Doodle/DoodleDisplay.jsx";
@@ -312,7 +312,7 @@ const PhotoPreview = ({
 
       {!isTextEditing && !isDoodling && !isDraggingCommittedText ? (
         <div className="absolute right-4 top-0 z-40 pt-[max(12px,env(safe-area-inset-top))]">
-          <PhotoTools
+          <MediaTools 
             activeTool={activeTool}
             onToolChange={onToolChange}
             onDownload={handleDownloadPhoto}

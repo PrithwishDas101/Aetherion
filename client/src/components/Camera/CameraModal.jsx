@@ -13,7 +13,7 @@ import {
 
 import CameraPreview from "./CameraPreview.jsx";
 import PhotoPreview from "./PhotoPreview.jsx";
-import { composePhoto } from "./Composition/composePhoto.js";
+import VideoPreview from "./VideoPreview.jsx";
 
 const CameraModal = ({
   isOpen,
@@ -44,6 +44,8 @@ const CameraModal = ({
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [recordedVideoUrl, setRecordedVideoUrl] = useState(null);
   const [recordedVideoBlob, setRecordedVideoBlob] = useState(null);
+  const [videoCaption, setVideoCaption] = useState("");
+  const [activeVideoTool, setActiveVideoTool] = useState(null);
 
   // TORCH
   const [isTorchEnabled, setIsTorchEnabled] = useState(false);
@@ -180,6 +182,8 @@ const CameraModal = ({
 
     setRecordedVideoUrl(null);
     setRecordedVideoBlob(null);
+    setVideoCaption("");
+    setActiveVideoTool(null);
   };
 
   /*
@@ -342,6 +346,19 @@ const CameraModal = ({
   };
 
   /*
+   * VIDEO TOOL
+   */
+  const handleVideoTool = (toolOrUpdater) => {
+    setActiveVideoTool((previous) => {
+      if (typeof toolOrUpdater === "function") {
+        return toolOrUpdater(previous);
+      }
+
+      return previous === toolOrUpdater ? null : toolOrUpdater;
+    });
+  };
+
+  /*
    * VIDEO RECORDING
    */
   const startVideoRecording = () => {
@@ -434,6 +451,9 @@ const CameraModal = ({
 
         setRecordedVideoBlob(blob);
         setRecordedVideoUrl(url);
+
+        setVideoCaption("");
+        setActiveVideoTool(null);
 
         setIsRecording(false);
         setRecordingSeconds(0);
@@ -534,6 +554,44 @@ const CameraModal = ({
       console.error("Photo download error:", error);
 
       setDownloadMessage("Unable to download photo");
+
+      setTimeout(() => {
+        setDownloadMessage("");
+      }, 2200);
+    }
+  };
+
+  const downloadVideo = (videoBlob = recordedVideoBlob) => {
+    if (!videoBlob) {
+      return;
+    }
+
+    try {
+      const downloadUrl = URL.createObjectURL(videoBlob);
+
+      const link = document.createElement("a");
+
+      link.href = downloadUrl;
+      link.download = `aetherion-video-${Date.now()}.webm`;
+      link.style.display = "none";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setDownloadMessage("Video download started");
+
+      setTimeout(() => {
+        URL.revokeObjectURL(downloadUrl);
+      }, 1000);
+
+      setTimeout(() => {
+        setDownloadMessage("");
+      }, 2200);
+    } catch (error) {
+      console.error("Video download error:", error);
+
+      setDownloadMessage("Unable to download video");
 
       setTimeout(() => {
         setDownloadMessage("");
@@ -703,56 +761,29 @@ const CameraModal = ({
         {/* ===================================================== */}
 
         {showingRecordedVideo ? (
-          <div className="relative h-full w-full overflow-hidden bg-black">
-            {/* TOP */}
+          <VideoPreview
+            videoUrl={recordedVideoUrl}
+            videoBlob={recordedVideoBlob}
+            activeTool={activeVideoTool}
+            onToolChange={handleVideoTool}
+            onClose={closeCamera}
+            onDownload={downloadVideo}
+            onRetake={retakeVideo}
+            onSend={({ blob, caption }) => {
+              if (!blob) return;
 
-            <div className="absolute inset-x-0 top-0 z-40 flex items-center px-4 pt-[max(10px,env(safe-area-inset-top))]">
-              <button
-                type="button"
-                onClick={closeCamera}
-                className="flex h-11 w-11 items-center justify-center rounded-full text-white active:scale-95"
-                aria-label="Close video preview"
-              >
-                <FiX className="text-xl" />
-              </button>
+              onVideoCaptured?.({
+                blob,
+                caption,
+              });
 
-              <div className="flex-1" />
-
-              <button
-                type="button"
-                onClick={retakeVideo}
-                className="flex h-11 w-11 items-center justify-center rounded-full text-white active:scale-95"
-                aria-label="Retake video"
-              >
-                <FiRefreshCw className="text-xl" />
-              </button>
-            </div>
-
-            {/* VIDEO */}
-
-            <div className="absolute inset-0 flex items-center justify-center">
-              <video
-                src={recordedVideoUrl}
-                controls
-                autoPlay
-                playsInline
-                className="h-full w-full object-contain"
-              />
-            </div>
-
-            {/* SEND */}
-
-            <div className="absolute inset-x-0 bottom-0 z-40 flex items-center justify-end bg-gradient-to-t from-black/90 to-transparent px-5 pb-[max(16px,env(safe-area-inset-bottom))] pt-20">
-              <button
-                type="button"
-                onClick={sendRecordedVideo}
-                className="flex h-12 items-center gap-2 rounded-full bg-[#d8f45a] px-6 font-semibold text-black active:scale-95"
-              >
-                <span>Send</span>
-                <span>➤</span>
-              </button>
-            </div>
-          </div>
+              closeCamera();
+            }}
+            recipientName={recipientName}
+            videoCaption={videoCaption}
+            onCaptionChange={(event) => setVideoCaption(event.target.value)}
+            downloadMessage={downloadMessage}
+          />
         ) : null}
 
         {/* ===================================================== */}

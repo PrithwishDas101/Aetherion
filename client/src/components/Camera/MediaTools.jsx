@@ -6,7 +6,7 @@ import {
   FiType,
 } from "react-icons/fi";
 
-const PhotoTools = ({ activeTool, onToolChange, onDownload, onRetake }) => {
+const MediaTools  = ({ activeTool, onToolChange, onDownload, onRetake }) => {
   const toggleTool = (tool) => {
     onToolChange?.((previous) => (previous === tool ? null : tool));
   };
@@ -78,4 +78,4 @@ const PhotoTools = ({ activeTool, onToolChange, onDownload, onRetake }) => {
   );
 };
 
-export default PhotoTools;
+export default MediaTools ;
