@@ -2,14 +2,28 @@ import Message from "../models/Message.js";
 import Chat from "../models/Chat.js";
 import { uploadImage, uploadVideo } from "../services/cloudinaryService.js";
 
-// SEND MESSAGE
+// SEND MESSAGES
 export const sendMessage = async (req, res) => {
   try {
-    const { chatId, text, type = "text", replyTo } = req.body;
-
-    let { mediaUrl } = req.body;
+    const {
+      chatId,
+      text,
+      type = "text",
+      mediaUrl: incomingMediaUrl,
+      replyTo,
+    } = req.body;
 
     const uploadedFile = req.file;
+
+    console.log("📨 SEND MESSAGE REQUEST:", {
+      chatId,
+      type,
+      text,
+      hasFile: Boolean(uploadedFile),
+      fileName: uploadedFile?.originalname,
+      fileMimeType: uploadedFile?.mimetype,
+      fileSize: uploadedFile?.size,
+    });
 
     if (!chatId) {
       return res.status(400).json({
@@ -25,24 +39,10 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    if (type === "gif" && !mediaUrl) {
+    if (type === "gif" && !incomingMediaUrl) {
       return res.status(400).json({
         success: false,
         message: "GIF URL is required.",
-      });
-    }
-
-    if (type === "image" && !uploadedFile) {
-      return res.status(400).json({
-        success: false,
-        message: "Image file is required.",
-      });
-    }
-
-    if (type === "video" && !uploadedFile) {
-      return res.status(400).json({
-        success: false,
-        message: "Video file is required.",
       });
     }
 
@@ -60,25 +60,6 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    // UPLOAD MEDIA
-    if (type === "image") {
-      const result = await uploadImage(
-        uploadedFile.buffer,
-        "aetherion/chat-images",
-      );
-
-      mediaUrl = result.secure_url;
-    }
-
-    if (type === "video") {
-      const result = await uploadVideo(
-        uploadedFile.buffer,
-        "aetherion/chat-videos",
-      );
-
-      mediaUrl = result.secure_url;
-    }
-
     const receiver = chat.members.find(
       (member) => String(member) !== senderId,
     );
@@ -90,7 +71,74 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    const receiverId = String(receiver);
+    /*
+     * MEDIA UPLOAD
+     *
+     * Images -> Cloudinary image upload
+     * Videos -> Cloudinary video upload
+     * GIFs -> already supplied URL
+     * Text -> no media
+     */
+
+    let finalMediaUrl = null;
+
+    if (type === "image") {
+      if (!uploadedFile) {
+        return res.status(400).json({
+          success: false,
+          message: "Image file is required.",
+        });
+      }
+
+      console.log("🖼️ UPLOADING IMAGE:", {
+        size: uploadedFile.size,
+        mimeType: uploadedFile.mimetype,
+      });
+
+      const uploadResult = await uploadImage(
+        uploadedFile.buffer,
+        "aetherion/chat-images",
+      );
+
+      finalMediaUrl = uploadResult.secure_url;
+
+      console.log("🖼️ IMAGE UPLOADED:", finalMediaUrl);
+    }
+
+    if (type === "video") {
+      if (!uploadedFile) {
+        return res.status(400).json({
+          success: false,
+          message: "Video file is required.",
+        });
+      }
+
+      console.log("🎥 UPLOADING VIDEO:", {
+        size: uploadedFile.size,
+        mimeType: uploadedFile.mimetype,
+        originalName: uploadedFile.originalname,
+      });
+
+      const uploadResult = await uploadVideo(
+        uploadedFile.buffer,
+        "aetherion/chat-videos",
+      );
+
+      finalMediaUrl = uploadResult.secure_url;
+
+      console.log("🎥 VIDEO UPLOADED:", finalMediaUrl);
+    }
+
+    if (type === "gif") {
+      finalMediaUrl = incomingMediaUrl;
+    }
+
+    console.log("💾 SAVING MESSAGE:", {
+      chatId,
+      senderId,
+      type,
+      mediaUrl: finalMediaUrl,
+    });
 
     const savedMessage = await Message.create({
       chatId,
@@ -100,10 +148,7 @@ export const sendMessage = async (req, res) => {
 
       text: text?.trim() || "",
 
-      mediaUrl:
-        type === "gif" || type === "image" || type === "video"
-          ? mediaUrl
-          : null,
+      mediaUrl: finalMediaUrl,
 
       replyTo: replyTo || null,
 
@@ -114,6 +159,8 @@ export const sendMessage = async (req, res) => {
       path: "replyTo",
       select: "text sender type mediaUrl",
     });
+
+    const receiverId = String(receiver);
 
     const unreadField = `unreadMessageCount.${receiverId}`;
 
@@ -136,6 +183,12 @@ export const sendMessage = async (req, res) => {
       .populate("members")
       .populate("lastMessage");
 
+    console.log("✅ MESSAGE SAVED:", {
+      messageId: savedMessage._id,
+      type: savedMessage.type,
+      mediaUrl: savedMessage.mediaUrl,
+    });
+
     return res.status(201).json({
       success: true,
       message: "Message sent successfully!",
@@ -143,7 +196,7 @@ export const sendMessage = async (req, res) => {
       chat: updatedChat,
     });
   } catch (error) {
-    console.error("Send message error:", error);
+    console.error("❌ Send message error:", error);
 
     return res.status(500).json({
       success: false,

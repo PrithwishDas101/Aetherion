@@ -19,6 +19,8 @@ const ReplyMessage = ({
 
   const isImage = replyTo.type === "image" && replyTo.mediaUrl;
 
+  const isVideo = replyTo.type === "video" && replyTo.mediaUrl;
+
   return (
     <button
       type="button"
@@ -52,6 +54,32 @@ const ReplyMessage = ({
               }`}
             >
               {replyTo.text?.trim() || "Photo"}
+            </p>
+          </div>
+        ) : isVideo ? (
+          <div className="flex items-center gap-2">
+            <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-md bg-black">
+              <video
+                src={replyTo.mediaUrl}
+                className="h-full w-full object-cover"
+                muted
+                playsInline
+                preload="metadata"
+              />
+
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-xs text-white">
+                  ▶
+                </span>
+              </div>
+            </div>
+
+            <p
+              className={`line-clamp-2 min-w-0 whitespace-pre-wrap text-xs ${
+                isMyMessage ? "text-[#343b16]" : "text-[#aab3a8]"
+              }`}
+            >
+              {replyTo.text?.trim() || "Video"}
             </p>
           </div>
         ) : isGif ? (

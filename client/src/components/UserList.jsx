@@ -6,6 +6,7 @@ import {
   IoCheckmarkDone,
   IoImageOutline,
   IoSearch,
+  IoVideocamOutline,
 } from "react-icons/io5";
 
 import { createChat } from "../apiCalls/chatApi.js";
@@ -91,7 +92,6 @@ function UserList({ searchKey, socket }) {
         toast.error(response?.message || "Unable to create chat.");
       }
     } catch (error) {
-      console.error("Create chat error:", error);
       toast.error("Unable to create chat.");
     } finally {
       dispatch(hideLoader());
@@ -329,6 +329,14 @@ function UserList({ searchKey, socket }) {
 
                             <span className="truncate">
                               {lastMessageText || "Photo"}
+                            </span>
+                          </>
+                        ) : lastMessageType === "video" ? (
+                          <>
+                            <IoVideocamOutline className="shrink-0 text-sm" />
+
+                            <span className="truncate">
+                              {lastMessageText || "Video"}
                             </span>
                           </>
                         ) : (

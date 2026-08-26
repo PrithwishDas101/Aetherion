@@ -97,8 +97,6 @@ const CameraModal = ({
         setIsTorchEnabled(false);
         setHasTorch(hasTorchSupport(newStream));
       } catch (error) {
-        console.error("Camera access error:", error);
-
         if (cancelled) {
           return;
         }
@@ -462,8 +460,6 @@ const CameraModal = ({
       };
 
       recorder.onerror = (event) => {
-        console.error("Video recording error:", event.error);
-
         setCameraError("Unable to record video.");
 
         setIsRecording(false);
@@ -475,8 +471,6 @@ const CameraModal = ({
 
       setIsRecording(true);
     } catch (error) {
-      console.error("Start video recording error:", error);
-
       setCameraError("Unable to start video recording.");
 
       setIsRecording(false);
@@ -551,8 +545,6 @@ const CameraModal = ({
         setDownloadMessage("");
       }, 2200);
     } catch (error) {
-      console.error("Photo download error:", error);
-
       setDownloadMessage("Unable to download photo");
 
       setTimeout(() => {
@@ -591,8 +583,6 @@ const CameraModal = ({
         setDownloadMessage("");
       }, 2200);
     } catch (error) {
-      console.error("Video download error:", error);
-
       setDownloadMessage("Unable to download video");
 
       setTimeout(() => {
@@ -656,8 +646,6 @@ const CameraModal = ({
       !video.videoWidth ||
       !video.videoHeight
     ) {
-      console.warn("Camera video is not ready yet.");
-
       return;
     }
 
@@ -669,8 +657,6 @@ const CameraModal = ({
     const context = canvas.getContext("2d");
 
     if (!context) {
-      console.error("Unable to create canvas context.");
-
       return;
     }
 
@@ -689,8 +675,6 @@ const CameraModal = ({
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          console.error("Unable to create captured image.");
-
           return;
         }
 

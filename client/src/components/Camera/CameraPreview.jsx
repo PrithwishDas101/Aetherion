@@ -31,10 +31,6 @@ const CameraPreview = forwardRef(
 
       video.addEventListener("canplay", handleReady);
 
-      video.play().catch((error) => {
-        console.error("Camera preview play error:", error);
-      });
-
       return () => {
         video.removeEventListener("loadedmetadata", handleReady);
 

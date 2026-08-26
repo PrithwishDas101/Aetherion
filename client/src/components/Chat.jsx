@@ -525,6 +525,13 @@ const Chat = ({ socket }) => {
   };
 
   const sendCameraVideo = async (videoData) => {
+    console.log("🎥 SEND VIDEO START", {
+      videoData,
+      blob: videoData?.blob,
+      blobType: videoData?.blob?.type,
+      blobSize: videoData?.blob?.size,
+    });
+
     if (!videoData?.blob || !selectedChat?._id || isSending) {
       return;
     }
@@ -570,7 +577,16 @@ const Chat = ({ socket }) => {
 
       formData.append("replyTo", replyingTo?._id || "");
 
+      console.log("🎥 VIDEO FORMDATA READY", {
+        chatId: selectedChat._id,
+        type: "video",
+        blobType: videoData.blob.type,
+        blobSize: videoData.blob.size,
+      });
+
       const response = await createMediaMessage(formData);
+
+      console.log("🎥 VIDEO API RESPONSE", response);
 
       if (!response?.success) {
         setAllMessages((previousMessages) =>
@@ -612,7 +628,13 @@ const Chat = ({ socket }) => {
       setNewMessageCount(0);
       setFirstNewMessageId(null);
     } catch (error) {
-      console.error("Send camera video error:", error);
+      console.error("🔥 SEND VIDEO FAILED", {
+        error,
+        message: error?.message,
+        response: error?.response,
+        responseData: error?.response?.data,
+        status: error?.response?.status,
+      });
 
       setAllMessages((previousMessages) =>
         previousMessages.filter(

@@ -21,7 +21,9 @@ const MessageBubble = ({
 
   const isImage = message.type === "image" && !!message.mediaUrl;
 
-  const isMedia = isGif || isImage;
+  const isVideo = message.type === "video" && !!message.mediaUrl;
+
+  const isMedia = isGif || isImage || isVideo;
 
   const {
     swipeOffset,
@@ -112,16 +114,28 @@ const MessageBubble = ({
               }`}
             >
               <div className="relative">
-                <img
-                  src={message.mediaUrl}
-                  alt={isGif ? "GIF" : "Image"}
-                  className={`block max-h-72 max-w-full object-cover transition-all duration-300 ${
-                    isImage && message.text?.trim()
-                      ? "rounded-t-[11px]"
-                      : "rounded-xl"
-                  } ${message.isUploading ? "scale-[1.01]" : "scale-100"}`}
-                  loading="lazy"
-                />
+                {isVideo ? (
+                  <video
+                    src={message.mediaUrl}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className={`block max-h-72 max-w-full rounded-xl object-cover transition-all duration-300 ${
+                      message.isUploading ? "scale-[1.01]" : "scale-100"
+                    }`}
+                  />
+                ) : (
+                  <img
+                    src={message.mediaUrl}
+                    alt={isGif ? "GIF" : "Image"}
+                    className={`block max-h-72 max-w-full object-cover transition-all duration-300 ${
+                      isImage && message.text?.trim()
+                        ? "rounded-t-[11px]"
+                        : "rounded-xl"
+                    } ${message.isUploading ? "scale-[1.01]" : "scale-100"}`}
+                    loading="lazy"
+                  />
+                )}
 
                 {/* UPLOAD OVERLAY */}
 
