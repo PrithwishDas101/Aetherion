@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FiRefreshCw, FiVolume2, FiVolumeX, FiX } from "react-icons/fi";
 
 import MediaTools from "./MediaTools.jsx";
@@ -25,6 +25,42 @@ const VideoPreview = ({
   const [editingTextId, setEditingTextId] = useState(null);
   const [videoDoodles, setVideoDoodles] = useState([]);
   const [isMuted, setIsMuted] = useState(false);
+
+  const [isProcessing, setIsProcessing] = useState(false);
+  const videoPreviewRef = useRef(null);
+
+  const handleSend = async () => {
+    if (!videoBlob || isProcessing) {
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const finalBlob = await renderVideoWithOverlays({
+        videoBlob,
+        texts: videoTexts,
+        doodles: videoDoodles,
+      });
+
+      onSend?.({
+        blob: finalBlob,
+        caption: videoCaption.trim(),
+        muted: isMuted,
+      });
+    } catch (error) {
+      console.error("Unable to render video overlays:", error);
+
+      // Fallback: still send the original video.
+      onSend?.({
+        blob: videoBlob,
+        caption: videoCaption.trim(),
+        muted: isMuted,
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const isTextEditing = activeTool === "text";
   const isDoodling = activeTool === "doodle";
@@ -58,6 +94,7 @@ const VideoPreview = ({
 
       <div className="absolute inset-0 overflow-hidden bg-black">
         <video
+          ref={videoPreviewRef}
           src={videoUrl}
           controls
           autoPlay
@@ -211,19 +248,14 @@ const VideoPreview = ({
 
           <button
             type="button"
-            onClick={() =>
-              onSend?.({
-                blob: videoBlob,
-                caption: videoCaption.trim(),
-                muted: isMuted,
-                texts: videoTexts,
-                doodles: videoDoodles,
-              })
-            }
+            onClick={handleSend}
+            disabled={isProcessing}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] shadow-lg transition hover:bg-[#e4ff6f] active:scale-95"
             aria-label="Send video"
           >
-            <span className="translate-x-[1px] text-xl">➤</span>
+            <span className="text-sm font-bold">
+              {isProcessing ? "..." : "➤"}
+            </span>
           </button>
         </div>
       ) : null}
@@ -366,6 +398,323 @@ const getFontClass = (font) => {
     default:
       return "font-sans";
   }
+};
+
+const renderVideoWithOverlays = ({ videoBlob, texts, doodles }) => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement("video");
+
+    video.src = URL.createObjectURL(videoBlob);
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "auto";
+
+    const cleanup = () => {
+      URL.revokeObjectURL(video.src);
+      video.remove();
+    };
+
+    video.onloadedmetadata = async () => {
+      try {
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+
+        if (!width || !height) {
+          cleanup();
+          reject(new Error("Invalid video dimensions."));
+          return;
+        }
+
+        const canvas = document.createElement("canvas");
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+          cleanup();
+          reject(new Error("Canvas is unavailable."));
+          return;
+        }
+
+        const canvasStream = canvas.captureStream(30);
+
+        let combinedStream = canvasStream;
+
+        if (typeof video.captureStream === "function") {
+          const audioStream = video.captureStream();
+
+          audioStream.getAudioTracks().forEach((track) => {
+            canvasStream.addTrack(track);
+          });
+
+          combinedStream = canvasStream;
+        }
+
+        let mimeType = "";
+
+        const supportedTypes = [
+          "video/webm;codecs=vp9,opus",
+          "video/webm;codecs=vp8,opus",
+          "video/webm",
+        ];
+
+        for (const type of supportedTypes) {
+          if (MediaRecorder.isTypeSupported(type)) {
+            mimeType = type;
+            break;
+          }
+        }
+
+        const recorder = mimeType
+          ? new MediaRecorder(combinedStream, {
+              mimeType,
+            })
+          : new MediaRecorder(combinedStream);
+
+        const chunks = [];
+
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunks.push(event.data);
+          }
+        };
+
+        recorder.onerror = () => {
+          cleanup();
+          reject(new Error("Unable to record composed video."));
+        };
+
+        recorder.onstop = () => {
+          const finalBlob = new Blob(chunks, {
+            type: recorder.mimeType || "video/webm",
+          });
+
+          canvasStream.getTracks().forEach((track) => track.stop());
+
+          cleanup();
+
+          resolve(finalBlob);
+        };
+
+        const drawText = (text) => {
+          if (!text?.text) return;
+
+          const x = (text.x / 100) * width;
+          const y = (text.y / 100) * height;
+
+          const fontSize = Math.max(
+            20,
+            Math.round((30 / Math.min(window.innerWidth, 430)) * width),
+          );
+
+          let fontWeight = "400";
+          let fontStyle = "normal";
+          let fontFamily = "sans-serif";
+
+          switch (text.font) {
+            case "serif":
+              fontFamily = "serif";
+              break;
+
+            case "mono":
+              fontFamily = "monospace";
+              break;
+
+            case "italic":
+              fontStyle = "italic";
+              break;
+
+            case "bold":
+              fontWeight = "900";
+              break;
+
+            case "slab":
+              fontFamily = "serif";
+              fontWeight = "700";
+              break;
+
+            case "wide":
+              fontFamily = "sans-serif";
+              break;
+
+            default:
+              fontFamily = "sans-serif";
+          }
+
+          context.save();
+
+          context.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+          context.fillStyle = text.color || "#FFFFFF";
+          context.textBaseline = "middle";
+
+          const lines = text.text.split("\n");
+          const lineHeight = fontSize * 1.2;
+
+          const totalHeight = lines.length * lineHeight;
+          const startY = y - totalHeight / 2 + lineHeight / 2;
+
+          let textAlign = "center";
+
+          if (text.alignment === "left") {
+            textAlign = "left";
+          }
+
+          if (text.alignment === "right") {
+            textAlign = "right";
+          }
+
+          context.textAlign = textAlign;
+
+          lines.forEach((line, index) => {
+            const lineY = startY + index * lineHeight;
+
+            let background = "transparent";
+
+            if (text.background === "white") {
+              background = "#FFFFFF";
+            } else if (text.background === "black") {
+              background = "#000000";
+            } else if (text.background === "transparent") {
+              background = "rgba(0,0,0,0.45)";
+            }
+
+            if (text.background !== "none" && background !== "transparent") {
+              const metrics = context.measureText(line || " ");
+
+              const paddingX = fontSize * 0.27;
+              const paddingY = fontSize * 0.1;
+
+              let backgroundX = x - metrics.width / 2 - paddingX;
+
+              if (textAlign === "left") {
+                backgroundX = x - paddingX;
+              }
+
+              if (textAlign === "right") {
+                backgroundX = x - metrics.width - paddingX;
+              }
+
+              context.fillStyle = background;
+
+              context.beginPath();
+
+              context.roundRect(
+                backgroundX,
+                lineY - fontSize / 2 - paddingY,
+                metrics.width + paddingX * 2,
+                fontSize + paddingY * 2,
+                fontSize * 0.2,
+              );
+
+              context.fill();
+
+              context.fillStyle = text.color || "#FFFFFF";
+            }
+
+            context.fillText(line || " ", x, lineY);
+          });
+
+          context.restore();
+        };
+
+        const drawDoodles = () => {
+          if (!Array.isArray(doodles)) return;
+
+          doodles.forEach((stroke) => {
+            if (!stroke?.points?.length) return;
+
+            const points = stroke.points;
+
+            context.save();
+
+            context.strokeStyle = stroke.color || "#FFFFFF";
+            context.fillStyle = stroke.color || "#FFFFFF";
+
+            /*
+             * Doodle coordinates are scaled from the
+             * preview coordinate system to the real video.
+             */
+            const previewWidth = Math.min(window.innerWidth, 430);
+            const scale = width / previewWidth;
+
+            context.lineWidth = (stroke.size || 5) * scale;
+            context.lineCap = "round";
+            context.lineJoin = "round";
+
+            if (points.length === 1) {
+              const point = points[0];
+
+              context.beginPath();
+              context.arc(
+                point.x * scale,
+                point.y * scale,
+                ((stroke.size || 5) * scale) / 2,
+                0,
+                Math.PI * 2,
+              );
+              context.fill();
+
+              context.restore();
+              return;
+            }
+
+            context.beginPath();
+
+            context.moveTo(points[0].x * scale, points[0].y * scale);
+
+            for (let index = 1; index < points.length; index += 1) {
+              context.lineTo(points[index].x * scale, points[index].y * scale);
+            }
+
+            context.stroke();
+            context.restore();
+          });
+        };
+
+        const drawFrame = () => {
+          if (video.ended || video.paused) {
+            return;
+          }
+
+          context.drawImage(video, 0, 0, width, height);
+
+          drawDoodles();
+
+          texts.forEach(drawText);
+
+          if ("requestVideoFrameCallback" in video) {
+            video.requestVideoFrameCallback(drawFrame);
+          } else {
+            requestAnimationFrame(drawFrame);
+          }
+        };
+
+        video.onended = () => {
+          if (recorder.state !== "inactive") {
+            recorder.stop();
+          }
+        };
+
+        recorder.start();
+
+        await video.play();
+
+        drawFrame();
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
+    };
+
+    video.onerror = () => {
+      cleanup();
+      reject(new Error("Unable to load video for rendering."));
+    };
+
+    video.load();
+  });
 };
 
 export default VideoPreview;
