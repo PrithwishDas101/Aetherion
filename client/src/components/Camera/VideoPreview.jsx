@@ -74,7 +74,23 @@ const VideoPreview = ({
 
         {!isTextEditing
           ? videoTexts.map((text) => (
-              <VideoTextBlock key={text.id} text={text} />
+              <VideoTextBlock
+                key={text.id}
+                text={text}
+                onPositionChange={(x, y) => {
+                  setVideoTexts((previous) =>
+                    previous.map((item) =>
+                      item.id === text.id
+                        ? {
+                            ...item,
+                            x,
+                            y,
+                          }
+                        : item,
+                    ),
+                  );
+                }}
+              />
             ))
           : null}
       </div>
@@ -215,13 +231,56 @@ const VideoPreview = ({
   );
 };
 
-const VideoTextBlock = ({ text }) => {
+const VideoTextBlock = ({ text, onPositionChange }) => {
   const background = getBackground(text.background);
   const fontClass = getFontClass(text.font);
 
+  const handlePointerDown = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const parent = event.currentTarget.parentElement;
+
+    if (!parent) return;
+
+    const rect = parent.getBoundingClientRect();
+
+    const startX = event.clientX;
+    const startY = event.clientY;
+
+    const initialX = text.x;
+    const initialY = text.y;
+
+    const handlePointerMove = (moveEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+
+      const nextX = Math.min(
+        95,
+        Math.max(5, initialX + (deltaX / rect.width) * 100),
+      );
+
+      const nextY = Math.min(
+        95,
+        Math.max(5, initialY + (deltaY / rect.height) * 100),
+      );
+
+      onPositionChange(nextX, nextY);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
   return (
     <div
-      className="absolute z-20 -translate-x-1/2 -translate-y-1/2 max-w-[82vw]"
+      onPointerDown={handlePointerDown}
+      className="absolute z-20 max-w-[82vw] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none active:cursor-grabbing"
       style={{
         left: `${text.x}%`,
         top: `${text.y}%`,
