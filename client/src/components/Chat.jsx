@@ -54,6 +54,9 @@ const Chat = ({ socket }) => {
   // NEW MESSAGE DIVIDER
   const [newMessageCount, setNewMessageCount] = useState(0);
   const [firstNewMessageId, setFirstNewMessageId] = useState(null);
+  const [dividerVisible, setDividerVisible] = useState(false);
+
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
 
   const messageInputRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -67,7 +70,9 @@ const Chat = ({ socket }) => {
   const hasInitialScrolledRef = useRef(false);
   const isNearBottomRef = useRef(true);
   const previousMessageCountRef = useRef(0);
+
   const newMessageCountRef = useRef(0);
+  const dividerVisibleRef = useRef(false);
 
   // IMPORTANT:
   // Capture the unread count BEFORE it gets cleared in Redux.
@@ -141,7 +146,14 @@ const Chat = ({ socket }) => {
         return;
       }
 
-      setNewMessagesState(0, null);
+      /*
+       * IMPORTANT:
+       *
+       * Clearing unread messages does NOT remove the divider.
+       *
+       * The divider represents where the new/unread section
+       * started during this chat session.
+       */
 
       if (response?.data) {
         updateChatWithoutReordering(response.data);
@@ -150,6 +162,39 @@ const Chat = ({ socket }) => {
       console.error("Clear unread messages error:", error);
     } finally {
       isClearingUnreadRef.current = false;
+    }
+  };
+
+  const leaveChat = async () => {
+    const chatId = selectedChat?._id;
+
+    if (!chatId) {
+      dispatch(setSelectedChat(null));
+      return;
+    }
+
+    try {
+      const response = await clearUnreadMessage(chatId);
+
+      console.log("🔥 LEAVE CLEAR RESPONSE:", {
+        success: response?.success,
+        unread: response?.data?.unreadMessageCount,
+      });
+
+      if (response?.success && response?.data) {
+        updateChatWithoutReordering(response.data);
+      }
+    } catch (error) {
+      console.error("Leave chat unread clear error:", error);
+    } finally {
+      dividerVisibleRef.current = false;
+      setDividerVisible(false);
+
+      newMessageCountRef.current = 0;
+      setNewMessageCount(0);
+      setFirstNewMessageId(null);
+
+      dispatch(setSelectedChat(null));
     }
   };
 
@@ -167,14 +212,7 @@ const Chat = ({ socket }) => {
 
     isNearBottomRef.current = isNearBottom;
 
-    /*
-     * If the user has reached the latest messages,
-     * the new-message divider can disappear and the
-     * unread messages can be marked as read.
-     */
-    if (isNearBottom && newMessageCount > 0 && !isClearingUnreadRef.current) {
-      clearUnreadMessages();
-    }
+    setShowScrollToBottom(!isNearBottom);
   };
 
   /* =========================================================
@@ -742,8 +780,9 @@ const Chat = ({ socket }) => {
     previousMessageCountRef.current = 0;
     isClearingUnreadRef.current = false;
 
-    // VERY IMPORTANT:
-    // Capture unread count before anything clears it.
+    dividerVisibleRef.current = false;
+    setDividerVisible(false);
+
     initialUnreadCountRef.current = unreadMessageCount;
 
     setAllMessages([]);
@@ -839,6 +878,9 @@ const Chat = ({ socket }) => {
         if (firstUnreadMessage?._id) {
           const firstUnreadElement =
             messageRefs.current[String(firstUnreadMessage._id)];
+
+          dividerVisibleRef.current = true;
+          setDividerVisible(true);
 
           setNewMessagesState(
             Math.min(initialUnreadCount, allMessages.length),
@@ -964,12 +1006,6 @@ const Chat = ({ socket }) => {
         scrollToBottom("smooth");
       });
 
-      setNewMessagesState(0, null);
-
-      /*
-       * We are actively viewing the latest message,
-       * so mark it as read.
-       */
       clearUnreadMessages();
 
       return;
@@ -996,6 +1032,9 @@ const Chat = ({ socket }) => {
         const firstNewMessage = newlyAddedMessages[0];
 
         if (firstNewMessage?._id) {
+          dividerVisibleRef.current = true;
+          setDividerVisible(true);
+
           setFirstNewMessageId(String(firstNewMessage._id));
         }
       }
@@ -1022,6 +1061,10 @@ const Chat = ({ socket }) => {
           (currentMessage) =>
             String(currentMessage._id) === String(data.message._id),
         );
+
+        console.log("📨 SOCKET CHAT:", {
+          unread: data.chat?.unreadMessageCount,
+        });
 
         if (alreadyExists) {
           return previousMessages;
@@ -1102,6 +1145,10 @@ const Chat = ({ socket }) => {
           members: selectedChat.members.map((member) => String(member._id)),
         });
       }
+
+      dividerVisibleRef.current = false;
+      setDividerVisible(false);
+      newMessageCountRef.current = 0;
     };
   }, [selectedChat?._id, socket, user?._id]);
 
@@ -1118,7 +1165,7 @@ const Chat = ({ socket }) => {
       <div className="mb-4 flex shrink-0 items-center border-b border-[#d8f45a]/15 px-2 py-3 sm:mb-5 sm:px-4">
         <button
           type="button"
-          onClick={() => dispatch(setSelectedChat(null))}
+          onClick={leaveChat}
           className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#f9fbf2] transition hover:bg-[#d8f45a]/10 md:hidden"
           aria-label="Back to chats"
         >
@@ -1186,6 +1233,7 @@ const Chat = ({ socket }) => {
             );
 
             const showNewMessagesDivider =
+              dividerVisible &&
               firstNewMessageId &&
               String(currentMessage._id) === String(firstNewMessageId);
 
@@ -1207,7 +1255,7 @@ const Chat = ({ socket }) => {
               >
                 {/* NEW MESSAGE DIVIDER */}
 
-                {showNewMessagesDivider && newMessageCount > 0 && (
+                {showNewMessagesDivider && (
                   <NewMessageDivider
                     count={newMessageCount}
                     onClick={jumpToNewMessages}
@@ -1242,6 +1290,27 @@ const Chat = ({ socket }) => {
               </div>
             );
           })}
+
+          {showScrollToBottom && (
+            <div className="pointer-events-none sticky bottom-3 z-20 flex justify-end px-2">
+              <div className="pointer-events-auto flex flex-col items-center gap-2">
+                {newMessageCount > 0 && (
+                  <div className="rounded-full border border-[#d8f45a]/20 bg-[#18221a] px-3 py-1 text-xs font-semibold text-[#d8f45a] shadow-lg">
+                    {newMessageCount}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={jumpToNewMessages}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d8f45a]/20 bg-[#18221a] text-[#d8f45a] shadow-xl transition hover:bg-[#202b21] active:scale-95"
+                  aria-label="Jump to latest messages"
+                >
+                  <span className="text-lg leading-none">↓</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* TYPING INDICATOR */}
 
