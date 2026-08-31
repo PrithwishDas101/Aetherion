@@ -67,6 +67,7 @@ const Chat = ({ socket }) => {
   const hasInitialScrolledRef = useRef(false);
   const isNearBottomRef = useRef(true);
   const previousMessageCountRef = useRef(0);
+  const newMessageCountRef = useRef(0);
 
   // IMPORTANT:
   // Capture the unread count BEFORE it gets cleared in Redux.
@@ -114,6 +115,13 @@ const Chat = ({ socket }) => {
     });
   };
 
+  const setNewMessagesState = (count, firstMessageId = null) => {
+    newMessageCountRef.current = count;
+
+    setNewMessageCount(count);
+    setFirstNewMessageId(firstMessageId);
+  };
+
   /* =========================================================
      CLEAR UNREAD MESSAGES
   ========================================================= */
@@ -130,14 +138,10 @@ const Chat = ({ socket }) => {
 
       if (!response?.success) {
         console.error(response?.message || "Unable to clear unread messages.");
-
         return;
       }
 
-      // The divider is no longer needed once the user reaches
-      // the latest messages.
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
+      setNewMessagesState(0, null);
 
       if (response?.data) {
         updateChatWithoutReordering(response.data);
@@ -159,9 +163,18 @@ const Chat = ({ socket }) => {
     const distanceFromBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight;
 
-    const isNearBottom = distanceFromBottom < 120;
+    const isNearBottom = distanceFromBottom <= 120;
 
     isNearBottomRef.current = isNearBottom;
+
+    /*
+     * If the user has reached the latest messages,
+     * the new-message divider can disappear and the
+     * unread messages can be marked as read.
+     */
+    if (isNearBottom && newMessageCount > 0 && !isClearingUnreadRef.current) {
+      clearUnreadMessages();
+    }
   };
 
   /* =========================================================
@@ -237,15 +250,7 @@ const Chat = ({ socket }) => {
   ========================================================= */
 
   const jumpToNewMessages = () => {
-    isNearBottomRef.current = true;
-
     scrollToBottom("smooth");
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        clearUnreadMessages();
-      });
-    });
   };
 
   /* =========================================================
@@ -342,8 +347,7 @@ const Chat = ({ socket }) => {
       }
 
       // We are the sender and therefore already at the latest message.
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
+      setNewMessagesState(0, null);
     } catch (error) {
       console.error("Send message error:", error);
 
@@ -404,8 +408,7 @@ const Chat = ({ socket }) => {
 
       setReplyingTo(null);
 
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
+      setNewMessagesState(0, null);
     } catch (error) {
       console.error("Send GIF error:", error);
 
@@ -504,8 +507,7 @@ const Chat = ({ socket }) => {
 
       setReplyingTo(null);
 
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
+      setNewMessagesState(0, null);
     } catch (error) {
       console.error("Send camera photo error:", error);
 
@@ -625,8 +627,7 @@ const Chat = ({ socket }) => {
 
       setReplyingTo(null);
 
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
+      setNewMessagesState(0, null);
     } catch (error) {
       console.error("🔥 SEND VIDEO FAILED", {
         error,
@@ -746,8 +747,7 @@ const Chat = ({ socket }) => {
     initialUnreadCountRef.current = unreadMessageCount;
 
     setAllMessages([]);
-    setNewMessageCount(0);
-    setFirstNewMessageId(null);
+    setNewMessagesState(0, null);
     setReplyingTo(null);
   }, [selectedChat?._id]);
 
@@ -840,9 +840,10 @@ const Chat = ({ socket }) => {
           const firstUnreadElement =
             messageRefs.current[String(firstUnreadMessage._id)];
 
-          setNewMessageCount(Math.min(initialUnreadCount, allMessages.length));
-
-          setFirstNewMessageId(String(firstUnreadMessage._id));
+          setNewMessagesState(
+            Math.min(initialUnreadCount, allMessages.length),
+            String(firstUnreadMessage._id),
+          );
 
           if (firstUnreadElement) {
             firstUnreadElement.scrollIntoView({
@@ -944,8 +945,7 @@ const Chat = ({ socket }) => {
      * Always follow the sender to the bottom.
      */
     if (isMyLatestMessage) {
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
+      setNewMessagesState(0, null);
 
       isNearBottomRef.current = true;
 
@@ -964,8 +964,7 @@ const Chat = ({ socket }) => {
         scrollToBottom("smooth");
       });
 
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
+      setNewMessagesState(0, null);
 
       /*
        * We are actively viewing the latest message,
@@ -986,7 +985,13 @@ const Chat = ({ socket }) => {
      *
      * Show the divider.
      */
+    const incomingCount = newlyAddedMessages.length;
+
     setNewMessageCount((previousCount) => {
+      const nextCount = previousCount + incomingCount;
+
+      newMessageCountRef.current = nextCount;
+
       if (previousCount === 0) {
         const firstNewMessage = newlyAddedMessages[0];
 
@@ -995,7 +1000,7 @@ const Chat = ({ socket }) => {
         }
       }
 
-      return previousCount + newlyAddedMessages.length;
+      return nextCount;
     });
   }, [allMessages, user?._id]);
 
