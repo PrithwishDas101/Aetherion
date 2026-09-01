@@ -11,6 +11,7 @@ const MessageBubble = ({
   isMyMessage,
   onReply,
   onReplyClick,
+  onMediaClick,
   isHighlighted,
   currentUserId,
   otherUserName,
@@ -113,14 +114,39 @@ const MessageBubble = ({
                   : ""
               }`}
             >
-              <div className="relative">
+              <div
+                role="button"
+                tabIndex={message.isUploading ? -1 : 0}
+                className={`relative ${
+                  message.isUploading ? "cursor-default" : "cursor-pointer"
+                }`}
+                onClick={(event) => {
+                  event.stopPropagation();
+
+                  if (message.isUploading) {
+                    return;
+                  }
+
+                  onMediaClick?.(message);
+                }}
+                onKeyDown={(event) => {
+                  if (message.isUploading) {
+                    return;
+                  }
+
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onMediaClick?.(message);
+                  }
+                }}
+              >
                 {isVideo ? (
                   <video
                     src={message.mediaUrl}
-                    controls
+                    muted
                     playsInline
                     preload="metadata"
-                    className={`block max-h-72 max-w-full rounded-xl object-cover transition-all duration-300 ${
+                    className={`block max-h-72 max-w-full cursor-pointer rounded-xl object-cover transition-all duration-300 ${
                       message.isUploading ? "scale-[1.01]" : "scale-100"
                     }`}
                   />
@@ -128,7 +154,7 @@ const MessageBubble = ({
                   <img
                     src={message.mediaUrl}
                     alt={isGif ? "GIF" : "Image"}
-                    className={`block max-h-72 max-w-full object-cover transition-all duration-300 ${
+                    className={`block max-h-72 max-w-full cursor-pointer object-cover transition-all duration-300 ${
                       isImage && message.text?.trim()
                         ? "rounded-t-[11px]"
                         : "rounded-xl"
@@ -136,6 +162,16 @@ const MessageBubble = ({
                     loading="lazy"
                   />
                 )}
+
+                {/* OPEN HINT */}
+
+                {!message.isUploading ? (
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 hover:opacity-100">
+                    <div className="rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md">
+                      Open
+                    </div>
+                  </div>
+                ) : null}
 
                 {/* UPLOAD OVERLAY */}
 

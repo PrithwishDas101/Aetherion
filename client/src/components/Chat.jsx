@@ -27,6 +27,7 @@ import MessageMediaPicker from "./MessageMediaPicker.jsx";
 import MessageComposer from "./MessageComposer/MessageComposer.jsx";
 import CameraModal from "./Camera/CameraModal.jsx";
 import NewMessageDivider from "./NewMessageDivider.jsx";
+import MediaViewer from "./Camera/MediaViewer.jsx";
 
 import {
   sendMessage as emitSendMessage,
@@ -50,6 +51,7 @@ const Chat = ({ socket }) => {
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
+  const [mediaViewerMessageId, setMediaViewerMessageId] = useState(null);
 
   // NEW MESSAGE DIVIDER
   const [newMessageCount, setNewMessageCount] = useState(0);
@@ -103,9 +105,7 @@ const Chat = ({ socket }) => {
   const unreadMessageCount =
     Number(selectedChat?.unreadMessageCount?.[String(user._id)]) || 0;
 
-  /* =========================================================
-     SCROLL HELPERS
-  ========================================================= */
+  /* SCROLL HELPERS */
 
   const scrollToBottom = (behavior = "auto") => {
     const container = messagesContainerRef.current;
@@ -282,6 +282,31 @@ const Chat = ({ socket }) => {
       setHighlightedMessageId(null);
     }, 1200);
   };
+
+  const mediaMessages = allMessages.filter(
+    (currentMessage) =>
+      (currentMessage.type === "image" ||
+        currentMessage.type === "video" ||
+        currentMessage.type === "gif") &&
+      !!currentMessage.mediaUrl,
+  );
+
+  const openMediaViewer = (selectedMessage) => {
+    if (!selectedMessage?._id) {
+      return;
+    }
+
+    setMediaViewerMessageId(String(selectedMessage._id));
+  };
+
+  const closeMediaViewer = () => {
+    setMediaViewerMessageId(null);
+  };
+
+  const mediaViewerIndex = mediaMessages.findIndex(
+    (currentMessage) =>
+      String(currentMessage._id) === String(mediaViewerMessageId),
+  );
 
   /* =========================================================
      JUMP TO NEW MESSAGES
@@ -1277,6 +1302,7 @@ const Chat = ({ socket }) => {
                   isMyMessage={isMyMessage}
                   onReply={startReply}
                   onReplyClick={scrollToMessage}
+                  onMediaClick={openMediaViewer}
                   isHighlighted={
                     highlightedMessageId === String(currentMessage._id)
                   }
@@ -1305,7 +1331,7 @@ const Chat = ({ socket }) => {
               >
                 {/* SCROLL ICON */}
                 <img
-                  src="/public/images/scroll-down-icon.png"
+                  src="/images/scroll-down-icon.png"
                   alt="scroll down icon"
                   draggable="false"
                   className="pointer-events-none absolute inset-0 h-full w-full object-contain"
@@ -1425,6 +1451,14 @@ const Chat = ({ socket }) => {
               onPhotoCaptured={sendCameraPhoto}
               onVideoCaptured={sendCameraVideo}
             />
+
+            {mediaViewerMessageId && mediaViewerIndex >= 0 ? (
+              <MediaViewer
+                mediaItems={mediaMessages}
+                initialIndex={mediaViewerIndex}
+                onClose={closeMediaViewer}
+              />
+            ) : null}
 
             {/* SEND */}
 
