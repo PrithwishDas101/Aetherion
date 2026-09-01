@@ -1293,22 +1293,43 @@ const Chat = ({ socket }) => {
 
           {showScrollToBottom && (
             <div className="pointer-events-none sticky bottom-3 z-20 flex justify-end px-2">
-              <div className="pointer-events-auto flex flex-col items-center gap-2">
+              <button
+                type="button"
+                onClick={jumpToNewMessages}
+                aria-label={
+                  newMessageCount > 0
+                    ? `Jump to latest messages, ${newMessageCount} new messages`
+                    : "Jump to latest messages"
+                }
+                className="pointer-events-auto relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full backdrop-blur-md transition-all duration-200 hover:bg-[#202b21] active:scale-90"
+              >
+                {/* SCROLL ICON */}
+                <img
+                  src="/public/images/scroll-down-icon.png"
+                  alt="scroll down icon"
+                  draggable="false"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-contain"
+                />
+
+                {/* NUMBER IN THE OPENING OF THE CIRCLE */}
                 {newMessageCount > 0 && (
-                  <div className="rounded-full border border-[#d8f45a]/20 bg-[#18221a] px-3 py-1 text-xs font-semibold text-[#d8f45a] shadow-lg">
-                    {newMessageCount}
-                  </div>
+                  <span className="pointer-events-none absolute left-[7px] top-1/4 z-10 flex -translate-y-1/2 items-center justify-center text-[13px] font-bold leading-none text-[#ffffff] drop-shadow-[0_1px_5px_rgba(216,244,90,0.55)]">
+                    {newMessageCount > 99 ? "99+" : newMessageCount}
+                  </span>
                 )}
 
-                <button
-                  type="button"
-                  onClick={jumpToNewMessages}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d8f45a]/20 bg-[#18221a] text-[#d8f45a] shadow-xl transition hover:bg-[#202b21] active:scale-95"
-                  aria-label="Jump to latest messages"
-                >
-                  <span className="text-lg leading-none">↓</span>
-                </button>
-              </div>
+                {/* SUBTLE SHINE */}
+                <span
+                  className="pointer-events-none absolute -left-8 top-0 h-full w-5 rotate-[20deg] bg-white/20 blur-md transition-transform duration-700 group-hover:translate-x-24"
+                  aria-hidden="true"
+                />
+
+                {/* SMALL INNER GLOW */}
+                <span
+                  className="pointer-events-none absolute inset-[3px] rounded-full border border-white/[0.035]"
+                  aria-hidden="true"
+                />
+              </button>
             </div>
           )}
 
