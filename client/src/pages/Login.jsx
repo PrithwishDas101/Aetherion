@@ -28,7 +28,7 @@ function Login() {
       if (response.success) {
         localStorage.setItem("token", response.token);
 
-        toast("Welcome back to Aetherion", {
+        toast("Welcome to Aetherion", {
           icon: null,
         });
 
@@ -56,11 +56,11 @@ function Login() {
       {/* Page layout */}
       <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-4 py-4">
         {/* Card */}
-        <div className="w-full max-w-[520px] rounded-[28px] border border-[#d8f45a]/25 bg-[#111612]/90 shadow-[0_25px_80px_rgba(0,0,0,0.65)] backdrop-blur-md">
+        <div className="h-[540px] w-full max-w-[450px] rounded-[28px] border border-[#d8f45a]/25 bg-[#111612]/90 shadow-[0_25px_80px_rgba(0,0,0,0.65)] backdrop-blur-md">
           {/* Card content */}
           <div className="px-5 pb-6 pt-6 sm:px-10">
             {/* Logo */}
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#d8f45a]/50 bg-[#080d09] shadow-[0_0_30px_rgba(216,244,90,0.12)]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#d8f45a]/50 bg-[#080d09] shadow-[0_0_30px_rgba(216,244,90,0.12)]">
               <img
                 src="/images/logo.png"
                 alt="Aetherion logo"
@@ -69,15 +69,15 @@ function Login() {
             </div>
 
             {/* Aetherion */}
-            <div className="mt-3 text-center text-lg tracking-[0.35em] text-[#f1eee8]">
+            <div className="mt-3 text-center text-lg tracking-[0.65em] text-[#f1eee8]">
               <span className="mr-3 text-[#d8f45a]">✦</span>
               AETHERION
               <span className="ml-3 text-[#d8f45a]">✦</span>
             </div>
 
             {/* Heading */}
-            <div className="mt-4 text-center">
-              <h1 className="text-3xl font-semibold text-[#f1eee8] sm:text-4xl">
+            <div className="mt-6 text-center">
+              <h1 className="text-3xl font-semibold text-[#f1eee8] sm:text-3xl tracking-[0.25rem]">
                 Welcome Back
               </h1>
 
@@ -95,7 +95,7 @@ function Login() {
               <div>
                 <label
                   htmlFor="email"
-                  className="mb-1 block text-sm text-[#d0d4cc]"
+                  className="mb-3 block text-sm text-[#d0d4cc]"
                 >
                   Email Address
                 </label>
@@ -111,7 +111,7 @@ function Login() {
                       email: e.target.value,
                     })
                   }
-                  className="h-12 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                  className="h-10 w-full py-2 rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
                 />
               </div>
 
@@ -135,14 +135,14 @@ function Login() {
                       password: e.target.value,
                     })
                   }
-                  className="h-12 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                  className="h-10 w-full py-2 rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
                 />
               </div>
 
               {/* Button */}
               <button
                 type="submit"
-                className="mt-6 h-12 w-full rounded-full bg-[#d8f45a] text-base font-semibold text-[#10120d] transition hover:bg-[#e4ff6c] hover:shadow-[0_0_30px_rgba(216,244,90,0.25)]"
+                className="mt-6 h-10 w-full rounded-full border border-[#d8f45a]/70 bg-[#d8f45a] text-base font-semibold text-[#10120d] shadow-[0_0_0_1px_rgba(216,244,90,0.15),0_0_18px_rgba(216,244,90,0.08)] transition-all hover:border-[#f0ff9a] hover:bg-[#e4ff6c] hover:shadow-[0_0_0_2px_rgba(216,244,90,0.12),0_0_30px_rgba(216,244,90,0.25)]"
               >
                 Log In
               </button>

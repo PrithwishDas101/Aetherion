@@ -45,9 +45,11 @@ function Signup() {
       const response = await signupUser(formData);
 
       if (response.success) {
+        localStorage.setItem("token", response.token);
+
         toast.success(response.message);
 
-        navigate("/login", { replace: true });
+        navigate("/", { replace: true });
       } else {
         toast.error(response.message);
       }
@@ -114,7 +116,7 @@ function Signup() {
           {/* Card content */}
           <div className="px-5 pb-5 pt-5 sm:px-10">
             {/* Logo */}
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#d8f45a]/50 bg-[#080d09] text-4xl text-[#d8f45a] shadow-[0_0_30px_rgba(216,244,90,0.12)]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#d8f45a]/50 bg-[#050906] text-2xl text-[#d8f45a] shadow-[0_0_30px_rgba(216,244,90,0.12)]">
               <img
                 src="/images/logo.png"
                 alt="Aetherion logo"
@@ -123,7 +125,7 @@ function Signup() {
             </div>
 
             {/* Aetherion */}
-            <div className="mt-3 text-center text-lg tracking-[0.35em] text-[#f1eee8]">
+            <div className="mt-3 text-center text-base tracking-[0.65em] text-[#f1eee8]">
               <span className="mr-3 text-[#d8f45a]">✦</span>
               AETHERION
               <span className="ml-3 text-[#d8f45a]">✦</span>
@@ -131,18 +133,18 @@ function Signup() {
 
             {/* Heading */}
             <div className="mt-2 text-center">
-              <h1 className="text-3xl font-semibold text-[#f1eee8] sm:text-4xl">
+              <h1 className="text-2xl font-semibold text-[#f1eee8] sm:text-3xl tracking-[0.25rem]">
                 Create Your Account
               </h1>
 
-              <p className="mt-1 text-sm text-[#9ca39a] sm:text-base">
+              <p className="mt-1 text-xs text-[#9ca39a] xs:text-base">
                 Create your account and start connecting with people.
               </p>
             </div>
 
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center py-2">
               <div className="relative">
-                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[#171d17] text-2xl font-bold text-[#d8f45a] ring-2 ring-[#d8f45a]/20 sm:h-24 sm:w-24">
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[#252d25] text-2xl font-bold text-[#d8f45a] ring-2 ring-[#d8f45a]/20 sm:h-16 sm:w-16">
                   {profilePreview ? (
                     <img
                       src={profilePreview}
@@ -157,7 +159,7 @@ function Signup() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#080d09] bg-[#d8f45a] text-xs font-bold text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 sm:h-7 sm:w-7 sm:text-sm"
+                  className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#080d09] bg-[#d8f45a] text-xs font-bold text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 sm:h-7 sm:w-7 sm:text-sm"
                   aria-label="Add profile picture"
                 >
                   +
@@ -188,10 +190,7 @@ function Signup() {
             </div>
 
             {/* Form */}
-            <form
-              onSubmit={onFormSubmit}
-              className="mx-auto mt-6 max-w-[560px]"
-            >
+            <form onSubmit={onFormSubmit} className="mx-auto max-w-[560px]">
               {/* First + Last Name */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
                 {/* First Name */}
@@ -215,7 +214,7 @@ function Signup() {
                         firstName: e.target.value,
                       })
                     }
-                    className="h-12 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                    className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
                   />
                 </div>
 
@@ -240,13 +239,13 @@ function Signup() {
                         lastName: e.target.value,
                       })
                     }
-                    className="h-12 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                    className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
                   />
                 </div>
               </div>
 
               {/* Email */}
-              <div className="mt-4">
+              <div className="mt-3">
                 <label
                   htmlFor="email"
                   className="mb-1 block text-sm text-[#d0d4cc]"
@@ -266,7 +265,7 @@ function Signup() {
                       email: e.target.value,
                     })
                   }
-                  className="h-12 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                  className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
                 />
               </div>
 
@@ -291,21 +290,21 @@ function Signup() {
                       password: e.target.value,
                     })
                   }
-                  className="h-12 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                  className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
                 />
               </div>
 
               {/* Button */}
               <button
                 type="submit"
-                className="mt-5 h-12 w-full rounded-full bg-[#d8f45a] text-base font-semibold text-[#10120d] transition hover:bg-[#e4ff6c] hover:shadow-[0_0_30px_rgba(216,244,90,0.25)]"
+                className="mt-6 h-10 w-full rounded-full border-2 border-[#f0ff6a] bg-[#d8f45a] text-base font-semibold text-[#10120d] shadow-[0_0_12px_rgba(216,244,90,0.12)] transition-all hover:bg-[#e4ff6c] hover:border-[#f7ffb0] hover:shadow-[0_0_30px_rgba(216,244,90,0.28)]"
               >
                 Create Account
               </button>
             </form>
 
             {/* Login */}
-            <div className="mt-4 text-center text-sm text-[#858d84]">
+            <div className="mt-3 text-center text-sm text-[#858d84]">
               Already have an account?
               <Link
                 to="/login"

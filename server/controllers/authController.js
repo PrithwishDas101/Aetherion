@@ -99,10 +99,22 @@ export const signup = async (req, res) => {
       profilePicPublicId,
     });
 
-    // 11. Return safe user data
+    // 11. Create JWT
+    const token = jwt.sign(
+      {
+        userId: newUser._id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
+
+    // 12. Return token and safe user data
     return res.status(201).json({
       success: true,
       message: "User created successfully",
+      token,
       user: {
         id: newUser._id,
         firstName: newUser.firstName,
