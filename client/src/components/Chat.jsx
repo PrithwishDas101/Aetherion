@@ -1457,6 +1457,11 @@ const Chat = ({ socket }) => {
                 mediaItems={mediaMessages}
                 initialIndex={mediaViewerIndex}
                 onClose={closeMediaViewer}
+                onReply={startReply}
+                currentUser={user}
+                otherUser={selectedChat?.members?.find(
+                  (member) => String(member._id) !== String(user?._id),
+                )}
               />
             ) : null}
 
