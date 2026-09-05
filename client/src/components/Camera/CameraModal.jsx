@@ -736,7 +736,6 @@ const CameraModal = ({
             onToolChange={handlePhotoTool}
             onClose={closeCamera}
             onDownload={downloadPhoto}
-            onRetake={retakePhoto}
             onSend={sendCapturedPhoto}
             recipientName={recipientName}
             photoCaption={photoCaption}

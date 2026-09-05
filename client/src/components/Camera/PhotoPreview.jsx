@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { FiTrash2, FiX } from "react-icons/fi";
 
-import MediaTools  from "./MediaTools.jsx";
+import MediaTools from "./MediaTools.jsx";
 import PhotoTextEditor from "./TextEditor/PhotoTextEditor.jsx";
 import DoodleEditor from "./Doodle/DoodleEditor.jsx";
 import DoodleDisplay from "./Doodle/DoodleDisplay.jsx";
@@ -17,7 +17,6 @@ const PhotoPreview = ({
   onToolChange,
   onClose,
   onDownload,
-  onRetake,
   onSend,
   recipientName,
   photoCaption,
@@ -29,6 +28,7 @@ const PhotoPreview = ({
   const [photoDoodles, setPhotoDoodles] = useState([]);
   const [draggingTextId, setDraggingTextId] = useState(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const previewRef = useRef(null);
   const dragStartRef = useRef(null);
@@ -41,22 +41,22 @@ const PhotoPreview = ({
 
   const handleOpenTextEditor = (textId = null) => {
     setEditingTextId(textId);
-    onToolChange("text");
+    onToolChange?.("text");
   };
 
   const isPointerInsideTrash = (clientX, clientY) => {
     const trash = trashRef.current;
 
-    if (!trash) return false;
+    if (!trash) {
+      return false;
+    }
 
     const rect = trash.getBoundingClientRect();
 
     const trashX = rect.left + rect.width / 2;
     const trashY = rect.top + rect.height / 2;
 
-    const distance = Math.hypot(clientX - trashX, clientY - trashY);
-
-    return distance <= TRASH_RADIUS;
+    return Math.hypot(clientX - trashX, clientY - trashY) <= TRASH_RADIUS;
   };
 
   const handleCommittedTextPointerDown = (event, textId) => {
@@ -67,13 +67,17 @@ const PhotoPreview = ({
 
     const preview = previewRef.current;
 
-    if (!preview) return;
+    if (!preview) {
+      return;
+    }
 
     const previewRect = preview.getBoundingClientRect();
 
     const currentText = photoTexts.find((text) => text.id === textId);
 
-    if (!currentText) return;
+    if (!currentText) {
+      return;
+    }
 
     dragStartRef.current = {
       pointerX: event.clientX,
@@ -91,26 +95,26 @@ const PhotoPreview = ({
   };
 
   const handleCommittedTextPointerMove = (event) => {
-    if (!draggingTextId) return;
+    if (!draggingTextId || !dragStartRef.current) {
+      return;
+    }
 
     const preview = previewRef.current;
 
-    if (!preview) return;
+    if (!preview) {
+      return;
+    }
 
     const rect = preview.getBoundingClientRect();
 
-    const distanceFromStart = dragStartRef.current
-      ? Math.hypot(
-          event.clientX - dragStartRef.current.pointerX,
-          event.clientY - dragStartRef.current.pointerY,
-        )
-      : 0;
+    const distanceFromStart = Math.hypot(
+      event.clientX - dragStartRef.current.pointerX,
+      event.clientY - dragStartRef.current.pointerY,
+    );
 
     if (distanceFromStart > 5) {
       didDragRef.current = true;
     }
-
-    // No left/right/top/bottom clamping.
 
     const draggedTextElement = document.querySelector(
       `[data-photo-text-id="${draggingTextId}"]`,
@@ -139,9 +143,7 @@ const PhotoPreview = ({
     const clampedX = Math.max(minX, Math.min(maxX, x));
     const clampedY = Math.max(minY, Math.min(maxY, y));
 
-    const overTrash = isPointerInsideTrash(event.clientX, event.clientY);
-
-    setIsOverTrash(overTrash);
+    setIsOverTrash(isPointerInsideTrash(event.clientX, event.clientY));
 
     setPhotoTexts((previous) =>
       previous.map((text) =>
@@ -157,7 +159,9 @@ const PhotoPreview = ({
   };
 
   const handleCommittedTextPointerUp = (event) => {
-    if (!draggingTextId) return;
+    if (!draggingTextId) {
+      return;
+    }
 
     event.currentTarget.releasePointerCapture?.(event.pointerId);
 
@@ -174,8 +178,6 @@ const PhotoPreview = ({
 
     setDraggingTextId(null);
     setIsOverTrash(false);
-
-    // A tap edits. A real drag only moves.
 
     if (!wasDragged && !shouldDelete) {
       handleOpenTextEditor(textIdToHandle);
@@ -195,12 +197,12 @@ const PhotoPreview = ({
   const handleTextDone = (updatedTexts) => {
     setPhotoTexts(updatedTexts);
     setEditingTextId(null);
-    onToolChange(null);
+    onToolChange?.(null);
   };
 
   const handleTextClose = () => {
     setEditingTextId(null);
-    onToolChange(null);
+    onToolChange?.(null);
   };
 
   const handleDoodleChange = (updatedDoodles) => {
@@ -208,34 +210,83 @@ const PhotoPreview = ({
   };
 
   const handleDoodleDone = () => {
-    onToolChange(null);
+    onToolChange?.(null);
+  };
+
+  const getOriginalPhotoBlob = async () => {
+    const response = await fetch(photoUrl);
+
+    if (!response.ok) {
+      throw new Error("Unable to read original photo.");
+    }
+
+    return response.blob();
+  };
+
+  const buildFinalPhoto = async () => {
+    const hasEdits = photoTexts.length > 0 || photoDoodles.length > 0;
+
+    if (!hasEdits) {
+      return getOriginalPhotoBlob();
+    }
+
+    return composePhoto({
+      photoUrl,
+      doodles: photoDoodles,
+      texts: photoTexts,
+    });
   };
 
   const handleSendPhoto = async () => {
-    try {
-      const finalBlob = await composePhoto({
-        photoUrl,
-        doodles: photoDoodles,
-        texts: photoTexts,
-      });
+    if (isSending) {
+      return;
+    }
 
-      onSend?.(finalBlob);
+    setIsSending(true);
+
+    try {
+      let finalBlob;
+
+      try {
+        finalBlob = await buildFinalPhoto();
+      } catch (composeError) {
+        console.error(
+          "Unable to compose edited photo, sending original instead:",
+          composeError,
+        );
+
+        finalBlob = await getOriginalPhotoBlob();
+      }
+
+      if (!finalBlob) {
+        throw new Error("No photo blob available.");
+      }
+
+      await onSend?.(finalBlob);
     } catch (error) {
-      console.error("Unable to compose photo for sending:", error);
+      console.error("Unable to send photo:", error);
+      setIsSending(false);
     }
   };
 
   const handleDownloadPhoto = async () => {
     try {
-      const finalBlob = await composePhoto({
-        photoUrl,
-        doodles: photoDoodles,
-        texts: photoTexts,
-      });
+      let finalBlob;
+
+      try {
+        finalBlob = await buildFinalPhoto();
+      } catch (composeError) {
+        console.error(
+          "Unable to compose edited photo, downloading original instead:",
+          composeError,
+        );
+
+        finalBlob = await getOriginalPhotoBlob();
+      }
 
       onDownload?.(finalBlob);
     } catch (error) {
-      console.error("Unable to compose photo for download:", error);
+      console.error("Unable to download photo:", error);
     }
   };
 
@@ -276,7 +327,7 @@ const PhotoPreview = ({
         </div>
       </MediaZoomSurface>
 
-      {/* DRAG MODE — TRASH TARGET */}
+      {/* TRASH TARGET */}
 
       {isDraggingCommittedText ? (
         <div className="pointer-events-none absolute left-4 top-0 z-[120] pt-[max(12px,env(safe-area-inset-top))]">
@@ -284,8 +335,8 @@ const PhotoPreview = ({
             ref={trashRef}
             className={`flex h-12 w-12 items-center justify-center rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-150 ${
               isOverTrash
-                ? "scale-110 border-red-300/80 bg-red-500/90 text-white shadow-[0_0_30px_rgba(239,68,68,0.95)]"
-                : "border-white/15 bg-black/65 text-white/80 shadow-black/50"
+                ? "scale-110 border-red-300/80 bg-red-500/90 text-white"
+                : "border-white/15 bg-black/65 text-white/80"
             }`}
           >
             <FiTrash2 className="text-[22px]" />
@@ -293,7 +344,7 @@ const PhotoPreview = ({
         </div>
       ) : null}
 
-      {/* CLOSE BUTTON */}
+      {/* CANCEL */}
 
       {!isDraggingCommittedText && !isDoodling ? (
         <div className="absolute left-0 top-0 z-[100] px-4 pt-[max(12px,env(safe-area-inset-top))]">
@@ -308,15 +359,15 @@ const PhotoPreview = ({
         </div>
       ) : null}
 
-      {/* NORMAL PHOTO TOOLS */}
+      {/* TOOLS — RETAKE REMOVED */}
 
       {!isTextEditing && !isDoodling && !isDraggingCommittedText ? (
         <div className="absolute right-4 top-0 z-40 pt-[max(12px,env(safe-area-inset-top))]">
-          <MediaTools 
+          <MediaTools
             activeTool={activeTool}
             onToolChange={onToolChange}
             onDownload={handleDownloadPhoto}
-            onRetake={onRetake}
+            showRetake={false}
           />
         </div>
       ) : null}
@@ -351,8 +402,8 @@ const PhotoPreview = ({
 
       {downloadMessage && !isDraggingCommittedText && !isDoodling ? (
         <div className="pointer-events-none absolute left-1/2 top-24 z-[110] -translate-x-1/2">
-          <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-black/65 px-4 py-2.5 text-sm font-medium text-white shadow-xl backdrop-blur-xl">
-            <span>{downloadMessage}</span>
+          <div className="rounded-full border border-white/10 bg-black/65 px-4 py-2.5 text-sm font-medium text-white shadow-xl backdrop-blur-xl">
+            {downloadMessage}
           </div>
         </div>
       ) : null}
@@ -384,16 +435,21 @@ const PhotoPreview = ({
               {recipientName}
             </p>
 
-            <p className="text-xs text-white/45">Send photo</p>
+            <p className="text-xs text-white/45">
+              {isSending ? "Sending..." : "Send photo"}
+            </p>
           </div>
 
           <button
             type="button"
             onClick={handleSendPhoto}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] shadow-lg transition hover:bg-[#e4ff6f] active:scale-95"
+            disabled={isSending}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] shadow-lg transition hover:bg-[#e4ff6f] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             aria-label="Send photo"
           >
-            <span className="translate-x-[1px] text-xl">➤</span>
+            <span className="translate-x-[1px] text-xl">
+              {isSending ? "…" : "➤"}
+            </span>
           </button>
         </div>
       ) : null}
@@ -412,7 +468,9 @@ const PhotoTextBlock = ({ text, isDragging, onPointerDown }) => {
       type="button"
       data-photo-text-id={text.id}
       onPointerDown={onPointerDown}
-      className={`absolute z-20 max-w-[82vw] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none border-0 bg-transparent p-0 text-left outline-none transition-opacity active:cursor-grabbing ${isDragging ? "z-[130]" : ""}`}
+      className={`absolute z-20 max-w-[82vw] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none border-0 bg-transparent p-0 text-left outline-none transition-opacity active:cursor-grabbing ${
+        isDragging ? "z-[130]" : ""
+      }`}
       style={{
         left: `${text.x}%`,
         top: `${text.y}%`,
@@ -421,7 +479,10 @@ const PhotoTextBlock = ({ text, isDragging, onPointerDown }) => {
     >
       <div
         className={`w-max max-w-[82vw] whitespace-pre-wrap break-words text-[30px] leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] ${fontClass}`}
-        style={{ color: text.color, textAlign: text.alignment }}
+        style={{
+          color: text.color,
+          textAlign: text.alignment,
+        }}
       >
         {text.text.split("\n").map((line, index, lines) => {
           const isLastLine = index === lines.length - 1;
