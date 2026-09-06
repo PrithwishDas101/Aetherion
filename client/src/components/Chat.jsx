@@ -486,8 +486,23 @@ const Chat = ({ socket }) => {
   ========================================================= */
 
   const sendCameraPhoto = async (photoData) => {
+    console.log("📸 CHAT RECEIVED PHOTO DATA:", {
+      photoData,
+      blob: photoData?.blob,
+      blobType: photoData?.blob?.type,
+      blobSize: photoData?.blob?.size,
+      caption: photoData?.caption,
+      isSending,
+    });
+
     if (!photoData?.blob || !selectedChat?._id || isSending) {
-      return;
+      console.log("📸 PHOTO SEND REJECTED:", {
+        hasBlob: !!photoData?.blob,
+        chatId: selectedChat?._id,
+        isSending,
+      });
+
+      return false;
     }
 
     isNearBottomRef.current = true;
@@ -531,6 +546,12 @@ const Chat = ({ socket }) => {
 
       formData.append("replyTo", replyingTo?._id || "");
 
+      console.log("📸 UPLOADING THIS EXACT BLOB:", {
+        blob: photoData.blob,
+        size: photoData.blob.size,
+        type: photoData.blob.type,
+      });
+
       const response = await createMediaMessage(formData);
 
       if (!response?.success) {
@@ -545,7 +566,7 @@ const Chat = ({ socket }) => {
 
         toast.error(response?.message || "Unable to send photo.");
 
-        return;
+        return false;
       }
 
       setAllMessages((previousMessages) =>
@@ -571,6 +592,8 @@ const Chat = ({ socket }) => {
       setReplyingTo(null);
 
       setNewMessagesState(0, null);
+
+      return true;
     } catch (error) {
       console.error("Send camera photo error:", error);
 
@@ -584,6 +607,8 @@ const Chat = ({ socket }) => {
       URL.revokeObjectURL(localPreviewUrl);
 
       toast.error("Unable to send photo.");
+
+      return false;
     } finally {
       setIsSending(false);
     }
@@ -1458,6 +1483,7 @@ const Chat = ({ socket }) => {
                 initialIndex={mediaViewerIndex}
                 onClose={closeMediaViewer}
                 onReply={startReply}
+                onSendEditedPhoto={sendCameraPhoto}
                 currentUser={user}
                 otherUser={selectedChat?.members?.find(
                   (member) => String(member._id) !== String(user?._id),

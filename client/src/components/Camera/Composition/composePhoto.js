@@ -5,12 +5,28 @@ const loadImage = (src) =>
   new Promise((resolve, reject) => {
     const image = new Image();
 
+    /*
+     * IMPORTANT:
+     *
+     * The image must request CORS permission BEFORE src is set.
+     *
+     * Without this, a remote image drawn onto the canvas can taint
+     * the canvas, which makes canvas.toBlob() throw:
+     *
+     * SecurityError: Tainted canvases may not be exported.
+     */
+    image.crossOrigin = "anonymous";
+
     image.onload = () => {
       resolve(image);
     };
 
     image.onerror = () => {
-      reject(new Error("Could not load the photo for composition."));
+      reject(
+        new Error(
+          "Could not load the photo for composition. The image server may not allow CORS access.",
+        ),
+      );
     };
 
     image.src = src;
@@ -34,17 +50,26 @@ export const composePhoto = async ({ photoUrl, doodles = [], texts = [] }) => {
     throw new Error("Could not create the photo composition canvas.");
   }
 
-  // Draw the original photo first.
+  /*
+   * Draw the original photo.
+   *
+   * If the source was successfully loaded with CORS permission,
+   * the canvas remains exportable.
+   */
   context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-  // Draw committed doodles on top of the photo.
+  /*
+   * Draw doodles.
+   */
   drawDoodles({
     context,
     canvas,
     doodles,
   });
 
-  // Draw committed texts on top of the photo and doodles.
+  /*
+   * Draw text.
+   */
   drawTexts({
     context,
     texts,
@@ -55,18 +80,22 @@ export const composePhoto = async ({ photoUrl, doodles = [], texts = [] }) => {
   });
 
   return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) {
-          reject(new Error("Could not generate the composed photo."));
+    try {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("Could not generate the composed photo."));
 
-          return;
-        }
+            return;
+          }
 
-        resolve(blob);
-      },
-      "image/png",
-      1,
-    );
+          resolve(blob);
+        },
+        "image/png",
+        1,
+      );
+    } catch (error) {
+      reject(error);
+    }
   });
 };

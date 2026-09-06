@@ -2,16 +2,24 @@ import { useEffect, useRef, useState } from "react";
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 8;
+const SWIPE_THRESHOLD = 70;
 
 const getDistance = (first, second) =>
   Math.hypot(second.x - first.x, second.y - first.y);
 
-const MediaZoomSurface = ({ children, className = "" }) => {
+const MediaZoomSurface = ({
+  children,
+  className = "",
+  onSwipeLeft,
+  onSwipeRight,
+}) => {
   const surfaceRef = useRef(null);
 
   const pointersRef = useRef(new Map());
+
   const pinchRef = useRef(null);
   const panRef = useRef(null);
+  const swipeRef = useRef(null);
 
   const transformRef = useRef({
     scale: MIN_SCALE,
@@ -51,8 +59,10 @@ const MediaZoomSurface = ({ children, className = "" }) => {
 
   const resetZoom = () => {
     pointersRef.current.clear();
+
     pinchRef.current = null;
     panRef.current = null;
+    swipeRef.current = null;
 
     applyTransform({
       scale: MIN_SCALE,
@@ -63,15 +73,14 @@ const MediaZoomSurface = ({ children, className = "" }) => {
 
   /*
    * DESKTOP WHEEL ZOOM
-   *
-   * Native listener is used with passive: false.
-   * React's onWheel is not reliable enough here because
-   * we need preventDefault() to stop page-level scrolling.
    */
+
   useEffect(() => {
     const surface = surfaceRef.current;
 
-    if (!surface) return undefined;
+    if (!surface) {
+      return undefined;
+    }
 
     const handleWheel = (event) => {
       event.preventDefault();
@@ -99,21 +108,25 @@ const MediaZoomSurface = ({ children, className = "" }) => {
         return;
       }
 
-      /*
-       * Zoom towards the actual cursor position.
-       *
-       * Convert the cursor into a point relative to
-       * the transformed media, then preserve that point.
-       */
-      const mediaX = (mouseX - rect.width / 2 - current.x) / current.scale;
+      const mediaX =
+        (mouseX - rect.width / 2 - current.x) / current.scale;
 
-      const mediaY = (mouseY - rect.height / 2 - current.y) / current.scale;
+      const mediaY =
+        (mouseY - rect.height / 2 - current.y) / current.scale;
 
-      const nextX = mouseX - rect.width / 2 - mediaX * nextScale;
+      const nextX =
+        mouseX - rect.width / 2 - mediaX * nextScale;
 
-      const nextY = mouseY - rect.height / 2 - mediaY * nextScale;
+      const nextY =
+        mouseY - rect.height / 2 - mediaY * nextScale;
 
-      applyTransform(clampTransform(nextScale, nextX, nextY));
+      applyTransform(
+        clampTransform(
+          nextScale,
+          nextX,
+          nextY,
+        ),
+      );
     };
 
     surface.addEventListener("wheel", handleWheel, {
@@ -128,53 +141,106 @@ const MediaZoomSurface = ({ children, className = "" }) => {
   /*
    * POINTER DOWN
    */
+
   const handlePointerDown = (event) => {
-    if (event.pointerType === "mouse" && event.button !== 0) {
+    if (
+      event.pointerType === "mouse" &&
+      event.button !== 0
+    ) {
       return;
     }
 
-    event.currentTarget.setPointerCapture?.(event.pointerId);
+    /*
+     * Capture the pointer so that a swipe still finishes
+     * correctly even if the finger moves outside the element.
+     */
+
+    event.currentTarget.setPointerCapture?.(
+      event.pointerId,
+    );
 
     pointersRef.current.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
     });
 
-    const points = [...pointersRef.current.values()];
+    const points = [
+      ...pointersRef.current.values(),
+    ];
+
     const current = transformRef.current;
 
     /*
-     * TWO POINTERS = PINCH ZOOM
+     * ONE POINTER AT NORMAL SCALE
+     *
+     * Could become a swipe.
      */
-    if (points.length === 2) {
-      const [first, second] = points;
 
-      pinchRef.current = {
-        startDistance: getDistance(first, second),
-        startTransform: { ...current },
+    if (
+      points.length === 1 &&
+      current.scale === MIN_SCALE
+    ) {
+      swipeRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
       };
-
-      panRef.current = null;
 
       return;
     }
 
     /*
-     * ONE POINTER + ZOOMED = PAN
+     * TWO POINTERS
+     *
+     * Begin pinch zoom.
      */
-    if (points.length === 1 && current.scale > MIN_SCALE) {
-      panRef.current = {
-        startPointer: points[0],
-        startTransform: { ...current },
+
+    if (points.length === 2) {
+      const [first, second] = points;
+
+      pinchRef.current = {
+        startDistance: getDistance(first, second),
+        startTransform: {
+          ...current,
+        },
       };
+
+      panRef.current = null;
+      swipeRef.current = null;
+
+      return;
+    }
+
+    /*
+     * ONE POINTER WHILE ZOOMED
+     *
+     * Pan the media instead of swiping.
+     */
+
+    if (
+      points.length === 1 &&
+      current.scale > MIN_SCALE
+    ) {
+      panRef.current = {
+        pointerId: event.pointerId,
+        startPointer: points[0],
+        startTransform: {
+          ...current,
+        },
+      };
+
+      swipeRef.current = null;
     }
   };
 
   /*
    * POINTER MOVE
    */
+
   const handlePointerMove = (event) => {
-    if (!pointersRef.current.has(event.pointerId)) {
+    if (
+      !pointersRef.current.has(event.pointerId)
+    ) {
       return;
     }
 
@@ -183,70 +249,173 @@ const MediaZoomSurface = ({ children, className = "" }) => {
       y: event.clientY,
     });
 
-    const points = [...pointersRef.current.values()];
+    const points = [
+      ...pointersRef.current.values(),
+    ];
 
     /*
-     * PINCH
+     * PINCH ZOOM
      */
-    if (points.length === 2 && pinchRef.current) {
+
+    if (
+      points.length === 2 &&
+      pinchRef.current
+    ) {
       const [first, second] = points;
 
-      const currentDistance = getDistance(first, second);
+      const currentDistance = getDistance(
+        first,
+        second,
+      );
 
-      if (!currentDistance || !pinchRef.current.startDistance) {
+      if (
+        !currentDistance ||
+        !pinchRef.current.startDistance
+      ) {
         return;
       }
 
-      const current = transformRef.current;
-
-      const zoomRatio = currentDistance / pinchRef.current.startDistance;
+      const zoomRatio =
+        currentDistance /
+        pinchRef.current.startDistance;
 
       const nextScale = Math.max(
         MIN_SCALE,
-        Math.min(MAX_SCALE, pinchRef.current.startTransform.scale * zoomRatio),
+        Math.min(
+          MAX_SCALE,
+          pinchRef.current.startTransform.scale *
+            zoomRatio,
+        ),
       );
 
-      applyTransform(clampTransform(nextScale, current.x, current.y));
+      applyTransform(
+        clampTransform(
+          nextScale,
+          pinchRef.current.startTransform.x,
+          pinchRef.current.startTransform.y,
+        ),
+      );
 
       return;
     }
 
     /*
-     * PAN
+     * PAN ZOOMED MEDIA
      */
-    if (points.length === 1 && panRef.current) {
+
+    if (
+      points.length === 1 &&
+      panRef.current
+    ) {
       const point = points[0];
 
-      const deltaX = point.x - panRef.current.startPointer.x;
+      const deltaX =
+        point.x -
+        panRef.current.startPointer.x;
 
-      const deltaY = point.y - panRef.current.startPointer.y;
+      const deltaY =
+        point.y -
+        panRef.current.startPointer.y;
 
       applyTransform(
         clampTransform(
           panRef.current.startTransform.scale,
-          panRef.current.startTransform.x + deltaX,
-          panRef.current.startTransform.y + deltaY,
+          panRef.current.startTransform.x +
+            deltaX,
+          panRef.current.startTransform.y +
+            deltaY,
         ),
       );
     }
   };
 
   /*
-   * POINTER UP / CANCEL
+   * POINTER END
    */
+
   const handlePointerEnd = (event) => {
-    event.currentTarget.releasePointerCapture?.(event.pointerId);
+    const swipe = swipeRef.current;
+    const current = transformRef.current;
 
-    pointersRef.current.delete(event.pointerId);
+    /*
+     * IMPORTANT:
+     *
+     * Calculate the swipe BEFORE removing the pointer.
+     *
+     * The old implementation depended on
+     * pointersRef.current.size === 1 in a way that could
+     * fail depending on pointer event ordering.
+     */
 
-    const points = [...pointersRef.current.values()];
+    if (
+      swipe &&
+      swipe.pointerId === event.pointerId &&
+      current.scale === MIN_SCALE &&
+      pointersRef.current.size === 1
+    ) {
+      const deltaX =
+        event.clientX - swipe.startX;
+
+      const deltaY =
+        event.clientY - swipe.startY;
+
+      const isHorizontalSwipe =
+        Math.abs(deltaX) >= SWIPE_THRESHOLD &&
+        Math.abs(deltaX) >
+          Math.abs(deltaY);
+
+      if (isHorizontalSwipe) {
+        if (deltaX < 0) {
+          onSwipeLeft?.();
+        } else {
+          onSwipeRight?.();
+        }
+      }
+    }
+
+    /*
+     * Now remove the finished pointer.
+     */
+
+    pointersRef.current.delete(
+      event.pointerId,
+    );
+
+    try {
+      event.currentTarget.releasePointerCapture?.(
+        event.pointerId,
+      );
+    } catch {
+      /*
+       * Pointer may already have been released.
+       */
+    }
+
+    swipeRef.current = null;
+
+    const points = [
+      ...pointersRef.current.values(),
+    ];
+
+    /*
+     * Pinch ends when fewer than two pointers remain.
+     */
 
     if (points.length < 2) {
       pinchRef.current = null;
     }
 
-    if (points.length === 1 && transformRef.current.scale > MIN_SCALE) {
+    /*
+     * If one finger remains after pinch zoom,
+     * allow that finger to continue panning.
+     */
+
+    if (
+      points.length === 1 &&
+      transformRef.current.scale > MIN_SCALE
+    ) {
       panRef.current = {
+        pointerId: null,
         startPointer: points[0],
         startTransform: {
           ...transformRef.current,
@@ -258,16 +427,32 @@ const MediaZoomSurface = ({ children, className = "" }) => {
   };
 
   /*
-   * DOUBLE CLICK / DOUBLE TAP RESET
+   * DOUBLE CLICK / DOUBLE TAP
    */
+
   const handleDoubleClick = () => {
-    resetZoom();
+    if (
+      transformRef.current.scale >
+      MIN_SCALE
+    ) {
+      resetZoom();
+      return;
+    }
+
+    applyTransform({
+      scale: 2.5,
+      x: 0,
+      y: 0,
+    });
   };
 
   return (
     <div
       ref={surfaceRef}
-      className={`absolute inset-0 overflow-hidden touch-none select-none ${className}`}
+      className={`absolute inset-0 overflow-hidden select-none ${className}`}
+      style={{
+        touchAction: "none",
+      }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
@@ -277,8 +462,16 @@ const MediaZoomSurface = ({ children, className = "" }) => {
       <div
         className="absolute inset-0 h-full w-full will-change-transform"
         style={{
-          transform: `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`,
-          transformOrigin: "center center",
+          transform: `
+            translate3d(
+              ${transform.x}px,
+              ${transform.y}px,
+              0
+            )
+            scale(${transform.scale})
+          `,
+          transformOrigin:
+            "center center",
         }}
       >
         {children}

@@ -245,43 +245,34 @@ const PhotoPreview = ({
     setIsSending(true);
 
     try {
-      let finalBlob;
-
-      try {
-        finalBlob = await buildFinalPhoto();
-      } catch (composeError) {
-        console.error(
-          "Unable to compose edited photo, sending original instead:",
-          composeError,
-        );
-
-        finalBlob = await getOriginalPhotoBlob();
-      }
+      const finalBlob = await buildFinalPhoto();
 
       if (!finalBlob) {
         throw new Error("No photo blob available.");
       }
 
-      await onSend?.(finalBlob);
+      const didSend = await onSend?.(finalBlob);
+
+      /*
+       * If the parent explicitly reports failure,
+       * allow the user to try again.
+       */
+      if (didSend === false) {
+        setIsSending(false);
+      }
     } catch (error) {
       console.error("Unable to send photo:", error);
+
       setIsSending(false);
     }
   };
 
   const handleDownloadPhoto = async () => {
     try {
-      let finalBlob;
+      const finalBlob = await buildFinalPhoto();
 
-      try {
-        finalBlob = await buildFinalPhoto();
-      } catch (composeError) {
-        console.error(
-          "Unable to compose edited photo, downloading original instead:",
-          composeError,
-        );
-
-        finalBlob = await getOriginalPhotoBlob();
+      if (!finalBlob) {
+        throw new Error("No photo blob available.");
       }
 
       onDownload?.(finalBlob);

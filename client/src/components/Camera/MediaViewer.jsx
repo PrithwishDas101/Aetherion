@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { createPortal } from "react-dom";
+
 import {
   FiArrowLeft,
   FiChevronLeft,
@@ -19,14 +21,11 @@ const getInitials = (person) => {
   }
 
   const firstName = String(person.firstName || "").trim();
+
   const middleName = String(person.middleName || "").trim();
+
   const lastName = String(person.lastName || "").trim();
 
-  /*
-   * First + last is preferred.
-   *
-   * If no last name exists, use first + middle.
-   */
   if (firstName && lastName) {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
   }
@@ -81,24 +80,39 @@ const MediaViewer = ({
   initialIndex = 0,
   onClose,
   onReply,
+  onSendEditedPhoto,
   currentUser,
   otherUser,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+
   const [isDownloading, setIsDownloading] = useState(false);
 
-  /*
-   * MOBILE / TABLET EDIT MODE
-   *
-   * This is intentionally separate from the desktop viewer.
-   */
   const [isEditing, setIsEditing] = useState(false);
+
   const [activeEditTool, setActiveEditTool] = useState(null);
+
+  /*
+   * Prevent multiple edited-photo sends.
+   */
+
+  const [isSendingEdited, setIsSendingEdited] = useState(false);
 
   const currentMedia = mediaItems[currentIndex];
 
   const hasPrevious = currentIndex > 0;
+
   const hasNext = currentIndex < mediaItems.length - 1;
+
+  /*
+   * Keep index valid if the media list changes.
+   */
+
+  useEffect(() => {
+    if (currentIndex > mediaItems.length - 1) {
+      setCurrentIndex(Math.max(0, mediaItems.length - 1));
+    }
+  }, [currentIndex, mediaItems.length]);
 
   const sender = useMemo(() => {
     if (!currentMedia) {
@@ -122,14 +136,17 @@ const MediaViewer = ({
   }, [currentMedia, currentUser, otherUser]);
 
   const senderName = getFullName(sender);
+
   const senderInitials = getInitials(sender);
 
   /*
-   * Reset editing state when navigating between media.
+   * Reset editor state when changing media.
    */
+
   useEffect(() => {
     setIsEditing(false);
     setActiveEditTool(null);
+    setIsSendingEdited(false);
   }, [currentIndex]);
 
   const goPrevious = () => {
@@ -150,9 +167,8 @@ const MediaViewer = ({
 
   /*
    * REPLY
-   *
-   * Uses Chat.jsx's existing reply system.
    */
+
   const handleReply = () => {
     if (!currentMedia) {
       return;
@@ -166,6 +182,7 @@ const MediaViewer = ({
   /*
    * DOWNLOAD
    */
+
   const handleDownload = async () => {
     if (!currentMedia?.mediaUrl || isDownloading) {
       return;
@@ -197,10 +214,13 @@ const MediaViewer = ({
       const link = document.createElement("a");
 
       link.href = blobUrl;
+
       link.download = `aetherion-media-${Date.now()}.${extension}`;
+
       link.style.display = "none";
 
       document.body.appendChild(link);
+
       link.click();
       link.remove();
 
@@ -210,9 +230,6 @@ const MediaViewer = ({
     } catch (error) {
       console.error("Unable to download media:", error);
 
-      /*
-       * Fallback for servers that block fetch requests.
-       */
       window.open(currentMedia.mediaUrl, "_blank", "noopener,noreferrer");
     } finally {
       setIsDownloading(false);
@@ -220,11 +237,9 @@ const MediaViewer = ({
   };
 
   /*
-   * MOBILE / TABLET EDIT
-   *
-   * Only images and GIF-like image media should enter PhotoPreview.
-   * Video editing is not sent into the photo editor.
+   * EDIT MODE
    */
+
   const openEditor = () => {
     if (!currentMedia) {
       return;
@@ -235,22 +250,69 @@ const MediaViewer = ({
     }
 
     setActiveEditTool(null);
+
     setIsEditing(true);
   };
 
   const closeEditor = () => {
+    if (isSendingEdited) {
+      return;
+    }
+
     setIsEditing(false);
     setActiveEditTool(null);
   };
 
   /*
+   * SEND EDITED PHOTO
+   *
+   * This is the important fix.
+   *
+   * We await Chat.jsx's sendCameraPhoto.
+   *
+   * sendCameraPhoto immediately inserts the local blob
+   * as an optimistic message, so the edited image appears
+   * in the chat immediately.
+   */
+
+  const handleSendEditedPhoto = async (editedBlob) => {
+    if (!editedBlob || isSendingEdited) {
+      return false;
+    }
+
+    try {
+      setIsSendingEdited(true);
+
+      const didSend = await onSendEditedPhoto?.({
+        blob: editedBlob,
+        caption: "",
+      });
+
+      if (!didSend) {
+        return false;
+      }
+
+      setIsEditing(false);
+      setActiveEditTool(null);
+
+      onClose?.();
+
+      return true;
+    } catch (error) {
+      console.error("Unable to send edited photo:", error);
+
+      return false;
+    } finally {
+      setIsSendingEdited(false);
+    }
+  };
+
+  /*
    * KEYBOARD CONTROLS
    */
+
   useEffect(() => {
     const handleKeyDown = (event) => {
-      /*
-       * Escape exits editing first.
-       */
       if (event.key === "Escape" && isEditing) {
         closeEditor();
         return;
@@ -276,11 +338,12 @@ const MediaViewer = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [currentIndex, mediaItems.length, isEditing, onClose]);
+  }, [currentIndex, mediaItems.length, isEditing, isSendingEdited, onClose]);
 
   /*
-   * LOCK BACKGROUND SCROLLING
+   * LOCK BACKGROUND SCROLL
    */
+
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
 
@@ -297,15 +360,10 @@ const MediaViewer = ({
 
   /*
    * =========================================================
-   * MOBILE / TABLET EDIT MODE
-   *
-   * We reuse the existing PhotoPreview component instead of
-   * building another editor.
-   *
-   * The viewer itself remains underneath this mode logically.
-   * Closing the editor returns to the media viewer.
+   * EDIT MODE
    * =========================================================
    */
+
   if (isEditing && currentMedia.type !== "video") {
     return createPortal(
       <div className="fixed inset-0 z-[300] bg-black lg:hidden">
@@ -316,19 +374,17 @@ const MediaViewer = ({
           onClose={closeEditor}
           onDownload={handleDownload}
           onRetake={closeEditor}
-          onSend={() => {
-            /*
-             * This media already exists in chat.
-             *
-             * For now, returning from editing must not accidentally
-             * resend or duplicate the existing message.
-             */
-            closeEditor();
-          }}
+          onSend={handleSendEditedPhoto}
           recipientName={senderName}
           photoCaption=""
           onCaptionChange={() => {}}
-          downloadMessage={isDownloading ? "Downloading..." : ""}
+          downloadMessage={
+            isSendingEdited
+              ? "Sending..."
+              : isDownloading
+                ? "Downloading..."
+                : ""
+          }
         />
       </div>,
       document.body,
@@ -338,33 +394,31 @@ const MediaViewer = ({
   return createPortal(
     <div className="fixed inset-0 z-[200] bg-black">
       {/* =====================================================
-          MOBILE + TABLET VIEW
-          < lg
-
-          COMPLETELY SEPARATE FROM DESKTOP.
+          MOBILE / TABLET
       ===================================================== */}
 
       <div className="flex h-full w-full flex-col overflow-hidden bg-[#101010] lg:hidden">
-        {/* =================================================
-            MOBILE HEADER
-        ================================================= */}
+        {/* MOBILE HEADER */}
 
         <div className="shrink-0 border-b border-white/10 px-3 pb-3 pt-[max(12px,env(safe-area-inset-top))]">
-          {/* BACK */}
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="mb-3 flex h-10 w-10 items-center justify-center rounded-full text-white transition active:scale-95"
-            aria-label="Back"
-          >
-            <FiArrowLeft className="text-[23px]" />
-          </button>
-
           <div className="flex items-center justify-between gap-3">
-            {/* SENDER */}
+            {/* LEFT SIDE:
+                BACK + AVATAR + NAME */}
 
             <div className="flex min-w-0 flex-1 items-center gap-3">
+              {/* BACK BUTTON BESIDE AVATAR */}
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition active:scale-95"
+                aria-label="Back"
+              >
+                <FiArrowLeft className="text-[23px]" />
+              </button>
+
+              {/* AVATAR */}
+
               {sender?.profilePic ? (
                 <img
                   src={sender.profilePic}
@@ -380,6 +434,8 @@ const MediaViewer = ({
                 </div>
               )}
 
+              {/* NAME + TIME */}
+
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-white">
                   {senderName}
@@ -394,8 +450,6 @@ const MediaViewer = ({
             {/* ACTIONS */}
 
             <div className="flex shrink-0 items-center gap-2">
-              {/* EDIT */}
-
               {currentMedia.type !== "video" ? (
                 <button
                   type="button"
@@ -406,8 +460,6 @@ const MediaViewer = ({
                   <FiEdit3 className="text-[20px]" />
                 </button>
               ) : null}
-
-              {/* DOWNLOAD */}
 
               <button
                 type="button"
@@ -422,12 +474,10 @@ const MediaViewer = ({
           </div>
         </div>
 
-        {/* =================================================
-            MOBILE MEDIA AREA
-        ================================================= */}
+        {/* MOBILE MEDIA */}
 
         <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden px-4 py-5">
-          <MediaZoomSurface>
+          <MediaZoomSurface onSwipeLeft={goNext} onSwipeRight={goPrevious}>
             <div className="relative h-full w-full">
               {currentMedia.type === "video" ? (
                 <video
@@ -449,39 +499,9 @@ const MediaViewer = ({
               )}
             </div>
           </MediaZoomSurface>
-
-          {/* PREVIOUS */}
-
-          {hasPrevious ? (
-            <button
-              type="button"
-              onClick={goPrevious}
-              className="absolute left-5 top-1/2 z-[60] hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white shadow-xl backdrop-blur-xl transition hover:bg-black/60 active:scale-95 lg:flex"
-              aria-label="Previous media"
-            >
-              <FiChevronLeft className="text-2xl" />
-            </button>
-          ) : null}
-
-          {/* NEXT */}
-
-          {hasNext ? (
-            <button
-              type="button"
-              onClick={goNext}
-              className="absolute right-5 top-1/2 z-[60] hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white shadow-xl backdrop-blur-xl transition hover:bg-black/60 active:scale-95 lg:flex"
-              aria-label="Next media"
-            >
-              <FiChevronRight className="text-2xl" />
-            </button>
-          ) : null}
         </div>
 
-        {/* =================================================
-            MOBILE REPLY BAR
-
-            Exactly the bottom action area requested.
-        ================================================= */}
+        {/* MOBILE REPLY */}
 
         <div className="shrink-0 border-t border-white/10 bg-[#101010] px-4 pb-[max(10px,env(safe-area-inset-bottom))] pt-2">
           <button
@@ -498,16 +518,11 @@ const MediaViewer = ({
       </div>
 
       {/* =====================================================
-          DESKTOP VIEW
-          lg+
-
-          THIS PRESERVES THE EXISTING LAPTOP/DESKTOP LAYOUT.
+          DESKTOP
       ===================================================== */}
 
       <div className="hidden h-full w-full lg:block">
-        {/* =====================================================
-            HEADER
-        ===================================================== */}
+        {/* HEADER */}
 
         <div className="absolute inset-x-0 top-0 z-[100] flex items-center justify-between border-b border-white/10 bg-black/40 px-5 py-3 backdrop-blur-xl">
           {/* SENDER */}
@@ -539,11 +554,9 @@ const MediaViewer = ({
             </div>
           </div>
 
-          {/* DESKTOP TOOLS */}
+          {/* ACTIONS */}
 
           <div className="flex shrink-0 items-center gap-2">
-            {/* REPLY */}
-
             <button
               type="button"
               onClick={handleReply}
@@ -552,8 +565,6 @@ const MediaViewer = ({
             >
               <FiCornerUpLeft className="text-[19px]" />
             </button>
-
-            {/* DOWNLOAD */}
 
             <button
               type="button"
@@ -564,8 +575,6 @@ const MediaViewer = ({
             >
               <FiDownload className="text-[20px]" />
             </button>
-
-            {/* CLOSE */}
 
             <button
               type="button"
@@ -578,14 +587,10 @@ const MediaViewer = ({
           </div>
         </div>
 
-        {/* =====================================================
-            DESKTOP MEDIA VIEWPORT
-
-            ONLY THIS AREA ZOOMS.
-        ===================================================== */}
+        {/* MEDIA */}
 
         <div className="absolute inset-0 z-10 flex items-center justify-center px-20 pb-24 pt-20">
-          <MediaZoomSurface>
+          <MediaZoomSurface onSwipeLeft={goNext} onSwipeRight={goPrevious}>
             <div className="relative h-full w-full">
               {currentMedia.type === "video" ? (
                 <video
@@ -678,14 +683,12 @@ const MediaViewer = ({
         ) : null}
       </div>
 
-      {/* =====================================================
-          DOWNLOAD STATUS
-      ===================================================== */}
+      {/* DOWNLOAD / SEND STATUS */}
 
-      {isDownloading ? (
+      {isDownloading || isSendingEdited ? (
         <div className="pointer-events-none absolute left-1/2 top-20 z-[400] -translate-x-1/2">
           <div className="rounded-full border border-white/10 bg-black/70 px-4 py-2 text-sm text-white shadow-xl backdrop-blur-xl">
-            Downloading...
+            {isSendingEdited ? "Sending..." : "Downloading..."}
           </div>
         </div>
       ) : null}
