@@ -14,6 +14,7 @@ import {
 
 import MediaZoomSurface from "./MediaZoomSurface.jsx";
 import PhotoPreview from "./PhotoPreview.jsx";
+import VideoPreview from "./VideoPreview.jsx";
 
 const getInitials = (person) => {
   if (!person) {
@@ -81,6 +82,7 @@ const MediaViewer = ({
   onClose,
   onReply,
   onSendEditedPhoto,
+  onSendEditedVideo,
   currentUser,
   otherUser,
 }) => {
@@ -92,11 +94,11 @@ const MediaViewer = ({
 
   const [activeEditTool, setActiveEditTool] = useState(null);
 
-  /*
-   * Prevent multiple edited-photo sends.
-   */
-
   const [isSendingEdited, setIsSendingEdited] = useState(false);
+
+  const [videoBlob, setVideoBlob] = useState(null);
+
+  const [isLoadingEditor, setIsLoadingEditor] = useState(false);
 
   const currentMedia = mediaItems[currentIndex];
 
@@ -105,14 +107,20 @@ const MediaViewer = ({
   const hasNext = currentIndex < mediaItems.length - 1;
 
   /*
-   * Keep index valid if the media list changes.
-   */
+
+* Keep index valid if media list changes.
+  */
 
   useEffect(() => {
     if (currentIndex > mediaItems.length - 1) {
       setCurrentIndex(Math.max(0, mediaItems.length - 1));
     }
   }, [currentIndex, mediaItems.length]);
+
+  /*
+
+* Resolve sender.
+  */
 
   const sender = useMemo(() => {
     if (!currentMedia) {
@@ -140,13 +148,16 @@ const MediaViewer = ({
   const senderInitials = getInitials(sender);
 
   /*
-   * Reset editor state when changing media.
-   */
+
+* Reset editor state when changing media.
+  */
 
   useEffect(() => {
     setIsEditing(false);
     setActiveEditTool(null);
     setIsSendingEdited(false);
+    setVideoBlob(null);
+    setIsLoadingEditor(false);
   }, [currentIndex]);
 
   const goPrevious = () => {
@@ -166,8 +177,9 @@ const MediaViewer = ({
   };
 
   /*
-   * REPLY
-   */
+
+* REPLY
+  */
 
   const handleReply = () => {
     if (!currentMedia) {
@@ -180,8 +192,9 @@ const MediaViewer = ({
   };
 
   /*
-   * DOWNLOAD
-   */
+
+* DOWNLOAD
+  */
 
   const handleDownload = async () => {
     if (!currentMedia?.mediaUrl || isDownloading) {
@@ -222,6 +235,7 @@ const MediaViewer = ({
       document.body.appendChild(link);
 
       link.click();
+
       link.remove();
 
       window.setTimeout(() => {
@@ -237,21 +251,60 @@ const MediaViewer = ({
   };
 
   /*
-   * EDIT MODE
-   */
 
-  const openEditor = () => {
-    if (!currentMedia) {
-      return;
-    }
+* EDIT
+*
+* Images and GIFs use PhotoPreview.
+*
+* Videos are first fetched as a Blob because
+* VideoPreview's rendering pipeline requires
+* a real Blob/File rather than only a remote URL.
+  */
 
-    if (currentMedia.type === "video") {
+  const openEditor = async () => {
+    if (!currentMedia?.mediaUrl || isLoadingEditor) {
       return;
     }
 
     setActiveEditTool(null);
 
-    setIsEditing(true);
+    /*
+     * IMAGE / GIF
+     */
+
+    if (currentMedia.type === "image" || currentMedia.type === "gif") {
+      setIsEditing(true);
+
+      return;
+    }
+
+    /*
+     * VIDEO
+     */
+
+    if (currentMedia.type === "video") {
+      try {
+        setIsLoadingEditor(true);
+
+        const response = await fetch(currentMedia.mediaUrl);
+
+        if (!response.ok) {
+          throw new Error(
+            `Unable to load video with status ${response.status}`,
+          );
+        }
+
+        const blob = await response.blob();
+
+        setVideoBlob(blob);
+
+        setIsEditing(true);
+      } catch (error) {
+        console.error("Unable to prepare video for editing:", error);
+      } finally {
+        setIsLoadingEditor(false);
+      }
+    }
   };
 
   const closeEditor = () => {
@@ -261,19 +314,13 @@ const MediaViewer = ({
 
     setIsEditing(false);
     setActiveEditTool(null);
+    setVideoBlob(null);
   };
 
   /*
-   * SEND EDITED PHOTO
-   *
-   * This is the important fix.
-   *
-   * We await Chat.jsx's sendCameraPhoto.
-   *
-   * sendCameraPhoto immediately inserts the local blob
-   * as an optimistic message, so the edited image appears
-   * in the chat immediately.
-   */
+
+* SEND EDITED IMAGE / GIF
+  */
 
   const handleSendEditedPhoto = async (editedBlob) => {
     if (!editedBlob || isSendingEdited) {
@@ -283,13 +330,6 @@ const MediaViewer = ({
     try {
       setIsSendingEdited(true);
 
-      /*
-       * Close the editor/viewer immediately.
-       *
-       * Chat.jsx will handle the optimistic
-       * sending message exactly like normal photos.
-       */
-
       setIsEditing(false);
       setActiveEditTool(null);
 
@@ -298,11 +338,12 @@ const MediaViewer = ({
       const didSend = await onSendEditedPhoto?.({
         blob: editedBlob,
         caption: "",
+        type: currentMedia.type,
       });
 
       return Boolean(didSend);
     } catch (error) {
-      console.error("Unable to send edited photo:", error);
+      console.error("Unable to send edited image:", error);
 
       return false;
     } finally {
@@ -311,23 +352,66 @@ const MediaViewer = ({
   };
 
   /*
-   * KEYBOARD CONTROLS
-   */
+
+* SEND EDITED VIDEO
+  */
+
+  const handleSendEditedVideo = async ({
+    blob,
+    caption = "",
+    muted = false,
+  }) => {
+    if (!blob || isSendingEdited) {
+      return false;
+    }
+
+    try {
+      setIsSendingEdited(true);
+
+      setIsEditing(false);
+      setActiveEditTool(null);
+      setVideoBlob(null);
+
+      onClose?.();
+
+      const didSend = await onSendEditedVideo?.({
+        blob,
+        caption,
+        muted,
+      });
+
+      return Boolean(didSend);
+    } catch (error) {
+      console.error("Unable to send edited video:", error);
+
+      return false;
+    } finally {
+      setIsSendingEdited(false);
+    }
+  };
+
+  /*
+
+* KEYBOARD CONTROLS
+  */
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape" && isEditing) {
         closeEditor();
+
         return;
       }
 
       if (event.key === "Escape") {
         onClose?.();
+
         return;
       }
 
       if (event.key === "ArrowLeft") {
         goPrevious();
+
         return;
       }
 
@@ -344,8 +428,9 @@ const MediaViewer = ({
   }, [currentIndex, mediaItems.length, isEditing, isSendingEdited, onClose]);
 
   /*
-   * LOCK BACKGROUND SCROLL
-   */
+
+* LOCK BACKGROUND SCROLL
+  */
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -362,49 +447,96 @@ const MediaViewer = ({
   }
 
   /*
-   * =========================================================
-   * EDIT MODE
-   * =========================================================
-   */
 
-  if (isEditing && currentMedia.type !== "video") {
-    return createPortal(
-      <div className="fixed inset-0 z-[300] bg-black lg:hidden">
-        <PhotoPreview
-          photoUrl={currentMedia.mediaUrl}
-          activeTool={activeEditTool}
-          onToolChange={setActiveEditTool}
-          onClose={closeEditor}
-          onDownload={handleDownload}
-          onRetake={closeEditor}
-          onSend={handleSendEditedPhoto}
-          recipientName={senderName}
-          photoCaption=""
-          onCaptionChange={() => {}}
-          downloadMessage={isDownloading ? "Downloading..." : ""}
-        />
-      </div>,
-      document.body,
-    );
+* =========================================================
+* EDIT MODE
+* =========================================================
+  */
+
+  if (isEditing) {
+    /*
+     * VIDEO EDITOR
+     */
+
+    if (currentMedia.type === "video" && videoBlob) {
+      return createPortal(
+        <div className="fixed inset-0 z-[300] bg-black">
+          <VideoPreview
+            videoUrl={currentMedia.mediaUrl}
+            videoBlob={videoBlob}
+            activeTool={activeEditTool}
+            onToolChange={setActiveEditTool}
+            onClose={closeEditor}
+            onDownload={handleDownload}
+            onRetake={closeEditor}
+            onSend={handleSendEditedVideo}
+            recipientName={senderName}
+            videoCaption=""
+            onCaptionChange={() => {}}
+            downloadMessage={isDownloading ? "Downloading..." : ""}
+          />
+        </div>,
+        document.body,
+      );
+    }
+
+    /*
+     * IMAGE / GIF EDITOR
+     */
+
+    if (currentMedia.type === "image" || currentMedia.type === "gif") {
+      return createPortal(
+        <div className="fixed inset-0 z-[300] bg-black">
+          <PhotoPreview
+            photoUrl={currentMedia.mediaUrl}
+            activeTool={activeEditTool}
+            onToolChange={setActiveEditTool}
+            onClose={closeEditor}
+            onDownload={handleDownload}
+            onRetake={closeEditor}
+            onSend={handleSendEditedPhoto}
+            recipientName={senderName}
+            photoCaption=""
+            onCaptionChange={() => {}}
+            downloadMessage={isDownloading ? "Downloading..." : ""}
+          />
+        </div>,
+        document.body,
+      );
+    }
   }
+
+  /*
+
+* Edit button rules.
+*
+* MOBILE / TABLET:
+* GIF + VIDEO
+*
+* DESKTOP:
+* GIF + VIDEO
+*
+* Normal images deliberately do NOT receive
+* an edit button in the media viewer.
+  */
+
+  const canEditMedia =
+    currentMedia.type === "gif" || currentMedia.type === "video";
 
   return createPortal(
     <div className="fixed inset-0 z-[200] bg-black">
       {/* =====================================================
-          MOBILE / TABLET
-      ===================================================== */}
+MOBILE / TABLET
+===================================================== */}
 
       <div className="flex h-full w-full flex-col overflow-hidden bg-[#101010] lg:hidden">
         {/* MOBILE HEADER */}
 
         <div className="shrink-0 border-b border-white/10 px-3 pb-3 pt-[max(12px,env(safe-area-inset-top))]">
           <div className="flex items-center justify-between gap-3">
-            {/* LEFT SIDE:
-                BACK + AVATAR + NAME */}
+            {/* LEFT SIDE */}
 
             <div className="flex min-w-0 flex-1 items-center gap-3">
-              {/* BACK BUTTON BESIDE AVATAR */}
-
               <button
                 type="button"
                 onClick={onClose}
@@ -413,8 +545,6 @@ const MediaViewer = ({
               >
                 <FiArrowLeft className="text-[23px]" />
               </button>
-
-              {/* AVATAR */}
 
               {sender?.profilePic ? (
                 <img
@@ -431,8 +561,6 @@ const MediaViewer = ({
                 </div>
               )}
 
-              {/* NAME + TIME */}
-
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-white">
                   {senderName}
@@ -447,14 +575,19 @@ const MediaViewer = ({
             {/* ACTIONS */}
 
             <div className="flex shrink-0 items-center gap-2">
-              {currentMedia.type !== "video" ? (
+              {canEditMedia ? (
                 <button
                   type="button"
                   onClick={openEditor}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition active:scale-95"
+                  disabled={isLoadingEditor}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition active:scale-95 disabled:opacity-50"
                   aria-label="Edit media"
                 >
-                  <FiEdit3 className="text-[20px]" />
+                  {isLoadingEditor ? (
+                    <span className="text-sm font-bold">...</span>
+                  ) : (
+                    <FiEdit3 className="text-[20px]" />
+                  )}
                 </button>
               ) : null}
 
@@ -515,8 +648,8 @@ const MediaViewer = ({
       </div>
 
       {/* =====================================================
-          DESKTOP
-      ===================================================== */}
+      DESKTOP
+  ===================================================== */}
 
       <div className="hidden h-full w-full lg:block">
         {/* HEADER */}
@@ -680,7 +813,7 @@ const MediaViewer = ({
         ) : null}
       </div>
 
-      {/* DOWNLOAD / SEND STATUS */}
+      {/* DOWNLOAD STATUS */}
 
       {isDownloading ? (
         <div className="pointer-events-none absolute left-1/2 top-20 z-[400] -translate-x-1/2">
