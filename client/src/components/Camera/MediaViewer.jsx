@@ -283,21 +283,24 @@ const MediaViewer = ({
     try {
       setIsSendingEdited(true);
 
-      const didSend = await onSendEditedPhoto?.({
-        blob: editedBlob,
-        caption: "",
-      });
-
-      if (!didSend) {
-        return false;
-      }
+      /*
+       * Close the editor/viewer immediately.
+       *
+       * Chat.jsx will handle the optimistic
+       * sending message exactly like normal photos.
+       */
 
       setIsEditing(false);
       setActiveEditTool(null);
 
       onClose?.();
 
-      return true;
+      const didSend = await onSendEditedPhoto?.({
+        blob: editedBlob,
+        caption: "",
+      });
+
+      return Boolean(didSend);
     } catch (error) {
       console.error("Unable to send edited photo:", error);
 
@@ -378,13 +381,7 @@ const MediaViewer = ({
           recipientName={senderName}
           photoCaption=""
           onCaptionChange={() => {}}
-          downloadMessage={
-            isSendingEdited
-              ? "Sending..."
-              : isDownloading
-                ? "Downloading..."
-                : ""
-          }
+          downloadMessage={isDownloading ? "Downloading..." : ""}
         />
       </div>,
       document.body,
@@ -685,10 +682,10 @@ const MediaViewer = ({
 
       {/* DOWNLOAD / SEND STATUS */}
 
-      {isDownloading || isSendingEdited ? (
+      {isDownloading ? (
         <div className="pointer-events-none absolute left-1/2 top-20 z-[400] -translate-x-1/2">
           <div className="rounded-full border border-white/10 bg-black/70 px-4 py-2 text-sm text-white shadow-xl backdrop-blur-xl">
-            {isSendingEdited ? "Sending..." : "Downloading..."}
+            Downloading...
           </div>
         </div>
       ) : null}
