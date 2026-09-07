@@ -127,10 +127,7 @@ const Chat = ({ socket }) => {
     setFirstNewMessageId(firstMessageId);
   };
 
-  /* =========================================================
-     CLEAR UNREAD MESSAGES
-  ========================================================= */
-
+  // CLEAR UNREAD MESSAGES
   const clearUnreadMessages = async () => {
     if (!selectedChat?._id || isClearingUnreadRef.current) {
       return;
@@ -215,10 +212,7 @@ const Chat = ({ socket }) => {
     setShowScrollToBottom(!isNearBottom);
   };
 
-  /* =========================================================
-     CAMERA
-  ========================================================= */
-
+  // CAMERA
   const openCamera = () => {
     setShowMediaPicker(false);
     setShowCameraModal(true);
@@ -234,10 +228,7 @@ const Chat = ({ socket }) => {
     console.log("Gallery opened");
   };
 
-  /* =========================================================
-     REPLY
-  ========================================================= */
-
+  // REPLY
   const startReply = (selectedMessage) => {
     setReplyingTo(selectedMessage);
 
@@ -308,18 +299,12 @@ const Chat = ({ socket }) => {
       String(currentMessage._id) === String(mediaViewerMessageId),
   );
 
-  /* =========================================================
-     JUMP TO NEW MESSAGES
-  ========================================================= */
-
+  // JUMP TO NEW MESSAGES
   const jumpToNewMessages = () => {
     scrollToBottom("smooth");
   };
 
-  /* =========================================================
-     REDUX CHAT UPDATES
-  ========================================================= */
-
+  // REDUX CHAT UPDATES
   const updateChatInRedux = (updatedChat) => {
     if (!updatedChat) {
       return;
@@ -351,10 +336,7 @@ const Chat = ({ socket }) => {
     dispatch(setSelectedChat(updatedChat));
   };
 
-  /* =========================================================
-     SEND TEXT MESSAGE
-  ========================================================= */
-
+  // SEND TEXT MESSAGE
   const sendMessage = async () => {
     const messageText = message.trim();
 
@@ -420,10 +402,7 @@ const Chat = ({ socket }) => {
     }
   };
 
-  /* =========================================================
-     SEND GIF
-  ========================================================= */
-
+  // SEND GIF
   const sendGifMessage = async (gif) => {
     if (!gif || !selectedChat?._id || isSending) {
       return;
@@ -481,19 +460,8 @@ const Chat = ({ socket }) => {
     }
   };
 
-  /* =========================================================
-     SEND CAMERA PHOTO
-  ========================================================= */
-
+  // SEND CAMERA PHOTO
   const sendCameraPhoto = async (photoData) => {
-    console.log("📸 CHAT RECEIVED PHOTO DATA:", {
-      photoData,
-      blob: photoData?.blob,
-      blobType: photoData?.blob?.type,
-      blobSize: photoData?.blob?.size,
-      caption: photoData?.caption,
-      isSending,
-    });
 
     if (!photoData?.blob || !selectedChat?._id || isSending) {
       console.log("📸 PHOTO SEND REJECTED:", {
@@ -615,12 +583,6 @@ const Chat = ({ socket }) => {
   };
 
   const sendCameraVideo = async (videoData) => {
-    console.log("🎥 SEND VIDEO START", {
-      videoData,
-      blob: videoData?.blob,
-      blobType: videoData?.blob?.type,
-      blobSize: videoData?.blob?.size,
-    });
 
     if (!videoData?.blob || !selectedChat?._id || isSending) {
       return;
@@ -740,10 +702,7 @@ const Chat = ({ socket }) => {
     }
   };
 
-  /* =========================================================
-     FETCH MESSAGES
-  ========================================================= */
-
+  // FETCH MESSAGES
   const getMessages = async () => {
     if (!selectedChat?._id) {
       return;
@@ -768,10 +727,7 @@ const Chat = ({ socket }) => {
     }
   };
 
-  /* =========================================================
-     TYPING
-  ========================================================= */
-
+  // TYPING
   const handleMessageChange = (event) => {
     const value = event.target.value;
 
@@ -820,10 +776,7 @@ const Chat = ({ socket }) => {
     }
   };
 
-  /* =========================================================
-     RESET WHEN CHAT CHANGES
-  ========================================================= */
-
+  // RESET WHEN CHAT CHANGES
   useEffect(() => {
     hasInitialScrolledRef.current = false;
     isNearBottomRef.current = true;
@@ -840,10 +793,7 @@ const Chat = ({ socket }) => {
     setReplyingTo(null);
   }, [selectedChat?._id]);
 
-  /* =========================================================
-     LOAD CHAT
-  ========================================================= */
-
+  // LOAD CHAT
   useEffect(() => {
     if (!selectedChat?._id) {
       return;
@@ -866,10 +816,7 @@ const Chat = ({ socket }) => {
     });
   }, [isSending, selectedChat?._id, showMediaPicker, showCameraModal]);
 
-  /* =========================================================
-     INITIAL POSITION
-  ========================================================= */
-
+  // INITIAL POSITION
   useEffect(() => {
     if (
       !selectedChat?._id ||
@@ -965,10 +912,7 @@ const Chat = ({ socket }) => {
     });
   }, [selectedChat?._id, allMessages.length]);
 
-  /* =========================================================
-     KEEP BOTTOM STABLE WHEN MEDIA LOADS
-  ========================================================= */
-
+  // KEEP BOTTOM STABLE WHEN MEDIA LOADS
   useEffect(() => {
     if (
       !selectedChat?._id ||
@@ -989,10 +933,7 @@ const Chat = ({ socket }) => {
     });
   }, [allMessages]);
 
-  /* =========================================================
-     HANDLE NEW MESSAGES + SCROLLING
-  ========================================================= */
-
+  // HANDLE NEW MESSAGES + SCROLLING
   useEffect(() => {
     if (!hasInitialScrolledRef.current) {
       return;
@@ -1093,10 +1034,7 @@ const Chat = ({ socket }) => {
     });
   }, [allMessages, user?._id]);
 
-  /* =========================================================
-     SOCKET: RECEIVE MESSAGE
-  ========================================================= */
-
+  // SOCKET: RECEIVE MESSAGE
   useEffect(() => {
     const handleReceiveMessage = (data) => {
       if (
@@ -1145,10 +1083,7 @@ const Chat = ({ socket }) => {
     });
   }, [socket, selectedChat?._id]);
 
-  /* =========================================================
-     SOCKET: MESSAGES READ
-  ========================================================= */
-
+  // SOCKET: MESSAGES READ
   useEffect(() => {
     const handleMessagesRead = (data) => {
       if (String(data.chatId) !== String(selectedChat?._id)) {
@@ -1179,10 +1114,7 @@ const Chat = ({ socket }) => {
     });
   }, [socket, selectedChat?._id, user?._id]);
 
-  /* =========================================================
-     CLEANUP
-  ========================================================= */
-
+  // CLEANUP
   useEffect(() => {
     return () => {
       clearTimeout(typingTimeout.current);
@@ -1208,10 +1140,7 @@ const Chat = ({ socket }) => {
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
-      {/* =====================================================
-          CHAT HEADER
-      ===================================================== */}
-
+      {/* CHAT HEADER */}
       <div className="mb-4 flex shrink-0 items-center border-b border-[#d8f45a]/15 px-2 py-3 sm:mb-5 sm:px-4">
         <button
           type="button"
@@ -1247,9 +1176,7 @@ const Chat = ({ socket }) => {
         </div>
       </div>
 
-      {/* =====================================================
-          CHAT MESSAGES
-      ===================================================== */}
+      {/* CHAT MESSAGES */}
 
       <div
         ref={messagesContainerRef}
@@ -1412,10 +1339,7 @@ const Chat = ({ socket }) => {
         </div>
       </div>
 
-      {/* =====================================================
-          MESSAGE INPUT
-      ===================================================== */}
-
+      {/* MESSAGE INPUT */}
       <div className="mt-4 shrink-0 sm:mt-5">
         <ReplyPreview
           message={replyingTo}

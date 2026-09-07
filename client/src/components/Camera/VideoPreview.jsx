@@ -34,6 +34,31 @@ const VideoPreview = ({
       return;
     }
 
+    const hasEdits =
+      videoTexts.length > 0 ||
+      videoDoodles.length > 0;
+
+    /*
+     * Untouched videos must keep their original blob.
+     *
+     * Do not send them through the canvas/MediaRecorder
+     * rendering pipeline.
+     */
+
+    if (!hasEdits) {
+      onSend?.({
+        blob: videoBlob,
+        caption: videoCaption.trim(),
+        muted: isMuted,
+      });
+
+      return;
+    }
+
+    /*
+     * Only edited videos need to be rendered again.
+     */
+
     setIsProcessing(true);
 
     try {
@@ -51,7 +76,10 @@ const VideoPreview = ({
     } catch (error) {
       console.error("Unable to render video overlays:", error);
 
-      // Fallback: still send the original video.
+      /*
+       * Fallback to the original video rather than failing.
+       */
+
       onSend?.({
         blob: videoBlob,
         caption: videoCaption.trim(),
@@ -111,24 +139,24 @@ const VideoPreview = ({
 
         {!isTextEditing
           ? videoTexts.map((text) => (
-              <VideoTextBlock
-                key={text.id}
-                text={text}
-                onPositionChange={(x, y) => {
-                  setVideoTexts((previous) =>
-                    previous.map((item) =>
-                      item.id === text.id
-                        ? {
-                            ...item,
-                            x,
-                            y,
-                          }
-                        : item,
-                    ),
-                  );
-                }}
-              />
-            ))
+            <VideoTextBlock
+              key={text.id}
+              text={text}
+              onPositionChange={(x, y) => {
+                setVideoTexts((previous) =>
+                  previous.map((item) =>
+                    item.id === text.id
+                      ? {
+                        ...item,
+                        x,
+                        y,
+                      }
+                      : item,
+                  ),
+                );
+              }}
+            />
+          ))
           : null}
       </div>
 
@@ -469,8 +497,8 @@ const renderVideoWithOverlays = ({ videoBlob, texts, doodles }) => {
 
         const recorder = mimeType
           ? new MediaRecorder(combinedStream, {
-              mimeType,
-            })
+            mimeType,
+          })
           : new MediaRecorder(combinedStream);
 
         const chunks = [];

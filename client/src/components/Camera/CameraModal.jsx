@@ -744,10 +744,7 @@ const CameraModal = ({
           />
         ) : null}
 
-        {/* ===================================================== */}
-        {/* VIDEO PREVIEW                                         */}
-        {/* ===================================================== */}
-
+        {/* VIDEO PREVIEW */}       
         {showingRecordedVideo ? (
           <VideoPreview
             videoUrl={recordedVideoUrl}
@@ -774,10 +771,7 @@ const CameraModal = ({
           />
         ) : null}
 
-        {/* ===================================================== */}
-        {/* LIVE CAMERA                                           */}
-        {/* ===================================================== */}
-
+        {/* LIVE CAMERA */}
         {!showingPreview ? (
           <div className="relative h-full min-h-0 w-full overflow-hidden bg-black">
             {/* CAMERA */}
@@ -805,10 +799,7 @@ const CameraModal = ({
               </div>
             )}
 
-            {/* ================================================= */}
-            {/* TOP CAMERA CONTROLS                              */}
-            {/* ================================================= */}
-
+            {/* TOP CAMERA CONTROLS */}
             <div className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-5 pt-[max(16px,env(safe-area-inset-top))]">
               {/* CLOSE */}
 
@@ -868,10 +859,7 @@ const CameraModal = ({
               ) : null}
             </div>
 
-            {/* ================================================= */}
-            {/* BOTTOM CAMERA CONTROLS                           */}
-            {/* ================================================= */}
-
+            {/* BOTTOM CAMERA CONTROLS */}
             <div className="absolute inset-x-0 bottom-0 z-30 px-5 pb-[max(12px,env(safe-area-inset-bottom))] pt-20">
               {/* GRADIENT */}
 

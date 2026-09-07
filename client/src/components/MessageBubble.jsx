@@ -1,5 +1,9 @@
 import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
-import { FiCornerUpLeft, FiCornerUpRight } from "react-icons/fi";
+import {
+  FiCornerUpLeft,
+  FiCornerUpRight,
+  FiPlay,
+} from "react-icons/fi";
 
 import { formatMessageTime } from "../utils/messageDate.js";
 import ReplyMessage from "./ReplyMessage.jsx";
@@ -47,9 +51,8 @@ const MessageBubble = ({
 
   return (
     <div
-      className={`group relative flex w-full items-center gap-2 overflow-hidden rounded-xl transition-all duration-300 ${
-        isMyMessage ? "justify-end" : "justify-start"
-      } ${isHighlighted ? "message-row-highlight" : ""}`}
+      className={`group relative flex w-full items-center gap-2 overflow-hidden rounded-xl transition-all duration-300 ${isMyMessage ? "justify-end" : "justify-start"
+        } ${isHighlighted ? "message-row-highlight" : ""}`}
     >
       {/* REPLY BUTTON — RECEIVED MESSAGE */}
 
@@ -80,15 +83,13 @@ const MessageBubble = ({
         }}
       >
         <div
-          className={`w-fit max-w-full break-words ${
-            isMedia
-              ? ""
-              : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                  isMyMessage
-                    ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
-                    : "rounded-bl-sm border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
-                }`
-          }`}
+          className={`w-fit max-w-full break-words ${isMedia
+            ? ""
+            : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMyMessage
+              ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
+              : "rounded-bl-sm border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
+            }`
+            }`}
         >
           {/* REPLIED MESSAGE PREVIEW */}
 
@@ -106,20 +107,18 @@ const MessageBubble = ({
 
           {isMedia ? (
             <div
-              className={`overflow-hidden rounded-xl ${
-                isImage && message.text?.trim()
-                  ? isMyMessage
-                    ? "border border-[#d8f164]"
-                    : "border border-[#18221a]"
-                  : ""
-              }`}
+              className={`overflow-hidden rounded-xl ${isImage && message.text?.trim()
+                ? isMyMessage
+                  ? "border border-[#d8f164]"
+                  : "border border-[#18221a]"
+                : ""
+                }`}
             >
               <div
                 role="button"
                 tabIndex={message.isUploading ? -1 : 0}
-                className={`relative ${
-                  message.isUploading ? "cursor-default" : "cursor-pointer"
-                }`}
+                className={`relative ${message.isUploading ? "cursor-default" : "cursor-pointer"
+                  }`}
                 onClick={(event) => {
                   event.stopPropagation();
 
@@ -141,28 +140,35 @@ const MessageBubble = ({
                 }}
               >
                 {isVideo ? (
-                  <video
-                    src={message.mediaUrl}
-                    muted
-                    playsInline
-                    preload="metadata"
-                    className={`block max-h-72 max-w-full cursor-pointer rounded-xl object-cover transition-all duration-300 ${
-                      message.isUploading ? "scale-[1.01]" : "scale-100"
-                    }`}
-                  />
+                  <>
+                    <video
+                      src={message.mediaUrl}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      className={`block max-h-72 max-w-full cursor-pointer rounded-xl object-cover transition-all duration-300 ${message.isUploading ? "scale-[1.01]" : "scale-100"
+                        }`}
+                    />
+
+                    {!message.isUploading ? (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#090909] text-white shadow-xl backdrop-blur-md">
+                          <FiPlay className="ml-1 text-2xl" />
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
                 ) : (
                   <img
                     src={message.mediaUrl}
                     alt={isGif ? "GIF" : "Image"}
-                    className={`block max-h-72 max-w-full cursor-pointer object-cover transition-all duration-300 ${
-                      isImage && message.text?.trim()
+                    className={`block max-h-72 max-w-full cursor-pointer object-cover transition-all duration-300 ${isImage && message.text?.trim()
                         ? "rounded-t-[11px]"
                         : "rounded-xl"
-                    } ${message.isUploading ? "scale-[1.01]" : "scale-100"}`}
+                      } ${message.isUploading ? "scale-[1.01]" : "scale-100"}`}
                     loading="lazy"
                   />
                 )}
-
                 {/* OPEN HINT */}
 
                 {!message.isUploading ? (
@@ -176,11 +182,10 @@ const MessageBubble = ({
                 {/* UPLOAD OVERLAY */}
 
                 <div
-                  className={`absolute inset-0 z-10 transition-opacity duration-300 ${
-                    message.isUploading
-                      ? "opacity-100"
-                      : "pointer-events-none opacity-0"
-                  }`}
+                  className={`absolute inset-0 z-10 transition-opacity duration-300 ${message.isUploading
+                    ? "opacity-100"
+                    : "pointer-events-none opacity-0"
+                    }`}
                 >
                   <MediaUploadIndicator />
                 </div>
@@ -190,11 +195,10 @@ const MessageBubble = ({
 
               {isImage && message.text?.trim() && (
                 <div
-                  className={`px-3 pb-2.5 pt-2.5 text-sm leading-relaxed ${
-                    isMyMessage
-                      ? "bg-[#d8f164] text-[#10120d]"
-                      : "bg-[#18221a] text-[#f1eee8]"
-                  }`}
+                  className={`px-3 pb-2.5 pt-2.5 text-sm leading-relaxed ${isMyMessage
+                    ? "bg-[#d8f164] text-[#10120d]"
+                    : "bg-[#18221a] text-[#f1eee8]"
+                    }`}
                 >
                   <p className="whitespace-pre-wrap break-words">
                     {message.text}
@@ -213,11 +217,10 @@ const MessageBubble = ({
           {/* MESSAGE META */}
 
           <div
-            className={`flex items-center justify-end gap-1 text-[10px] leading-none ${
-              isMedia
-                ? "px-1 pt-1 text-[#aab3a8]"
-                : `mt-1 ${isMyMessage ? "text-[#10120d]/60" : "text-[#aab3a8]"}`
-            }`}
+            className={`flex items-center justify-end gap-1 text-[10px] leading-none ${isMedia
+              ? "px-1 pt-1 text-[#aab3a8]"
+              : `mt-1 ${isMyMessage ? "text-[#10120d]/60" : "text-[#aab3a8]"}`
+              }`}
           >
             <span>{messageTime}</span>
 

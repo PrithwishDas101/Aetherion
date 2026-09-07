@@ -446,18 +446,9 @@ const MediaViewer = ({
     return null;
   }
 
-  /*
-
-* =========================================================
-* EDIT MODE
-* =========================================================
-  */
-
+  /* EDIT MODE */
   if (isEditing) {
-    /*
-     * VIDEO EDITOR
-     */
-
+    /* VIDEO EDITOR */
     if (currentMedia.type === "video" && videoBlob) {
       return createPortal(
         <div className="fixed inset-0 z-[300] bg-black">
@@ -472,7 +463,7 @@ const MediaViewer = ({
             onSend={handleSendEditedVideo}
             recipientName={senderName}
             videoCaption=""
-            onCaptionChange={() => {}}
+            onCaptionChange={() => { }}
             downloadMessage={isDownloading ? "Downloading..." : ""}
           />
         </div>,
@@ -497,7 +488,7 @@ const MediaViewer = ({
             onSend={handleSendEditedPhoto}
             recipientName={senderName}
             photoCaption=""
-            onCaptionChange={() => {}}
+            onCaptionChange={() => { }}
             downloadMessage={isDownloading ? "Downloading..." : ""}
           />
         </div>,
@@ -525,9 +516,7 @@ const MediaViewer = ({
 
   return createPortal(
     <div className="fixed inset-0 z-[200] bg-black">
-      {/* =====================================================
-MOBILE / TABLET
-===================================================== */}
+      {/* MOBILE / TABLET */}
 
       <div className="flex h-full w-full flex-col overflow-hidden bg-[#101010] lg:hidden">
         {/* MOBILE HEADER */}
@@ -647,9 +636,7 @@ MOBILE / TABLET
         </div>
       </div>
 
-      {/* =====================================================
-      DESKTOP
-  ===================================================== */}
+      {/* DESKTOP */}
 
       <div className="hidden h-full w-full lg:block">
         {/* HEADER */}
@@ -783,11 +770,10 @@ MOBILE / TABLET
                     key={media._id || `${media.mediaUrl}-${index}`}
                     type="button"
                     onClick={() => setCurrentIndex(index)}
-                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition ${
-                      isActive
-                        ? "border-white"
-                        : "border-white/10 opacity-60 hover:opacity-100"
-                    }`}
+                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition ${isActive
+                      ? "border-white"
+                      : "border-white/10 opacity-60 hover:opacity-100"
+                      }`}
                     aria-label={`Open media ${index + 1}`}
                   >
                     {media.type === "video" ? (
