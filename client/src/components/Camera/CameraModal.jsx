@@ -59,9 +59,7 @@ const CameraModal = ({
 
   const isMobile = isMobileDevice();
 
-  /*
-   * CAMERA INITIALIZATION
-   */
+  // CAMERA INITIALIZATION
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -131,9 +129,7 @@ const CameraModal = ({
     };
   }, [isOpen, mode, facingMode, cameraRestartKey]);
 
-  /*
-   * RECORDING TIMER
-   */
+  //RECORDING TIMER
   useEffect(() => {
     if (!isRecording) {
       if (recordingTimerRef.current) {
@@ -156,9 +152,7 @@ const CameraModal = ({
     };
   }, [isRecording]);
 
-  /*
-   * CLEANUP PHOTO
-   */
+  // CLEANUP PHOTO
   const cleanupCapturedPhoto = () => {
     if (capturedPhotoUrl) {
       URL.revokeObjectURL(capturedPhotoUrl);
@@ -170,9 +164,7 @@ const CameraModal = ({
     setActivePhotoTool(null);
   };
 
-  /*
-   * CLEANUP VIDEO
-   */
+  // CLEANUP VIDEO
   const cleanupRecordedVideo = () => {
     if (recordedVideoUrl) {
       URL.revokeObjectURL(recordedVideoUrl);
@@ -184,9 +176,7 @@ const CameraModal = ({
     setActiveVideoTool(null);
   };
 
-  /*
-   * CLOSE CAMERA
-   */
+  // CLOSE CAMERA
   const closeCamera = () => {
     const recorder = mediaRecorderRef.current;
 
@@ -221,9 +211,7 @@ const CameraModal = ({
     onClose?.();
   };
 
-  /*
-   * CAMERA MODE
-   */
+  // CAMERA MODE
   const changeMode = (nextMode) => {
     if (
       nextMode === mode ||
@@ -246,9 +234,7 @@ const CameraModal = ({
     setMode(nextMode);
   };
 
-  /*
-   * SHUTTER
-   */
+  // SHUTTER
   const handleShutter = () => {
     if (!stream || isLoading || !isVideoReady) {
       return;
@@ -267,9 +253,7 @@ const CameraModal = ({
     startVideoRecording();
   };
 
-  /*
-   * CAMERA SWITCH
-   */
+  // CAMERA SWITCH
   const switchCamera = () => {
     if (
       !isMobile ||
@@ -292,9 +276,7 @@ const CameraModal = ({
     setFacingMode((previous) => (previous === "user" ? "environment" : "user"));
   };
 
-  /*
-   * GALLERY
-   */
+  // GALLERY
   const handleGallery = () => {
     if (isRecording || recordedVideoUrl || capturedPhotoUrl) {
       return;
@@ -303,9 +285,7 @@ const CameraModal = ({
     onGallery?.();
   };
 
-  /*
-   * TORCH
-   */
+  // TORCH
   const toggleTorch = async () => {
     if (
       !isMobile ||
@@ -330,9 +310,7 @@ const CameraModal = ({
     setIsTorchEnabled(nextState);
   };
 
-  /*
-   * PHOTO TOOL
-   */
+  // PHOTO TOOL
   const handlePhotoTool = (toolOrUpdater) => {
     setActivePhotoTool((previous) => {
       if (typeof toolOrUpdater === "function") {
@@ -343,9 +321,7 @@ const CameraModal = ({
     });
   };
 
-  /*
-   * VIDEO TOOL
-   */
+  // VIDEO TOOL
   const handleVideoTool = (toolOrUpdater) => {
     setActiveVideoTool((previous) => {
       if (typeof toolOrUpdater === "function") {
@@ -356,9 +332,7 @@ const CameraModal = ({
     });
   };
 
-  /*
-   * VIDEO RECORDING
-   */
+  // VIDEO RECORDING
   const startVideoRecording = () => {
     if (
       mode !== "video" ||
@@ -487,9 +461,7 @@ const CameraModal = ({
     recorder.stop();
   };
 
-  /*
-   * RETAKE PHOTO
-   */
+  // RETAKE PHOTO
   const retakePhoto = () => {
     cleanupCapturedPhoto();
 
@@ -501,9 +473,7 @@ const CameraModal = ({
     setCameraRestartKey((previous) => previous + 1);
   };
 
-  /*
-   * RETAKE VIDEO
-   */
+  // RETAKE VIDEO
   const retakeVideo = () => {
     cleanupRecordedVideo();
 
@@ -553,6 +523,7 @@ const CameraModal = ({
     }
   };
 
+  // DOWNLOAD VIDEO
   const downloadVideo = (videoBlob = recordedVideoBlob) => {
     if (!videoBlob) {
       return;
@@ -592,7 +563,6 @@ const CameraModal = ({
   };
 
   // SEND PHOTO
-
   const sendCapturedPhoto = (composedBlob) => {
     if (!composedBlob) {
       return;
@@ -606,9 +576,7 @@ const CameraModal = ({
     closeCamera();
   };
 
-  /*
-   * SEND VIDEO
-   */
+  // SEND VIDEO
   const sendRecordedVideo = () => {
     if (!recordedVideoBlob) {
       return;
@@ -622,22 +590,12 @@ const CameraModal = ({
     closeCamera();
   };
 
-  /*
-   * CAPTURE PHOTO
-   */
+  // CAPTURE PHOTO
   const capturePhoto = () => {
     if (mode !== "photo" || !stream || isLoading || !isVideoReady) {
       return;
     }
 
-    /*
-     * CameraPreview is now responsible for
-     * rendering the actual camera element.
-     *
-     * We still need access to that element
-     * when capturing the frame, so locate it
-     * from the modal DOM.
-     */
     const video = cameraPreviewRef.current;
 
     if (
@@ -660,10 +618,6 @@ const CameraModal = ({
       return;
     }
 
-    /*
-     * Mirror front camera photos so they
-     * behave like the preview.
-     */
     if (facingMode === "user") {
       context.translate(canvas.width, 0);
 
@@ -698,9 +652,7 @@ const CameraModal = ({
     );
   };
 
-  /*
-   * RECORDING TIME
-   */
+  // RECORDING TIME
   const formatRecordingTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
 
@@ -711,9 +663,7 @@ const CameraModal = ({
     ).padStart(2, "0")}`;
   };
 
-  /*
-   * GUARDS
-   */
+  // GUARDS
   if (!isOpen) {
     return null;
   }

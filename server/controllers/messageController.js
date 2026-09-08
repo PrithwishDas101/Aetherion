@@ -43,13 +43,6 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    /*
-     * GIFs can be either:
-     *
-     * 1. A normal GIF URL
-     * 2. An edited GIF uploaded as a file
-     */
-
     if (type === "gif" && !incomingMediaUrl && !uploadedFile) {
       return res.status(400).json({
         success: false,
@@ -82,10 +75,6 @@ export const sendMessage = async (req, res) => {
 
     let finalMediaUrl = null;
 
-    /*
-     * NORMAL IMAGE
-     */
-
     if (type === "image") {
       if (!uploadedFile) {
         return res.status(400).json({
@@ -109,16 +98,6 @@ export const sendMessage = async (req, res) => {
       console.log("🖼️ IMAGE UPLOADED:", finalMediaUrl);
     }
 
-    /*
-     * GIF
-     *
-     * Normal GIF:
-     * Uses its existing URL.
-     *
-     * Edited GIF:
-     * Uploads the newly generated GIF file.
-     */
-
     if (type === "gif") {
       if (uploadedFile) {
         console.log("🎞️ EDITED GIF REACHED CONTROLLER:", {
@@ -136,11 +115,6 @@ export const sendMessage = async (req, res) => {
 
         console.log("🎞️ GIF UPLOADED:", finalMediaUrl);
       } else if (incomingMediaUrl) {
-        /*
-         * Existing unedited GIF.
-         *
-         * Keep its original URL and do not re-upload it.
-         */
         finalMediaUrl = incomingMediaUrl;
       } else {
         return res.status(400).json({
@@ -150,10 +124,7 @@ export const sendMessage = async (req, res) => {
       }
     }
 
-    /*
-     * VIDEO
-     */
-
+    // VIDEO
     if (type === "video") {
       if (!uploadedFile) {
         return res.status(400).json({

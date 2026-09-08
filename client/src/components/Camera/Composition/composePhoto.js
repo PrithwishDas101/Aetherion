@@ -5,16 +5,6 @@ const loadImage = (src) =>
   new Promise((resolve, reject) => {
     const image = new Image();
 
-    /*
-     * IMPORTANT:
-     *
-     * The image must request CORS permission BEFORE src is set.
-     *
-     * Without this, a remote image drawn onto the canvas can taint
-     * the canvas, which makes canvas.toBlob() throw:
-     *
-     * SecurityError: Tainted canvases may not be exported.
-     */
     image.crossOrigin = "anonymous";
 
     image.onload = () => {
@@ -50,26 +40,16 @@ export const composePhoto = async ({ photoUrl, doodles = [], texts = [] }) => {
     throw new Error("Could not create the photo composition canvas.");
   }
 
-  /*
-   * Draw the original photo.
-   *
-   * If the source was successfully loaded with CORS permission,
-   * the canvas remains exportable.
-   */
   context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-  /*
-   * Draw doodles.
-   */
+  // Draw doodles.
   drawDoodles({
     context,
     canvas,
     doodles,
   });
 
-  /*
-   * Draw text.
-   */
+  // Draw text.
   drawTexts({
     context,
     texts,

@@ -235,28 +235,9 @@ const PhotoPreview = ({
   const buildFinalPhoto = async () => {
     const hasEdits = photoTexts.length > 0 || photoDoodles.length > 0;
 
-    /*
-     * No edits:
-     *
-     * Keep the original file completely untouched.
-     *
-     * This preserves:
-     * - GIF animation
-     * - GIF timing
-     * - normal image format
-     */
-
     if (!hasEdits) {
       return getOriginalPhotoBlob();
     }
-
-    /*
-     * Edited GIF:
-     *
-     * Use the dedicated animated GIF composition pipeline.
-     *
-     * composePhoto() would flatten the GIF into one PNG frame.
-     */
 
     if (isGifUrl(photoUrl)) {
       return composeGif({
@@ -265,12 +246,6 @@ const PhotoPreview = ({
         texts: photoTexts,
       });
     }
-
-    /*
-     * Normal image.
-     *
-     * Keep the existing working image pipeline unchanged.
-     */
 
     return composePhoto({
       photoUrl,
@@ -295,10 +270,6 @@ const PhotoPreview = ({
 
       const didSend = await onSend?.(finalBlob);
 
-      /*
-       * If the parent explicitly reports failure,
-       * allow the user to try again.
-       */
       if (didSend === false) {
         setIsSending(false);
       }

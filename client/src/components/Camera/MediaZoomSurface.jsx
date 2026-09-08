@@ -71,10 +71,6 @@ const MediaZoomSurface = ({
     });
   };
 
-  /*
-   * DESKTOP WHEEL ZOOM
-   */
-
   useEffect(() => {
     const surface = surfaceRef.current;
 
@@ -138,10 +134,6 @@ const MediaZoomSurface = ({
     };
   }, []);
 
-  /*
-   * POINTER DOWN
-   */
-
   const handlePointerDown = (event) => {
     if (
       event.pointerType === "mouse" &&
@@ -149,11 +141,6 @@ const MediaZoomSurface = ({
     ) {
       return;
     }
-
-    /*
-     * Capture the pointer so that a swipe still finishes
-     * correctly even if the finger moves outside the element.
-     */
 
     event.currentTarget.setPointerCapture?.(
       event.pointerId,
@@ -170,12 +157,6 @@ const MediaZoomSurface = ({
 
     const current = transformRef.current;
 
-    /*
-     * ONE POINTER AT NORMAL SCALE
-     *
-     * Could become a swipe.
-     */
-
     if (
       points.length === 1 &&
       current.scale === MIN_SCALE
@@ -188,12 +169,6 @@ const MediaZoomSurface = ({
 
       return;
     }
-
-    /*
-     * TWO POINTERS
-     *
-     * Begin pinch zoom.
-     */
 
     if (points.length === 2) {
       const [first, second] = points;
@@ -211,12 +186,6 @@ const MediaZoomSurface = ({
       return;
     }
 
-    /*
-     * ONE POINTER WHILE ZOOMED
-     *
-     * Pan the media instead of swiping.
-     */
-
     if (
       points.length === 1 &&
       current.scale > MIN_SCALE
@@ -233,10 +202,6 @@ const MediaZoomSurface = ({
     }
   };
 
-  /*
-   * POINTER MOVE
-   */
-
   const handlePointerMove = (event) => {
     if (
       !pointersRef.current.has(event.pointerId)
@@ -252,10 +217,6 @@ const MediaZoomSurface = ({
     const points = [
       ...pointersRef.current.values(),
     ];
-
-    /*
-     * PINCH ZOOM
-     */
 
     if (
       points.length === 2 &&
@@ -284,7 +245,7 @@ const MediaZoomSurface = ({
         Math.min(
           MAX_SCALE,
           pinchRef.current.startTransform.scale *
-            zoomRatio,
+          zoomRatio,
         ),
       );
 
@@ -298,10 +259,6 @@ const MediaZoomSurface = ({
 
       return;
     }
-
-    /*
-     * PAN ZOOMED MEDIA
-     */
 
     if (
       points.length === 1 &&
@@ -321,31 +278,17 @@ const MediaZoomSurface = ({
         clampTransform(
           panRef.current.startTransform.scale,
           panRef.current.startTransform.x +
-            deltaX,
+          deltaX,
           panRef.current.startTransform.y +
-            deltaY,
+          deltaY,
         ),
       );
     }
   };
 
-  /*
-   * POINTER END
-   */
-
   const handlePointerEnd = (event) => {
     const swipe = swipeRef.current;
     const current = transformRef.current;
-
-    /*
-     * IMPORTANT:
-     *
-     * Calculate the swipe BEFORE removing the pointer.
-     *
-     * The old implementation depended on
-     * pointersRef.current.size === 1 in a way that could
-     * fail depending on pointer event ordering.
-     */
 
     if (
       swipe &&
@@ -362,7 +305,7 @@ const MediaZoomSurface = ({
       const isHorizontalSwipe =
         Math.abs(deltaX) >= SWIPE_THRESHOLD &&
         Math.abs(deltaX) >
-          Math.abs(deltaY);
+        Math.abs(deltaY);
 
       if (isHorizontalSwipe) {
         if (deltaX < 0) {
@@ -373,10 +316,6 @@ const MediaZoomSurface = ({
       }
     }
 
-    /*
-     * Now remove the finished pointer.
-     */
-
     pointersRef.current.delete(
       event.pointerId,
     );
@@ -386,9 +325,7 @@ const MediaZoomSurface = ({
         event.pointerId,
       );
     } catch {
-      /*
-       * Pointer may already have been released.
-       */
+      // Pointer may already have been released.
     }
 
     swipeRef.current = null;
@@ -397,18 +334,10 @@ const MediaZoomSurface = ({
       ...pointersRef.current.values(),
     ];
 
-    /*
-     * Pinch ends when fewer than two pointers remain.
-     */
-
+    // Pinch ends when fewer than two pointers remain.
     if (points.length < 2) {
       pinchRef.current = null;
     }
-
-    /*
-     * If one finger remains after pinch zoom,
-     * allow that finger to continue panning.
-     */
 
     if (
       points.length === 1 &&
@@ -425,10 +354,6 @@ const MediaZoomSurface = ({
       panRef.current = null;
     }
   };
-
-  /*
-   * DOUBLE CLICK / DOUBLE TAP
-   */
 
   const handleDoubleClick = () => {
     if (

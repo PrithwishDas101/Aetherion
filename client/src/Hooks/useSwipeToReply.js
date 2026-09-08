@@ -46,12 +46,6 @@ const useSwipeToReply = ({ isMyMessage, onReply }) => {
     const deltaX = event.clientX - startX.current;
     const deltaY = event.clientY - startY.current;
 
-    /*
-     * Ignore tiny movement.
-     *
-     * This is important because a normal tap can move
-     * a few pixels on a touchscreen.
-     */
     if (
       Math.abs(deltaX) < SWIPE_ACTIVATION_DISTANCE &&
       Math.abs(deltaY) < SWIPE_ACTIVATION_DISTANCE
@@ -59,20 +53,12 @@ const useSwipeToReply = ({ isMyMessage, onReply }) => {
       return;
     }
 
-    /*
-     * Vertical movement = normal scrolling.
-     *
-     * Do not activate swipe-to-reply.
-     */
     if (Math.abs(deltaY) > Math.abs(deltaX)) {
       isSwiping.current = false;
       setSwipeOffset(0);
       return;
     }
 
-    /*
-     * Horizontal movement = swipe-to-reply.
-     */
     isSwiping.current = true;
 
     // Your message can only be swiped LEFT.
@@ -97,13 +83,6 @@ const useSwipeToReply = ({ isMyMessage, onReply }) => {
       return;
     }
 
-    /*
-     * Only trigger reply when an actual horizontal swipe
-     * happened.
-     *
-     * A simple tap therefore remains a normal click and
-     * can reach the media element.
-     */
     const shouldReply =
       isSwiping.current && Math.abs(swipeOffset) >= SWIPE_THRESHOLD;
 

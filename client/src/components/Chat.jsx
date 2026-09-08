@@ -28,6 +28,7 @@ import MessageComposer from "./MessageComposer/MessageComposer.jsx";
 import CameraModal from "./Camera/CameraModal.jsx";
 import NewMessageDivider from "./NewMessageDivider.jsx";
 import MediaViewer from "./Camera/MediaViewer.jsx";
+import GalleryModal from "./Gallery/GalleryModal.jsx";
 
 import {
   sendMessage as emitSendMessage,
@@ -50,6 +51,7 @@ const Chat = ({ socket }) => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
   const [mediaViewerMessageId, setMediaViewerMessageId] = useState(null);
 
@@ -76,7 +78,6 @@ const Chat = ({ socket }) => {
   const newMessageCountRef = useRef(0);
   const dividerVisibleRef = useRef(false);
 
-  // IMPORTANT:
   // Capture the unread count BEFORE it gets cleared in Redux.
   const initialUnreadCountRef = useRef(0);
 
@@ -105,8 +106,7 @@ const Chat = ({ socket }) => {
   const unreadMessageCount =
     Number(selectedChat?.unreadMessageCount?.[String(user._id)]) || 0;
 
-  /* SCROLL HELPERS */
-
+  // SCROLL HELPERS
   const scrollToBottom = (behavior = "auto") => {
     const container = messagesContainerRef.current;
 
@@ -142,15 +142,6 @@ const Chat = ({ socket }) => {
         console.error(response?.message || "Unable to clear unread messages.");
         return;
       }
-
-      /*
-       * IMPORTANT:
-       *
-       * Clearing unread messages does NOT remove the divider.
-       *
-       * The divider represents where the new/unread section
-       * started during this chat session.
-       */
 
       if (response?.data) {
         updateChatWithoutReordering(response.data);
@@ -222,10 +213,15 @@ const Chat = ({ socket }) => {
     setShowCameraModal(false);
   };
 
+  // GALLERY
   const openGallery = () => {
+    setShowMediaPicker(false);
     setShowCameraModal(false);
+    setShowGalleryModal(true);
+  };
 
-    console.log("Gallery opened");
+  const closeGallery = () => {
+    setShowGalleryModal(false);
   };
 
   // REPLY
@@ -626,19 +622,13 @@ const Chat = ({ socket }) => {
       isUploading: true,
     };
 
-    /*
-     * Add to chat immediately.
-     */
-
+    // Add to chat immediately.
     setAllMessages((previousMessages) => [
       ...previousMessages,
       temporaryMessage,
     ]);
 
-    /*
-     * We are the sender, so follow the message.
-     */
-
+    // We are the sender, so follow the message.
     isNearBottomRef.current = true;
 
     setNewMessagesState(0, null);
@@ -659,11 +649,6 @@ const Chat = ({ socket }) => {
       videoData.temporaryMessageId;
 
     try {
-      /*
-       * We can now mark the overall sending state.
-       *
-       * The temporary message is already visible in chat.
-       */
 
       setIsSending(true);
 
@@ -696,9 +681,6 @@ const Chat = ({ socket }) => {
       const response = await createMediaMessage(formData);
 
       if (!response?.success) {
-        /*
-         * Remove failed temporary message.
-         */
 
         setAllMessages((previousMessages) => {
           const failedMessage = previousMessages.find(
@@ -726,11 +708,6 @@ const Chat = ({ socket }) => {
         return false;
       }
 
-      /*
-       * Replace the uploading message with the
-       * real server message.
-       */
-
       setAllMessages((previousMessages) =>
         previousMessages.map((currentMessage) => {
           if (
@@ -740,11 +717,7 @@ const Chat = ({ socket }) => {
             return currentMessage;
           }
 
-          /*
-           * Remove local preview URL now that the
-           * real Cloudinary URL exists.
-           */
-
+          // Removing local preview URL now that the
           if (
             currentMessage.mediaUrl?.startsWith(
               "blob:",
@@ -784,10 +757,6 @@ const Chat = ({ socket }) => {
         responseData: error?.response?.data,
         status: error?.response?.status,
       });
-
-      /*
-       * Remove failed temporary message.
-       */
 
       setAllMessages((previousMessages) => {
         const failedMessage = previousMessages.find(
@@ -954,10 +923,7 @@ const Chat = ({ socket }) => {
 
         const initialUnreadCount = Number(initialUnreadCountRef.current) || 0;
 
-        /*
-         * NORMAL CHAT:
-         * No unread messages → go directly to bottom.
-         */
+        // NORMAL CHAT: No unread messages → go directly to bottom.
         if (initialUnreadCount <= 0) {
           scrollToBottom("auto");
 
@@ -968,21 +934,6 @@ const Chat = ({ socket }) => {
           return;
         }
 
-        /*
-         * UNREAD CHAT:
-         *
-         * Messages are assumed to be returned oldest → newest.
-         *
-         * Example:
-         *
-         * [1,2,3,4,5,6]
-         * unread = 2
-         *
-         * first unread = index 4
-         *
-         * [1,2,3] read
-         * [4,5] unread
-         */
         const firstUnreadIndex = Math.max(
           0,
           allMessages.length - initialUnreadCount,
@@ -1018,13 +969,6 @@ const Chat = ({ socket }) => {
         }
 
         hasInitialScrolledRef.current = true;
-
-        /*
-         * This is critical.
-         *
-         * The initial history must NOT be interpreted as
-         * newly received messages.
-         */
         previousMessageCountRef.current = allMessages.length;
       });
     });
@@ -1060,13 +1004,6 @@ const Chat = ({ socket }) => {
     const currentMessageCount = allMessages.length;
     const previousMessageCount = previousMessageCountRef.current;
 
-    /*
-     * No new messages.
-     *
-     * This also prevents image temporary-message replacement
-     * and other same-length updates from being treated as
-     * incoming messages.
-     */
     if (currentMessageCount <= previousMessageCount) {
       previousMessageCountRef.current = currentMessageCount;
 
@@ -1090,11 +1027,6 @@ const Chat = ({ socket }) => {
 
     const isMyLatestMessage = String(latestSenderId) === String(user._id);
 
-    /*
-     * MY MESSAGE
-     *
-     * Always follow the sender to the bottom.
-     */
     if (isMyLatestMessage) {
       setNewMessagesState(0, null);
 
@@ -1107,9 +1039,6 @@ const Chat = ({ socket }) => {
       return;
     }
 
-    /*
-     * OTHER USER SENT A MESSAGE WHILE WE ARE AT BOTTOM.
-     */
     if (isNearBottomRef.current) {
       requestAnimationFrame(() => {
         scrollToBottom("smooth");
@@ -1120,16 +1049,6 @@ const Chat = ({ socket }) => {
       return;
     }
 
-    /*
-     * OTHER USER SENT MESSAGE WHILE WE ARE READING OLD
-     * MESSAGES.
-     *
-     * DO NOT SCROLL.
-     *
-     * DO NOT CLEAR UNREAD.
-     *
-     * Show the divider.
-     */
     const incomingCount = newlyAddedMessages.length;
 
     setNewMessageCount((previousCount) => {
@@ -1182,18 +1101,6 @@ const Chat = ({ socket }) => {
       if (data.chat) {
         updateChatInRedux(data.chat);
       }
-
-      /*
-       * IMPORTANT:
-       *
-       * We DO NOT blindly clear unread here anymore.
-       *
-       * The allMessages effect decides whether the user is
-       * actually at the bottom.
-       *
-       * If they are reading old messages, the new message
-       * stays unread and the divider remains visible.
-       */
     };
 
     return registerSocketListeners(socket, {

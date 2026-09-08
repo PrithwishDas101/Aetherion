@@ -41,14 +41,6 @@ const VideoPreview = ({
 
     setIsProcessing(true);
 
-    /*
-     * Create the temporary chat message immediately.
-     *
-     * This happens BEFORE rendering the edited video.
-     * Therefore the preview can disappear instantly and
-     * Chat can immediately show the uploading loader.
-     */
-
     let temporaryMessageId = null;
 
     try {
@@ -57,12 +49,6 @@ const VideoPreview = ({
         caption: videoCaption.trim(),
         muted: isMuted,
       });
-
-      /*
-       * Untouched video.
-       *
-       * No rendering required.
-       */
 
       if (!hasEdits) {
         await onSend?.({
@@ -74,10 +60,6 @@ const VideoPreview = ({
 
         return;
       }
-
-      /*
-       * Render edited video in the background.
-       */
 
       const finalBlob = await renderVideoWithOverlays({
         videoBlob,
@@ -93,10 +75,6 @@ const VideoPreview = ({
       });
     } catch (error) {
       console.error("Unable to render video overlays:", error);
-
-      /*
-       * If rendering fails, send original video.
-       */
 
       try {
         await onSend?.({
@@ -683,10 +661,6 @@ const renderVideoWithOverlays = ({ videoBlob, texts, doodles }) => {
             context.strokeStyle = stroke.color || "#FFFFFF";
             context.fillStyle = stroke.color || "#FFFFFF";
 
-            /*
-             * Doodle coordinates are scaled from the
-             * preview coordinate system to the real video.
-             */
             const previewWidth = Math.min(window.innerWidth, 430);
             const scale = width / previewWidth;
 

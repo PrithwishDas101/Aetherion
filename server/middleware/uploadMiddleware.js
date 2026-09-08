@@ -29,14 +29,6 @@ const upload = multer({
     ];
 
     const allowedTypes = [...allowedImageTypes, ...allowedVideoTypes];
-
-    /*
-     * Some browsers/devices can send a Blob as text/plain even
-     * though the actual file is a video.
-     *
-     * Our frontend gives the uploaded video a .webm filename,
-     * so use the filename extension as a fallback.
-     */
     const fileName = file.originalname?.toLowerCase() || "";
 
     const extensionMatches =

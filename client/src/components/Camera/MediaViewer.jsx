@@ -107,22 +107,13 @@ const MediaViewer = ({
 
   const hasNext = currentIndex < mediaItems.length - 1;
 
-  /*
-
-* Keep index valid if media list changes.
-  */
-
   useEffect(() => {
     if (currentIndex > mediaItems.length - 1) {
       setCurrentIndex(Math.max(0, mediaItems.length - 1));
     }
   }, [currentIndex, mediaItems.length]);
 
-  /*
-
-* Resolve sender.
-  */
-
+  // Resolve sender.
   const sender = useMemo(() => {
     if (!currentMedia) {
       return otherUser || currentUser || null;
@@ -148,11 +139,6 @@ const MediaViewer = ({
 
   const senderInitials = getInitials(sender);
 
-  /*
-
-* Reset editor state when changing media.
-  */
-
   useEffect(() => {
     setIsEditing(false);
     setActiveEditTool(null);
@@ -177,11 +163,7 @@ const MediaViewer = ({
     setCurrentIndex((previous) => previous + 1);
   };
 
-  /*
-
-* REPLY
-  */
-
+  // REPLY
   const handleReply = () => {
     if (!currentMedia) {
       return;
@@ -192,11 +174,7 @@ const MediaViewer = ({
     onClose?.();
   };
 
-  /*
-
-* DOWNLOAD
-  */
-
+  // DOWNLOAD
   const handleDownload = async () => {
     if (!currentMedia?.mediaUrl || isDownloading) {
       return;
@@ -251,17 +229,6 @@ const MediaViewer = ({
     }
   };
 
-  /*
-
-* EDIT
-*
-* Images and GIFs use PhotoPreview.
-*
-* Videos are first fetched as a Blob because
-* VideoPreview's rendering pipeline requires
-* a real Blob/File rather than only a remote URL.
-  */
-
   const openEditor = async () => {
     if (!currentMedia?.mediaUrl || isLoadingEditor) {
       return;
@@ -269,20 +236,14 @@ const MediaViewer = ({
 
     setActiveEditTool(null);
 
-    /*
-     * IMAGE / GIF
-     */
-
+    // IMAGE / GIF
     if (currentMedia.type === "image" || currentMedia.type === "gif") {
       setIsEditing(true);
 
       return;
     }
 
-    /*
-     * VIDEO
-     */
-
+    // VIDEO
     if (currentMedia.type === "video") {
       try {
         setIsLoadingEditor(true);
@@ -318,33 +279,18 @@ const MediaViewer = ({
     setVideoBlob(null);
   };
 
-  /*
-
-* SEND EDITED IMAGE / GIF
-  */
-
+  // SEND EDITED IMAGE / GIF
   const handleSendEditedPhoto = async (editedBlob) => {
     if (!editedBlob || isSendingEdited) {
       return false;
     }
 
     setIsSendingEdited(true);
-
-    /*
-     * Close the editor/viewer immediately.
-     *
-     * Chat.jsx will create the optimistic temporary message
-     * as soon as onSendEditedPhoto is called.
-     */
     setIsEditing(false);
     setActiveEditTool(null);
 
     onClose?.();
 
-    /*
-     * Give React one frame to commit the viewer closing,
-     * then immediately hand the blob to Chat.jsx.
-     */
     await new Promise((resolve) => {
       requestAnimationFrame(resolve);
     });
@@ -366,11 +312,7 @@ const MediaViewer = ({
     }
   };
 
-  /*
-
-* SEND EDITED VIDEO
-  */
-
+  // SEND EDITED VIDEO
   const handleVideoProcessingStart = async ({
     blob,
     caption = "",
@@ -381,12 +323,6 @@ const MediaViewer = ({
     }
 
     try {
-      /*
-       * Close the editor immediately.
-       *
-       * The temporary message will already be added
-       * to the chat before video rendering finishes.
-       */
 
       setIsSendingEdited(true);
 
@@ -439,11 +375,7 @@ const MediaViewer = ({
     }
   };
 
-  /*
-
-* KEYBOARD CONTROLS
-  */
-
+  // KEYBOARD CONTROLS
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape" && isEditing) {
@@ -475,11 +407,6 @@ const MediaViewer = ({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [currentIndex, mediaItems.length, isEditing, isSendingEdited, onClose]);
-
-  /*
-
-* LOCK BACKGROUND SCROLL
-  */
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -521,10 +448,6 @@ const MediaViewer = ({
       );
     }
 
-    /*
-     * IMAGE / GIF EDITOR
-     */
-
     if (currentMedia.type === "image" || currentMedia.type === "gif") {
       return createPortal(
         <div className="fixed inset-0 z-[300] bg-black">
@@ -546,20 +469,6 @@ const MediaViewer = ({
       );
     }
   }
-
-  /*
-
-* Edit button rules.
-*
-* MOBILE / TABLET:
-* GIF + VIDEO
-*
-* DESKTOP:
-* GIF + VIDEO
-*
-* Normal images deliberately do NOT receive
-* an edit button in the media viewer.
-  */
 
   const canEditMedia =
     currentMedia.type === "gif" || currentMedia.type === "video";
