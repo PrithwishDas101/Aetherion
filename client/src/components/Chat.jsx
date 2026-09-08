@@ -601,10 +601,10 @@ const Chat = ({ socket }) => {
     }
   };
 
-  const sendCameraVideo = async (videoData) => {
-
-    if (!videoData?.blob || !selectedChat?._id || isSending) {
-      return;
+  // SEND CAMERA VIDEO
+  const startVideoProcessing = async (videoData) => {
+    if (!videoData?.blob || !selectedChat?._id) {
+      return null;
     }
 
     isNearBottomRef.current = true;
@@ -626,19 +626,55 @@ const Chat = ({ socket }) => {
       isUploading: true,
     };
 
+    /*
+     * Add to chat immediately.
+     */
+
     setAllMessages((previousMessages) => [
       ...previousMessages,
       temporaryMessage,
     ]);
 
+    /*
+     * We are the sender, so follow the message.
+     */
+
+    isNearBottomRef.current = true;
+
+    setNewMessagesState(0, null);
+
+    return temporaryMessageId;
+  };
+
+  const sendCameraVideo = async (videoData) => {
+    if (
+      !videoData?.blob ||
+      !videoData?.temporaryMessageId ||
+      !selectedChat?._id
+    ) {
+      return false;
+    }
+
+    const temporaryMessageId =
+      videoData.temporaryMessageId;
+
     try {
+      /*
+       * We can now mark the overall sending state.
+       *
+       * The temporary message is already visible in chat.
+       */
+
       setIsSending(true);
 
       const formData = new FormData();
 
       formData.append("chatId", selectedChat._id);
       formData.append("type", "video");
-      formData.append("text", videoData.caption?.trim() || "");
+      formData.append(
+        "text",
+        videoData.caption?.trim() || "",
+      );
 
       formData.append(
         "media",
@@ -646,48 +682,89 @@ const Chat = ({ socket }) => {
         `aetherion-video-${Date.now()}.webm`,
       );
 
-      formData.append("replyTo", replyingTo?._id || "");
+      formData.append(
+        "replyTo",
+        replyingTo?._id || "",
+      );
 
-      console.log("🎥 VIDEO FORMDATA READY", {
-        chatId: selectedChat._id,
-        type: "video",
+      console.log("🎥 UPLOADING FINAL VIDEO:", {
+        temporaryMessageId,
         blobType: videoData.blob.type,
         blobSize: videoData.blob.size,
       });
 
       const response = await createMediaMessage(formData);
 
-      console.log("🎥 VIDEO API RESPONSE", response);
-
       if (!response?.success) {
-        setAllMessages((previousMessages) =>
-          previousMessages.filter(
+        /*
+         * Remove failed temporary message.
+         */
+
+        setAllMessages((previousMessages) => {
+          const failedMessage = previousMessages.find(
             (currentMessage) =>
-              String(currentMessage._id) !== String(temporaryMessageId),
-          ),
+              String(currentMessage._id) ===
+              String(temporaryMessageId),
+          );
+
+          if (failedMessage?.mediaUrl?.startsWith("blob:")) {
+            URL.revokeObjectURL(failedMessage.mediaUrl);
+          }
+
+          return previousMessages.filter(
+            (currentMessage) =>
+              String(currentMessage._id) !==
+              String(temporaryMessageId),
+          );
+        });
+
+        toast.error(
+          response?.message ||
+          "Unable to send video.",
         );
 
-        URL.revokeObjectURL(localPreviewUrl);
-
-        toast.error(response?.message || "Unable to send video.");
-
-        return;
+        return false;
       }
 
-      setAllMessages((previousMessages) =>
-        previousMessages.map((currentMessage) =>
-          String(currentMessage._id) === String(temporaryMessageId)
-            ? response.data
-            : currentMessage,
-        ),
-      );
+      /*
+       * Replace the uploading message with the
+       * real server message.
+       */
 
-      URL.revokeObjectURL(localPreviewUrl);
+      setAllMessages((previousMessages) =>
+        previousMessages.map((currentMessage) => {
+          if (
+            String(currentMessage._id) !==
+            String(temporaryMessageId)
+          ) {
+            return currentMessage;
+          }
+
+          /*
+           * Remove local preview URL now that the
+           * real Cloudinary URL exists.
+           */
+
+          if (
+            currentMessage.mediaUrl?.startsWith(
+              "blob:",
+            )
+          ) {
+            URL.revokeObjectURL(
+              currentMessage.mediaUrl,
+            );
+          }
+
+          return response.data;
+        }),
+      );
 
       emitSendMessage(socket, {
         message: response.data,
         chat: response.chat,
-        members: selectedChat.members.map((member) => String(member._id)),
+        members: selectedChat.members.map(
+          (member) => String(member._id),
+        ),
       });
 
       if (response?.chat) {
@@ -697,6 +774,8 @@ const Chat = ({ socket }) => {
       setReplyingTo(null);
 
       setNewMessagesState(0, null);
+
+      return true;
     } catch (error) {
       console.error("🔥 SEND VIDEO FAILED", {
         error,
@@ -706,16 +785,36 @@ const Chat = ({ socket }) => {
         status: error?.response?.status,
       });
 
-      setAllMessages((previousMessages) =>
-        previousMessages.filter(
+      /*
+       * Remove failed temporary message.
+       */
+
+      setAllMessages((previousMessages) => {
+        const failedMessage = previousMessages.find(
           (currentMessage) =>
-            String(currentMessage._id) !== String(temporaryMessageId),
-        ),
+            String(currentMessage._id) ===
+            String(temporaryMessageId),
+        );
+
+        if (failedMessage?.mediaUrl?.startsWith("blob:")) {
+          URL.revokeObjectURL(
+            failedMessage.mediaUrl,
+          );
+        }
+
+        return previousMessages.filter(
+          (currentMessage) =>
+            String(currentMessage._id) !==
+            String(temporaryMessageId),
+        );
+      });
+
+      toast.error(
+        error?.response?.data?.message ||
+        "Unable to send video.",
       );
 
-      URL.revokeObjectURL(localPreviewUrl);
-
-      toast.error(error.response?.data?.message || "Unable to send video.");
+      return false;
     } finally {
       setIsSending(false);
     }
@@ -1428,6 +1527,7 @@ const Chat = ({ socket }) => {
                 onReply={startReply}
                 onSendEditedPhoto={sendCameraPhoto}
                 onSendEditedVideo={sendCameraVideo}
+                onVideoProcessingStart={startVideoProcessing}
                 currentUser={user}
                 otherUser={selectedChat?.members?.find(
                   (member) => String(member._id) !== String(user?._id),

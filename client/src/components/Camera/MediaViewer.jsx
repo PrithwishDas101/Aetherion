@@ -83,6 +83,7 @@ const MediaViewer = ({
   onReply,
   onSendEditedPhoto,
   onSendEditedVideo,
+  onVideoProcessingStart,
   currentUser,
   otherUser,
 }) => {
@@ -327,14 +328,28 @@ const MediaViewer = ({
       return false;
     }
 
+    setIsSendingEdited(true);
+
+    /*
+     * Close the editor/viewer immediately.
+     *
+     * Chat.jsx will create the optimistic temporary message
+     * as soon as onSendEditedPhoto is called.
+     */
+    setIsEditing(false);
+    setActiveEditTool(null);
+
+    onClose?.();
+
+    /*
+     * Give React one frame to commit the viewer closing,
+     * then immediately hand the blob to Chat.jsx.
+     */
+    await new Promise((resolve) => {
+      requestAnimationFrame(resolve);
+    });
+
     try {
-      setIsSendingEdited(true);
-
-      setIsEditing(false);
-      setActiveEditTool(null);
-
-      onClose?.();
-
       const didSend = await onSendEditedPhoto?.({
         blob: editedBlob,
         caption: "",
@@ -356,28 +371,64 @@ const MediaViewer = ({
 * SEND EDITED VIDEO
   */
 
-  const handleSendEditedVideo = async ({
+  const handleVideoProcessingStart = async ({
     blob,
     caption = "",
     muted = false,
   }) => {
     if (!blob || isSendingEdited) {
-      return false;
+      return null;
     }
 
     try {
+      /*
+       * Close the editor immediately.
+       *
+       * The temporary message will already be added
+       * to the chat before video rendering finishes.
+       */
+
       setIsSendingEdited(true);
 
       setIsEditing(false);
       setActiveEditTool(null);
       setVideoBlob(null);
 
+      const temporaryMessageId =
+        await onVideoProcessingStart?.({
+          blob,
+          caption,
+          muted,
+        });
+
       onClose?.();
 
+      return temporaryMessageId || null;
+    } catch (error) {
+      console.error("Unable to start video processing:", error);
+
+      return null;
+    } finally {
+      setIsSendingEdited(false);
+    }
+  };
+
+  const handleSendEditedVideo = async ({
+    blob,
+    caption = "",
+    muted = false,
+    temporaryMessageId = null,
+  }) => {
+    if (!blob) {
+      return false;
+    }
+
+    try {
       const didSend = await onSendEditedVideo?.({
         blob,
         caption,
         muted,
+        temporaryMessageId,
       });
 
       return Boolean(didSend);
@@ -385,8 +436,6 @@ const MediaViewer = ({
       console.error("Unable to send edited video:", error);
 
       return false;
-    } finally {
-      setIsSendingEdited(false);
     }
   };
 
@@ -461,6 +510,7 @@ const MediaViewer = ({
             onDownload={handleDownload}
             onRetake={closeEditor}
             onSend={handleSendEditedVideo}
+            onProcessingStart={handleVideoProcessingStart}
             recipientName={senderName}
             videoCaption=""
             onCaptionChange={() => { }}

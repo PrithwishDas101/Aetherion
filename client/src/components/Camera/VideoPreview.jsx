@@ -16,6 +16,7 @@ const VideoPreview = ({
   onDownload,
   onRetake,
   onSend,
+  onProcessingStart,
   recipientName,
   videoCaption,
   onCaptionChange,
@@ -38,53 +39,75 @@ const VideoPreview = ({
       videoTexts.length > 0 ||
       videoDoodles.length > 0;
 
+    setIsProcessing(true);
+
     /*
-     * Untouched videos must keep their original blob.
+     * Create the temporary chat message immediately.
      *
-     * Do not send them through the canvas/MediaRecorder
-     * rendering pipeline.
+     * This happens BEFORE rendering the edited video.
+     * Therefore the preview can disappear instantly and
+     * Chat can immediately show the uploading loader.
      */
 
-    if (!hasEdits) {
-      onSend?.({
+    let temporaryMessageId = null;
+
+    try {
+      temporaryMessageId = await onProcessingStart?.({
         blob: videoBlob,
         caption: videoCaption.trim(),
         muted: isMuted,
       });
 
-      return;
-    }
+      /*
+       * Untouched video.
+       *
+       * No rendering required.
+       */
 
-    /*
-     * Only edited videos need to be rendered again.
-     */
+      if (!hasEdits) {
+        await onSend?.({
+          blob: videoBlob,
+          caption: videoCaption.trim(),
+          muted: isMuted,
+          temporaryMessageId,
+        });
 
-    setIsProcessing(true);
+        return;
+      }
 
-    try {
+      /*
+       * Render edited video in the background.
+       */
+
       const finalBlob = await renderVideoWithOverlays({
         videoBlob,
         texts: videoTexts,
         doodles: videoDoodles,
       });
 
-      onSend?.({
+      await onSend?.({
         blob: finalBlob,
         caption: videoCaption.trim(),
         muted: isMuted,
+        temporaryMessageId,
       });
     } catch (error) {
       console.error("Unable to render video overlays:", error);
 
       /*
-       * Fallback to the original video rather than failing.
+       * If rendering fails, send original video.
        */
 
-      onSend?.({
-        blob: videoBlob,
-        caption: videoCaption.trim(),
-        muted: isMuted,
-      });
+      try {
+        await onSend?.({
+          blob: videoBlob,
+          caption: videoCaption.trim(),
+          muted: isMuted,
+          temporaryMessageId,
+        });
+      } catch (sendError) {
+        console.error("Unable to send fallback video:", sendError);
+      }
     } finally {
       setIsProcessing(false);
     }
