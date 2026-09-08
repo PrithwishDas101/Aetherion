@@ -789,6 +789,217 @@ const Chat = ({ socket }) => {
     }
   };
 
+  // SEND GALLERY MEDIA
+  const sendGalleryMedia = async ({ items = [], caption = "" }) => {
+    if (!items.length || !selectedChat?._id) {
+      return false;
+    }
+
+    isNearBottomRef.current = true;
+
+    const temporaryMessages = items.map((item, index) => {
+      const temporaryMessageId = `temp-gallery-${Date.now()}-${index}`;
+
+      return {
+        _id: temporaryMessageId,
+        chatId: selectedChat._id,
+        sender: user._id,
+        type: item.type === "video" ? "video" : "image",
+        text: index === 0 ? caption.trim() : "",
+        mediaUrl: item.previewUrl,
+        replyTo: index === 0 ? replyingTo || null : null,
+        read: false,
+        createdAt: new Date().toISOString(),
+        isUploading: true,
+
+        // Keep the original file temporarily so we can upload it.
+        _galleryFile: item.file,
+      };
+    });
+
+    // SHOW ALL SELECTED MEDIA IN CHAT IMMEDIATELY
+    setAllMessages((previousMessages) => [
+      ...previousMessages,
+      ...temporaryMessages,
+    ]);
+
+    setNewMessagesState(0, null);
+
+    try {
+      setIsSending(true);
+
+      // Upload each selected item.
+      for (let index = 0; index < temporaryMessages.length; index++) {
+        const temporaryMessage = temporaryMessages[index];
+
+        const file = temporaryMessage._galleryFile;
+
+        if (!file) {
+          continue;
+        }
+
+        const formData = new FormData();
+
+        const isVideo = file.type.startsWith("video/");
+
+        formData.append("chatId", selectedChat._id);
+
+        formData.append(
+          "type",
+          isVideo ? "video" : "image",
+        );
+
+        // Caption and reply only belong to the first item.
+        formData.append(
+          "text",
+          index === 0 ? caption.trim() : "",
+        );
+
+        formData.append(
+          "replyTo",
+          index === 0
+            ? replyingTo?._id || ""
+            : "",
+        );
+
+        formData.append(
+          "media",
+          file,
+          file.name ||
+          `aetherion-gallery-${Date.now()}-${index}`,
+        );
+
+        console.log("🖼️ UPLOADING GALLERY MEDIA:", {
+          index,
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        });
+
+        const response = await createMediaMessage(formData);
+
+        if (!response?.success) {
+          // Remove only the failed temporary message.
+          setAllMessages((previousMessages) =>
+            previousMessages.filter(
+              (currentMessage) => {
+                if (
+                  String(currentMessage._id) ===
+                  String(temporaryMessage._id)
+                ) {
+                  if (
+                    currentMessage.mediaUrl?.startsWith(
+                      "blob:",
+                    )
+                  ) {
+                    URL.revokeObjectURL(
+                      currentMessage.mediaUrl,
+                    );
+                  }
+
+                  return false;
+                }
+
+                return true;
+              },
+            ),
+          );
+
+          toast.error(
+            response?.message ||
+            `Unable to send ${file.name || "media"}.`,
+          );
+
+          continue;
+        }
+
+        // Replace temporary loader message with real message.
+        setAllMessages((previousMessages) =>
+          previousMessages.map(
+            (currentMessage) => {
+              if (
+                String(currentMessage._id) !==
+                String(temporaryMessage._id)
+              ) {
+                return currentMessage;
+              }
+
+              if (
+                currentMessage.mediaUrl?.startsWith(
+                  "blob:",
+                )
+              ) {
+                URL.revokeObjectURL(
+                  currentMessage.mediaUrl,
+                );
+              }
+
+              return response.data;
+            },
+          ),
+        );
+
+        // Emit each successfully uploaded message.
+        emitSendMessage(socket, {
+          message: response.data,
+          chat: response.chat,
+          members: selectedChat.members.map(
+            (member) => String(member._id),
+          ),
+        });
+
+        if (response?.chat) {
+          updateChatInRedux(response.chat);
+        }
+      }
+
+      setReplyingTo(null);
+
+      setNewMessagesState(0, null);
+
+      return true;
+    } catch (error) {
+      console.error("Gallery send error:", error);
+
+      toast.error(
+        error?.response?.data?.message ||
+        "Unable to send selected media.",
+      );
+
+      // Remove any remaining uploading messages.
+      setAllMessages((previousMessages) =>
+        previousMessages.filter((currentMessage) => {
+          if (!currentMessage.isUploading) {
+            return true;
+          }
+
+          const isGalleryTemporaryMessage =
+            String(currentMessage._id).startsWith(
+              "temp-gallery-",
+            );
+
+          if (!isGalleryTemporaryMessage) {
+            return true;
+          }
+
+          if (
+            currentMessage.mediaUrl?.startsWith("blob:")
+          ) {
+            URL.revokeObjectURL(
+              currentMessage.mediaUrl,
+            );
+          }
+
+          return false;
+        }),
+      );
+
+      return false;
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   // FETCH MESSAGES
   const getMessages = async () => {
     if (!selectedChat?._id) {
@@ -890,7 +1101,12 @@ const Chat = ({ socket }) => {
   }, [selectedChat?._id]);
 
   useEffect(() => {
-    if (isSending || showMediaPicker || showCameraModal) {
+    if (
+      isSending ||
+      showMediaPicker ||
+      showCameraModal ||
+      showGalleryModal
+    ) {
       return;
     }
 
@@ -901,7 +1117,13 @@ const Chat = ({ socket }) => {
     requestAnimationFrame(() => {
       messageInputRef.current?.focus();
     });
-  }, [isSending, selectedChat?._id, showMediaPicker, showCameraModal]);
+  }, [
+    isSending,
+    selectedChat?._id,
+    showMediaPicker,
+    showCameraModal,
+    showGalleryModal,
+  ]);
 
   // INITIAL POSITION
   useEffect(() => {
@@ -1424,6 +1646,15 @@ const Chat = ({ socket }) => {
               }
               onPhotoCaptured={sendCameraPhoto}
               onVideoCaptured={sendCameraVideo}
+            />
+
+            {/* GALLERY */}
+
+            <GalleryModal
+              isOpen={showGalleryModal}
+              onClose={closeGallery}
+              onSend={sendGalleryMedia}
+              source="chat"
             />
 
             {mediaViewerMessageId && mediaViewerIndex >= 0 ? (
