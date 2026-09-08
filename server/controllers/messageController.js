@@ -1,6 +1,10 @@
 import Message from "../models/Message.js";
 import Chat from "../models/Chat.js";
-import { uploadImage, uploadVideo } from "../services/cloudinaryService.js";
+import {
+  uploadImage,
+  uploadGif,
+  uploadVideo,
+} from "../services/cloudinaryService.js";
 
 // SEND MESSAGES
 export const sendMessage = async (req, res) => {
@@ -39,10 +43,17 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    if (type === "gif" && !incomingMediaUrl) {
+    /*
+     * GIFs can be either:
+     *
+     * 1. A normal GIF URL
+     * 2. An edited GIF uploaded as a file
+     */
+
+    if (type === "gif" && !incomingMediaUrl && !uploadedFile) {
       return res.status(400).json({
         success: false,
-        message: "GIF URL is required.",
+        message: "GIF file or GIF URL is required.",
       });
     }
 
@@ -60,9 +71,7 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    const receiver = chat.members.find(
-      (member) => String(member) !== senderId,
-    );
+    const receiver = chat.members.find((member) => String(member) !== senderId);
 
     if (!receiver) {
       return res.status(400).json({
@@ -71,16 +80,11 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    /*
-     * MEDIA UPLOAD
-     *
-     * Images -> Cloudinary image upload
-     * Videos -> Cloudinary video upload
-     * GIFs -> already supplied URL
-     * Text -> no media
-     */
-
     let finalMediaUrl = null;
+
+    /*
+     * NORMAL IMAGE
+     */
 
     if (type === "image") {
       if (!uploadedFile) {
@@ -105,6 +109,51 @@ export const sendMessage = async (req, res) => {
       console.log("🖼️ IMAGE UPLOADED:", finalMediaUrl);
     }
 
+    /*
+     * GIF
+     *
+     * Normal GIF:
+     * Uses its existing URL.
+     *
+     * Edited GIF:
+     * Uploads the newly generated GIF file.
+     */
+
+    if (type === "gif") {
+      if (uploadedFile) {
+        console.log("🎞️ EDITED GIF REACHED CONTROLLER:", {
+          size: uploadedFile.size,
+          sizeInMB: (uploadedFile.size / 1024 / 1024).toFixed(2),
+          mimetype: uploadedFile.mimetype,
+        });
+
+        const uploadResult = await uploadGif(
+          uploadedFile.buffer,
+          "aetherion/chat-gifs",
+        );
+
+        finalMediaUrl = uploadResult.secure_url;
+
+        console.log("🎞️ GIF UPLOADED:", finalMediaUrl);
+      } else if (incomingMediaUrl) {
+        /*
+         * Existing unedited GIF.
+         *
+         * Keep its original URL and do not re-upload it.
+         */
+        finalMediaUrl = incomingMediaUrl;
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "GIF file or GIF URL is required.",
+        });
+      }
+    }
+
+    /*
+     * VIDEO
+     */
+
     if (type === "video") {
       if (!uploadedFile) {
         return res.status(400).json({
@@ -127,10 +176,6 @@ export const sendMessage = async (req, res) => {
       finalMediaUrl = uploadResult.secure_url;
 
       console.log("🎥 VIDEO UPLOADED:", finalMediaUrl);
-    }
-
-    if (type === "gif") {
-      finalMediaUrl = incomingMediaUrl;
     }
 
     console.log("💾 SAVING MESSAGE:", {

@@ -2,6 +2,8 @@ import multer from "multer";
 
 const storage = multer.memoryStorage();
 
+console.log("🔥 ACTIVE UPLOAD MIDDLEWARE LOADED — LIMIT: 50MB");
+
 const upload = multer({
   storage,
 
@@ -15,6 +17,7 @@ const upload = multer({
       "image/jpeg",
       "image/png",
       "image/webp",
+      "image/gif",
     ];
 
     const allowedVideoTypes = [
@@ -25,10 +28,7 @@ const upload = multer({
       "video/x-matroska",
     ];
 
-    const allowedTypes = [
-      ...allowedImageTypes,
-      ...allowedVideoTypes,
-    ];
+    const allowedTypes = [...allowedImageTypes, ...allowedVideoTypes];
 
     /*
      * Some browsers/devices can send a Blob as text/plain even
@@ -48,7 +48,8 @@ const upload = multer({
       fileName.endsWith(".jpg") ||
       fileName.endsWith(".jpeg") ||
       fileName.endsWith(".png") ||
-      fileName.endsWith(".webp");
+      fileName.endsWith(".webp") ||
+      fileName.endsWith(".gif");
 
     console.log("📦 MULTER FILE:", {
       fieldname: file.fieldname,
@@ -62,12 +63,7 @@ const upload = multer({
       return;
     }
 
-    cb(
-      new Error(
-        `Unsupported media type: ${file.mimetype}`,
-      ),
-      false,
-    );
+    cb(new Error(`Unsupported media type: ${file.mimetype}`), false);
   },
 });
 

@@ -60,3 +60,24 @@ export const uploadVideo = (buffer, folder = "aetherion/chat-videos") => {
     uploadStream.end(buffer);
   });
 };
+
+export const uploadGif = (buffer, folder = "aetherion/chat-gifs") => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve(result);
+      },
+    );
+
+    uploadStream.end(buffer);
+  });
+};

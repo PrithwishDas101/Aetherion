@@ -479,11 +479,16 @@ const Chat = ({ socket }) => {
 
     const temporaryMessageId = `temp-image-${Date.now()}`;
 
+    const mediaType =
+      photoData.type === "gif" || photoData.blob.type === "image/gif"
+        ? "gif"
+        : "image";
+
     const temporaryMessage = {
       _id: temporaryMessageId,
       chatId: selectedChat._id,
       sender: user._id,
-      type: "image",
+      type: mediaType,
       text: photoData.caption?.trim() || "",
       mediaUrl: localPreviewUrl,
       replyTo: replyingTo || null,
@@ -502,14 +507,28 @@ const Chat = ({ socket }) => {
 
       const formData = new FormData();
 
+      const mediaType =
+        photoData.type === "gif" || photoData.blob.type === "image/gif"
+          ? "gif"
+          : "image";
+
       formData.append("chatId", selectedChat._id);
-      formData.append("type", "image");
+      formData.append("type", mediaType);
       formData.append("text", photoData.caption?.trim() || "");
+
+      const extension =
+        photoData.blob.type === "image/gif"
+          ? "gif"
+          : photoData.blob.type === "image/png"
+            ? "png"
+            : photoData.blob.type === "image/webp"
+              ? "webp"
+              : "jpg";
 
       formData.append(
         "media",
         photoData.blob,
-        `aetherion-photo-${Date.now()}.jpg`,
+        `aetherion-${mediaType}-${Date.now()}.${extension}`,
       );
 
       formData.append("replyTo", replyingTo?._id || "");

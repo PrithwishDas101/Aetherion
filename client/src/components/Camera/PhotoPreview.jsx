@@ -8,8 +8,17 @@ import DoodleDisplay from "./Doodle/DoodleDisplay.jsx";
 import StickerEditor from "./Sticker/StickerEditor.jsx";
 import MediaZoomSurface from "./MediaZoomSurface.jsx";
 import { composePhoto } from "./Composition/composePhoto.js";
+import { composeGif } from "./Composition/composeGif.js";
 
 const TRASH_RADIUS = 64;
+
+const isGifUrl = (url) => {
+  if (!url) {
+    return false;
+  }
+
+  return /\.gif(?:$|\?)/i.test(url);
+};
 
 const PhotoPreview = ({
   photoUrl,
@@ -149,10 +158,10 @@ const PhotoPreview = ({
       previous.map((text) =>
         text.id === draggingTextId
           ? {
-              ...text,
-              x: clampedX,
-              y: clampedY,
-            }
+            ...text,
+            x: clampedX,
+            y: clampedY,
+          }
           : text,
       ),
     );
@@ -226,9 +235,42 @@ const PhotoPreview = ({
   const buildFinalPhoto = async () => {
     const hasEdits = photoTexts.length > 0 || photoDoodles.length > 0;
 
+    /*
+     * No edits:
+     *
+     * Keep the original file completely untouched.
+     *
+     * This preserves:
+     * - GIF animation
+     * - GIF timing
+     * - normal image format
+     */
+
     if (!hasEdits) {
       return getOriginalPhotoBlob();
     }
+
+    /*
+     * Edited GIF:
+     *
+     * Use the dedicated animated GIF composition pipeline.
+     *
+     * composePhoto() would flatten the GIF into one PNG frame.
+     */
+
+    if (isGifUrl(photoUrl)) {
+      return composeGif({
+        gifUrl: photoUrl,
+        doodles: photoDoodles,
+        texts: photoTexts,
+      });
+    }
+
+    /*
+     * Normal image.
+     *
+     * Keep the existing working image pipeline unchanged.
+     */
 
     return composePhoto({
       photoUrl,
@@ -303,15 +345,15 @@ const PhotoPreview = ({
 
           {!isTextEditing
             ? photoTexts.map((text) => (
-                <PhotoTextBlock
-                  key={text.id}
-                  text={text}
-                  isDragging={draggingTextId === text.id}
-                  onPointerDown={(event) =>
-                    handleCommittedTextPointerDown(event, text.id)
-                  }
-                />
-              ))
+              <PhotoTextBlock
+                key={text.id}
+                text={text}
+                isDragging={draggingTextId === text.id}
+                onPointerDown={(event) =>
+                  handleCommittedTextPointerDown(event, text.id)
+                }
+              />
+            ))
             : null}
 
           <DoodleDisplay doodles={photoDoodles} />
@@ -324,11 +366,10 @@ const PhotoPreview = ({
         <div className="pointer-events-none absolute left-4 top-0 z-[120] pt-[max(12px,env(safe-area-inset-top))]">
           <div
             ref={trashRef}
-            className={`flex h-12 w-12 items-center justify-center rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-150 ${
-              isOverTrash
+            className={`flex h-12 w-12 items-center justify-center rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-150 ${isOverTrash
                 ? "scale-110 border-red-300/80 bg-red-500/90 text-white"
                 : "border-white/15 bg-black/65 text-white/80"
-            }`}
+              }`}
           >
             <FiTrash2 className="text-[22px]" />
           </div>
@@ -459,9 +500,8 @@ const PhotoTextBlock = ({ text, isDragging, onPointerDown }) => {
       type="button"
       data-photo-text-id={text.id}
       onPointerDown={onPointerDown}
-      className={`absolute z-20 max-w-[82vw] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none border-0 bg-transparent p-0 text-left outline-none transition-opacity active:cursor-grabbing ${
-        isDragging ? "z-[130]" : ""
-      }`}
+      className={`absolute z-20 max-w-[82vw] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none border-0 bg-transparent p-0 text-left outline-none transition-opacity active:cursor-grabbing ${isDragging ? "z-[130]" : ""
+        }`}
       style={{
         left: `${text.x}%`,
         top: `${text.y}%`,
