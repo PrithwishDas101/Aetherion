@@ -35,7 +35,8 @@ const GalleryModal = ({
     initialFiles = [],
     source = "chat",
 }) => {
-    const [mediaItems, setMediaItems] = useState([]);
+    const [mediaItems, setMediaItems] =
+        useState([]);
 
     const [selectedItems, setSelectedItems] =
         useState([]);
@@ -63,7 +64,38 @@ const GalleryModal = ({
             GALLERY_PERMISSION.ASK,
         );
 
+    const [isDesktop, setIsDesktop] =
+        useState(false);
+
     const fileInputRef = useRef(null);
+
+    // DETECT DESKTOP
+    useEffect(() => {
+        const mediaQuery =
+            window.matchMedia(
+                "(min-width: 768px)",
+            );
+
+        const updateDeviceType = () => {
+            setIsDesktop(
+                mediaQuery.matches,
+            );
+        };
+
+        updateDeviceType();
+
+        mediaQuery.addEventListener(
+            "change",
+            updateDeviceType,
+        );
+
+        return () => {
+            mediaQuery.removeEventListener(
+                "change",
+                updateDeviceType,
+            );
+        };
+    }, []);
 
     // LOAD SAVED GALLERY PERMISSION
     useEffect(() => {
@@ -78,7 +110,9 @@ const GalleryModal = ({
             savedPermission ===
             GALLERY_PERMISSION.DENIED
         ) {
-            setPermission(savedPermission);
+            setPermission(
+                savedPermission,
+            );
         } else {
             setPermission(
                 GALLERY_PERMISSION.ASK,
@@ -88,26 +122,41 @@ const GalleryModal = ({
 
     // OPEN NATIVE FILE PICKER
     const openNativeGalleryPicker = () => {
-        requestAnimationFrame(() => {
-            fileInputRef.current?.click();
-        });
+        fileInputRef.current?.click();
     };
 
-    // OPEN PICKER AUTOMATICALLY IF ALREADY ALLOWED
+    // IF PERMISSION IS ALREADY GRANTED,
+    // OPEN THE PICKER WHEN GALLERY OPENS.
+    //
+    // NOTE:
+    // Some browsers may block this because it
+    // is not directly triggered by a user click.
+    // The final desktop implementation should
+    // move this trigger to the Gallery button
+    // inside Chat.jsx.
     useEffect(() => {
         if (!isOpen) {
             return;
         }
 
         if (
-            permission ===
+            permission !==
             GALLERY_PERMISSION.GRANTED
         ) {
-            openNativeGalleryPicker();
+            return;
         }
+
+        if (!isDesktop) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            openNativeGalleryPicker();
+        });
     }, [
         isOpen,
         permission,
+        isDesktop,
     ]);
 
     // SUPPORT INITIAL FILES
@@ -163,6 +212,16 @@ const GalleryModal = ({
         setIsFolderMenuOpen(false);
 
         setIsSending(false);
+
+        setMediaItems(
+            (previousItems) => {
+                revokeMediaPreviewUrls(
+                    previousItems,
+                );
+
+                return [];
+            },
+        );
     }, [isOpen]);
 
     // CLEANUP MEDIA PREVIEW URLS
@@ -174,7 +233,7 @@ const GalleryModal = ({
         };
     }, [mediaItems]);
 
-    // USER ACCEPTS AETHERION GALLERY ACCESS
+    // USER ACCEPTS GALLERY ACCESS
     const handleAllowGallery = () => {
         localStorage.setItem(
             GALLERY_PERMISSION_STORAGE_KEY,
@@ -184,9 +243,13 @@ const GalleryModal = ({
         setPermission(
             GALLERY_PERMISSION.GRANTED,
         );
+
+        // This is directly inside the user's
+        // button click, so browsers allow it.
+        openNativeGalleryPicker();
     };
 
-    // USER DENIES AETHERION GALLERY ACCESS
+    // USER DENIES GALLERY ACCESS
     const handleDenyGallery = () => {
         localStorage.setItem(
             GALLERY_PERMISSION_STORAGE_KEY,
@@ -209,11 +272,16 @@ const GalleryModal = ({
                 event.target.files || [],
             );
 
-        // Reset the input so selecting the
-        // same file again still triggers change.
+        // Reset so the same files can be
+        // selected again later.
         event.target.value = "";
 
         if (!files.length) {
+            // User cancelled desktop picker.
+            if (isDesktop) {
+                onClose?.();
+            }
+
             return;
         }
 
@@ -231,6 +299,18 @@ const GalleryModal = ({
                 return items;
             },
         );
+
+        if (isDesktop) {
+            onSend?.({
+                items,
+                caption: "",
+                source,
+            });
+
+            onClose?.();
+
+            return;
+        }
 
         setSelectedItems([]);
 
@@ -287,7 +367,6 @@ const GalleryModal = ({
                 String(item.id),
             );
 
-        // DESELECT
         if (isAlreadySelected) {
             setSelectedItems(
                 (
@@ -309,7 +388,6 @@ const GalleryModal = ({
             return;
         }
 
-        // VALIDATE BEFORE SELECTING
         const validation =
             validateGallerySelection({
                 file: item.file,
@@ -325,7 +403,6 @@ const GalleryModal = ({
             return;
         }
 
-        // SELECT
         setSelectedItems(
             (previousItems) => [
                 ...previousItems,
@@ -441,11 +518,10 @@ const GalleryModal = ({
                         </div>
                     </div>
                 </div>
-            ) : (
+            ) : isDesktop ? null : (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-0 backdrop-blur-sm sm:p-4">
-                    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0b100c] shadow-2xl sm:h-[min(900px,92vh)] sm:max-w-4xl sm:rounded-3xl">
 
-                        {/* HEADER */}
+                    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0b100c] shadow-2xl sm:h-[min(900px,92vh)] sm:max-w-4xl sm:rounded-3xl">
 
                         <GalleryHeader
                             currentFolder={
@@ -461,13 +537,12 @@ const GalleryModal = ({
                                     ) =>
                                         !previousState,
                                 )
+
                             }
                             isFolderMenuOpen={
                                 isFolderMenuOpen
                             }
                         />
-
-                        {/* FOLDER MENU */}
 
                         <GalleryFolderMenu
                             folders={folders}
@@ -481,8 +556,6 @@ const GalleryModal = ({
                                 isFolderMenuOpen
                             }
                         />
-
-                        {/* MEDIA GRID */}
 
                         <div className="min-h-0 flex-1 pt-3">
                             <GalleryGrid
@@ -500,8 +573,6 @@ const GalleryModal = ({
                                 }
                             />
                         </div>
-
-                        {/* SELECTION BAR */}
 
                         <GallerySelectionBar
                             caption={
