@@ -5,6 +5,12 @@ import {
     useState,
 } from "react";
 
+import {
+    Image,
+    ShieldCheck,
+    X,
+} from "lucide-react";
+
 import toast from "react-hot-toast";
 
 import GalleryHeader from "./GalleryHeader.jsx";
@@ -35,37 +41,19 @@ const GalleryModal = ({
     initialFiles = [],
     source = "chat",
 }) => {
-    const [mediaItems, setMediaItems] =
-        useState([]);
-
-    const [selectedItems, setSelectedItems] =
-        useState([]);
-
-    const [caption, setCaption] =
-        useState("");
-
+    const [mediaItems, setMediaItems] = useState([]);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [caption, setCaption] = useState("");
     const [currentFolder, setCurrentFolder] =
         useState({
             id: "recent",
             name: "Recents",
             filter: "all",
         });
-
-    const [
-        isFolderMenuOpen,
-        setIsFolderMenuOpen,
-    ] = useState(false);
-
-    const [isSending, setIsSending] =
-        useState(false);
-
-    const [permission, setPermission] =
-        useState(
-            GALLERY_PERMISSION.ASK,
-        );
-
-    const [isDesktop, setIsDesktop] =
-        useState(false);
+    const [isFolderMenuOpen, setIsFolderMenuOpen,] = useState(false);
+    const [isSending, setIsSending] = useState(false);
+    const [permission, setPermission] = useState(GALLERY_PERMISSION.ASK,);
+    const [isDesktop, setIsDesktop] = useState(false);
 
     const fileInputRef = useRef(null);
 
@@ -247,6 +235,10 @@ const GalleryModal = ({
         // This is directly inside the user's
         // button click, so browsers allow it.
         openNativeGalleryPicker();
+    };
+
+    const handleCancelGalleryAccess = () => {
+        onClose?.();
     };
 
     // USER DENIES GALLERY ACCESS
@@ -481,29 +473,40 @@ const GalleryModal = ({
 
             {permission ===
                 GALLERY_PERMISSION.ASK ? (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-                    <div className="w-full max-w-md rounded-3xl border border-[#d8f45a]/15 bg-[#0b100c] p-6 shadow-2xl">
-                        <h2 className="text-lg font-bold text-[#edefe5]">
-                            Allow Aetherion to
-                            access your gallery?
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="w-full max-w-[340px] rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-5 py-5 shadow-[0_18px_50px_rgba(0,0,0,0.45)]">
+
+                        {/* GALLERY ICON */}
+
+                        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#181f1a]">
+                            <Image
+                                size={20}
+                                strokeWidth={2}
+                                className="text-[#506fb9]"
+                            />
+                        </div>
+
+                        {/* TEXT */}
+
+                        <h2 className="text-[17px] font-semibold text-[#edefe5]">
+                            Access your gallery?
                         </h2>
 
-                        <p className="mt-3 text-sm leading-6 text-[#8a9385]">
-                            Choose photos and
-                            videos from your
-                            device to send in this
-                            chat.
+                        <p className="mt-2 text-sm leading-5 text-[#8a9385]">
+                            Choose photos and videos to
+                            send in this chat.
                         </p>
 
-                        <div className="mt-6 flex justify-end gap-3">
+                        {/* ACTIONS */}
+
+                        <div className="mt-5 flex gap-3">
+
                             <button
                                 type="button"
-                                onClick={
-                                    handleDenyGallery
-                                }
-                                className="rounded-xl px-5 py-2.5 text-sm font-medium text-[#edefe5] transition hover:bg-white/5"
+                                onClick={handleCancelGalleryAccess}
+                                className="flex-1 rounded-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-[#edefe5] transition hover:bg-white/[0.05]"
                             >
-                                No
+                                Cancel
                             </button>
 
                             <button
@@ -511,11 +514,13 @@ const GalleryModal = ({
                                 onClick={
                                     handleAllowGallery
                                 }
-                                className="rounded-xl bg-[#d8f45a] px-5 py-2.5 text-sm font-bold text-[#10120d] transition hover:bg-[#e4ff6f]"
+                                className="flex-1 rounded-xl bg-[#e4ff6f] px-4 py-2.5 text-sm font-semibold text-[#10120d] transition hover:bg-[#e1fe5d]"
                             >
-                                Yes
+                                Continue
                             </button>
+
                         </div>
+
                     </div>
                 </div>
             ) : isDesktop ? null : (
