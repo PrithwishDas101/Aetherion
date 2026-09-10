@@ -1,89 +1,40 @@
 import {
     useEffect,
-    useMemo,
     useRef,
     useState,
 } from "react";
 
 import {
     Image,
-    ShieldCheck,
-    X,
 } from "lucide-react";
 
 import toast from "react-hot-toast";
 
-import GalleryHeader from "./GalleryHeader.jsx";
-import GalleryFolderMenu from "./GalleryFolderMenu.jsx";
-import GalleryGrid from "./GalleryGrid.jsx";
-import GallerySelectionBar from "./GallerySelectionBar.jsx";
+const GALLERY_PERMISSION_STORAGE_KEY =
+    "aetherion_gallery_permission";
 
-import {
-    GALLERY_PERMISSION,
-    GALLERY_PERMISSION_STORAGE_KEY,
-} from "./galleryConstants.js";
-
-import {
-    validateGallerySelection,
-} from "../../utils/galleryValidation.js";
-
-import {
-    createGalleryFoldersFromMedia,
-    createGalleryMediaItems,
-    filterGalleryMediaItems,
-    revokeMediaPreviewUrls,
-} from "../../utils/mediaMetadata.js";
+const GALLERY_PERMISSION = {
+    ASK: "ASK",
+    GRANTED: "GRANTED",
+};
 
 const GalleryModal = ({
     isOpen,
     onClose,
     onSend,
-    initialFiles = [],
     source = "chat",
 }) => {
-    const [mediaItems, setMediaItems] = useState([]);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [caption, setCaption] = useState("");
-    const [currentFolder, setCurrentFolder] =
-        useState({
-            id: "recent",
-            name: "Recents",
-            filter: "all",
-        });
-    const [isFolderMenuOpen, setIsFolderMenuOpen,] = useState(false);
-    const [isSending, setIsSending] = useState(false);
-    const [permission, setPermission] = useState(GALLERY_PERMISSION.ASK,);
-    const [isDesktop, setIsDesktop] = useState(false);
+    const fileInputRef =
+        useRef(null);
 
-    const fileInputRef = useRef(null);
+    const [isSending, setIsSending] =
+        useState(false);
 
-    // DETECT DESKTOP
-    useEffect(() => {
-        const mediaQuery =
-            window.matchMedia(
-                "(min-width: 768px)",
-            );
+    const [permission, setPermission] =
+        useState(GALLERY_PERMISSION.ASK);
 
-        const updateDeviceType = () => {
-            setIsDesktop(
-                mediaQuery.matches,
-            );
-        };
-
-        updateDeviceType();
-
-        mediaQuery.addEventListener(
-            "change",
-            updateDeviceType,
-        );
-
-        return () => {
-            mediaQuery.removeEventListener(
-                "change",
-                updateDeviceType,
-            );
-        };
-    }, []);
+    const hasOpenedPickerRef =
+        useRef(false);
 
     // LOAD SAVED GALLERY PERMISSION
     useEffect(() => {
@@ -94,34 +45,30 @@ const GalleryModal = ({
 
         if (
             savedPermission ===
-            GALLERY_PERMISSION.GRANTED ||
-            savedPermission ===
-            GALLERY_PERMISSION.DENIED
+            GALLERY_PERMISSION.GRANTED
         ) {
             setPermission(
-                savedPermission,
+                GALLERY_PERMISSION.GRANTED,
             );
-        } else {
-            setPermission(
-                GALLERY_PERMISSION.ASK,
-            );
+
+            return;
         }
+
+        setPermission(
+            GALLERY_PERMISSION.ASK,
+        );
     }, []);
 
-    // OPEN NATIVE FILE PICKER
-    const openNativeGalleryPicker = () => {
-        fileInputRef.current?.click();
-    };
+    // RESET PICKER STATE WHEN MODAL CLOSES
+    useEffect(() => {
+        if (!isOpen) {
+            hasOpenedPickerRef.current =
+                false;
+        }
+    }, [isOpen]);
 
-    // IF PERMISSION IS ALREADY GRANTED,
-    // OPEN THE PICKER WHEN GALLERY OPENS.
-    //
-    // NOTE:
-    // Some browsers may block this because it
-    // is not directly triggered by a user click.
-    // The final desktop implementation should
-    // move this trigger to the Gallery button
-    // inside Chat.jsx.
+    // IF PERMISSION WAS ALREADY GRANTED,
+    // OPEN THE NATIVE PICKER DIRECTLY.
     useEffect(() => {
         if (!isOpen) {
             return;
@@ -134,321 +81,100 @@ const GalleryModal = ({
             return;
         }
 
-        if (!isDesktop) {
-            return;
-        }
-
-        requestAnimationFrame(() => {
-            openNativeGalleryPicker();
-        });
-    }, [
-        isOpen,
-        permission,
-        isDesktop,
-    ]);
-
-    // SUPPORT INITIAL FILES
-    useEffect(() => {
-        if (!isOpen) {
-            return;
-        }
-
-        const files =
-            Array.from(
-                initialFiles || [],
-            );
-
-        if (!files.length) {
-            return;
-        }
-
-        const items =
-            createGalleryMediaItems(
-                files,
-            );
-
-        setMediaItems(
-            (previousItems) => {
-                revokeMediaPreviewUrls(
-                    previousItems,
-                );
-
-                return items;
-            },
-        );
-
-        setCurrentFolder({
-            id: "recent",
-            name: "Recents",
-            filter: "all",
-        });
-    }, [
-        initialFiles,
-        isOpen,
-    ]);
-
-    // CLEAN STATE WHEN CLOSED
-    useEffect(() => {
-        if (isOpen) {
-            return;
-        }
-
-        setSelectedItems([]);
-
-        setCaption("");
-
-        setIsFolderMenuOpen(false);
-
-        setIsSending(false);
-
-        setMediaItems(
-            (previousItems) => {
-                revokeMediaPreviewUrls(
-                    previousItems,
-                );
-
-                return [];
-            },
-        );
-    }, [isOpen]);
-
-    // CLEANUP MEDIA PREVIEW URLS
-    useEffect(() => {
-        return () => {
-            revokeMediaPreviewUrls(
-                mediaItems,
-            );
-        };
-    }, [mediaItems]);
-
-    // USER ACCEPTS GALLERY ACCESS
-    const handleAllowGallery = () => {
-        localStorage.setItem(
-            GALLERY_PERMISSION_STORAGE_KEY,
-            GALLERY_PERMISSION.GRANTED,
-        );
-
-        setPermission(
-            GALLERY_PERMISSION.GRANTED,
-        );
-
-        // This is directly inside the user's
-        // button click, so browsers allow it.
-        openNativeGalleryPicker();
-    };
-
-    const handleCancelGalleryAccess = () => {
-        onClose?.();
-    };
-
-    // USER DENIES GALLERY ACCESS
-    const handleDenyGallery = () => {
-        localStorage.setItem(
-            GALLERY_PERMISSION_STORAGE_KEY,
-            GALLERY_PERMISSION.DENIED,
-        );
-
-        setPermission(
-            GALLERY_PERMISSION.DENIED,
-        );
-
-        onClose?.();
-    };
-
-    // HANDLE FILE INPUT CHANGE
-    const handleFileInputChange = (
-        event,
-    ) => {
-        const files =
-            Array.from(
-                event.target.files || [],
-            );
-
-        // Reset so the same files can be
-        // selected again later.
-        event.target.value = "";
-
-        if (!files.length) {
-            // User cancelled desktop picker.
-            if (isDesktop) {
-                onClose?.();
-            }
-
-            return;
-        }
-
-        const items =
-            createGalleryMediaItems(
-                files,
-            );
-
-        setMediaItems(
-            (previousItems) => {
-                revokeMediaPreviewUrls(
-                    previousItems,
-                );
-
-                return items;
-            },
-        );
-
-        if (isDesktop) {
-            onSend?.({
-                items,
-                caption: "",
-                source,
-            });
-
-            onClose?.();
-
-            return;
-        }
-
-        setSelectedItems([]);
-
-        setCurrentFolder({
-            id: "recent",
-            name: "Recents",
-            filter: "all",
-        });
-    };
-
-    // CREATE AVAILABLE FOLDERS
-    const folders = useMemo(() => {
-        return createGalleryFoldersFromMedia(
-            mediaItems,
-        );
-    }, [mediaItems]);
-
-    // FILTER CURRENT FOLDER
-    const visibleMediaItems =
-        useMemo(() => {
-            return filterGalleryMediaItems(
-                mediaItems,
-                currentFolder?.filter ||
-                "all",
-            );
-        }, [
-            mediaItems,
-            currentFolder,
-        ]);
-
-    // SELECTED ITEM IDS
-    const selectedItemIds =
-        useMemo(() => {
-            return new Set(
-                selectedItems.map(
-                    (item) =>
-                        String(
-                            item.id,
-                        ),
-                ),
-            );
-        }, [selectedItems]);
-
-    // TOGGLE MEDIA SELECTION
-    const handleItemClick = (
-        item,
-    ) => {
-        if (!item) {
-            return;
-        }
-
-        const isAlreadySelected =
-            selectedItemIds.has(
-                String(item.id),
-            );
-
-        if (isAlreadySelected) {
-            setSelectedItems(
-                (
-                    previousItems,
-                ) =>
-                    previousItems.filter(
-                        (
-                            currentItem,
-                        ) =>
-                            String(
-                                currentItem.id,
-                            ) !==
-                            String(
-                                item.id,
-                            ),
-                    ),
-            );
-
-            return;
-        }
-
-        const validation =
-            validateGallerySelection({
-                file: item.file,
-                selectedCount:
-                    selectedItems.length,
-            });
-
-        if (!validation.valid) {
-            toast.error(
-                validation.error,
-            );
-
-            return;
-        }
-
-        setSelectedItems(
-            (previousItems) => [
-                ...previousItems,
-                item,
-            ],
-        );
-    };
-
-    // CHANGE FOLDER
-    const handleFolderSelect = (
-        folder,
-    ) => {
-        setCurrentFolder(folder);
-
-        setIsFolderMenuOpen(false);
-    };
-
-    // SEND SELECTED MEDIA
-    const handleSend = async () => {
         if (
-            !selectedItems.length ||
-            isSending
+            hasOpenedPickerRef.current
         ) {
             return;
         }
 
-        try {
-            setIsSending(true);
+        hasOpenedPickerRef.current =
+            true;
 
-            await onSend?.({
-                items: selectedItems,
-                caption:
-                    caption.trim(),
-                source,
-            });
+        requestAnimationFrame(() => {
+            fileInputRef.current?.click();
+        });
+    }, [
+        isOpen,
+        permission,
+    ]);
 
-            setSelectedItems([]);
-
-            setCaption("");
-
-            onClose?.();
-        } catch (error) {
-            console.error(
-                "Gallery send error:",
-                error,
-            );
-
-            toast.error(
-                "Unable to send selected media.",
-            );
-        } finally {
-            setIsSending(false);
-        }
+    const handleCancel = () => {
+        onClose?.();
     };
+
+    const handleContinue = () => {
+        // SAVE PERMISSION ONLY WHEN
+        // THE USER EXPLICITLY CONTINUES.
+        localStorage.setItem(
+            GALLERY_PERMISSION_STORAGE_KEY,
+            GALLERY_PERMISSION.GRANTED,
+        );
+
+        setPermission(
+            GALLERY_PERMISSION.GRANTED,
+        );
+
+        // Prevent the effect above from
+        // opening the picker twice.
+        hasOpenedPickerRef.current =
+            true;
+
+        // This runs directly inside the user's
+        // button click, so browsers can open
+        // the native media picker.
+        fileInputRef.current?.click();
+    };
+
+    const handleFileInputChange =
+        async (event) => {
+            const files =
+                Array.from(
+                    event.target.files || [],
+                );
+
+            // Reset so selecting the same file
+            // again later still triggers change.
+            event.target.value = "";
+
+            // User closed the native picker.
+            if (!files.length) {
+                onClose?.();
+
+                return;
+            }
+
+            try {
+                setIsSending(true);
+
+                await onSend?.({
+                    items: files.map(
+                        (file) => ({
+                            id: [
+                                file.name,
+                                file.size,
+                                file.lastModified,
+                            ].join("-"),
+                            file,
+                        }),
+                    ),
+                    caption: "",
+                    source,
+                });
+
+                onClose?.();
+            } catch (error) {
+                console.error(
+                    "Gallery send error:",
+                    error,
+                );
+
+                toast.error(
+                    "Unable to send selected media.",
+                );
+            } finally {
+                setIsSending(false);
+            }
+        };
 
     if (!isOpen) {
         return null;
@@ -456,7 +182,7 @@ const GalleryModal = ({
 
     return (
         <>
-            {/* HIDDEN NATIVE GALLERY PICKER */}
+            {/* HIDDEN NATIVE MEDIA PICKER */}
 
             <input
                 ref={fileInputRef}
@@ -469,11 +195,13 @@ const GalleryModal = ({
                 }
             />
 
-            {/* AETHERION PERMISSION SCREEN */}
+            {/* SHOW PERMISSION UI ONLY
+                BEFORE ACCESS IS GRANTED */}
 
             {permission ===
                 GALLERY_PERMISSION.ASK ? (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+
                     <div className="w-full max-w-[340px] rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-5 py-5 shadow-[0_18px_50px_rgba(0,0,0,0.45)]">
 
                         {/* GALLERY ICON */}
@@ -493,8 +221,8 @@ const GalleryModal = ({
                         </h2>
 
                         <p className="mt-2 text-sm leading-5 text-[#8a9385]">
-                            Choose photos and videos to
-                            send in this chat.
+                            Choose photos and videos
+                            to send in this chat.
                         </p>
 
                         {/* ACTIONS */}
@@ -503,8 +231,13 @@ const GalleryModal = ({
 
                             <button
                                 type="button"
-                                onClick={handleCancelGalleryAccess}
-                                className="flex-1 rounded-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-[#edefe5] transition hover:bg-white/[0.05]"
+                                onClick={
+                                    handleCancel
+                                }
+                                disabled={
+                                    isSending
+                                }
+                                className="flex-1 rounded-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-[#edefe5] transition hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 Cancel
                             </button>
@@ -512,9 +245,12 @@ const GalleryModal = ({
                             <button
                                 type="button"
                                 onClick={
-                                    handleAllowGallery
+                                    handleContinue
                                 }
-                                className="flex-1 rounded-xl bg-[#e4ff6f] px-4 py-2.5 text-sm font-semibold text-[#10120d] transition hover:bg-[#e1fe5d]"
+                                disabled={
+                                    isSending
+                                }
+                                className="flex-1 rounded-xl bg-[#e4ff6f] px-4 py-2.5 text-sm font-semibold text-[#10120d] transition hover:bg-[#e1fe5d] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 Continue
                             </button>
@@ -522,83 +258,9 @@ const GalleryModal = ({
                         </div>
 
                     </div>
+
                 </div>
-            ) : isDesktop ? null : (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-0 backdrop-blur-sm sm:p-4">
-
-                    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0b100c] shadow-2xl sm:h-[min(900px,92vh)] sm:max-w-4xl sm:rounded-3xl">
-
-                        <GalleryHeader
-                            currentFolder={
-                                currentFolder?.name
-                            }
-                            onClose={
-                                onClose
-                            }
-                            onFolderClick={() =>
-                                setIsFolderMenuOpen(
-                                    (
-                                        previousState,
-                                    ) =>
-                                        !previousState,
-                                )
-
-                            }
-                            isFolderMenuOpen={
-                                isFolderMenuOpen
-                            }
-                        />
-
-                        <GalleryFolderMenu
-                            folders={folders}
-                            currentFolderId={
-                                currentFolder?.id
-                            }
-                            onSelect={
-                                handleFolderSelect
-                            }
-                            isOpen={
-                                isFolderMenuOpen
-                            }
-                        />
-
-                        <div className="min-h-0 flex-1 pt-3">
-                            <GalleryGrid
-                                mediaItems={
-                                    visibleMediaItems
-                                }
-                                selectedItems={
-                                    selectedItems
-                                }
-                                onItemClick={
-                                    handleItemClick
-                                }
-                                disabled={
-                                    isSending
-                                }
-                            />
-                        </div>
-
-                        <GallerySelectionBar
-                            caption={
-                                caption
-                            }
-                            selectedCount={
-                                selectedItems.length
-                            }
-                            onCaptionChange={
-                                setCaption
-                            }
-                            onSend={
-                                handleSend
-                            }
-                            isSending={
-                                isSending
-                            }
-                        />
-                    </div>
-                </div>
-            )}
+            ) : null}
         </>
     );
 };
