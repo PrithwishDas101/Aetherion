@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiRefreshCw, FiX, FiZap, FiZapOff } from "react-icons/fi";
+import {
+  FiRefreshCw,
+  FiX,
+  FiZap,
+  FiZapOff,
+  FiImage,
+} from "react-icons/fi";
 
 import {
   getCameraStream,
@@ -381,8 +387,8 @@ const CameraModal = ({
     try {
       const recorder = mimeType
         ? new MediaRecorder(stream, {
-            mimeType,
-          })
+          mimeType,
+        })
         : new MediaRecorder(stream);
 
       mediaRecorderRef.current = recorder;
@@ -694,7 +700,7 @@ const CameraModal = ({
           />
         ) : null}
 
-        {/* VIDEO PREVIEW */}       
+        {/* VIDEO PREVIEW */}
         {showingRecordedVideo ? (
           <VideoPreview
             videoUrl={recordedVideoUrl}
@@ -767,9 +773,8 @@ const CameraModal = ({
               {mode === "video" ? (
                 <div className="absolute left-1/2 -translate-x-1/2">
                   <div
-                    className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-md ${
-                      isRecording ? "bg-red-500/90" : "bg-black/45"
-                    }`}
+                    className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-md ${isRecording ? "bg-red-500/90" : "bg-black/45"
+                      }`}
                   >
                     {isRecording ? (
                       <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
@@ -787,11 +792,10 @@ const CameraModal = ({
                   type="button"
                   onClick={toggleTorch}
                   disabled={isLoading || !hasTorch}
-                  className={`ml-auto flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md transition active:scale-95 ${
-                    isTorchEnabled
-                      ? "bg-white text-black"
-                      : "bg-black/45 text-white"
-                  } ${!hasTorch ? "cursor-not-allowed opacity-40" : ""}`}
+                  className={`ml-auto flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md transition active:scale-95 ${isTorchEnabled
+                    ? "bg-white text-black"
+                    : "bg-black/45 text-white"
+                    } ${!hasTorch ? "cursor-not-allowed opacity-40" : ""}`}
                   aria-label={
                     !hasTorch
                       ? "Torch unavailable"
@@ -827,7 +831,7 @@ const CameraModal = ({
                       className="flex h-12 w-12 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-md transition active:scale-95 disabled:opacity-40"
                       aria-label="Open gallery"
                     >
-                      <span className="text-lg">▧</span>
+                      <FiImage className="text-xl" />
                     </button>
                   ) : null}
                 </div>
@@ -848,13 +852,12 @@ const CameraModal = ({
                   }
                 >
                   <span
-                    className={`block transition-all duration-200 ${
-                      mode === "photo"
-                        ? "h-14 w-14 rounded-full bg-white"
-                        : isRecording
-                          ? "h-9 w-9 rounded-lg bg-red-500"
-                          : "h-12 w-12 rounded-xl bg-red-500"
-                    }`}
+                    className={`block transition-all duration-200 ${mode === "photo"
+                      ? "h-14 w-14 rounded-full bg-white"
+                      : isRecording
+                        ? "h-9 w-9 rounded-lg bg-red-500"
+                        : "h-12 w-12 rounded-xl bg-red-500"
+                      }`}
                   />
                 </button>
 
@@ -882,9 +885,8 @@ const CameraModal = ({
                   type="button"
                   onClick={() => changeMode("video")}
                   disabled={isRecording}
-                  className={`text-sm font-semibold ${
-                    mode === "video" ? "text-white" : "text-white/45"
-                  }`}
+                  className={`text-sm font-semibold ${mode === "video" ? "text-white" : "text-white/45"
+                    }`}
                 >
                   Video
                 </button>
@@ -893,9 +895,8 @@ const CameraModal = ({
                   type="button"
                   onClick={() => changeMode("photo")}
                   disabled={isRecording}
-                  className={`text-sm font-semibold ${
-                    mode === "photo" ? "text-white" : "text-white/45"
-                  }`}
+                  className={`text-sm font-semibold ${mode === "photo" ? "text-white" : "text-white/45"
+                    }`}
                 >
                   Photo
                 </button>
