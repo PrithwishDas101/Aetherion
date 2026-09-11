@@ -7,31 +7,56 @@ const messageSchema = new mongoose.Schema(
       ref: "Chat",
       required: true,
     },
+
     sender: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+
     type: {
       type: String,
-      enum: ["text", "gif", "image", "video"],
+      enum: ["text", "gif", "image", "video", "document"],
       default: "text",
     },
+
     text: {
       type: String,
       trim: true,
       default: "",
     },
+
     mediaUrl: {
       type: String,
       trim: true,
       default: null,
     },
+
+    document: {
+      name: {
+        type: String,
+        trim: true,
+        default: null,
+      },
+
+      mimeType: {
+        type: String,
+        trim: true,
+        default: null,
+      },
+
+      size: {
+        type: Number,
+        default: null,
+      },
+    },
+
     replyTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",
       default: null,
     },
+
     read: {
       type: Boolean,
       default: false,

@@ -4,6 +4,7 @@ import {
   uploadImage,
   uploadGif,
   uploadVideo,
+  uploadDocument,
 } from "../services/cloudinaryService.js";
 
 // SEND MESSAGES
@@ -75,6 +76,7 @@ export const sendMessage = async (req, res) => {
 
     let finalMediaUrl = null;
 
+    // IMAGE
     if (type === "image") {
       if (!uploadedFile) {
         return res.status(400).json({
@@ -98,6 +100,7 @@ export const sendMessage = async (req, res) => {
       console.log("🖼️ IMAGE UPLOADED:", finalMediaUrl);
     }
 
+    // GIF
     if (type === "gif") {
       if (uploadedFile) {
         console.log("🎞️ EDITED GIF REACHED CONTROLLER:", {
@@ -149,6 +152,31 @@ export const sendMessage = async (req, res) => {
       console.log("🎥 VIDEO UPLOADED:", finalMediaUrl);
     }
 
+    // DOCUMENT
+    if (type === "document") {
+      if (!uploadedFile) {
+        return res.status(400).json({
+          success: false,
+          message: "Document file is required.",
+        });
+      }
+
+      console.log("📄 UPLOADING DOCUMENT:", {
+        size: uploadedFile.size,
+        mimeType: uploadedFile.mimetype,
+        originalName: uploadedFile.originalname,
+      });
+
+      const uploadResult = await uploadDocument(
+        uploadedFile.buffer,
+        "aetherion/chat-documents",
+      );
+
+      finalMediaUrl = uploadResult.secure_url;
+
+      console.log("📄 DOCUMENT UPLOADED:", finalMediaUrl);
+    }
+
     console.log("💾 SAVING MESSAGE:", {
       chatId,
       senderId,
@@ -159,15 +187,20 @@ export const sendMessage = async (req, res) => {
     const savedMessage = await Message.create({
       chatId,
       sender: senderId,
-
       type,
-
       text: text?.trim() || "",
-
       mediaUrl: finalMediaUrl,
+      document:
+        type === "document" && uploadedFile
+          ? {
+              name: uploadedFile.originalname,
 
+              mimeType: uploadedFile.mimetype,
+
+              size: uploadedFile.size,
+            }
+          : undefined,
       replyTo: replyTo || null,
-
       read: false,
     });
 
@@ -212,7 +245,7 @@ export const sendMessage = async (req, res) => {
       chat: updatedChat,
     });
   } catch (error) {
-    console.error("❌ Send message error:", error);
+    console.error(" Send message error:", error);
 
     return res.status(500).json({
       success: false,
@@ -243,7 +276,7 @@ export const getAllMessages = async (req, res) => {
     })
       .populate({
         path: "replyTo",
-        select: "text sender type mediaUrl",
+        select: "text sender type mediaUrl document",
       })
       .sort({
         createdAt: 1,

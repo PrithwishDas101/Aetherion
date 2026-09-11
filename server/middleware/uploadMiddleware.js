@@ -2,13 +2,10 @@ import multer from "multer";
 
 const storage = multer.memoryStorage();
 
-console.log("🔥 ACTIVE UPLOAD MIDDLEWARE LOADED — LIMIT: 50MB");
-
 const upload = multer({
   storage,
 
   limits: {
-    // 50 MB — videos can easily exceed the old 5 MB limit.
     fileSize: 50 * 1024 * 1024,
   },
 
@@ -28,34 +25,75 @@ const upload = multer({
       "video/x-matroska",
     ];
 
-    const allowedTypes = [...allowedImageTypes, ...allowedVideoTypes];
+    const allowedDocumentTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "text/plain",
+      "text/csv",
+      "application/zip",
+      "application/x-zip-compressed",
+    ];
+
+    const allowedTypes = [
+      ...allowedImageTypes,
+      ...allowedVideoTypes,
+      ...allowedDocumentTypes,
+    ];
+
     const fileName = file.originalname?.toLowerCase() || "";
 
-    const extensionMatches =
-      fileName.endsWith(".webm") ||
-      fileName.endsWith(".mp4") ||
-      fileName.endsWith(".ogg") ||
-      fileName.endsWith(".mov") ||
-      fileName.endsWith(".mkv") ||
-      fileName.endsWith(".jpg") ||
-      fileName.endsWith(".jpeg") ||
-      fileName.endsWith(".png") ||
-      fileName.endsWith(".webp") ||
-      fileName.endsWith(".gif");
+    const allowedExtensions = [
+      ".webm",
+      ".mp4",
+      ".ogg",
+      ".mov",
+      ".mkv",
+
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp",
+      ".gif",
+
+      ".pdf",
+
+      ".doc",
+      ".docx",
+
+      ".xls",
+      ".xlsx",
+
+      ".ppt",
+      ".pptx",
+
+      ".txt",
+      ".csv",
+
+      ".zip",
+    ];
+
+    const extensionMatches = allowedExtensions.some((extension) =>
+      fileName.endsWith(extension),
+    );
 
     console.log("📦 MULTER FILE:", {
       fieldname: file.fieldname,
       originalname: file.originalname,
       mimetype: file.mimetype,
-      size: file.size,
     });
 
     if (allowedTypes.includes(file.mimetype) || extensionMatches) {
       cb(null, true);
+
       return;
     }
 
-    cb(new Error(`Unsupported media type: ${file.mimetype}`), false);
+    cb(new Error(`Unsupported file type: ${file.mimetype}`), false);
   },
 });
 
