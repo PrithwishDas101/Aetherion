@@ -12,6 +12,7 @@ const MessageComposer = ({
   onSendMessage,
   onCamera,
   onGallery,
+  onDocument
 }) => {
   const [showAttachmentPanel, setShowAttachmentPanel] = useState(false);
 
@@ -27,6 +28,12 @@ const MessageComposer = ({
   const handleGallery = () => {
     setShowAttachmentPanel(false);
     onGallery?.();
+  };
+
+  const handleDocument = () => {
+    setShowAttachmentPanel(false);
+
+    onDocument?.();
   };
 
   const handleKeyDown = (event) => {
@@ -66,7 +73,7 @@ const MessageComposer = ({
             isOpen={showAttachmentPanel}
             onCamera={handleCamera}
             onGallery={handleGallery}
-            onDocument={() => console.log("Document clicked")}
+            onDocument={handleDocument}
             onPoll={() => console.log("Poll clicked")}
             onLocation={() => console.log("Location clicked")}
             onContact={() => console.log("Contact clicked")}

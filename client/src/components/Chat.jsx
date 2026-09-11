@@ -29,6 +29,7 @@ import CameraModal from "./Camera/CameraModal.jsx";
 import NewMessageDivider from "./NewMessageDivider.jsx";
 import MediaViewer from "./Camera/MediaViewer.jsx";
 import GalleryModal from "./Gallery/GalleryModal.jsx";
+import DocumentModal from "./Documents/DocumentModal.jsx";
 
 import {
   sendMessage as emitSendMessage,
@@ -52,6 +53,7 @@ const Chat = ({ socket }) => {
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
   const [mediaViewerMessageId, setMediaViewerMessageId] = useState(null);
 
@@ -222,6 +224,19 @@ const Chat = ({ socket }) => {
 
   const closeGallery = () => {
     setShowGalleryModal(false);
+  };
+
+  // DOCUMENT
+  const openDocument = () => {
+    setShowMediaPicker(false);
+    setShowCameraModal(false);
+    setShowGalleryModal(false);
+
+    setShowDocumentModal(true);
+  };
+
+  const closeDocument = () => {
+    setShowDocumentModal(false);
   };
 
   // REPLY
@@ -1105,7 +1120,8 @@ const Chat = ({ socket }) => {
       isSending ||
       showMediaPicker ||
       showCameraModal ||
-      showGalleryModal
+      showGalleryModal ||
+      showDocumentModal
     ) {
       return;
     }
@@ -1631,6 +1647,7 @@ const Chat = ({ socket }) => {
               onSendMessage={sendMessage}
               onCamera={openCamera}
               onGallery={openGallery}
+              onDocument={openDocument}
             />
 
             {/* CAMERA */}
@@ -1654,6 +1671,17 @@ const Chat = ({ socket }) => {
               isOpen={showGalleryModal}
               onClose={closeGallery}
               onSend={sendGalleryMedia}
+              source="chat"
+            />
+
+            {/* DOCUMENT */}
+
+            <DocumentModal
+              isOpen={showDocumentModal}
+              onClose={closeDocument}
+              onSend={(documentData) => {
+                console.log("Selected document:", documentData);
+              }}
               source="chat"
             />
 
