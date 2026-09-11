@@ -4,6 +4,10 @@ import {
 } from "react";
 
 import {
+    createPortal,
+} from "react-dom";
+
+import {
     FileText,
 } from "lucide-react";
 
@@ -26,9 +30,9 @@ const DocumentModal = ({
     };
 
     const handleContinue = () => {
-        // Runs directly inside the user's
-        // button click, allowing the browser
-        // to open the native file picker.
+        // This runs directly inside the user's
+        // button click, so browsers can open
+        // the native document picker.
         fileInputRef.current?.click();
     };
 
@@ -40,32 +44,30 @@ const DocumentModal = ({
                 );
 
             // Reset so selecting the same file
-            // later still triggers onChange.
+            // later still triggers change.
             event.target.value = "";
 
-            // User closed the picker.
+            // User closed the native picker.
             if (!files.length) {
                 onClose?.();
 
                 return;
             }
 
-            const file = files[0];
-
             try {
                 setIsSending(true);
 
                 await onSend?.({
-                    id: [
-                        file.name,
-                        file.size,
-                        file.lastModified,
-                    ].join("-"),
-
-                    file,
-
-                    caption: "",
-
+                    items: files.map(
+                        (file) => ({
+                            id: [
+                                file.name,
+                                file.size,
+                                file.lastModified,
+                            ].join("-"),
+                            file,
+                        }),
+                    ),
                     source,
                 });
 
@@ -88,14 +90,15 @@ const DocumentModal = ({
         return null;
     }
 
-    return (
+    return createPortal(
         <>
-            {/* HIDDEN NATIVE FILE PICKER */}
+            {/* HIDDEN NATIVE DOCUMENT PICKER */}
 
             <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt, .csv, .zip"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip"
+                multiple
                 className="hidden"
                 onChange={
                     handleFileInputChange
@@ -124,15 +127,13 @@ const DocumentModal = ({
                     </h2>
 
                     <p className="mt-2 text-sm leading-5 text-[#8a9385]">
-                        Choose a document to send
+                        Choose documents to send
                         in this chat.
                     </p>
 
                     {/* ACTIONS */}
 
                     <div className="mt-5 flex gap-3">
-
-                        {/* CANCEL */}
 
                         <button
                             type="button"
@@ -146,8 +147,6 @@ const DocumentModal = ({
                         >
                             Cancel
                         </button>
-
-                        {/* CONTINUE */}
 
                         <button
                             type="button"
@@ -166,7 +165,8 @@ const DocumentModal = ({
 
                 </div>
             </div>
-        </>
+        </>,
+        document.body,
     );
 };
 
