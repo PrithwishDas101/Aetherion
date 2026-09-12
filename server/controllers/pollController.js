@@ -86,14 +86,19 @@ export const createPoll = async (req, res) => {
     const poll = await Poll.create({
       messageId: savedMessage._id,
       chatId,
+      creator: senderId,
       question: question.trim(),
       options: cleanedOptions.map((option) => ({
         text: option,
         votes: [],
       })),
       allowMultipleAnswers: Boolean(allowMultipleAnswers),
-      createdBy: senderId,
     });
+
+    // LINK MESSAGE TO POLL
+    savedMessage.poll = poll._id;
+
+    await savedMessage.save();
 
     // POPULATE REPLY MESSAGE
     await savedMessage.populate({

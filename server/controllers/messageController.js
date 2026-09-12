@@ -276,7 +276,10 @@ export const getAllMessages = async (req, res) => {
     })
       .populate({
         path: "replyTo",
-        select: "text sender type mediaUrl document",
+        select: "text sender type mediaUrl document poll",
+      })
+      .populate({
+        path: "poll",
       })
       .sort({
         createdAt: 1,

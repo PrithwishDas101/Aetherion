@@ -10,6 +10,10 @@ import {
   createMediaMessage,
   getAllMessages,
 } from "../apiCalls/messageApi.js";
+import {
+  createPoll,
+  voteOnPoll,
+} from "../apiCalls/pollApi.js";
 import { clearUnreadMessage } from "../apiCalls/chatApi.js";
 import { showLoader, hideLoader } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
@@ -30,6 +34,7 @@ import NewMessageDivider from "./NewMessageDivider.jsx";
 import MediaViewer from "./Camera/MediaViewer.jsx";
 import GalleryModal from "./Gallery/GalleryModal.jsx";
 import DocumentModal from "./Documents/DocumentModal.jsx";
+import PollModal from "./Poll/PollModal.jsx";
 
 import {
   sendMessage as emitSendMessage,
@@ -54,6 +59,7 @@ const Chat = ({ socket }) => {
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
+  const [showPollModal, setShowPollModal] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
   const [mediaViewerMessageId, setMediaViewerMessageId] = useState(null);
 
@@ -449,6 +455,248 @@ const Chat = ({ socket }) => {
       return false;
     } finally {
       setIsSending(false);
+    }
+  };
+
+  // POLL
+  // POLL
+  const openPoll = () => {
+    setShowMediaPicker(false);
+    setShowCameraModal(false);
+    setShowGalleryModal(false);
+    setShowDocumentModal(false);
+
+    setShowPollModal(true);
+  };
+
+  const closePoll = () => {
+    setShowPollModal(false);
+  };
+
+  // CREATE POLL
+  const handleCreatePoll = async (pollData) => {
+    if (
+      !selectedChat?._id ||
+      !pollData?.question?.trim() ||
+      !Array.isArray(pollData?.options) ||
+      pollData.options.length < 2 ||
+      isSending
+    ) {
+      return false;
+    }
+
+    const cleanedOptions = pollData.options
+      .map((option) => option?.trim())
+      .filter(Boolean);
+
+    if (cleanedOptions.length < 2) {
+      toast.error("A poll needs at least two options.");
+
+      return false;
+    }
+
+    if (cleanedOptions.length > 10) {
+      toast.error("A poll can have a maximum of 10 options.");
+
+      return false;
+    }
+
+    isNearBottomRef.current = true;
+
+    try {
+      setIsSending(true);
+
+      const response = await createPoll({
+        chatId: selectedChat._id,
+        question: pollData.question.trim(),
+        options: cleanedOptions,
+        allowMultipleAnswers:
+          Boolean(pollData.allowMultipleAnswers),
+        replyTo: replyingTo?._id || null,
+      });
+
+      if (!response?.success) {
+        toast.error(
+          response?.message ||
+          "Unable to create poll.",
+        );
+
+        return false;
+      }
+
+      const createdMessage =
+        response.data?.message || null;
+
+      const createdPoll =
+        response.data?.poll || null;
+
+      const updatedChat =
+        response.chat || response.data?.chat || null;
+
+      if (!createdMessage) {
+        console.error(
+          "Poll created but no message was returned:",
+          response,
+        );
+
+        toast.error(
+          "Poll was created, but the message could not be loaded.",
+        );
+
+        return false;
+      }
+
+      const pollMessage = {
+        ...createdMessage,
+        type: "poll",
+
+        poll:
+          createdMessage.poll ||
+          createdPoll ||
+          createdMessage.pollData ||
+          null,
+      };
+
+      setAllMessages(
+        (previousMessages) => {
+          const alreadyExists =
+            previousMessages.some(
+              (currentMessage) =>
+                String(currentMessage._id) ===
+                String(pollMessage._id),
+            );
+
+          if (alreadyExists) {
+            return previousMessages;
+          }
+
+          return [
+            ...previousMessages,
+            pollMessage,
+          ];
+        },
+      );
+
+      emitSendMessage(socket, {
+        message: pollMessage,
+        chat: updatedChat,
+        members:
+          selectedChat.members.map(
+            (member) =>
+              String(member._id),
+          ),
+      });
+
+      if (updatedChat) {
+        updateChatInRedux(updatedChat);
+      }
+
+      setReplyingTo(null);
+
+      setNewMessagesState(0, null);
+
+      return true;
+    } catch (error) {
+      console.error(
+        "Create poll error:",
+        error,
+      );
+
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to create poll.",
+      );
+
+      return false;
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  // VOTE ON POLL
+  const handlePollVote = async (
+    pollId,
+    optionIds,
+  ) => {
+    if (
+      !pollId ||
+      !Array.isArray(optionIds) ||
+      optionIds.length === 0
+    ) {
+      return false;
+    }
+
+    try {
+      const response =
+        await voteOnPoll(
+          pollId,
+          optionIds,
+        );
+
+      if (!response?.success) {
+        toast.error(
+          response?.message ||
+          "Unable to update poll vote.",
+        );
+
+        return false;
+      }
+
+      const updatedPoll =
+        response.data;
+
+      if (!updatedPoll?._id) {
+        console.error(
+          "Poll vote succeeded but no updated poll was returned:",
+          response,
+        );
+
+        toast.error(
+          "Vote was saved, but the poll could not be updated.",
+        );
+
+        return false;
+      }
+
+      // UPDATE ONLY THE POLL INSIDE THE MATCHING MESSAGE
+      setAllMessages(
+        (previousMessages) =>
+          previousMessages.map(
+            (currentMessage) => {
+              if (
+                String(
+                  currentMessage.poll?._id,
+                ) !==
+                String(
+                  updatedPoll._id,
+                )
+              ) {
+                return currentMessage;
+              }
+
+              return {
+                ...currentMessage,
+                poll: updatedPoll,
+              };
+            },
+          ),
+      );
+
+      return true;
+    } catch (error) {
+      console.error(
+        "Vote on poll error:",
+        error,
+      );
+
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to update poll vote.",
+      );
+
+      return false;
     }
   };
 
@@ -1731,8 +1979,10 @@ const Chat = ({ socket }) => {
                   onReply={startReply}
                   onReplyClick={scrollToMessage}
                   onMediaClick={openMediaViewer}
+                  onPollVote={handlePollVote}
                   isHighlighted={
-                    highlightedMessageId === String(currentMessage._id)
+                    highlightedMessageId ===
+                    String(currentMessage._id)
                   }
                   currentUserId={user._id}
                   otherUserName={
@@ -1834,7 +2084,6 @@ const Chat = ({ socket }) => {
         <div className="relative">
           <div className="relative flex items-end gap-2 sm:gap-3">
             {/* EMOJI / GIF / STICKER */}
-
             <button
               type="button"
               onClick={toggleMediaPicker}
@@ -1851,7 +2100,6 @@ const Chat = ({ socket }) => {
             </button>
 
             {/* COMPOSER */}
-
             <MessageComposer
               message={message}
               messageInputRef={messageInputRef}
@@ -1861,10 +2109,10 @@ const Chat = ({ socket }) => {
               onCamera={openCamera}
               onGallery={openGallery}
               onDocument={openDocument}
+              onPoll={openPoll}
             />
 
             {/* CAMERA */}
-
             <CameraModal
               isOpen={showCameraModal}
               onClose={closeCamera}
@@ -1879,7 +2127,6 @@ const Chat = ({ socket }) => {
             />
 
             {/* GALLERY */}
-
             <GalleryModal
               isOpen={showGalleryModal}
               onClose={closeGallery}
@@ -1888,12 +2135,18 @@ const Chat = ({ socket }) => {
             />
 
             {/* DOCUMENT */}
-
             <DocumentModal
               isOpen={showDocumentModal}
               onClose={closeDocument}
               onSend={handleSendDocuments}
               source="chat"
+            />
+
+            {/* POLL */}
+            <PollModal
+              isOpen={showPollModal}
+              onClose={closePoll}
+              onSend={handleCreatePoll}
             />
 
             {mediaViewerMessageId && mediaViewerIndex >= 0 ? (

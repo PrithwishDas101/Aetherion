@@ -57,6 +57,7 @@ const pollSchema = new mongoose.Schema(
       validate: {
         validator: (options) =>
           Array.isArray(options) && options.length >= 2 && options.length <= 10,
+
         message: "A poll must have between 2 and 10 options.",
       },
     },

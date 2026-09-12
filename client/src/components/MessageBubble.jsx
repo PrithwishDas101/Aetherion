@@ -11,6 +11,7 @@ import { formatMessageTime } from "../utils/messageDate.js";
 
 import ReplyMessage from "./ReplyMessage.jsx";
 import MediaUploadIndicator from "./MediaUploadIndicator.jsx";
+import PollMessage from "./Poll/PollMessage.jsx";
 
 import useSwipeToReply from "../Hooks/useSwipeToReply.js";
 
@@ -20,6 +21,7 @@ const MessageBubble = ({
   onReply,
   onReplyClick,
   onMediaClick,
+  onPollVote,
   isHighlighted,
   currentUserId,
   otherUserName,
@@ -35,6 +37,8 @@ const MessageBubble = ({
   const isVideo = message.type === "video" && !!message.mediaUrl;
 
   const isDocument = message.type === "document" && !!message.mediaUrl;
+
+  const isPoll = message.type === "poll" && !!message.poll;
 
   const isMedia = isGif || isImage || isVideo;
 
@@ -183,7 +187,7 @@ const MessageBubble = ({
         }}
       >
         <div
-          className={`w-fit max-w-full break-words ${isMedia
+          className={`w-fit max-w-full break-words ${isMedia || isPoll
             ? ""
             : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMyMessage
               ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
@@ -226,8 +230,8 @@ const MessageBubble = ({
               onClick={handleDocumentClick}
               onKeyDown={handleDocumentKeyDown}
               className={`relative inline-flex max-w-full items-center gap-2 rounded-lg px-2.5 py-2 transition ${message.isUploading
-                  ? "cursor-default"
-                  : "cursor-pointer"
+                ? "cursor-default"
+                : "cursor-pointer"
                 } ${isMyMessage
                   ? "bg-[#d8f164] text-[#10120d]"
                   : "border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
@@ -243,8 +247,8 @@ const MessageBubble = ({
                 {message.document?.size ? (
                   <p
                     className={`mt-0.5 text-[10px] leading-3 ${isMyMessage
-                        ? "text-[#10120d]/55"
-                        : "text-[#aab3a8]"
+                      ? "text-[#10120d]/55"
+                      : "text-[#aab3a8]"
                       }`}
                   >
                     {formatFileSize(message.document.size)}
@@ -258,6 +262,17 @@ const MessageBubble = ({
                 </div>
               ) : null}
             </div>
+          ) : null}
+
+          {/* POLL MESSAGE */}
+
+          {isPoll ? (
+            <PollMessage
+              poll={message.poll}
+              isMyMessage={isMyMessage}
+              currentUserId={currentUserId}
+              onVote={onPollVote}
+            />
           ) : null}
 
           {/* IMAGE / GIF / VIDEO MESSAGE */}
@@ -410,7 +425,8 @@ const MessageBubble = ({
           {/* TEXT MESSAGE */}
 
           {!isMedia &&
-            !isDocument && (
+            !isDocument &&
+            !isPoll && (
               <div className="whitespace-pre-wrap break-words">
                 {message.text}
               </div>
@@ -419,7 +435,7 @@ const MessageBubble = ({
           {/* MESSAGE META */}
 
           <div
-            className={`flex items-center justify-end gap-1 text-[10px] leading-none ${isMedia
+            className={`flex items-center justify-end gap-1 text-[10px] leading-none ${isMedia || isPoll
               ? "px-1 pt-1 text-[#aab3a8]"
               : `mt-1 ${isMyMessage
                 ? "text-[#10120d]/60"
@@ -447,21 +463,23 @@ const MessageBubble = ({
 
       {/* REPLY BUTTON — SENT MESSAGE */}
 
-      {isMyMessage && (
-        <div className="shrink-0">
-          <button
-            type="button"
-            onClick={() =>
-              onReply(message)
-            }
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a] group-hover:opacity-100"
-            aria-label="Reply to message"
-          >
-            <FiCornerUpLeft className="text-lg" />
-          </button>
-        </div>
-      )}
-    </div>
+      {
+        isMyMessage && (
+          <div className="shrink-0">
+            <button
+              type="button"
+              onClick={() =>
+                onReply(message)
+              }
+              className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a] group-hover:opacity-100"
+              aria-label="Reply to message"
+            >
+              <FiCornerUpLeft className="text-lg" />
+            </button>
+          </div>
+        )
+      }
+    </div >
   );
 };
 
