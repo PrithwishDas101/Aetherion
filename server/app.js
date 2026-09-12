@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoute.js";
 import userRoutes from "./routes/userRoute.js";
 import chatRoutes from "./routes/chatRoute.js";
 import messageRoutes from "./routes/messageRoute.js";
+import pollRoutes from "./routes/pollRoute.js";
 
 const app = express();
 
@@ -47,5 +48,6 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/message", messageRoutes);
+app.use("/api/v1/poll", pollRoutes);
 
 export default app;
