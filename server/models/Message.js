@@ -16,7 +16,7 @@ const messageSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["text", "gif", "image", "video", "document"],
+      enum: ["text", "gif", "image", "video", "document", "poll"],
       default: "text",
     },
 
@@ -49,6 +49,12 @@ const messageSchema = new mongoose.Schema(
         type: Number,
         default: null,
       },
+    },
+
+    poll: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Poll",
+      default: null,
     },
 
     replyTo: {
