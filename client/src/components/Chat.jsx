@@ -239,6 +239,219 @@ const Chat = ({ socket }) => {
     setShowDocumentModal(false);
   };
 
+  // SEND DOCUMENTS
+  const handleSendDocuments = async (documentData) => {
+    const items = documentData?.items || [];
+
+    if (
+      !items.length ||
+      !selectedChat?._id ||
+      isSending
+    ) {
+      return false;
+    }
+
+    isNearBottomRef.current = true;
+
+    try {
+      setIsSending(true);
+
+      const uploadResults = await Promise.all(
+        items.map(async (item) => {
+          const file = item?.file;
+
+          if (!file) {
+            return null;
+          }
+
+          const localPreviewUrl =
+            URL.createObjectURL(file);
+
+          const temporaryMessageId =
+            `temp-document-${Date.now()}-${item.id}`;
+
+          const temporaryMessage = {
+            _id: temporaryMessageId,
+            chatId: selectedChat._id,
+            sender: user._id,
+            type: "document",
+            text: documentData.caption?.trim() || "",
+            mediaUrl: localPreviewUrl,
+            fileName: file.name,
+            fileSize: file.size,
+            mimeType: file.type,
+            replyTo: replyingTo || null,
+            read: false,
+            createdAt: new Date().toISOString(),
+            isUploading: true,
+          };
+
+          setAllMessages((previousMessages) => [
+            ...previousMessages,
+            temporaryMessage,
+          ]);
+
+          try {
+            const formData = new FormData();
+
+            formData.append(
+              "chatId",
+              selectedChat._id,
+            );
+
+            formData.append(
+              "type",
+              "document",
+            );
+
+            formData.append(
+              "text",
+              documentData.caption?.trim() || "",
+            );
+
+            formData.append(
+              "media",
+              file,
+              file.name,
+            );
+
+            formData.append(
+              "replyTo",
+              replyingTo?._id || "",
+            );
+
+            const response =
+              await createMediaMessage(formData);
+
+            if (!response?.success) {
+              throw new Error(
+                response?.message ||
+                "Unable to send document.",
+              );
+            }
+
+            setAllMessages(
+              (previousMessages) =>
+                previousMessages.map(
+                  (currentMessage) => {
+                    if (
+                      String(
+                        currentMessage._id,
+                      ) !==
+                      String(
+                        temporaryMessageId,
+                      )
+                    ) {
+                      return currentMessage;
+                    }
+
+                    if (
+                      currentMessage.mediaUrl?.startsWith(
+                        "blob:",
+                      )
+                    ) {
+                      URL.revokeObjectURL(
+                        currentMessage.mediaUrl,
+                      );
+                    }
+
+                    return response.data;
+                  },
+                ),
+            );
+
+            emitSendMessage(socket, {
+              message: response.data,
+              chat: response.chat,
+              members:
+                selectedChat.members.map(
+                  (member) =>
+                    String(member._id),
+                ),
+            });
+
+            if (response?.chat) {
+              updateChatInRedux(
+                response.chat,
+              );
+            }
+
+            return true;
+          } catch (error) {
+            console.error(
+              "Document upload error:",
+              error,
+            );
+
+            setAllMessages(
+              (previousMessages) =>
+                previousMessages.filter(
+                  (currentMessage) => {
+                    if (
+                      String(
+                        currentMessage._id,
+                      ) !==
+                      String(
+                        temporaryMessageId,
+                      )
+                    ) {
+                      return true;
+                    }
+
+                    if (
+                      currentMessage.mediaUrl?.startsWith(
+                        "blob:",
+                      )
+                    ) {
+                      URL.revokeObjectURL(
+                        currentMessage.mediaUrl,
+                      );
+                    }
+
+                    return false;
+                  },
+                ),
+            );
+
+            throw error;
+          }
+        }),
+      );
+
+      const successfulUploads =
+        uploadResults.filter(Boolean);
+
+      if (!successfulUploads.length) {
+        toast.error(
+          "Unable to send document.",
+        );
+
+        return false;
+      }
+
+      setReplyingTo(null);
+
+      setNewMessagesState(0, null);
+
+      return true;
+    } catch (error) {
+      console.error(
+        "Document sending error:",
+        error,
+      );
+
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to send document.",
+      );
+
+      return false;
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   // REPLY
   const startReply = (selectedMessage) => {
     setReplyingTo(selectedMessage);
@@ -1679,9 +1892,7 @@ const Chat = ({ socket }) => {
             <DocumentModal
               isOpen={showDocumentModal}
               onClose={closeDocument}
-              onSend={(documentData) => {
-                console.log("Selected document:", documentData);
-              }}
+              onSend={handleSendDocuments}
               source="chat"
             />
 
