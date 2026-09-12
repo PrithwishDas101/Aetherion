@@ -50,4 +50,17 @@ const getPresence = (socket) => {
   socket.emit("get-presence");
 };
 
-export { joinRoom, sendMessage, sendTyping, sendStopTyping, getPresence };
+const sendPollUpdate = (socket, { poll, chatId, sender, members }) => {
+  if (!socket || !poll?._id || !chatId || !sender || !Array.isArray(members)) {
+    return;
+  }
+
+  socket.emit("poll-updated", {
+    poll,
+    chatId,
+    sender,
+    members,
+  });
+};
+
+export { joinRoom, sendMessage, sendTyping, sendStopTyping, getPresence, sendPollUpdate };

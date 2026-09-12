@@ -40,6 +40,7 @@ import {
   sendMessage as emitSendMessage,
   sendTyping,
   sendStopTyping,
+  sendPollUpdate
 } from "../sockets/socketEmitters.js";
 
 import registerSocketListeners from "../sockets/socketListeners.js";
@@ -682,6 +683,17 @@ const Chat = ({ socket }) => {
             },
           ),
       );
+
+      sendPollUpdate(socket, {
+        poll: updatedPoll,
+        chatId: selectedChat._id,
+        sender: user._id,
+        members:
+          selectedChat.members.map(
+            (member) =>
+              String(member._id),
+          ),
+      });
 
       return true;
     } catch (error) {
@@ -1837,6 +1849,55 @@ const Chat = ({ socket }) => {
       onMessagesRead: handleMessagesRead,
     });
   }, [socket, selectedChat?._id, user?._id]);
+
+  // SOCKET: POLL UPDATED
+  useEffect(() => {
+    const handlePollUpdated = (
+      data,
+    ) => {
+      if (
+        !data?.poll?._id ||
+        String(data.chatId) !==
+        String(selectedChat?._id)
+      ) {
+        return;
+      }
+
+      setAllMessages(
+        (previousMessages) =>
+          previousMessages.map(
+            (currentMessage) => {
+              if (
+                String(
+                  currentMessage.poll?._id,
+                ) !==
+                String(
+                  data.poll._id,
+                )
+              ) {
+                return currentMessage;
+              }
+
+              return {
+                ...currentMessage,
+                poll: data.poll,
+              };
+            },
+          ),
+      );
+    };
+
+    return registerSocketListeners(
+      socket,
+      {
+        onPollUpdated:
+          handlePollUpdated,
+      },
+    );
+  }, [
+    socket,
+    selectedChat?._id,
+  ]);
 
   // CLEANUP
   useEffect(() => {

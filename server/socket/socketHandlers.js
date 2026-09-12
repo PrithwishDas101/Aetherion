@@ -36,5 +36,20 @@ export const registerSocketHandlers = (io) => {
         }
       });
     });
+
+    socket.on("poll-updated", ({ poll, chatId, sender, members }) => {
+      if (!poll?._id || !chatId || !sender || !Array.isArray(members)) {
+        return;
+      }
+
+      members.forEach((memberId) => {
+        if (String(memberId) !== String(sender)) {
+          socket.to(String(memberId)).emit("poll-updated", {
+            poll,
+            chatId,
+          });
+        }
+      });
+    });
   });
 };
