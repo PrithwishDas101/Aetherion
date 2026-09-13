@@ -76,22 +76,22 @@ const PollMessage = ({
 
             // SINGLE ANSWER
             if (!allowMultipleAnswers) {
-                nextSelectedOptionIds = [
-                    normalizedOptionId,
-                ];
+                const isAlreadySelected =
+                    selectedOptionIds.includes(normalizedOptionId);
+
+                nextSelectedOptionIds = isAlreadySelected
+                    ? []
+                    : [normalizedOptionId];
             } else {
                 // MULTIPLE ANSWERS
                 const isAlreadySelected =
-                    selectedOptionIds.includes(
-                        normalizedOptionId,
-                    );
+                    selectedOptionIds.includes(normalizedOptionId);
 
                 if (isAlreadySelected) {
                     nextSelectedOptionIds =
                         selectedOptionIds.filter(
                             (selectedId) =>
-                                selectedId !==
-                                normalizedOptionId,
+                                selectedId !== normalizedOptionId,
                         );
                 } else {
                     nextSelectedOptionIds = [
@@ -99,15 +99,6 @@ const PollMessage = ({
                         normalizedOptionId,
                     ];
                 }
-            }
-
-            // BACKEND DOES NOT CURRENTLY
-            // ALLOW EMPTY OPTION ARRAYS
-            if (
-                nextSelectedOptionIds.length ===
-                0
-            ) {
-                return;
             }
 
             try {
@@ -126,8 +117,8 @@ const PollMessage = ({
     return (
         <div
             className={`min-w-[260px] max-w-[420px] rounded-2xl px-3 py-3 ${isMyMessage
-                    ? "bg-[#d8f164] text-[#10120d]"
-                    : "border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
+                ? "bg-[#d8f164] text-[#10120d]"
+                : "border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
                 }`}
         >
             {/* POLL LABEL */}
@@ -136,8 +127,8 @@ const PollMessage = ({
             <div className="mb-3 flex items-center gap-2">
                 <span
                     className={`text-[10px] font-bold uppercase tracking-[0.14em] ${isMyMessage
-                            ? "text-[#10120d]/55"
-                            : "text-[#8f998b]"
+                        ? "text-[#10120d]/55"
+                        : "text-[#8f998b]"
                         }`}
                 >
                     Poll
@@ -148,8 +139,8 @@ const PollMessage = ({
 
             <h3
                 className={`mb-4 text-sm font-semibold leading-6 ${isMyMessage
-                        ? "text-[#10120d]"
-                        : "text-[#edefe5]"
+                    ? "text-[#10120d]"
+                    : "text-[#edefe5]"
                     }`}
             >
                 {question}
@@ -223,8 +214,8 @@ const PollMessage = ({
 
             <div
                 className={`mt-3 flex items-center justify-between text-[11px] ${isMyMessage
-                        ? "text-[#10120d]/55"
-                        : "text-[#7d8778]"
+                    ? "text-[#10120d]/55"
+                    : "text-[#7d8778]"
                     }`}
             >
                 <span>

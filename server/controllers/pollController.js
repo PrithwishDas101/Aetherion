@@ -159,13 +159,12 @@ export const voteOnPoll = async (req, res) => {
     const userId = String(req.user.userId);
 
     // VALIDATE OPTIONS
-    if (!Array.isArray(optionIds) || !optionIds.length) {
+    if (!Array.isArray(optionIds)) {
       return res.status(400).json({
         success: false,
-        message: "At least one poll option must be selected.",
+        message: "Invalid poll options.",
       });
     }
-
     // FIND POLL
     const poll = await Poll.findById(pollId);
 

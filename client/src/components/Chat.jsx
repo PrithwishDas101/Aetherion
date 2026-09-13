@@ -460,7 +460,6 @@ const Chat = ({ socket }) => {
   };
 
   // POLL
-  // POLL
   const openPoll = () => {
     setShowMediaPicker(false);
     setShowCameraModal(false);
@@ -622,8 +621,7 @@ const Chat = ({ socket }) => {
   ) => {
     if (
       !pollId ||
-      !Array.isArray(optionIds) ||
-      optionIds.length === 0
+      !Array.isArray(optionIds)
     ) {
       return false;
     }
