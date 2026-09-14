@@ -8,216 +8,169 @@ const PollMessage = ({
     currentUserId,
     onVote,
 }) => {
-    const [isVoting, setIsVoting] =
-        useState(false);
+    const [isVoting, setIsVoting] = useState(false);
 
     if (!poll) {
         return null;
     }
 
-    const question =
-        poll.question ||
-        "Untitled poll";
+    const question = poll.question || "Untitled poll";
 
-    const options =
-        Array.isArray(poll.options)
-            ? poll.options
-            : [];
+    const options = Array.isArray(poll.options)
+        ? poll.options
+        : [];
 
-    const allowMultipleAnswers =
-        Boolean(
-            poll.allowMultipleAnswers,
-        );
+    const allowMultipleAnswers = Boolean(
+        poll.allowMultipleAnswers,
+    );
 
-    // GET OPTIONS CURRENT USER HAS VOTED FOR
-    const selectedOptionIds =
-        options
-            .filter((option) =>
-                Array.isArray(option.votes) &&
-                option.votes.some(
-                    (voteUserId) =>
-                        String(voteUserId) ===
-                        String(currentUserId),
-                ),
-            )
-            .map((option) =>
-                String(option._id),
-            );
+    const selectedOptionIds = options
+        .filter((option) =>
+            Array.isArray(option.votes) &&
+            option.votes.some(
+                (voteUserId) =>
+                    String(voteUserId) ===
+                    String(currentUserId),
+            ),
+        )
+        .map((option) => String(option._id));
 
-    const totalVotes =
-        options.reduce(
-            (total, option) =>
-                total +
-                Number(
-                    option.voteCount ||
-                    option.votes?.length ||
-                    0,
-                ),
-            0,
-        );
+    const totalVotes = options.reduce(
+        (total, option) =>
+            total +
+            Number(
+                option.voteCount ||
+                option.votes?.length ||
+                0,
+            ),
+        0,
+    );
 
-    // HANDLE OPTION CLICK
-    const handleOptionClick =
-        async (optionId) => {
-            if (
-                isVoting ||
-                !poll._id ||
-                !optionId ||
-                !onVote
-            ) {
-                return;
-            }
+    const handleOptionClick = async (optionId) => {
+        if (
+            isVoting ||
+            !poll._id ||
+            !optionId ||
+            !onVote
+        ) {
+            return;
+        }
 
+        const normalizedOptionId = String(optionId);
 
-            const normalizedOptionId =
-                String(optionId);
+        let nextSelectedOptionIds;
 
-            let nextSelectedOptionIds;
+        if (!allowMultipleAnswers) {
+            const isAlreadySelected =
+                selectedOptionIds.includes(
+                    normalizedOptionId,
+                );
 
-            // SINGLE ANSWER
-            if (!allowMultipleAnswers) {
-                const isAlreadySelected =
-                    selectedOptionIds.includes(normalizedOptionId);
-
-                nextSelectedOptionIds = isAlreadySelected
+            nextSelectedOptionIds =
+                isAlreadySelected
                     ? []
                     : [normalizedOptionId];
-            } else {
-                // MULTIPLE ANSWERS
-                const isAlreadySelected =
-                    selectedOptionIds.includes(normalizedOptionId);
-
-                if (isAlreadySelected) {
-                    nextSelectedOptionIds =
-                        selectedOptionIds.filter(
-                            (selectedId) =>
-                                selectedId !== normalizedOptionId,
-                        );
-                } else {
-                    nextSelectedOptionIds = [
-                        ...selectedOptionIds,
-                        normalizedOptionId,
-                    ];
-                }
-            }
-
-            try {
-                setIsVoting(true);
-
-                await onVote(
-                    poll._id,
-                    nextSelectedOptionIds,
+        } else {
+            const isAlreadySelected =
+                selectedOptionIds.includes(
+                    normalizedOptionId,
                 );
-            } finally {
-                setIsVoting(false);
-            }
-        };
 
+            if (isAlreadySelected) {
+                nextSelectedOptionIds =
+                    selectedOptionIds.filter(
+                        (selectedId) =>
+                            selectedId !==
+                            normalizedOptionId,
+                    );
+            } else {
+                nextSelectedOptionIds = [
+                    ...selectedOptionIds,
+                    normalizedOptionId,
+                ];
+            }
+        }
+
+        try {
+            setIsVoting(true);
+
+            await onVote(
+                poll._id,
+                nextSelectedOptionIds,
+            );
+        } finally {
+            setIsVoting(false);
+        }
+    };
 
     return (
         <div
-            className={`min-w-[260px] max-w-[420px] rounded-2xl px-3 py-3 ${isMyMessage
-                ? "bg-[#d8f164] text-[#10120d]"
-                : "border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
+            className={`min-w-[270px] max-w-[420px] overflow-hidden rounded-2xl border px-3.5 py-3 ${isMyMessage
+                    ? "border-[#2b3027] bg-[#1a2018] text-[#edefe5]"
+                    : "border-[#202720] bg-[#141a16] text-[#edefe5]"
                 }`}
         >
-            {/* POLL LABEL */}
-
-
-            <div className="mb-3 flex items-center gap-2">
-                <span
-                    className={`text-[10px] font-bold uppercase tracking-[0.14em] ${isMyMessage
-                        ? "text-[#10120d]/55"
-                        : "text-[#8f998b]"
-                        }`}
-                >
-                    Poll
-                </span>
-            </div>
-
-            {/* QUESTION */}
-
-            <h3
-                className={`mb-4 text-sm font-semibold leading-6 ${isMyMessage
-                    ? "text-[#10120d]"
-                    : "text-[#edefe5]"
-                    }`}
-            >
+            <h3 className="mb-3 text-sm font-semibold leading-5 text-[#f1f3ed]">
                 {question}
             </h3>
 
-            {/* OPTIONS */}
+            <div className="space-y-1">
+                {options.map((option, index) => {
+                    const optionId =
+                        option._id ||
+                        option.id;
 
-            <div className="space-y-2">
-                {options.map(
-                    (option, index) => {
-                        const optionId =
-                            option._id ||
-                            option.id;
+                    const voteCount = Number(
+                        option.voteCount ||
+                        option.votes?.length ||
+                        0,
+                    );
 
-                        const voteCount =
-                            Number(
-                                option.voteCount ||
-                                option.votes?.length ||
-                                0,
-                            );
+                    const percentage =
+                        totalVotes > 0
+                            ? (voteCount / totalVotes) *
+                            100
+                            : 0;
 
-                        const percentage =
-                            totalVotes > 0
-                                ? (
-                                    voteCount /
-                                    totalVotes
-                                ) *
-                                100
-                                : 0;
-
-                        const isSelected =
-                            selectedOptionIds.includes(
-                                String(optionId),
-                            );
-
-                        return (
-                            <PollOption
-                                key={
-                                    optionId ||
-                                    index
-                                }
-                                option={{
-                                    ...option,
-                                    text:
-                                        option.text ||
-                                        String(option),
-                                }}
-                                index={index}
-                                voteCount={voteCount}
-                                percentage={percentage}
-                                isSelected={isSelected}
-                                allowMultipleAnswers={
-                                    allowMultipleAnswers
-                                }
-                                disabled={
-                                    isVoting ||
-                                    !optionId
-                                }
-                                onClick={() =>
-                                    handleOptionClick(
-                                        optionId,
-                                    )
-                                }
-                            />
+                    const isSelected =
+                        selectedOptionIds.includes(
+                            String(optionId),
                         );
-                    },
-                )}
+
+                    return (
+                        <PollOption
+                            key={
+                                optionId ||
+                                index
+                            }
+                            option={{
+                                ...option,
+                                text:
+                                    option.text ||
+                                    String(option),
+                            }}
+                            index={index}
+                            voteCount={voteCount}
+                            percentage={percentage}
+                            isSelected={isSelected}
+                            allowMultipleAnswers={
+                                allowMultipleAnswers
+                            }
+                            disabled={
+                                isVoting ||
+                                !optionId
+                            }
+                            onClick={() =>
+                                handleOptionClick(
+                                    optionId,
+                                )
+                            }
+                        />
+                    );
+                })}
             </div>
 
-            {/* FOOTER */}
-
-            <div
-                className={`mt-3 flex items-center justify-between text-[11px] ${isMyMessage
-                    ? "text-[#10120d]/55"
-                    : "text-[#7d8778]"
-                    }`}
-            >
+            <div className="mt-2.5 flex items-center justify-between border-t border-white/[0.06] pt-2 text-[10px] font-medium text-[#7d8778]">
                 <span>
                     {totalVotes}{" "}
                     {totalVotes === 1
@@ -225,15 +178,13 @@ const PollMessage = ({
                         : "votes"}
                 </span>
 
-                {allowMultipleAnswers ? (
-                    <span>
-                        Multiple answers
-                    </span>
-                ) : null}
+                <span>
+                    {allowMultipleAnswers
+                        ? "Multiple"
+                        : "Single"}
+                </span>
             </div>
         </div>
-
-
     );
 };
 

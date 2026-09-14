@@ -1,4 +1,4 @@
-import { FiCheck, } from "react-icons/fi";
+import { FiCheck } from "react-icons/fi";
 
 const PollOption = ({
     option,
@@ -10,7 +10,6 @@ const PollOption = ({
     disabled = false,
     onClick,
 }) => {
-
     const handleClick = () => {
         if (disabled) {
             return;
@@ -29,11 +28,14 @@ const PollOption = ({
             event.key === " "
         ) {
             event.preventDefault();
-
             onClick?.();
         }
     };
 
+    const safePercentage = Math.max(
+        0,
+        Math.min(100, percentage),
+    );
 
     return (
         <button
@@ -41,88 +43,57 @@ const PollOption = ({
             onClick={handleClick}
             onKeyDown={handleKeyDown}
             disabled={disabled}
-            className={`relative w-full overflow-hidden rounded-xl border text-left transition-all duration-200 ${isSelected
-                ? "border-[#d8f45a]/55 bg-[#d8f45a]/10"
-                : "border-white/[0.06] bg-white/[0.025] hover:border-[#d8f45a]/25 hover:bg-white/[0.045]"
-                } ${disabled
+            className={`w-full text-left outline-none focus:outline-none focus:ring-0 focus-visible:outline-none ${disabled
                     ? "cursor-not-allowed opacity-70"
-                    : "cursor-pointer active:scale-[0.99]"
+                    : "cursor-pointer"
                 }`}
             aria-label={`Vote for ${option.text}`}
             aria-pressed={isSelected}
         >
-
-            {/* PERCENTAGE FILL */}
-            <div
-                className={`absolute inset-y-0 left-0 transition-all duration-500 ${isSelected
-                    ? "bg-[#d8f45a]/18"
-                    : "bg-[#d8f45a]/8"
-                    }`}
-                style={{
-                    width: `${Math.max(
-                        0,
-                        Math.min(
-                            100,
-                            percentage,
-                        ),
-                    )}%`,
-                }}
-            />
-
-
-            {/* CONTENT */}
-            <div className="relative flex min-h-12 items-center gap-3 px-3.5 py-2.5">
-
-                {/* SELECTOR */}
+            {/* OPTION */}
+            <div className="flex items-center gap-2 px-0.5 py-1">
                 <div
-                    className={`flex h-6 w-6 shrink-0 items-center justify-center border transition ${isSelected
-                        ? "border-[#d8f45a] bg-[#d8f45a] text-[#10120d]"
-                        : "border-[#7d8677] bg-transparent text-transparent"
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center border transition ${isSelected
+                        ? "border-[#d8f45a] bg-[#d8f45a] text-[#1e2119]"
+                        : "border-[#687165] bg-transparent text-transparent"
                         } ${allowMultipleAnswers
                             ? "rounded-md"
                             : "rounded-full"
                         }`}
                 >
                     {isSelected ? (
-                        <FiCheck className="text-base stroke-[3]" />
+                        <FiCheck className="text-[10px] stroke-[4]" />
                     ) : null}
                 </div>
 
-                {/* OPTION TEXT */}
                 <span
-                    className={`min-w-0 flex-1 break-words text-sm font-medium ${isSelected
-                        ? "text-[#eff6d6]"
+                    className={`min-w-0 flex-1 break-words text-xs font-medium leading-5 ${isSelected
+                        ? "text-[#f0f5dd]"
                         : "text-[#d9dfd4]"
                         }`}
                 >
                     {option.text}
                 </span>
 
-                {/* VOTE COUNT */}
-                <span
-                    className={`shrink-0 text-xs font-semibold ${voteCount > 0
-                        ? "text-[#d8f45a]"
-                        : "text-[#6f786a]"
-                        }`}
-                >
-                    {voteCount}
-                </span>
-
+                {voteCount > 0 ? (
+                    <span className="shrink-0 text-[10px] font-semibold text-[#8c9688]">
+                        {voteCount}
+                    </span>
+                ) : null}
             </div>
 
-            {/* OPTIONAL PERCENTAGE */}
-            {voteCount > 0 ? (
-                <div className="relative px-3.5 pb-2.5 pl-[58px]">
-
-                    <span className="text-[10px] font-medium text-[#778071]">
-                        {Math.round(
-                            percentage,
-                        )}
-                        %
-                    </span>
-
-                </div>
-            ) : null}
+            {/* VOTE BAR */}
+            <div className="relative ml-7 h-[9px] w-[calc(100%-1.75rem)] overflow-hidden rounded-md border border-white/[0.06] bg-[#0b100c]">
+                <div
+                    className={`absolute inset-y-0 left-0 rounded-md transition-all duration-500 ${isSelected
+                        ? "bg-[#eaff8f]"
+                        : "bg-[#d8f45a]/16"
+                        }`}
+                    style={{
+                        width: `${safePercentage}%`,
+                    }}
+                />
+            </div>
 
         </button>
     );

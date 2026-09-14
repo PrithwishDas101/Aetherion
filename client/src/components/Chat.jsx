@@ -550,10 +550,11 @@ const Chat = ({ socket }) => {
         type: "poll",
 
         poll:
-          createdMessage.poll ||
           createdPoll ||
           createdMessage.pollData ||
-          null,
+          (typeof createdMessage.poll === "object"
+            ? createdMessage.poll
+            : null),
       };
 
       setAllMessages(
