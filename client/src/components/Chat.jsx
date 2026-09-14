@@ -112,8 +112,7 @@ const Chat = ({ socket }) => {
     ? presence[String(selectedUser._id)]?.lastSeen
     : null;
 
-  const unreadMessageCount =
-    Number(selectedChat?.unreadMessageCount?.[String(user._id)]) || 0;
+  const unreadMessageCount = Number(selectedChat?.unreadMessageCount?.[String(user._id)]) || 0;
 
   // SCROLL HELPERS
   const scrollToBottom = (behavior = "auto") => {
