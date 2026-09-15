@@ -44,6 +44,11 @@ const MessageComposer = ({
     onPoll?.();
   };
 
+  const handleLocation = () => {
+  setShowAttachmentPanel(false);
+  onLocation?.();
+};
+
   const handleKeyDown = (event) => {
     if (event.key !== "Enter" || event.shiftKey) {
       return;
@@ -83,7 +88,7 @@ const MessageComposer = ({
             onGallery={handleGallery}
             onDocument={handleDocument}
             onPoll={handlePoll}
-            onLocation={onLocation}
+            onLocation={handleLocation}
             onContact={() => console.log("Contact clicked")}
           />
         </div>

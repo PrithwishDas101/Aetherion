@@ -10,6 +10,7 @@ import {
   IoVideocamOutline,
   IoDocumentTextOutline,
   IoStatsChartOutline,
+  IoLocationOutline,
 } from "react-icons/io5";
 
 import { createChat } from "../apiCalls/chatApi.js";
@@ -267,7 +268,6 @@ function UserList({ searchKey, socket }) {
 
                 <div className="min-w-0 flex-1">
                   {/* NAME + TIME */}
-
                   <div className="flex items-center gap-3">
                     <div
                       className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${isSelected || unreadCount > 0
@@ -291,7 +291,6 @@ function UserList({ searchKey, socket }) {
                   </div>
 
                   {/* LAST MESSAGE */}
-
                   <div className="mt-1 flex items-center gap-2">
                     <div className="flex min-w-0 flex-1 items-center gap-1.5">
                       {/* MESSAGE STATUS */}
@@ -306,7 +305,6 @@ function UserList({ searchKey, socket }) {
                         ))}
 
                       {/* MESSAGE PREVIEW */}
-
                       <div
                         className={`flex min-w-0 flex-1 items-center gap-1.5 text-xs ${isTyping
                           ? "font-semibold italic text-[#d8f45a]"
@@ -355,6 +353,14 @@ function UserList({ searchKey, socket }) {
                               {lastMessageText || "Poll"}
                             </span>
                           </>
+                        ) : lastMessageType === "location" ? (
+                          <>
+                            <IoLocationOutline className="shrink-0 text-sm" />
+
+                            <span className="truncate">
+                              Location
+                            </span>
+                          </>
                         ) : (
                           <span className="truncate">
                             {lastMessageText || "No messages yet."}
@@ -364,7 +370,6 @@ function UserList({ searchKey, socket }) {
                     </div>
 
                     {/* UNREAD COUNT */}
-
                     {unreadCount > 0 && !isSelected && (
                       <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#f1ffb5] px-1.5 text-[10px] font-bold text-[#10120d]">
                         {unreadCount > 99 ? "99+" : unreadCount}
@@ -374,7 +379,6 @@ function UserList({ searchKey, socket }) {
                 </div>
 
                 {/* START CHAT */}
-
                 {!userChat && (
                   <button
                     type="button"
