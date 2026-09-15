@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiBarChart2 } from "react-icons/fi";
+import { FiRepeat } from "react-icons/fi";
 
 import PollOption from "./PollOption.jsx";
 import PollChart from "./PollChart.jsx";
@@ -136,7 +136,7 @@ const PollMessage = ({
                             : "Show poll chart"
                     }
                 >
-                    <FiBarChart2 className="text-sm" />
+                    <FiRepeat className="text-sm" />
                 </button>
             </div>
 
