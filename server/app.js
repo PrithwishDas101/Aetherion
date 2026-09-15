@@ -14,7 +14,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "http://192.168.1.33:5173",
   "http://192.168.1.38:5173",
-  "http://192.168.0.104:5173/",
+  "http://192.168.0.104:5173",
   "http://192.168.1.35:5173",
   process.env.CLIENT_URL,
 ].filter(Boolean);

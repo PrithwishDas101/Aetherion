@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { FiBarChart2 } from "react-icons/fi";
 
 import PollOption from "./PollOption.jsx";
+import PollChart from "./PollChart.jsx";
 
 const PollMessage = ({
     poll,
@@ -9,6 +11,8 @@ const PollMessage = ({
     onVote,
 }) => {
     const [isVoting, setIsVoting] = useState(false);
+    const [showChart, setShowChart] = useState(false);
+
 
     if (!poll) {
         return null;
@@ -105,70 +109,99 @@ const PollMessage = ({
 
     return (
         <div
-            className={`min-w-[270px] max-w-[420px] overflow-hidden rounded-2xl border px-3.5 py-3 ${isMyMessage
-                    ? "border-[#2b3027] bg-[#1a2018] text-[#edefe5]"
-                    : "border-[#202720] bg-[#141a16] text-[#edefe5]"
+            className={`min-w-[250px] max-w-[420px] overflow-hidden rounded-2xl border px-3.5 py-3 ${isMyMessage
+                ? "border-[#2b3027] bg-[#1a2018] text-[#edefe5]"
+                : "border-[#202720] bg-[#141a16] text-[#edefe5]"
                 }`}
         >
-            <h3 className="mb-3 text-sm font-semibold leading-5 text-[#f1f3ed]">
-                {question}
-            </h3>
+            <div className="mb-3 flex items-start justify-between gap-2">
+                <h3 className="min-w-0 flex-1 text-sm font-semibold leading-5 text-[#f1f3ed]">
+                    {question}
+                </h3>
 
-            <div className="space-y-1">
-                {options.map((option, index) => {
-                    const optionId =
-                        option._id ||
-                        option.id;
+                <button
+                    type="button"
+                    onClick={() =>
+                        setShowChart((previous) => !previous)
+                    }
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#8c9688] outline-none transition hover:bg-white/[0.05] hover:text-[#d8f45a] focus:outline-none focus:ring-0"
+                    aria-label={
+                        showChart
+                            ? "Show poll"
+                            : "Show poll chart"
+                    }
+                    title={
+                        showChart
+                            ? "Show poll"
+                            : "Show poll chart"
+                    }
+                >
+                    <FiBarChart2 className="text-sm" />
+                </button>
+            </div>
 
-                    const voteCount = Number(
-                        option.voteCount ||
-                        option.votes?.length ||
-                        0,
-                    );
+            {showChart ? (
+                <PollChart
+                    poll={poll}
+                    currentUserId={currentUserId}
+                />
+            ) : (
+                <div className="space-y-1">
+                    {options.map((option, index) => {
+                        const optionId =
+                            option._id ||
+                            option.id;
 
-                    const percentage =
-                        totalVotes > 0
-                            ? (voteCount / totalVotes) *
-                            100
-                            : 0;
-
-                    const isSelected =
-                        selectedOptionIds.includes(
-                            String(optionId),
+                        const voteCount = Number(
+                            option.voteCount ||
+                            option.votes?.length ||
+                            0,
                         );
 
-                    return (
-                        <PollOption
-                            key={
-                                optionId ||
-                                index
-                            }
-                            option={{
-                                ...option,
-                                text:
-                                    option.text ||
-                                    String(option),
-                            }}
-                            index={index}
-                            voteCount={voteCount}
-                            percentage={percentage}
-                            isSelected={isSelected}
-                            allowMultipleAnswers={
-                                allowMultipleAnswers
-                            }
-                            disabled={
-                                isVoting ||
-                                !optionId
-                            }
-                            onClick={() =>
-                                handleOptionClick(
-                                    optionId,
-                                )
-                            }
-                        />
-                    );
-                })}
-            </div>
+                        const percentage =
+                            totalVotes > 0
+                                ? (voteCount / totalVotes) *
+                                100
+                                : 0;
+
+                        const isSelected =
+                            selectedOptionIds.includes(
+                                String(optionId),
+                            );
+
+                        return (
+                            <PollOption
+                                key={
+                                    optionId ||
+                                    index
+                                }
+                                option={{
+                                    ...option,
+                                    text:
+                                        option.text ||
+                                        String(option),
+                                }}
+                                index={index}
+                                voteCount={voteCount}
+                                percentage={percentage}
+                                isSelected={isSelected}
+                                allowMultipleAnswers={
+                                    allowMultipleAnswers
+                                }
+                                disabled={
+                                    isVoting ||
+                                    !optionId
+                                }
+                                onClick={() =>
+                                    handleOptionClick(
+                                        optionId,
+                                    )
+                                }
+                            />
+                        );
+                    })}
+                </div>
+            )}
 
             <div className="mt-2.5 flex items-center justify-between border-t border-white/[0.06] pt-2 text-[10px] font-medium text-[#7d8778]">
                 <span>
@@ -186,6 +219,8 @@ const PollMessage = ({
             </div>
         </div>
     );
+
+
 };
 
 export default PollMessage;

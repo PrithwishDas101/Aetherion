@@ -162,9 +162,12 @@ const MessageBubble = ({
 
       <div
         className={`order-1 touch-pan-y ${isDocument
-          ? "max-w-[62%]"
-          : "max-w-[75%]"
+            ? "max-w-[62%]"
+            : isPoll
+              ? "max-w-[90%]"
+              : "max-w-[75%]"
           }`}
+
         onPointerDown={
           handlePointerDown
         }
