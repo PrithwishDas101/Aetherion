@@ -4,8 +4,21 @@ import { FiPlus, FiTrash2, FiX, FiSend } from "react-icons/fi";
 
 const MAX_OPTIONS = 10;
 
+const createId = () => {
+    if (
+        typeof crypto !== "undefined" &&
+        typeof crypto.randomUUID === "function"
+    ) {
+        return crypto.randomUUID();
+    }
+
+    return `${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 11)}`;
+};
+
 const createOption = () => ({
-    id: crypto.randomUUID(),
+    id: createId(),
     text: "",
 });
 
