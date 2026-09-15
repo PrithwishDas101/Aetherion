@@ -35,6 +35,7 @@ import MediaViewer from "./Camera/MediaViewer.jsx";
 import GalleryModal from "./Gallery/GalleryModal.jsx";
 import DocumentModal from "./Documents/DocumentModal.jsx";
 import PollModal from "./Poll/PollModal.jsx";
+import LocationModal from "./Location/LocationModal.jsx";
 
 import {
   sendMessage as emitSendMessage,
@@ -61,6 +62,7 @@ const Chat = ({ socket }) => {
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [showPollModal, setShowPollModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
   const [mediaViewerMessageId, setMediaViewerMessageId] = useState(null);
 
@@ -243,6 +245,136 @@ const Chat = ({ socket }) => {
 
   const closeDocument = () => {
     setShowDocumentModal(false);
+  };
+
+  // LOCATION
+  const openLocation = () => {
+    setShowMediaPicker(false);
+    setShowCameraModal(false);
+    setShowGalleryModal(false);
+    setShowDocumentModal(false);
+    setShowPollModal(false);
+
+    setShowLocationModal(true);
+  };
+
+  const closeLocation = () => {
+    setShowLocationModal(false);
+  };
+
+  // SEND LOCATION
+  const handleSendLocation = async (coordinates) => {
+    if (
+      !selectedChat?._id ||
+      !coordinates ||
+      isSending
+    ) {
+      return false;
+    }
+
+    const latitude = Number(coordinates.latitude);
+    const longitude = Number(coordinates.longitude);
+
+    if (
+      !Number.isFinite(latitude) ||
+      !Number.isFinite(longitude)
+    ) {
+      toast.error("Invalid location coordinates.");
+      return false;
+    }
+
+    isNearBottomRef.current = true;
+
+    try {
+      setIsSending(true);
+
+      const response = await createMessage({
+        chatId: selectedChat._id,
+        type: "location",
+        text: "",
+        location: {
+          latitude,
+          longitude,
+          address: null,
+        },
+        replyTo: replyingTo?._id || null,
+      });
+
+      if (!response?.success) {
+        toast.error(
+          response?.message ||
+          "Unable to send location.",
+        );
+
+        return false;
+      }
+
+      const createdMessage = response.data;
+
+      if (!createdMessage) {
+        toast.error(
+          "Location was sent, but the message could not be loaded.",
+        );
+
+        return false;
+      }
+
+      setAllMessages(
+        (previousMessages) => {
+          const alreadyExists =
+            previousMessages.some(
+              (currentMessage) =>
+                String(currentMessage._id) ===
+                String(createdMessage._id),
+            );
+
+          if (alreadyExists) {
+            return previousMessages;
+          }
+
+          return [
+            ...previousMessages,
+            createdMessage,
+          ];
+        },
+      );
+
+      emitSendMessage(socket, {
+        message: createdMessage,
+        chat: response.chat,
+        members:
+          selectedChat.members.map(
+            (member) =>
+              String(member._id),
+          ),
+      });
+
+      if (response.chat) {
+        updateChatInRedux(response.chat);
+      }
+
+      setReplyingTo(null);
+      setShowLocationModal(false);
+
+      setNewMessagesState(0, null);
+
+      return true;
+    } catch (error) {
+      console.error(
+        "Send location error:",
+        error,
+      );
+
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to send location.",
+      );
+
+      return false;
+    } finally {
+      setIsSending(false);
+    }
   };
 
   // SEND DOCUMENTS
@@ -2169,6 +2301,7 @@ const Chat = ({ socket }) => {
               onGallery={openGallery}
               onDocument={openDocument}
               onPoll={openPoll}
+              onLocation={openLocation}
             />
 
             {/* CAMERA */}
@@ -2206,6 +2339,14 @@ const Chat = ({ socket }) => {
               isOpen={showPollModal}
               onClose={closePoll}
               onSend={handleCreatePoll}
+            />
+
+            {/* LOCATION */}
+            <LocationModal
+              isOpen={showLocationModal}
+              onClose={closeLocation}
+              onSend={handleSendLocation}
+              isSending={isSending}
             />
 
             {mediaViewerMessageId && mediaViewerIndex >= 0 ? (

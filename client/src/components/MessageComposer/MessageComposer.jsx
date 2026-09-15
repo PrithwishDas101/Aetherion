@@ -13,7 +13,8 @@ const MessageComposer = ({
   onCamera,
   onGallery,
   onDocument,
-  onPoll
+  onPoll,
+  onLocation,
 }) => {
   const [showAttachmentPanel, setShowAttachmentPanel] = useState(false);
 
@@ -82,7 +83,7 @@ const MessageComposer = ({
             onGallery={handleGallery}
             onDocument={handleDocument}
             onPoll={handlePoll}
-            onLocation={() => console.log("Location clicked")}
+            onLocation={onLocation}
             onContact={() => console.log("Contact clicked")}
           />
         </div>

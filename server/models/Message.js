@@ -16,7 +16,7 @@ const messageSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["text", "gif", "image", "video", "document", "poll"],
+      enum: ["text", "gif", "image", "video", "document", "poll", "location"],
       default: "text",
     },
 
@@ -55,6 +55,24 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Poll",
       default: null,
+    },
+
+    location: {
+      latitude: {
+        type: Number,
+        default: null,
+      },
+
+      longitude: {
+        type: Number,
+        default: null,
+      },
+
+      address: {
+        type: String,
+        trim: true,
+        default: null,
+      },
     },
 
     replyTo: {

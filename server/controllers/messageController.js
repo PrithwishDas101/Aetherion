@@ -16,6 +16,7 @@ export const sendMessage = async (req, res) => {
       type = "text",
       mediaUrl: incomingMediaUrl,
       replyTo,
+      location,
     } = req.body;
 
     const uploadedFile = req.file;
@@ -28,6 +29,7 @@ export const sendMessage = async (req, res) => {
       fileName: uploadedFile?.originalname,
       fileMimeType: uploadedFile?.mimetype,
       fileSize: uploadedFile?.size,
+      location,
     });
 
     if (!chatId) {
@@ -49,6 +51,31 @@ export const sendMessage = async (req, res) => {
         success: false,
         message: "GIF file or GIF URL is required.",
       });
+    }
+
+    // LOCATION
+    if (type === "location") {
+      const latitude = Number(location?.latitude);
+      const longitude = Number(location?.longitude);
+
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return res.status(400).json({
+          success: false,
+          message: "Valid location coordinates are required.",
+        });
+      }
+
+      if (
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Location coordinates are out of range.",
+        });
+      }
     }
 
     const senderId = String(req.user.userId);
@@ -182,6 +209,7 @@ export const sendMessage = async (req, res) => {
       senderId,
       type,
       mediaUrl: finalMediaUrl,
+      location,
     });
 
     const savedMessage = await Message.create({
@@ -190,23 +218,35 @@ export const sendMessage = async (req, res) => {
       type,
       text: text?.trim() || "",
       mediaUrl: finalMediaUrl,
+
       document:
         type === "document" && uploadedFile
           ? {
               name: uploadedFile.originalname,
-
               mimeType: uploadedFile.mimetype,
-
               size: uploadedFile.size,
             }
           : undefined,
+
+      location:
+        type === "location"
+          ? {
+              latitude: Number(location.latitude),
+              longitude: Number(location.longitude),
+              address:
+                typeof location.address === "string" && location.address.trim()
+                  ? location.address.trim()
+                  : null,
+            }
+          : undefined,
+
       replyTo: replyTo || null,
       read: false,
     });
 
     await savedMessage.populate({
       path: "replyTo",
-      select: "text sender type mediaUrl",
+      select: "text sender type mediaUrl document poll location",
     });
 
     const receiverId = String(receiver);
@@ -236,6 +276,7 @@ export const sendMessage = async (req, res) => {
       messageId: savedMessage._id,
       type: savedMessage.type,
       mediaUrl: savedMessage.mediaUrl,
+      location: savedMessage.location,
     });
 
     return res.status(201).json({
@@ -276,7 +317,7 @@ export const getAllMessages = async (req, res) => {
     })
       .populate({
         path: "replyTo",
-        select: "text sender type mediaUrl document poll",
+        select: "text sender type mediaUrl document poll location",
       })
       .populate({
         path: "poll",

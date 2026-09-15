@@ -12,6 +12,7 @@ import { formatMessageTime } from "../utils/messageDate.js";
 import ReplyMessage from "./ReplyMessage.jsx";
 import MediaUploadIndicator from "./MediaUploadIndicator.jsx";
 import PollMessage from "./Poll/PollMessage.jsx";
+import LocationMessage from "./Location/LocationMessage.jsx";
 
 import useSwipeToReply from "../Hooks/useSwipeToReply.js";
 
@@ -29,22 +30,18 @@ const MessageBubble = ({
   const messageTime = formatMessageTime(message.createdAt);
 
   // MESSAGE TYPES
-
   const isGif = message.type === "gif" && !!message.mediaUrl;
-
   const isImage = message.type === "image" && !!message.mediaUrl;
-
   const isVideo = message.type === "video" && !!message.mediaUrl;
-
   const isDocument = message.type === "document" && !!message.mediaUrl;
-
   const isPoll = message.type === "poll" && !!message.poll;
+  const isLocation = message.type === "location" && !!message.location;
 
   const isMedia = isGif || isImage || isVideo;
 
   // DOCUMENT HELPERS
   const getDocumentName = () => {
-    return (message.document?.name || "Document");
+    return message.document?.name || "Document";
   };
 
   const getDocumentExtension = () => {
@@ -66,8 +63,7 @@ const MessageBubble = ({
   };
 
   const formatFileSize = (bytes) => {
-    if (!bytes || Number.isNaN(bytes)
-    ) {
+    if (!bytes || Number.isNaN(bytes)) {
       return "";
     }
 
@@ -80,21 +76,23 @@ const MessageBubble = ({
     }
 
     if (bytes < 1024 * 1024 * 1024) {
-      return `${(
-        bytes /
-        (1024 * 1024)
-      ).toFixed(1)} MB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     }
 
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
   };
 
   // SWIPE TO REPLY
-  const { swipeOffset, handlePointerDown, handlePointerMove, handlePointerUp, handlePointerCancel, } = useSwipeToReply({
-    isMyMessage,
+  const {
+    swipeOffset,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePointerCancel, } = useSwipeToReply({
+      isMyMessage,
 
-    onReply: () => onReply(message),
-  });
+      onReply: () => onReply(message),
+    });
 
   // REPLY PREVIEW CLICK
   const handleReplyPreviewClick = () => {
@@ -102,32 +100,46 @@ const MessageBubble = ({
       return;
     }
 
-    onReplyClick?.(message.replyTo._id,);
+    onReplyClick?.(message.replyTo._id);
   };
 
   // OPEN DOCUMENT
-  const handleDocumentClick = (event,) => {
+  const handleDocumentClick = (event) => {
     event.stopPropagation();
 
     if (
-      message.isUploading || !message.mediaUrl
+      message.isUploading ||
+      !message.mediaUrl
     ) {
       return;
     }
 
-    window.open(message.mediaUrl, "_blank", "noopener,noreferrer",);
+    window.open(
+      message.mediaUrl,
+      "_blank",
+      "noopener,noreferrer",
+    );
   };
 
-  const handleDocumentKeyDown = (event,) => {
-    if (message.isUploading) {
+  const handleDocumentKeyDown = (event) => {
+    if (
+      message.isUploading ||
+      !message.mediaUrl
+    ) {
       return;
     }
 
-    if (event.key === "Enter" || event.key === " "
+    if (
+      event.key === "Enter" ||
+      event.key === " "
     ) {
       event.preventDefault();
 
-      window.open(message.mediaUrl, "_blank", "noopener,noreferrer",);
+      window.open(
+        message.mediaUrl,
+        "_blank",
+        "noopener,noreferrer",
+      );
     }
   };
 
@@ -142,14 +154,11 @@ const MessageBubble = ({
         }`}
     >
       {/* REPLY BUTTON — RECEIVED MESSAGE */}
-
       {!isMyMessage && (
         <div className="order-2 shrink-0">
           <button
             type="button"
-            onClick={() =>
-              onReply(message)
-            }
+            onClick={() => onReply(message)}
             className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#f4ffc3] group-hover:opacity-100"
             aria-label="Reply to message"
           >
@@ -159,27 +168,17 @@ const MessageBubble = ({
       )}
 
       {/* SWIPEABLE MESSAGE */}
-
       <div
         className={`order-1 touch-pan-y ${isDocument
-            ? "max-w-[62%]"
-            : isPoll
-              ? "max-w-[90%]"
-              : "max-w-[75%]"
+          ? "max-w-[62%]"
+          : isPoll || isLocation
+            ? "max-w-[90%]"
+            : "max-w-[75%]"
           }`}
-
-        onPointerDown={
-          handlePointerDown
-        }
-        onPointerMove={
-          handlePointerMove
-        }
-        onPointerUp={
-          handlePointerUp
-        }
-        onPointerCancel={
-          handlePointerCancel
-        }
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
         style={{
           transform: `translateX(${swipeOffset}px)`,
 
@@ -190,7 +189,9 @@ const MessageBubble = ({
         }}
       >
         <div
-          className={`w-fit max-w-full break-words ${isMedia || isPoll
+          className={`w-fit max-w-full break-words ${isMedia ||
+            isPoll ||
+            isLocation
             ? ""
             : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMyMessage
               ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
@@ -199,29 +200,17 @@ const MessageBubble = ({
             }`}
         >
           {/* REPLIED MESSAGE PREVIEW */}
-
           {message.replyTo && (
             <ReplyMessage
-              replyTo={
-                message.replyTo
-              }
-              isMyMessage={
-                isMyMessage
-              }
-              currentUserId={
-                currentUserId
-              }
-              otherUserName={
-                otherUserName
-              }
-              onClick={
-                handleReplyPreviewClick
-              }
+              replyTo={message.replyTo}
+              isMyMessage={isMyMessage}
+              currentUserId={currentUserId}
+              otherUserName={otherUserName}
+              onClick={handleReplyPreviewClick}
             />
           )}
 
           {/* DOCUMENT MESSAGE */}
-
           {isDocument ? (
             <div
               role="button"
@@ -254,7 +243,9 @@ const MessageBubble = ({
                       : "text-[#aab3a8]"
                       }`}
                   >
-                    {formatFileSize(message.document.size)}
+                    {formatFileSize(
+                      message.document.size,
+                    )}
                   </p>
                 ) : null}
               </div>
@@ -268,7 +259,6 @@ const MessageBubble = ({
           ) : null}
 
           {/* POLL MESSAGE */}
-
           {isPoll ? (
             <PollMessage
               poll={message.poll}
@@ -278,8 +268,15 @@ const MessageBubble = ({
             />
           ) : null}
 
-          {/* IMAGE / GIF / VIDEO MESSAGE */}
+          {/* LOCATION MESSAGE */}
+          {isLocation ? (
+            <LocationMessage
+              message={message}
+              isOwn={isMyMessage}
+            />
+          ) : null}
 
+          {/* IMAGE / GIF / VIDEO MESSAGE */}
           {isMedia ? (
             <div
               className={`overflow-hidden rounded-xl ${isImage &&
@@ -310,13 +307,9 @@ const MessageBubble = ({
                     return;
                   }
 
-                  onMediaClick?.(
-                    message,
-                  );
+                  onMediaClick?.(message);
                 }}
-                onKeyDown={(
-                  event,
-                ) => {
+                onKeyDown={(event) => {
                   if (
                     message.isUploading
                   ) {
@@ -330,20 +323,15 @@ const MessageBubble = ({
                   ) {
                     event.preventDefault();
 
-                    onMediaClick?.(
-                      message,
-                    );
+                    onMediaClick?.(message);
                   }
                 }}
               >
                 {/* VIDEO */}
-
                 {isVideo ? (
                   <>
                     <video
-                      src={
-                        message.mediaUrl
-                      }
+                      src={message.mediaUrl}
                       muted
                       playsInline
                       preload="metadata"
@@ -363,11 +351,8 @@ const MessageBubble = ({
                   </>
                 ) : (
                   /* IMAGE / GIF */
-
                   <img
-                    src={
-                      message.mediaUrl
-                    }
+                    src={message.mediaUrl}
                     alt={
                       isGif
                         ? "GIF"
@@ -386,7 +371,6 @@ const MessageBubble = ({
                 )}
 
                 {/* OPEN HINT */}
-
                 {!message.isUploading ? (
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 hover:opacity-100">
                     <div className="rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md">
@@ -396,7 +380,6 @@ const MessageBubble = ({
                 ) : null}
 
                 {/* UPLOAD OVERLAY */}
-
                 <div
                   className={`absolute inset-0 z-10 transition-opacity duration-300 ${message.isUploading
                     ? "opacity-100"
@@ -408,7 +391,6 @@ const MessageBubble = ({
               </div>
 
               {/* IMAGE CAPTION */}
-
               {isImage &&
                 message.text?.trim() && (
                   <div
@@ -426,19 +408,20 @@ const MessageBubble = ({
           ) : null}
 
           {/* TEXT MESSAGE */}
-
           {!isMedia &&
             !isDocument &&
-            !isPoll && (
+            !isPoll &&
+            !isLocation && (
               <div className="whitespace-pre-wrap break-words">
                 {message.text}
               </div>
             )}
 
           {/* MESSAGE META */}
-
           <div
-            className={`flex items-center justify-end gap-1 text-[10px] leading-none ${isMedia || isPoll
+            className={`flex items-center justify-end gap-1 text-[10px] leading-none ${isMedia ||
+              isPoll ||
+              isLocation
               ? "px-1 pt-1 text-[#aab3a8]"
               : `mt-1 ${isMyMessage
                 ? "text-[#10120d]/60"
@@ -465,24 +448,19 @@ const MessageBubble = ({
       </div>
 
       {/* REPLY BUTTON — SENT MESSAGE */}
-
-      {
-        isMyMessage && (
-          <div className="shrink-0">
-            <button
-              type="button"
-              onClick={() =>
-                onReply(message)
-              }
-              className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a] group-hover:opacity-100"
-              aria-label="Reply to message"
-            >
-              <FiCornerUpLeft className="text-lg" />
-            </button>
-          </div>
-        )
-      }
-    </div >
+      {isMyMessage && (
+        <div className="shrink-0">
+          <button
+            type="button"
+            onClick={() => onReply(message)}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a] group-hover:opacity-100"
+            aria-label="Reply to message"
+          >
+            <FiCornerUpLeft className="text-lg" />
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 
