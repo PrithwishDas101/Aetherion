@@ -1,12 +1,15 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+
 import {
   IoCheckmark,
   IoCheckmarkDone,
   IoImageOutline,
   IoSearch,
   IoVideocamOutline,
+  IoDocumentTextOutline,
+  IoStatsChartOutline,
 } from "react-icons/io5";
 
 import { createChat } from "../apiCalls/chatApi.js";
@@ -44,8 +47,8 @@ function UserList({ searchKey, socket }) {
 
       const updatedChats = chatExists
         ? chats.map((chat) =>
-            String(chat._id) === String(updatedChat._id) ? updatedChat : chat,
-          )
+          String(chat._id) === String(updatedChat._id) ? updatedChat : chat,
+        )
         : [...chats, updatedChat];
 
       updatedChats.sort(
@@ -267,22 +270,20 @@ function UserList({ searchKey, socket }) {
 
                   <div className="flex items-center gap-3">
                     <div
-                      className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${
-                        isSelected || unreadCount > 0
-                          ? "text-[#f7f7d0]"
-                          : "text-[#f1eee8]"
-                      }`}
+                      className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${isSelected || unreadCount > 0
+                        ? "text-[#f7f7d0]"
+                        : "text-[#f1eee8]"
+                        }`}
                     >
                       {`${user.firstName} ${user.lastName}`}
                     </div>
 
                     {lastMessageTime && (
                       <span
-                        className={`shrink-0 text-[10px] font-medium ${
-                          unreadCount > 0 && !isSelected
-                            ? "text-[#e9fb95]"
-                            : "text-[#7f8a7c]"
-                        }`}
+                        className={`shrink-0 text-[10px] font-medium ${unreadCount > 0 && !isSelected
+                          ? "text-[#e9fb95]"
+                          : "text-[#7f8a7c]"
+                          }`}
                       >
                         {lastMessageTime}
                       </span>
@@ -307,15 +308,14 @@ function UserList({ searchKey, socket }) {
                       {/* MESSAGE PREVIEW */}
 
                       <div
-                        className={`flex min-w-0 flex-1 items-center gap-1.5 text-xs ${
-                          isTyping
-                            ? "font-semibold italic text-[#d8f45a]"
-                            : unreadCount > 0 && !isSelected
-                              ? "font-semibold text-[#999999]"
-                              : isSelected
-                                ? "text-[#b4bcae]"
-                                : "text-[#858d84]"
-                        }`}
+                        className={`flex min-w-0 flex-1 items-center gap-1.5 text-xs ${isTyping
+                          ? "font-semibold italic text-[#d8f45a]"
+                          : unreadCount > 0 && !isSelected
+                            ? "font-semibold text-[#999999]"
+                            : isSelected
+                              ? "text-[#b4bcae]"
+                              : "text-[#858d84]"
+                          }`}
                       >
                         {isTyping ? (
                           <span className="truncate">typing...</span>
@@ -337,6 +337,22 @@ function UserList({ searchKey, socket }) {
 
                             <span className="truncate">
                               {lastMessageText || "Video"}
+                            </span>
+                          </>
+                        ) : lastMessageType === "document" ? (
+                          <>
+                            <IoDocumentTextOutline className="shrink-0 text-sm" />
+
+                            <span className="truncate">
+                              {lastMessage?.document?.name || "Document"}
+                            </span>
+                          </>
+                        ) : lastMessageType === "poll" ? (
+                          <>
+                            <IoStatsChartOutline className="shrink-0 text-sm" />
+
+                            <span className="truncate">
+                              {lastMessageText || "Poll"}
                             </span>
                           </>
                         ) : (
