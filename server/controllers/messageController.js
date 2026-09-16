@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import Message from "../models/Message.js";
 import Chat from "../models/Chat.js";
 import {
@@ -17,6 +19,7 @@ export const sendMessage = async (req, res) => {
       mediaUrl: incomingMediaUrl,
       replyTo,
       location,
+      contact,
     } = req.body;
 
     const uploadedFile = req.file;
@@ -30,6 +33,7 @@ export const sendMessage = async (req, res) => {
       fileMimeType: uploadedFile?.mimetype,
       fileSize: uploadedFile?.size,
       location,
+      contact
     });
 
     if (!chatId) {
@@ -78,6 +82,23 @@ export const sendMessage = async (req, res) => {
       }
     }
 
+    // CONTACT
+    if (type === "contact") {
+      if (!contact?.userId) {
+        return res.status(400).json({
+          success: false,
+          message: "Contact user ID is required.",
+        });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(contact.userId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid contact user ID.",
+        });
+      }
+    }
+
     const senderId = String(req.user.userId);
 
     const chat = await Chat.findOne({
@@ -90,6 +111,23 @@ export const sendMessage = async (req, res) => {
         success: false,
         message: "Chat not found.",
       });
+    }
+
+    if (type === "contact") {
+      const contactUserId = String(contact.userId);
+
+      const hasExistingChat = await Chat.exists({
+        members: {
+          $all: [senderId, contactUserId],
+        },
+      });
+
+      if (!hasExistingChat) {
+        return res.status(403).json({
+          success: false,
+          message: "You can only share contacts you already have a chat with.",
+        });
+      }
     }
 
     const receiver = chat.members.find((member) => String(member) !== senderId);
@@ -240,13 +278,34 @@ export const sendMessage = async (req, res) => {
             }
           : undefined,
 
+      contact:
+        type === "contact"
+          ? {
+              userId: contact.userId,
+              firstName:
+                typeof contact.firstName === "string"
+                  ? contact.firstName.trim()
+                  : null,
+              lastName:
+                typeof contact.lastName === "string"
+                  ? contact.lastName.trim()
+                  : null,
+              email:
+                typeof contact.email === "string" ? contact.email.trim() : null,
+              profilePic:
+                typeof contact.profilePic === "string"
+                  ? contact.profilePic.trim()
+                  : null,
+            }
+          : undefined,
+
       replyTo: replyTo || null,
       read: false,
     });
 
     await savedMessage.populate({
       path: "replyTo",
-      select: "text sender type mediaUrl document poll location",
+      select: "text sender type mediaUrl document poll location contact",
     });
 
     const receiverId = String(receiver);
@@ -317,7 +376,7 @@ export const getAllMessages = async (req, res) => {
     })
       .populate({
         path: "replyTo",
-        select: "text sender type mediaUrl document poll location",
+        select: "text sender type mediaUrl document poll location contact",
       })
       .populate({
         path: "poll",

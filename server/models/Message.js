@@ -16,7 +16,16 @@ const messageSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["text", "gif", "image", "video", "document", "poll", "location"],
+      enum: [
+        "text",
+        "gif",
+        "image",
+        "video",
+        "document",
+        "poll",
+        "location",
+        "contact",
+      ],
       default: "text",
     },
 
@@ -69,6 +78,38 @@ const messageSchema = new mongoose.Schema(
       },
 
       address: {
+        type: String,
+        trim: true,
+        default: null,
+      },
+    },
+
+    contact: {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
+
+      firstName: {
+        type: String,
+        trim: true,
+        default: null,
+      },
+
+      lastName: {
+        type: String,
+        trim: true,
+        default: null,
+      },
+
+      email: {
+        type: String,
+        trim: true,
+        default: null,
+      },
+
+      profilePic: {
         type: String,
         trim: true,
         default: null,

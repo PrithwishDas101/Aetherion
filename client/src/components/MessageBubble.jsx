@@ -13,6 +13,7 @@ import ReplyMessage from "./ReplyMessage.jsx";
 import MediaUploadIndicator from "./MediaUploadIndicator.jsx";
 import PollMessage from "./Poll/PollMessage.jsx";
 import LocationMessage from "./Location/LocationMessage.jsx";
+import ContactMessage from "./Contacts/ContactMessage.jsx";
 
 import useSwipeToReply from "../Hooks/useSwipeToReply.js";
 
@@ -23,6 +24,7 @@ const MessageBubble = ({
   onReplyClick,
   onMediaClick,
   onPollVote,
+  onChat,
   isHighlighted,
   currentUserId,
   otherUserName,
@@ -36,6 +38,7 @@ const MessageBubble = ({
   const isDocument = message.type === "document" && !!message.mediaUrl;
   const isPoll = message.type === "poll" && !!message.poll;
   const isLocation = message.type === "location" && !!message.location;
+  const isContact = message.type === "contact" && !!message.contact;
 
   const isMedia = isGif || isImage || isVideo;
 
@@ -171,7 +174,7 @@ const MessageBubble = ({
       <div
         className={`order-1 touch-pan-y ${isDocument
           ? "max-w-[62%]"
-          : isPoll || isLocation
+          : isPoll || isLocation || isContact
             ? "max-w-[90%]"
             : "max-w-[75%]"
           }`}
@@ -273,6 +276,14 @@ const MessageBubble = ({
             <LocationMessage
               message={message}
               isOwn={isMyMessage}
+            />
+          ) : null}
+
+          {/* CONTACT MESSAGE */}
+          {isContact ? (
+            <ContactMessage
+              contact={message.contact}
+              onChat={onChat}
             />
           ) : null}
 
@@ -411,7 +422,8 @@ const MessageBubble = ({
           {!isMedia &&
             !isDocument &&
             !isPoll &&
-            !isLocation && (
+            !isLocation &&
+            !isContact && (
               <div className="whitespace-pre-wrap break-words">
                 {message.text}
               </div>
@@ -419,14 +431,16 @@ const MessageBubble = ({
 
           {/* MESSAGE META */}
           <div
-            className={`flex items-center justify-end gap-1 text-[10px] leading-none ${isMedia ||
-              isPoll ||
-              isLocation
-              ? "px-1 pt-1 text-[#aab3a8]"
-              : `mt-1 ${isMyMessage
-                ? "text-[#10120d]/60"
-                : "text-[#aab3a8]"
-              }`
+            className={`flex items-center justify-end gap-1 text-[10px] leading-none 
+              ${isMedia ||
+                isPoll ||
+                isLocation ||
+                isContact
+                ? "px-1 pt-1 text-[#aab3a8]"
+                : `mt-1 ${isMyMessage
+                  ? "text-[#10120d]/60"
+                  : "text-[#aab3a8]"
+                }`
               }`}
           >
             <span>

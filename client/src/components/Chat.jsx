@@ -14,7 +14,7 @@ import {
   createPoll,
   voteOnPoll,
 } from "../apiCalls/pollApi.js";
-import { clearUnreadMessage } from "../apiCalls/chatApi.js";
+import { clearUnreadMessage, createChat } from "../apiCalls/chatApi.js";
 import { showLoader, hideLoader } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
 
@@ -298,6 +298,82 @@ const Chat = ({ socket }) => {
 
   const closeContacts = () => {
     setShowContactsModal(false);
+  };
+
+  // OPEN CONTACT CHAT
+  const handleContactChat = async (contactUserId) => {
+    if (!contactUserId || !user?._id) {
+      return;
+    }
+
+    try {
+      dispatch(showLoader());
+
+      // CHECK FOR EXISTING CHAT
+      const existingChat = (allChats || []).find((chat) => {
+        const memberIds = (chat.members || [])
+          .filter(Boolean)
+          .map((member) =>
+            String(member?._id || member),
+          );
+
+        return (
+          memberIds.includes(String(user._id)) &&
+          memberIds.includes(String(contactUserId))
+        );
+      });
+
+      // EXISTING CHAT → OPEN IT
+      if (existingChat) {
+        dispatch(setSelectedChat(existingChat));
+        setShowContactsModal(false);
+        return;
+      }
+
+      // NO CHAT → CREATE ONE
+      const response = await createChat([
+        user._id,
+        contactUserId,
+      ]);
+
+      if (!response?.success) {
+        toast.error(
+          response?.message ||
+          "Unable to create chat.",
+        );
+        return;
+      }
+
+      const newChat = response.data;
+
+      const chatAlreadyExists = (allChats || []).some(
+        (chat) =>
+          String(chat._id) === String(newChat._id),
+      );
+
+      dispatch(
+        setAllChats(
+          chatAlreadyExists
+            ? allChats
+            : [...(allChats || []), newChat],
+        ),
+      );
+
+      dispatch(setSelectedChat(newChat));
+      setShowContactsModal(false);
+    } catch (error) {
+      console.error(
+        "Open contact chat error:",
+        error,
+      );
+
+      toast.error(
+        error?.response?.data?.message ||
+        "Unable to open chat.",
+      );
+    } finally {
+      dispatch(hideLoader());
+    }
   };
 
   // SEND LOCATION
@@ -620,6 +696,105 @@ const Chat = ({ socket }) => {
         error?.response?.data?.message ||
         error?.message ||
         "Unable to send document.",
+      );
+
+      return false;
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  // SEND CONTACTS
+  const handleSendContacts = async (selectedContacts) => {
+    if (
+      !selectedChat?._id ||
+      !selectedContacts?.length ||
+      isSending
+    ) {
+      return false;
+    }
+
+    isNearBottomRef.current = true;
+
+    try {
+      setIsSending(true);
+
+      for (const contact of selectedContacts) {
+        const response = await createMessage({
+          chatId: selectedChat._id,
+          type: "contact",
+          text: "",
+          contact: {
+            userId: contact._id,
+            firstName: contact.firstName || "",
+            lastName: contact.lastName || "",
+            email: contact.email || "",
+            profilePic: contact.profilePic || "",
+          },
+          replyTo: replyingTo?._id || null,
+        });
+
+        if (!response?.success) {
+          throw new Error(
+            response?.message ||
+            "Unable to send contact.",
+          );
+        }
+
+        const createdMessage = response.data;
+
+        if (!createdMessage) {
+          throw new Error(
+            "Contact was sent, but the message could not be loaded.",
+          );
+        }
+
+        setAllMessages((previousMessages) => {
+          const alreadyExists = previousMessages.some(
+            (currentMessage) =>
+              String(currentMessage._id) ===
+              String(createdMessage._id),
+          );
+
+          if (alreadyExists) {
+            return previousMessages;
+          }
+
+          return [
+            ...previousMessages,
+            createdMessage,
+          ];
+        });
+
+        emitSendMessage(socket, {
+          message: createdMessage,
+          chat: response.chat,
+          members: selectedChat.members.map(
+            (member) => String(member._id),
+          ),
+        });
+
+        if (response?.chat) {
+          updateChatInRedux(response.chat);
+        }
+      }
+
+      setReplyingTo(null);
+      setShowContactsModal(false);
+
+      setNewMessagesState(0, null);
+
+      return true;
+    } catch (error) {
+      console.error(
+        "Send contacts error:",
+        error,
+      );
+
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to send contact.",
       );
 
       return false;
@@ -2208,6 +2383,7 @@ const Chat = ({ socket }) => {
                   onReplyClick={scrollToMessage}
                   onMediaClick={openMediaViewer}
                   onPollVote={handlePollVote}
+                  onChat={handleContactChat}
                   isHighlighted={
                     highlightedMessageId ===
                     String(currentMessage._id)
@@ -2392,10 +2568,7 @@ const Chat = ({ socket }) => {
               isOpen={showContactsModal}
               onClose={closeContacts}
               contacts={contactUsers}
-              onSend={async (selectedContacts) => {
-                console.log("Selected contacts:", selectedContacts);
-                return true;
-              }}
+              onSend={handleSendContacts}
             />
 
             {mediaViewerMessageId && mediaViewerIndex >= 0 ? (
