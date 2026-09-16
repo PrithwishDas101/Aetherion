@@ -1,5 +1,3 @@
-import { FiMessageCircle } from "react-icons/fi";
-
 const ContactMessage = ({
     contact,
     onChat,
@@ -20,9 +18,10 @@ const ContactMessage = ({
     };
 
     return (
-        <div className="w-[260px] max-w-full rounded-2xl border border-[#d8f45a]/10 bg-[#18221a] p-3">
+        <div className="w-[280px] max-w-full rounded-2xl border border-[#d8f45a]/10 bg-[#18221a] p-3.5">
+            {/* CONTACT INFO */}
             <div className="flex items-center gap-3">
-                {/* PROFILE PICTURE */}
+                {/* DP */}
                 <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-[#0d120e]">
                     {contact?.profilePic ? (
                         <img
@@ -50,14 +49,15 @@ const ContactMessage = ({
             </div>
 
             {/* CHAT BUTTON */}
-            <button
-                type="button"
-                onClick={handleChat}
-                className="mt-3 inline-flex items-center gap-1.5 px-0.5 text-xs font-medium text-[#d8f45a] transition hover:text-[#e4ff6c] hover:underline"
-            >
-                <FiMessageCircle className="text-sm" />
-                Chat
-            </button>
+            <div className="mt-3 flex justify-center">
+                <button
+                    type="button"
+                    onClick={handleChat}
+                    className="text-xs font-medium text-[#d8f45a] transition-colors hover:text-[#e4ff6c] hover:underline"
+                >
+                    Chat
+                </button>
+            </div>
         </div>
     );
 };

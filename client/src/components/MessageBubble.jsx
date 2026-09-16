@@ -194,7 +194,8 @@ const MessageBubble = ({
         <div
           className={`w-fit max-w-full break-words ${isMedia ||
             isPoll ||
-            isLocation
+            isLocation || 
+            isContact
             ? ""
             : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMyMessage
               ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
