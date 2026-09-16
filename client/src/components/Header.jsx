@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { FiLogOut, FiUser } from "react-icons/fi";
+
+import { logoutUser } from "../apiCalls/authApi.js";
 
 function Header() {
   const { user } = useSelector((state) => state.userReducer);
@@ -8,6 +11,10 @@ function Header() {
   const navigate = useNavigate();
 
   const [showProfileHint, setShowProfileHint] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const profileMenuRef = useRef(null);
 
   useEffect(() => {
     if (!user?._id) {
@@ -22,14 +29,66 @@ function Header() {
     }
   }, [user?._id]);
 
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (
+        showProfileMenu &&
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target)
+      ) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [showProfileMenu]);
+
+  // Close profile menu with Escape
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setShowProfileMenu(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   const dismissProfileHint = () => {
     if (!user?._id) {
       return;
     }
 
-    localStorage.setItem(`aetherion_profile_hint_seen_${user._id}`, "true");
+    localStorage.setItem(
+      `aetherion_profile_hint_seen_${user._id}`,
+      "true"
+    );
 
     setShowProfileHint(false);
+  };
+
+  const handleProfileClick = () => {
+    dismissProfileHint();
+    setShowProfileMenu(false);
+    navigate("/profile");
+  };
+
+  const handleLogout = async () => {
+    setShowLogoutConfirm(false);
+    setShowProfileMenu(false);
+
+    await logoutUser();
+
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -49,7 +108,10 @@ function Header() {
         </div>
 
         {/* Logged-in user profile */}
-        <div className="flex items-center gap-[5px]">
+        <div
+          ref={profileMenuRef}
+          className="relative flex items-center gap-[5px]"
+        >
           {/* User name — desktop only */}
           <div className="mr-4 hidden font-bold text-[#d0d4cc] sm:block">
             {user?.firstName} {user?.lastName}
@@ -60,14 +122,15 @@ function Header() {
             type="button"
             onClick={() => {
               dismissProfileHint();
-              navigate("/profile");
+              setShowProfileMenu((prev) => !prev);
             }}
-            className={`relative flex h-8 w-8 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-[#d8f45a] text-sm font-bold text-[#10120d] transition sm:h-10 sm:w-10 sm:text-base ${
-              showProfileHint
-                ? "z-[60] ring-4 ring-[#d8f45a]/40 shadow-[0_0_25px_rgba(216,244,90,0.6)]"
-                : ""
-            }`}
-            aria-label="Open profile"
+            className={`relative flex h-8 w-8 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-[#d8f45a] text-sm font-bold text-[#10120d] transition active:scale-95 sm:h-10 sm:w-10 sm:text-base ${showProfileHint
+              ? "z-[60] ring-4 ring-[#d8f45a]/40 shadow-[0_0_25px_rgba(216,244,90,0.6)]"
+              : ""
+              }`}
+            aria-label="Open profile menu"
+            aria-haspopup="menu"
+            aria-expanded={showProfileMenu}
           >
             {user?.profilePic ? (
               <img
@@ -85,8 +148,125 @@ function Header() {
               </>
             )}
           </button>
+
+          {/* PROFILE DROPDOWN */}
+          <div
+            className={`absolute right-0 top-full z-50 mt-3 origin-top-right transition-all duration-300 ease-out ${showProfileMenu
+              ? "pointer-events-auto translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-2 opacity-0"
+              }`}
+          >
+            <div className="w-[250px] rounded-2xl border border-white/10 bg-[#101610]/95 p-2 shadow-2xl backdrop-blur-md sm:w-[270px]">
+              {/* User info */}
+              <div className="flex items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#d8f45a] text-sm font-bold text-[#10120d]">
+                  {user?.profilePic ? (
+                    <img
+                      src={user.profilePic}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      {user?.firstName?.[0]}
+                      {user?.lastName?.[0]}
+                    </>
+                  )}
+                </div>
+
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-[#f1eee8]">
+                    {user?.firstName} {user?.lastName}
+                  </p>
+
+                  <p className="mt-0.5 truncate text-xs text-[#8f998b]">
+                    {user?.email}
+                  </p>
+                </div>
+              </div>
+
+              {/* Profile */}
+              <button
+                type="button"
+                onClick={handleProfileClick}
+                className="mt-2 flex w-full items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-[#5af48b] active:scale-[0.98]"
+              >
+                <FiUser className="h-[18px] w-[18px]" />
+
+                <span>Profile</span>
+              </button>
+
+              {/* Divider */}
+              <div className="my-2 h-px bg-white/10" />
+
+              {/* Logout */}
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(true)}
+                className="flex w-full items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-red-400 active:scale-[0.98]"
+              >
+                <FiLogOut className="h-[18px] w-[18px]" />
+
+                <span>Log out</span>
+              </button>
+            </div>
+          </div>
         </div>
       </header>
+      
+      {/* LOGOUT CONFIRMATION */}
+      {showLogoutConfirm && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-5"
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          <div
+            className="w-full max-w-[350px] overflow-hidden rounded-2xl border border-white/10 bg-[#111711] shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {/* Red accent */}
+            <div className="h-[3px] w-full bg-red-500/80" />
+
+            <div className="p-5">
+              {/* Header */}
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-400">
+                  <FiLogOut className="h-[17px] w-[17px]" />
+                </div>
+
+                <div className="min-w-0">
+                  <h2 className="text-[16px] font-semibold text-[#f1eee8]">
+                    Log out of Aetherion?
+                  </h2>
+
+                  <p className="mt-1 text-[13px] leading-5 text-[#8f998b]">
+                    You'll need to log in again to continue.
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="mt-5 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 rounded-xl border border-white/10 bg-[#151c15] px-4 py-2.5 text-sm font-medium text-[#c9cec5] transition hover:bg-[#1c261c] active:scale-[0.98]"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-400 active:scale-[0.98]"
+                >
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* PROFILE ONBOARDING SPOTLIGHT */}
       {showProfileHint && (

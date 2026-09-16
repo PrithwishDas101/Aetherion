@@ -69,7 +69,7 @@ function Login() {
             </div>
 
             {/* Aetherion */}
-            <div className="mt-3 text-center text-lg tracking-[0.65em] text-[#f1eee8]">
+            <div className="mt-3 text-center text-lg tracking-[0.45em] text-[#f1eee8]">
               <span className="mr-3 text-[#d8f45a]">✦</span>
               AETHERION
               <span className="ml-3 text-[#d8f45a]">✦</span>
