@@ -15,6 +15,7 @@ const MessageComposer = ({
   onDocument,
   onPoll,
   onLocation,
+  onContact,
 }) => {
   const [showAttachmentPanel, setShowAttachmentPanel] = useState(false);
 
@@ -34,20 +35,23 @@ const MessageComposer = ({
 
   const handleDocument = () => {
     setShowAttachmentPanel(false);
-
     onDocument?.();
   };
 
   const handlePoll = () => {
     setShowAttachmentPanel(false);
-
     onPoll?.();
   };
 
   const handleLocation = () => {
-  setShowAttachmentPanel(false);
-  onLocation?.();
-};
+    setShowAttachmentPanel(false);
+    onLocation?.();
+  };
+
+  const handleContact = () => {
+    setShowAttachmentPanel(false);
+    onContact?.();
+  };
 
   const handleKeyDown = (event) => {
     if (event.key !== "Enter" || event.shiftKey) {
@@ -78,7 +82,6 @@ const MessageComposer = ({
         />
 
         {/* ATTACHMENT BUTTON + PANEL */}
-
         <div className="relative shrink-0">
           <MessageAttachmentButton onClick={toggleAttachmentPanel} />
 
@@ -89,12 +92,11 @@ const MessageComposer = ({
             onDocument={handleDocument}
             onPoll={handlePoll}
             onLocation={handleLocation}
-            onContact={() => console.log("Contact clicked")}
+            onContact={handleContact}
           />
         </div>
 
         {/* CAMERA BUTTON */}
-
         <MessageCameraButton onClick={handleCamera} />
 
       </div>

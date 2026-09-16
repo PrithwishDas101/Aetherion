@@ -18,7 +18,7 @@ const MessageComposerInput = ({
       <button
         type="button"
         onClick={onToggleMediaPicker}
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#83b47b] transition hover:bg-[#2a2a29] hover:text-[#bcf66b]"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#83b47b] transition hover:text-[#f6f9f1] active:scale-95"
         aria-label={
           showMediaPicker
             ? "Show keyboard"

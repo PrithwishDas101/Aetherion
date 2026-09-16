@@ -36,6 +36,7 @@ import GalleryModal from "./Gallery/GalleryModal.jsx";
 import DocumentModal from "./Documents/DocumentModal.jsx";
 import PollModal from "./Poll/PollModal.jsx";
 import LocationModal from "./Location/LocationModal.jsx";
+import ContactsModal from "./Contacts/ContactsModal.jsx";
 
 import {
   sendMessage as emitSendMessage,
@@ -49,7 +50,7 @@ import registerSocketListeners from "../sockets/socketListeners.js";
 const Chat = ({ socket }) => {
   const dispatch = useDispatch();
 
-  const { selectedChat, user, allChats, typingChats, presence } = useSelector(
+  const { selectedChat, user, allUsers, allChats, typingChats, presence } = useSelector(
     (state) => state.userReducer,
   );
 
@@ -63,6 +64,7 @@ const Chat = ({ socket }) => {
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [showPollModal, setShowPollModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showContactsModal, setShowContactsModal] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
   const [mediaViewerMessageId, setMediaViewerMessageId] = useState(null);
 
@@ -136,6 +138,26 @@ const Chat = ({ socket }) => {
     setNewMessageCount(count);
     setFirstNewMessageId(firstMessageId);
   };
+
+  // GET CONTACTS
+  const contactUsers = (allUsers || []).filter((contact) => {
+    if (!contact?._id || String(contact._id) === String(user?._id)) {
+      return false;
+    }
+
+    return (allChats || []).some((chat) => {
+      const memberIds = (chat.members || [])
+        .filter(Boolean)
+        .map((member) =>
+          String(member?._id || member),
+        );
+
+      return (
+        memberIds.includes(String(user._id)) &&
+        memberIds.includes(String(contact._id))
+      );
+    });
+  });
 
   // CLEAR UNREAD MESSAGES
   const clearUnreadMessages = async () => {
@@ -260,6 +282,22 @@ const Chat = ({ socket }) => {
 
   const closeLocation = () => {
     setShowLocationModal(false);
+  };
+
+  // CONTACTS
+  const openContacts = () => {
+    setShowMediaPicker(false);
+    setShowCameraModal(false);
+    setShowGalleryModal(false);
+    setShowDocumentModal(false);
+    setShowPollModal(false);
+    setShowLocationModal(false);
+
+    setShowContactsModal(true);
+  };
+
+  const closeContacts = () => {
+    setShowContactsModal(false);
   };
 
   // SEND LOCATION
@@ -2163,7 +2201,6 @@ const Chat = ({ socket }) => {
                 )}
 
                 {/* MESSAGE */}
-
                 <MessageBubble
                   message={currentMessage}
                   isMyMessage={isMyMessage}
@@ -2278,7 +2315,7 @@ const Chat = ({ socket }) => {
             <button
               type="button"
               onClick={toggleMediaPicker}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#83b47b] transition hover:bg-[#2a2a29] hover:text-[#bcf66b]"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#cedecb] transition hover:text-[#ebf0e4] active:scale-95"
               aria-label={
                 showMediaPicker ? "Show keyboard" : "Open emojis and media"
               }
@@ -2302,6 +2339,7 @@ const Chat = ({ socket }) => {
               onDocument={openDocument}
               onPoll={openPoll}
               onLocation={openLocation}
+              onContact={openContacts}
             />
 
             {/* CAMERA */}
@@ -2349,6 +2387,17 @@ const Chat = ({ socket }) => {
               isSending={isSending}
             />
 
+            {/* CONTACTS */}
+            <ContactsModal
+              isOpen={showContactsModal}
+              onClose={closeContacts}
+              contacts={contactUsers}
+              onSend={async (selectedContacts) => {
+                console.log("Selected contacts:", selectedContacts);
+                return true;
+              }}
+            />
+
             {mediaViewerMessageId && mediaViewerIndex >= 0 ? (
               <MediaViewer
                 mediaItems={mediaMessages}
@@ -2366,7 +2415,6 @@ const Chat = ({ socket }) => {
             ) : null}
 
             {/* SEND */}
-
             <button
               type="button"
               onClick={sendMessage}
@@ -2379,7 +2427,6 @@ const Chat = ({ socket }) => {
           </div>
 
           {/* MEDIA PICKER */}
-
           <div className="mt-2 md:relative">
             <MessageMediaPicker
               isOpen={showMediaPicker}
