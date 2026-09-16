@@ -11,6 +11,7 @@ import {
   IoDocumentTextOutline,
   IoStatsChartOutline,
   IoLocationOutline,
+  IoPersonOutline 
 } from "react-icons/io5";
 
 import { createChat } from "../apiCalls/chatApi.js";
@@ -359,6 +360,14 @@ function UserList({ searchKey, socket }) {
 
                             <span className="truncate">
                               Location
+                            </span>
+                          </>
+                        ) : lastMessageType === "contact" ? (
+                          <>
+                            <IoPersonOutline className="shrink-0 text-sm" />
+
+                            <span className="truncate">
+                              Contact
                             </span>
                           </>
                         ) : (
