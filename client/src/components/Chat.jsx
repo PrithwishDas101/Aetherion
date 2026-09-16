@@ -2442,7 +2442,6 @@ const Chat = ({ socket }) => {
           )}
 
           {/* TYPING INDICATOR */}
-
           {isTyping && (
             <div className="flex justify-start">
               <div className="max-w-fit rounded-2xl bg-[#171d17] px-3 py-2 shadow-sm transition-all duration-200">
@@ -2470,20 +2469,24 @@ const Chat = ({ socket }) => {
       </div>
 
       {/* MESSAGE INPUT */}
-      <div className="mt-4 shrink-0 sm:mt-5">
-        <ReplyPreview
-          message={replyingTo}
-          isMyMessage={
-            String(replyingTo?.sender?._id || replyingTo?.sender) ===
-            String(user._id)
-          }
-          otherUserName={
-            selectedUser
-              ? `${selectedUser.firstName} ${selectedUser.lastName}`
-              : "User"
-          }
-          onCancel={cancelReply}
-        />
+      <div className="relative z-30 mt-4 shrink-0 sm:mt-5">
+        {replyingTo && (
+          <div className="mb-2 w-full">
+            <ReplyPreview
+              message={replyingTo}
+              isMyMessage={
+                String(replyingTo?.sender?._id || replyingTo?.sender) ===
+                String(user._id)
+              }
+              otherUserName={
+                selectedUser
+                  ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                  : "User"
+              }
+              onCancel={cancelReply}
+            />
+          </div>
+        )}
 
         <div className="relative">
           <div className="relative flex items-end gap-2 sm:gap-3">
