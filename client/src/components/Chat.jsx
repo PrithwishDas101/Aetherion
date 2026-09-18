@@ -37,6 +37,12 @@ import DocumentModal from "./Documents/DocumentModal.jsx";
 import PollModal from "./Poll/PollModal.jsx";
 import LocationModal from "./Location/LocationModal.jsx";
 import ContactsModal from "./Contacts/ContactsModal.jsx";
+import {
+  getEffectivePresenceStatus,
+  PRESENCE_STATUS,
+} from "../utils/presenceStatus.js";
+
+import PresenceIcon from "./PresenceIcon.jsx";
 
 import {
   sendMessage as emitSendMessage,
@@ -110,7 +116,10 @@ const Chat = ({ socket }) => {
     ? presence[String(selectedUser._id)]
     : null;
 
-  const isSelectedUserOnline = !!selectedUserPresence?.online;
+  const effectivePresenceStatus = getEffectivePresenceStatus({
+    user: selectedUser,
+    livePresence: selectedUserPresence,
+  });
 
   const selectedUserLastSeen = selectedUser?._id
     ? presence[String(selectedUser._id)]?.lastSeen
@@ -2287,19 +2296,46 @@ const Chat = ({ socket }) => {
                 : "Chat"}
             </p>
 
-            <p className="flex items-center justify-end gap-1 text-xs text-[#8a9385]">
-              {isSelectedUserOnline && (
-                <span className="h-1.5 w-1.5 rounded-full bg-[#d8f45a]" />
-              )}
+            {selectedUser &&
+              selectedUser.publicPresenceStatus !== PRESENCE_STATUS.AUTOMATIC ? (
+              <p className="flex items-center justify-end gap-1 text-xs text-[#8a9385]">
+                <PresenceIcon
+                  status={effectivePresenceStatus}
+                  size="small"
+                />
 
-              {isSelectedUserOnline
-                ? "online"
-                : formatLastSeen(selectedUserLastSeen)}
-            </p>
+                <span>
+                  {effectivePresenceStatus === PRESENCE_STATUS.ONLINE &&
+                    "Online"}
+
+                  {effectivePresenceStatus === PRESENCE_STATUS.OFF_PLANET &&
+                    "Off Planet"}
+
+                  {effectivePresenceStatus === PRESENCE_STATUS.IDLE &&
+                    "Idle"}
+
+                  {effectivePresenceStatus === PRESENCE_STATUS.DND &&
+                    "DND"}
+                </span>
+              </p>
+            ) : (
+              <p className="flex items-center justify-end gap-1 text-xs text-[#8a9385]">
+                {selectedUserPresence?.online && (
+                  <PresenceIcon
+                    status={PRESENCE_STATUS.ONLINE}
+                    size="small"
+                  />
+                )}
+
+                {selectedUserPresence?.online
+                  ? "online"
+                  : formatLastSeen(selectedUserLastSeen)}
+              </p>
+            )}
           </div>
 
           {isTyping && (
-            <p className="text-right text-xs text-[#f1eee8]">typing...</p>
+            <p className="text-right text-xs text-[#eaf7b3]">typing...</p>
           )}
         </div>
       </div>
@@ -2321,7 +2357,6 @@ const Chat = ({ socket }) => {
           )}
 
           {/* MESSAGES */}
-
           {allMessages.map((currentMessage, index) => {
             const previousMessage = allMessages[index - 1];
 

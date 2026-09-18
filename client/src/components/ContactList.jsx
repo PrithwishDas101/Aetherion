@@ -51,10 +51,6 @@ const ContactList = () => {
                     No contacts yet
                 </p>
 
-                <p className="mx-auto mt-1 max-w-xs text-xs leading-5 text-[#626960]">
-                    Your contacts will appear here once the contacts system is
-                    added.
-                </p>
             </div>
         </section>
     );

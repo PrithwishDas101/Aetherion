@@ -7,91 +7,74 @@ const PresenceIcon = ({
     const isSmall = size === "small";
 
     const sizeClasses = isSmall
-  ? "h-3.5 w-3.5 shrink-0"
-  : "h-5 w-5 shrink-0";
+        ? "h-2.5 w-2.5 shrink-0"
+        : "h-5 w-5 shrink-0";
 
     const strokeWidth = isSmall ? 1.8 : 2;
 
     switch (status) {
-        /*
-         * ONLINE
-         * Empty green perimeter.
-         */
+        // ONLINE
         case PRESENCE_STATUS.ONLINE:
             return (
                 <span
-                    className={`${sizeClasses} rounded-full border-[2px] border-[#4ade80] bg-transparent`}
+                    className={`${sizeClasses} rounded-full bg-[#42e655] shadow-[0_0_4px_rgba(9,217,85,0.55)]`}
                     aria-label="Online"
                 />
             );
 
-        /*
-         * OFF PLANET
-         * Empty grey perimeter.
-         */
+        // OFF PLANET
         case PRESENCE_STATUS.OFF_PLANET:
             return (
                 <span
-                    className={`${sizeClasses} rounded-full border-[2px] border-[#737a76] bg-transparent`}
+                    className={`${sizeClasses} rounded-full bg-[#737a76] shadow-[0_0_3px_rgba(180,188,183,0.4)]`}
                     aria-label="Off Planet"
                 />
             );
 
-        /*
-         * IDLE
-         * True new-moon icon.
-         *
-         * SVG is used so the shape itself is transparent
-         * rather than faking the cutout with a background color.
-         */
+        // IDLE
         case PRESENCE_STATUS.IDLE:
             return (
                 <svg
                     viewBox="0 0 24 24"
-                    className={sizeClasses}
+                    className="h-4 w-4"
                     fill="none"
                     aria-label="Idle"
                     role="img"
                 >
                     <path
                         d="M17.5 3.5A9.5 9.5 0 1 0 20.5 16
-               A8 8 0 1 1 17.5 3.5Z"
+                           A8 8 0 1 1 17.5 3.5Z"
                         fill="#facc15"
                     />
                 </svg>
             );
 
-        /*
-         * DND
-         *
-         * Black perimeter with a clean red cross.
-         * No filled black circle.
-         */
+        // DND
         case PRESENCE_STATUS.DND:
             return (
                 <svg
                     viewBox="0 0 24 24"
-                    className={sizeClasses}
+                    className="h-4 w-4"
                     fill="none"
                     aria-label="Do Not Disturb"
                     role="img"
                 >
+                    {/* Red ball */}
                     <circle
                         cx="12"
                         cy="12"
-                        r="9.5"
-                        stroke="#050505"
-                        strokeWidth={strokeWidth}
+                        r="9"
+                        fill="#ef4444"
                     />
 
+                    {/* Black center line */}
                     <path
-                        d="M8.5 8.5L15.5 15.5M15.5 8.5L8.5 15.5"
-                        stroke="#ef4444"
-                        strokeWidth={strokeWidth}
+                        d="M7 12H17"
+                        stroke="#050505"
+                        strokeWidth="3"
                         strokeLinecap="round"
                     />
-                </svg>
-            );
+                </svg>);
 
         default:
             return null;
