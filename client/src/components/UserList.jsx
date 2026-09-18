@@ -11,7 +11,7 @@ import {
   IoDocumentTextOutline,
   IoStatsChartOutline,
   IoLocationOutline,
-  IoPersonOutline 
+  IoPersonOutline
 } from "react-icons/io5";
 
 import { createChat } from "../apiCalls/chatApi.js";
@@ -20,6 +20,11 @@ import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
 import store from "../redux/store.js";
 import registerSocketListeners from "../sockets/socketListeners.js";
 import { formatChatPreviewTime } from "../utils/messageDate.js";
+import {
+  getEffectivePresenceStatus,
+  PRESENCE_STATUS,
+} from "../utils/presenceStatus.js";
+import PresenceIcon from "./PresenceIcon.jsx";
 
 function UserList({ searchKey, socket }) {
   const {
@@ -194,6 +199,11 @@ function UserList({ searchKey, socket }) {
         visibleUsers.map((user) => {
           const userChat = findChatWithUser(user._id);
 
+          const effectivePresenceStatus = getEffectivePresenceStatus({
+            user,
+            livePresence: presence?.[String(user._id)],
+          });
+
           const isTyping =
             !!userChat?._id &&
             !!typingChats[userChat._id] &&
@@ -259,12 +269,12 @@ function UserList({ searchKey, socket }) {
                     </div>
                   )}
 
-                  {!!presence?.[String(user._id)]?.online && (
-                    <span
-                      className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#0b100c] bg-[#76f45a]"
-                      aria-label="Online"
+                  <div className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center">
+                    <PresenceIcon
+                      status={effectivePresenceStatus}
+                      size="small"
                     />
-                  )}
+                  </div>
                 </div>
 
                 <div className="min-w-0 flex-1">

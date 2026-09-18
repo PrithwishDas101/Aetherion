@@ -218,7 +218,14 @@ export const updatePersonalProfile = async (req, res) => {
       });
     }
 
-    const { firstName, lastName, pronouns, bio, customStatus } = req.body;
+    const {
+      firstName,
+      lastName,
+      pronouns,
+      bio,
+      customStatus,
+      publicPresenceStatus,
+    } = req.body;
 
     // Update only fields that are actually provided.
     if (firstName !== undefined) {
@@ -239,6 +246,25 @@ export const updatePersonalProfile = async (req, res) => {
 
     if (customStatus !== undefined) {
       user.customStatus = customStatus.trim();
+    }
+
+    if (publicPresenceStatus !== undefined) {
+      const allowedPresenceStatuses = [
+        "automatic",
+        "online",
+        "off_planet",
+        "idle",
+        "dnd",
+      ];
+
+      if (!allowedPresenceStatuses.includes(publicPresenceStatus)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid public presence status.",
+        });
+      }
+
+      user.publicPresenceStatus = publicPresenceStatus;
     }
 
     await user.save();
