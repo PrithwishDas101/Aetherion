@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 import { uploadImage, deleteImage } from "../services/cloudinaryService.js";
-
+import { emitPublicPresenceUpdated } from "../socket/profileEvents.js";
 // GET LOGGED-IN USER
 export const getLoggedUser = async (req, res) => {
   try {
@@ -268,6 +268,12 @@ export const updatePersonalProfile = async (req, res) => {
     }
 
     await user.save();
+
+    if (publicPresenceStatus !== undefined) {
+      const io = req.app.get("io");
+
+      emitPublicPresenceUpdated(io, user._id, user.publicPresenceStatus);
+    }
 
     const updatedUser = user.toObject();
 

@@ -9,6 +9,7 @@ const registerSocketListeners = (
     onUserOffline,
     onPresenceState,
     onPollUpdated,
+    onPublicPresenceUpdated,
   } = {},
 ) => {
   if (!socket) {
@@ -47,6 +48,10 @@ const registerSocketListeners = (
     socket.on("poll-updated", onPollUpdated);
   }
 
+  if (onPublicPresenceUpdated) {
+    socket.on("public-presence-updated", onPublicPresenceUpdated);
+  }
+
   return () => {
     if (onReceiveMessage) {
       socket.off("receive-message", onReceiveMessage);
@@ -78,6 +83,10 @@ const registerSocketListeners = (
 
     if (onPollUpdated) {
       socket.off("poll-updated", onPollUpdated);
+    }
+
+    if (onPublicPresenceUpdated) {
+      socket.off("public-presence-updated", onPublicPresenceUpdated);
     }
   };
 };

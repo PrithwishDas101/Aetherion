@@ -12,6 +12,7 @@ import {
   setUserOnline,
   setUserOffline,
   setPresenceState,
+  updateUserPublicPresenceStatus,
 } from "../redux/userSlice.js";
 import socket from "../sockets/socket.js";
 import { joinRoom, getPresence } from "../sockets/socketEmitters.js";
@@ -134,12 +135,32 @@ const Home = () => {
       dispatch(setPresenceState(data?.userIds || []));
     };
 
+    const handlePublicPresenceUpdated = (data) => {
+      if (
+        !data?.userId ||
+        !data?.publicPresenceStatus
+      ) {
+        return;
+      }
+
+      dispatch(
+        updateUserPublicPresenceStatus({
+          userId: data.userId,
+          publicPresenceStatus:
+            data.publicPresenceStatus,
+        }),
+      );
+    };
+
     return registerSocketListeners(socket, {
       onUserOnline: handleUserOnline,
 
       onUserOffline: handleUserOffline,
 
       onPresenceState: handlePresenceState,
+
+      onPublicPresenceUpdated:
+        handlePublicPresenceUpdated,
     });
   }, [dispatch]);
 
@@ -164,9 +185,8 @@ const Home = () => {
 
         {/* CHAT AREA */}
         <div
-          className={`min-h-0 flex-1 overflow-hidden ${
-            selectedChat || hasNoChats ? "block" : "hidden"
-          } md:block`}
+          className={`min-h-0 flex-1 overflow-hidden ${selectedChat || hasNoChats ? "block" : "hidden"
+            } md:block`}
         >
           {selectedChat ? (
             <Chat socket={socket} />

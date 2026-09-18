@@ -96,6 +96,69 @@ const userSlice = createSlice({
         };
       });
     },
+
+    updateUserPublicPresenceStatus: (state, action) => {
+      const { userId, publicPresenceStatus } = action.payload;
+
+      if (!userId || !publicPresenceStatus) {
+        return;
+      }
+
+      const id = String(userId);
+
+      // Update the user list.
+      if (Array.isArray(state.allUsers)) {
+        state.allUsers = state.allUsers.map((user) =>
+          String(user._id) === id
+            ? {
+                ...user,
+                publicPresenceStatus,
+              }
+            : user,
+        );
+      }
+
+      // Update users inside all chats.
+      if (Array.isArray(state.allChats)) {
+        state.allChats = state.allChats.map((chat) => ({
+          ...chat,
+          members: Array.isArray(chat.members)
+            ? chat.members.map((member) =>
+                String(member._id) === id
+                  ? {
+                      ...member,
+                      publicPresenceStatus,
+                    }
+                  : member,
+              )
+            : chat.members,
+        }));
+      }
+
+      // Update the currently selected chat.
+      if (state.selectedChat?.members) {
+        state.selectedChat = {
+          ...state.selectedChat,
+          members: state.selectedChat.members.map((member) =>
+            String(member._id) === id
+              ? {
+                  ...member,
+                  publicPresenceStatus,
+                }
+              : member,
+          ),
+        };
+      }
+
+      // If this happens to be the logged-in user,
+      // keep the local user object in sync too.
+      if (state.user && String(state.user._id) === id) {
+        state.user = {
+          ...state.user,
+          publicPresenceStatus,
+        };
+      }
+    },
   },
 });
 
@@ -111,6 +174,7 @@ export const {
   setUserOffline,
   setPresenceState,
   setInitialPresence,
+  updateUserPublicPresenceStatus,
 } = userSlice.actions;
 
 export default userSlice.reducer;
