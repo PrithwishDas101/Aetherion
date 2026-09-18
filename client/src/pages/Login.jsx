@@ -78,7 +78,7 @@ function Login() {
             {/* Heading */}
             <div className="mt-6 text-center">
               <h1 className="text-3xl font-semibold text-[#f1eee8] sm:text-3xl tracking-[0.25rem]">
-                Welcome Back
+                Welcome {user.firstName}
               </h1>
 
               <p className="mt-2 text-sm text-[#9ca39a] sm:text-base">

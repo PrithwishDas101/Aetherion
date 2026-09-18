@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required"],
     },
 
+    // PROFILE PICTURE
     profilePic: {
       type: String,
       default: null,
@@ -43,6 +44,34 @@ const userSchema = new mongoose.Schema(
     profilePicPublicId: {
       type: String,
       default: null,
+    },
+
+    // PERSONAL PROFILE
+    pronouns: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: [50, "Pronouns cannot exceed 50 characters"],
+    },
+
+    bio: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: [250, "Bio cannot exceed 250 characters"],
+    },
+
+    customStatus: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: [100, "Custom status cannot exceed 100 characters"],
+    },
+
+    publicPresenceStatus: {
+      type: String,
+      enum: ["automatic", "online", "off_planet", "idle", "dnd"],
+      default: "automatic",
     },
 
     lastSeen: {

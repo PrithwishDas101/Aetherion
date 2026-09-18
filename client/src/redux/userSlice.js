@@ -17,6 +17,13 @@ const userSlice = createSlice({
       state.user = action.payload;
     },
 
+    updateUser: (state, action) => {
+      state.user = {
+        ...state.user,
+        ...action.payload,
+      };
+    },
+
     setAllUser: (state, action) => {
       state.allUsers = action.payload;
     },
@@ -94,6 +101,7 @@ const userSlice = createSlice({
 
 export const {
   setUser,
+  updateUser,
   setAllUser,
   setAllChats,
   setSelectedChat,

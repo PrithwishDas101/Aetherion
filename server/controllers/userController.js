@@ -205,3 +205,59 @@ export const removeProfilePicture = async (req, res) => {
     });
   }
 };
+
+// UPDATE PERSONAL PROFILE
+export const updatePersonalProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    const { firstName, lastName, pronouns, bio, customStatus } = req.body;
+
+    // Update only fields that are actually provided.
+    if (firstName !== undefined) {
+      user.firstName = firstName.trim();
+    }
+
+    if (lastName !== undefined) {
+      user.lastName = lastName.trim();
+    }
+
+    if (pronouns !== undefined) {
+      user.pronouns = pronouns.trim();
+    }
+
+    if (bio !== undefined) {
+      user.bio = bio.trim();
+    }
+
+    if (customStatus !== undefined) {
+      user.customStatus = customStatus.trim();
+    }
+
+    await user.save();
+
+    const updatedUser = user.toObject();
+
+    delete updatedUser.password;
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully.",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update personal profile error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update profile.",
+    });
+  }
+};

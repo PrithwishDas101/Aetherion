@@ -52,3 +52,17 @@ export const removeProfilePicture = async () => {
     return error.response?.data;
   }
 };
+
+// UPDATE PERSONAL PROFILE
+export const updatePersonalProfile = async (profileData) => {
+  try {
+    const response = await axiosInstance.put(
+      "/api/v1/user/profile",
+      profileData,
+    );
+
+    return response.data;
+  } catch (error) {
+    return error.response?.data;
+  }
+};

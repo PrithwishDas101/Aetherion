@@ -6,6 +6,7 @@ import {
   getAllUsers,
   updateProfilePicture,
   removeProfilePicture,
+  updatePersonalProfile,
 } from "../controllers/userController.js";
 import { protectRoute } from "../middleware/authMiddleware.js";
 import {
@@ -17,6 +18,7 @@ const router = express.Router();
 
 router.get("/get-logged-user", protectRoute, getLoggedUser);
 router.get("/get-all-users", protectRoute, getAllUsers);
+router.put("/profile", protectRoute, updatePersonalProfile);
 router.post(
   "/profile-picture",
   profilePictureLimiter,
