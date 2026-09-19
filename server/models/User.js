@@ -46,6 +46,17 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    // PROFILE BANNER
+    profileBanner: {
+      type: String,
+      default: null,
+    },
+
+    profileBannerPublicId: {
+      type: String,
+      default: null,
+    },
+
     // PERSONAL PROFILE
     pronouns: {
       type: String,

@@ -66,3 +66,17 @@ export const updatePersonalProfile = async (profileData) => {
     return error.response?.data;
   }
 };
+
+// UPDATE PROFILE BANNER
+export const updateProfileBanner = async (formData) => {
+  try {
+    const response = await axiosInstance.post(
+      "/api/v1/user/profile-banner",
+      formData,
+    );
+
+    return response.data;
+  } catch (error) {
+    return error.response?.data;
+  }
+};

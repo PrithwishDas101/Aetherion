@@ -7,6 +7,7 @@ import {
   updateProfilePicture,
   removeProfilePicture,
   updatePersonalProfile,
+  updateProfileBanner,
 } from "../controllers/userController.js";
 import { protectRoute } from "../middleware/authMiddleware.js";
 import {
@@ -31,6 +32,13 @@ router.delete(
   protectRoute,
   removeProfilePictureLimiter,
   removeProfilePicture,
+);
+router.post(
+  "/profile-banner",
+  profilePictureLimiter,
+  protectRoute,
+  upload.single("profileBanner"),
+  updateProfileBanner,
 );
 
 export default router;
