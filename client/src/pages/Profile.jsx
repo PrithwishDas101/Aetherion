@@ -6,7 +6,8 @@ import toast from "react-hot-toast";
 import {
   updatePersonalProfile,
   updateProfileBanner,
-} from "../apiCalls/userApi.js"; import {
+} from "../apiCalls/userApi.js";
+import {
   getEffectivePresenceStatus,
   PRESENCE_STATUS,
 } from "../utils/presenceStatus.js";
@@ -326,77 +327,85 @@ const Profile = () => {
 
           <div className="relative px-5 pb-10 sm:px-8 sm:pb-12 lg:px-10 lg:pb-14">
             {/* =================================================
-                  AVATAR + STATUS
-              ================================================= */}
+      AVATAR + STATUS
+  ================================================= */}
 
-            <div className="-mt-16 flex items-end gap-4 sm:-mt-20 sm:gap-5">
+            <div className="relative min-h-[6rem] sm:min-h-[6.5rem] lg:min-h-[7rem]">
+
               {/* AVATAR */}
 
-              <div className="relative shrink-0">
-                <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[4px] border-[#101218] bg-[#171d17] text-3xl font-bold text-[#d8f45a] shadow-xl sm:h-32 sm:w-32 sm:text-4xl lg:h-36 lg:w-36">
-                  {user?.profilePic ? (
-                    <img
-                      src={user.profilePic}
-                      alt={fullName}
-                      className="h-full w-full object-cover"
+              <div className="absolute left-0 top-0 z-10 -translate-y-16 sm:-translate-y-20">
+                <div className="relative shrink-0">
+
+                  <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[4px] border-[#101218] bg-[#171d17] text-3xl font-bold text-[#d8f45a] shadow-xl sm:h-32 sm:w-32 sm:text-4xl lg:h-36 lg:w-36">
+                    {user?.profilePic ? (
+                      <img
+                        src={user.profilePic}
+                        alt={fullName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span>{initials}</span>
+                    )}
+                  </div>
+
+                  {/* PRESENCE */}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowPresenceModal(true)
+                    }
+                    className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full border-[2px] border-[#111317] bg-[#131613] shadow-md transition hover:scale-105 active:scale-95"
+                    aria-label="Change online status"
+                    title="Change online status"
+                  >
+                    <PresenceIcon
+                      status={effectivePresenceStatus}
+                      size="small"
                     />
-                  ) : (
-                    <span>{initials}</span>
-                  )}
+                  </button>
+
                 </div>
-
-                {/* PRESENCE */}
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowPresenceModal(true)
-                  }
-                  className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full border-[2px] border-[#111317] bg-[#131613] shadow-md transition hover:scale-105 active:scale-95"
-                  aria-label="Change online status"
-                  title="Change online status"
-                >
-                  <PresenceIcon
-                    status={effectivePresenceStatus}
-                    size="small"
-                  />
-                </button>
               </div>
 
-              {/* STATUS BUBBLE */}
+              {/* STATUS */}
+              <div className=" absolute left-[7.5rem] right-0 -top-[8px] z-20 sm:left-[8.5rem] lg:left-[9.5rem]">
+                <div className="flex min-w-0 items-start">
 
-              <div className="min-w-0 max-w-[260px] pb-3 sm:max-w-sm lg:max-w-md">
-                <div className="flex items-center">
-                  <div className="mr-1 -mt-2 h-2 w-2 shrink-0 rounded-full bg-[#1a1c1a]" />
+                  {/* CONNECTOR DOT */}
+                  <div className="mr-1 mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1a1c1a]" />
+                  <div className="mr-1.5 mt-4 h-3 w-3 shrink-0 rounded-full bg-[#1a1c1a]" />
 
-                  <div className="mr-1.5 h-3 w-3 shrink-0 rounded-full bg-[#1a1c1a]" />
-
+                  {/* STATUS BUBBLE */}
                   <button
                     type="button"
                     onClick={() =>
                       setShowStatusModal(true)
                     }
-                    className="min-w-0 max-w-full rounded-2xl rounded-bl-md border border-white/[0.06] bg-[#1a1c1a] px-4 py-2.5 text-left text-sm leading-5 text-[#d6d8d3] shadow-lg transition hover:bg-[#242524] hover:text-white"
+                    className="min-w-0 max-w-[calc(100vw-9rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl transition hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white sm:max-w-[calc(100vw-10rem)] lg:max-w-[28rem]"
                   >
                     {hasCustomStatus ? (
-                      <span className="break-words">
+                      <span className="block max-h-[3.75rem] overflow-hidden break-all">
                         {user.customStatus}
                       </span>
                     ) : (
-                      <span className="text-[#8d918c]">
+                      <span className="whitespace-nowrap text-[#8d918c]">
                         + Add a status
                       </span>
                     )}
                   </button>
+
                 </div>
               </div>
+
             </div>
 
             {/* =================================================
                   IDENTITY
               ================================================= */}
 
-            <div className="mt-5 max-w-3xl">
+            <div className="-mt-4 max-w-3xl">
               <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                 {fullName}
               </h2>
