@@ -8,6 +8,7 @@ import {
   removeProfilePicture,
   updatePersonalProfile,
   updateProfileBanner,
+  updateConnections,
 } from "../controllers/userController.js";
 import { protectRoute } from "../middleware/authMiddleware.js";
 import {
@@ -40,5 +41,6 @@ router.post(
   upload.single("profileBanner"),
   updateProfileBanner,
 );
+router.put("/connections", protectRoute, updateConnections);
 
 export default router;

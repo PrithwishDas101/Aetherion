@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import {
   updatePersonalProfile,
   updateProfileBanner,
+  updateConnections,
 } from "../apiCalls/userApi.js";
 import {
   getEffectivePresenceStatus,
@@ -14,6 +15,7 @@ import {
 import { setUser } from "../redux/userSlice.js";
 import ContactList from "../components/ContactList.jsx";
 import PresenceIcon from "../components/PresenceIcon.jsx";
+import Connections from "../components/Connections.jsx";
 import AetherionDayBadge from "../components/AetherionDayBadge.jsx";
 import {
   getAetherionDays,
@@ -49,21 +51,14 @@ const Profile = () => {
     setStatusText(user?.customStatus || "");
   }, [user?.customStatus]);
 
-  /* =======================================================
-     PROFILE DATA
-  ======================================================= */
+  // PROFILE DATA
 
-  const fullName =
-    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
-    "User";
+  const fullName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "User";
 
   const aetherionDays = getAetherionDays(user?.createdAt);
-
   const aetherionMilestone = getAetherionDayMilestone(aetherionDays);
 
-  const initials =
-    `${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`
-      .toUpperCase() || "?";
+  const initials = `${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`.toUpperCase() || "?";
 
   const profileMeta = [
     user?.email,
@@ -72,9 +67,7 @@ const Profile = () => {
     .filter(Boolean)
     .join(" • ");
 
-  const livePresence = user?._id
-    ? presence?.[String(user._id)]
-    : null;
+  const livePresence = user?._id ? presence?.[String(user._id)] : null;
 
   const effectivePresenceStatus =
     getEffectivePresenceStatus({
@@ -94,10 +87,7 @@ const Profile = () => {
 
   const hasCustomStatus = Boolean(user?.customStatus?.trim());
 
-  /* =======================================================
-     STATUS
-  ======================================================= */
-
+  //STATUS
   const handleStatusSave = async () => {
     if (isSavingStatus) {
       return;
@@ -180,8 +170,7 @@ const Profile = () => {
     }
   };
 
-
-  // Banner
+  // BANNER
   const handleBannerChange = async (bannerFile) => {
     const formData = new FormData();
 
@@ -208,10 +197,31 @@ const Profile = () => {
     toast.success("Banner updated.");
   };
 
-  /* =======================================================
-     PUBLIC PRESENCE
-  ======================================================= */
+  // CONNECTIONS
+  const handleConnectionsSave = async (
+    connections,
+  ) => {
+    const response =
+      await updateConnections(connections);
 
+    if (!response?.success) {
+      toast.error(
+        response?.message ||
+        "Couldn't update your connections.",
+      );
+
+      throw new Error(
+        response?.message ||
+        "Connections update failed.",
+      );
+    }
+
+    dispatch(setUser(response.data));
+
+    toast.success("Connections updated.");
+  };
+
+  // PUBLIC PRESENCE
   const handlePresenceStatusChange = async (
     status,
   ) => {
@@ -256,10 +266,7 @@ const Profile = () => {
     }
   };
 
-  /* =======================================================
-     MODAL CLOSE
-  ======================================================= */
-
+  // MODAL CLOSE
   const closeStatusModal = () => {
     if (!isSavingStatus) {
       setShowStatusModal(false);
@@ -272,10 +279,7 @@ const Profile = () => {
     }
   };
 
-  /* =======================================================
-     UI
-  ======================================================= */
-
+  // UI
   return (
     <div className="min-h-screen bg-[#080d09] text-[#f1eee8]">
       {/* ===================================================
@@ -545,162 +549,11 @@ const Profile = () => {
 
                 </div>
 
-                {/* =================================================
-        RIGHT — CONNECTIONS
-    ================================================= */}
-
-                <div className="min-w-0 lg:border-l lg:border-white/[0.06] lg:pl-10">
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8d918c]">
-                        Connections
-                      </p>
-
-                      <p className="mt-1 text-xs text-[#626960]">
-                        Find me around the internet
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        // Connections modal will be added later.
-                      }}
-                      className="text-xs font-semibold text-[#d8f45a] transition hover:text-[#e4ff6f]"
-                    >
-                      Edit
-                    </button>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap items-center gap-3">
-
-                    {/* Instagram */}
-
-                    <a
-                      href={user?.connections?.instagram || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Instagram"
-                      className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.06] bg-[#2f3138] text-[#d8f45a] transition hover:scale-105 hover:border-[#d8f45a]/20 hover:bg-[#363940]"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="h-5 w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                      >
-                        <rect
-                          x="3"
-                          y="3"
-                          width="18"
-                          height="18"
-                          rx="5"
-                        />
-
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="4"
-                        />
-
-                        <circle
-                          cx="17.5"
-                          cy="6.5"
-                          r="0.8"
-                          fill="currentColor"
-                          stroke="none"
-                        />
-                      </svg>
-                    </a>
-
-                    {/* Twitter / X */}
-
-                    <a
-                      href={user?.connections?.twitter || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Twitter"
-                      className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.06] bg-[#2f3138] text-[#d8f45a] transition hover:scale-105 hover:border-[#d8f45a]/20 hover:bg-[#363940]"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="h-5 w-5"
-                        fill="currentColor"
-                      >
-                        <path d="M18.9 2H22l-6.77 7.74L23.2 22h-6.24l-4.88-6.37L6.5 22H3.4l7.24-8.28L3 2h6.4l4.41 5.82L18.9 2Zm-1.1 17.8h1.73L8.47 4.08H6.61L17.8 19.8Z" />
-                      </svg>
-                    </a>
-
-                    {/* LinkedIn */}
-
-                    <a
-                      href={user?.connections?.linkedin || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="LinkedIn"
-                      className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.06] bg-[#2f3138] text-[#d8f45a] transition hover:scale-105 hover:border-[#d8f45a]/20 hover:bg-[#363940]"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="h-5 w-5"
-                        fill="currentColor"
-                      >
-                        <path d="M5.1 3.5A2.1 2.1 0 1 1 5.1 7.7a2.1 2.1 0 0 1 0-4.2ZM3.3 9.3h3.6V21H3.3V9.3Zm5.8 0h3.45v1.6h.05c.48-.91 1.66-1.87 3.42-1.87 3.66 0 4.34 2.41 4.34 5.55V21h-3.6v-5.7c0-1.36-.03-3.1-1.89-3.1-1.89 0-2.18 1.47-2.18 3v5.8H9.1V9.3Z" />
-                      </svg>
-                    </a>
-
-                    {/* Reddit */}
-
-                    <a
-                      href={user?.connections?.reddit || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Reddit"
-                      className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.06] bg-[#2f3138] text-[#d8f45a] transition hover:scale-105 hover:border-[#d8f45a]/20 hover:bg-[#363940]"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="h-5 w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 12.5c0-2-2.3-3.6-5.2-3.6-1.1 0-2.1.3-2.9.7l-.8-3.1 3.2-.7" />
-
-                        <circle
-                          cx="15.7"
-                          cy="5.2"
-                          r="1.2"
-                        />
-
-                        <path d="M4 12.5c0-2 2.3-3.6 5.2-3.6 1.1 0 2.1.3 2.9.7" />
-
-                        <path d="M4 13.1c0 3.2 3.5 5.8 8 5.8s8-2.6 8-5.8" />
-
-                        <circle
-                          cx="8.8"
-                          cy="13"
-                          r="1"
-                          fill="currentColor"
-                        />
-
-                        <circle
-                          cx="15.2"
-                          cy="13"
-                          r="1"
-                          fill="currentColor"
-                        />
-
-                        <path d="M9.5 16.1c1.4.9 3.6.9 5 0" />
-                      </svg>
-                    </a>
-
-                  </div>
-                </div>
+                {/* RIGHT - CONNECTIONS */}
+                <Connections
+                  connections={user?.connections || []}
+                  onSave={handleConnectionsSave}
+                />
               </div>
             </div>
           </div>

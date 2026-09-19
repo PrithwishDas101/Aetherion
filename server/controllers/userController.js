@@ -373,3 +373,99 @@ export const updateProfileBanner = async (req, res) => {
     });
   }
 };
+
+// UPDATE PROFILE CONNECTIONS
+export const updateConnections = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    const { connections } = req.body;
+
+    if (!Array.isArray(connections)) {
+      return res.status(400).json({
+        success: false,
+        message: "Connections must be an array.",
+      });
+    }
+
+    if (connections.length > 20) {
+      return res.status(400).json({
+        success: false,
+        message: "You can have a maximum of 20 connections.",
+      });
+    }
+
+    const cleanedConnections = [];
+
+    for (const connection of connections) {
+      if (!connection || typeof connection.url !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Each connection must contain a valid URL.",
+        });
+      }
+
+      const url = connection.url.trim();
+
+      if (!url) {
+        continue;
+      }
+
+      let parsedUrl;
+
+      try {
+        parsedUrl = new URL(url);
+      } catch {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid connection URL: ${url}`,
+        });
+      }
+
+      if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+        return res.status(400).json({
+          success: false,
+          message: "Connections must use http or https URLs.",
+        });
+      }
+
+      const name =
+        typeof connection.name === "string" && connection.name.trim()
+          ? connection.name.trim().slice(0, 50)
+          : parsedUrl.hostname.replace(/^www\./, "").slice(0, 50);
+
+      cleanedConnections.push({
+        name,
+        url: url.slice(0, 2048),
+      });
+    }
+
+    user.connections = cleanedConnections;
+
+    await user.save();
+
+    const updatedUser = user.toObject();
+
+    delete updatedUser.password;
+
+    return res.status(200).json({
+      success: true,
+      message: "Connections updated successfully.",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update connections error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update connections.",
+    });
+  }
+};

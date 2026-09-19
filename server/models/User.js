@@ -79,6 +79,30 @@ const userSchema = new mongoose.Schema(
       maxlength: [100, "Custom status cannot exceed 100 characters"],
     },
 
+    connections: {
+      type: [
+        {
+          name: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 50,
+          },
+          url: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 2048,
+          },
+        },
+      ],
+      default: [],
+      validate: {
+        validator: (connections) => connections.length <= 20,
+        message: "You can have a maximum of 20 connections.",
+      },
+    },
+
     publicPresenceStatus: {
       type: String,
       enum: ["automatic", "online", "off_planet", "idle", "dnd"],

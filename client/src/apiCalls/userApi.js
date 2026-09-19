@@ -80,3 +80,16 @@ export const updateProfileBanner = async (formData) => {
     return error.response?.data;
   }
 };
+
+// UPDATE PROFILE CONNECTIONS
+export const updateConnections = async (connections) => {
+  try {
+    const response = await axiosInstance.put("/api/v1/user/connections", {
+      connections,
+    });
+
+    return response.data;
+  } catch (error) {
+    return error.response?.data;
+  }
+};
