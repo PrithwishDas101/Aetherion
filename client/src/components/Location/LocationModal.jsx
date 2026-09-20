@@ -120,9 +120,9 @@ const LocationModal = ({
                             type="button"
                             onClick={handleClose}
                             disabled={isSending}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#899287] transition hover:bg-white/[0.05] hover:text-[#d8f45a] disabled:cursor-not-allowed disabled:opacity-40"
+                            className="aetherion-button h-7 w-7 rounded-lg text-sm disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                            <FiArrowLeft className="text-sm" />
+                            <FiArrowLeft />
                         </button>
 
                         <div>

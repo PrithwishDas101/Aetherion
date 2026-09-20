@@ -488,10 +488,10 @@ const MediaViewer = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition active:scale-95"
-                aria-label="Back"
-              >
-                <FiArrowLeft className="text-[23px]" />
+                className="aetherion-button h-10 w-10 text-xl" aria-label="Back">
+                <span>
+                  <FiArrowLeft />
+                </span>
               </button>
 
               {sender?.profilePic ? (

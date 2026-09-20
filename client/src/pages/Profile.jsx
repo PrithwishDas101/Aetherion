@@ -31,28 +31,19 @@ const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [showStatusModal, setShowStatusModal] =
-    useState(false);
-
-  const [showPresenceModal, setShowPresenceModal] =
-    useState(false);
-
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showPresenceModal, setShowPresenceModal] = useState(false);
   const [statusText, setStatusText] = useState(
     user?.customStatus || "",
   );
-
-  const [isSavingStatus, setIsSavingStatus] =
-    useState(false);
-
-  const [isSavingPresence, setIsSavingPresence] =
-    useState(false);
+  const [isSavingStatus, setIsSavingStatus] = useState(false);
+  const [isSavingPresence, setIsSavingPresence] = useState(false);
 
   useEffect(() => {
     setStatusText(user?.customStatus || "");
   }, [user?.customStatus]);
 
   // PROFILE DATA
-
   const fullName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "User";
 
   const aetherionDays = getAetherionDays(user?.createdAt);
@@ -291,12 +282,8 @@ const Profile = () => {
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="group flex h-10 w-10 items-center justify-center rounded-full text-xl text-[#858d84] transitio hover:text-[#e8e8e5]"
-            aria-label="Back to home"
-          >
-            <span className="transition-transform group-hover:-translate-x-0.5">
-              ←
-            </span>
+            className="aetherion-button" aria-label="Back to home">
+            <span>←</span>
           </button>
 
           <div className="ml-3">

@@ -90,10 +90,10 @@ const EditProfile = () => {
                     <button
                         type="button"
                         onClick={() => navigate("/profile")}
-                        className="flex h-9 w-9 items-center justify-center rounded-full text-[#858d84] transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a]"
-                        aria-label="Back to profile"
-                    >
-                        ←
+                        className="aetherion-button h-9 w-9 text-base" aria-label="Back to profile">
+                        <span>
+                            ←
+                        </span>
                     </button>
 
                     <h1 className="text-lg font-bold">Edit profile</h1>

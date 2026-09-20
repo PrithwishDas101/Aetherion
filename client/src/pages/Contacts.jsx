@@ -237,11 +237,9 @@ function Contacts() {
         navigate(-1);
     };
 
-    const isSearching =
-        searchInput.trim().length > 0;
+    const isSearching = searchInput.trim().length > 0;
 
-    const hasContacts =
-        filteredContacts.length > 0;
+    const hasContacts = filteredContacts.length > 0;
 
     return (
         <div className="min-h-screen w-full bg-[#080b08] text-[#f1eee8]">
@@ -250,13 +248,8 @@ function Contacts() {
 
                 <header className="flex items-center justify-between">
                     <div className="flex min-w-0 items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={handleBack}
-                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#8a9288] transition hover:bg-[#151a15] hover:text-[#f1eee8]"
-                            aria-label="Go back"
-                        >
-                            <IoArrowBack className="text-lg" />
+                        <button type="button" onClick={handleBack} className="aetherion-button h-9 w-9 text-base" aria-label="Go back">
+                            <span><IoArrowBack /></span>
                         </button>
 
                         <div className="min-w-0">
@@ -269,10 +262,6 @@ function Contacts() {
                                     {total}
                                 </span>
                             </div>
-
-                            <p className="mt-0.5 text-xs text-[#646c63]">
-                                Your people on Aetherion
-                            </p>
                         </div>
                     </div>
 
@@ -331,9 +320,9 @@ function Contacts() {
                                     )
                                 }
                                 className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${filter ===
-                                        CONTACT_FILTER.ALL
-                                        ? "bg-[#171d17] text-[#f1eee8]"
-                                        : "text-[#687166] hover:text-[#aeb6aa]"
+                                    CONTACT_FILTER.ALL
+                                    ? "bg-[#171d17] text-[#f1eee8]"
+                                    : "text-[#687166] hover:text-[#aeb6aa]"
                                     }`}
                             >
                                 All
@@ -347,9 +336,9 @@ function Contacts() {
                                     )
                                 }
                                 className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${filter ===
-                                        CONTACT_FILTER.ONLINE
-                                        ? "bg-[#171d17] text-[#f1eee8]"
-                                        : "text-[#687166] hover:text-[#aeb6aa]"
+                                    CONTACT_FILTER.ONLINE
+                                    ? "bg-[#171d17] text-[#f1eee8]"
+                                    : "text-[#687166] hover:text-[#aeb6aa]"
                                     }`}
                             >
                                 Online
@@ -359,7 +348,6 @@ function Contacts() {
                 </div>
 
                 {/* CONTENT */}
-
                 <main className="mt-8">
                     {loading ? (
                         <LoadingState />
@@ -490,10 +478,7 @@ function Contacts() {
     );
 }
 
-/* =========================================================
-   CONTACT ROW
-   ========================================================= */
-
+// CONTACT ROW
 function ContactRow({
     contact,
     onChat,
@@ -510,18 +495,16 @@ function ContactRow({
             effectivePresenceStatus,
         );
 
-    const fullName =
-        getFullName(contact);
+    const fullName = getFullName(contact);
 
     return (
         <div
             className={`group flex min-h-[68px] items-center gap-3 border-b border-[#ffffff]/[0.06] px-2 py-3 transition hover:bg-[#0d120d] ${isLast
-                    ? "border-b-0"
-                    : ""
+                ? "border-b-0"
+                : ""
                 }`}
         >
             {/* AVATAR */}
-
             <div className="relative shrink-0">
                 {contact.profilePic ? (
                     <img
@@ -546,7 +529,6 @@ function ContactRow({
             </div>
 
             {/* USER INFO */}
-
             <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-medium text-[#e8e5de]">
                     {fullName}
@@ -558,7 +540,6 @@ function ContactRow({
             </div>
 
             {/* CHAT ACTION */}
-
             <button
                 type="button"
                 onClick={() =>
@@ -573,10 +554,7 @@ function ContactRow({
     );
 }
 
-/* =========================================================
-   LOADING
-   ========================================================= */
-
+// LOADING 
 function LoadingState() {
     return (
         <div className="py-20 text-center">
@@ -589,10 +567,7 @@ function LoadingState() {
     );
 }
 
-/* =========================================================
-   ERROR
-   ========================================================= */
-
+// ERROR
 function ErrorState({
     message,
     onRetry,
@@ -614,10 +589,7 @@ function ErrorState({
     );
 }
 
-/* =========================================================
-   EMPTY
-   ========================================================= */
-
+// EMPTY
 function EmptyState({
     isSearching,
     searchValue,
@@ -655,10 +627,7 @@ function EmptyState({
     );
 }
 
-/* =========================================================
-   PAGINATION
-   ========================================================= */
-
+// PAGINATION
 function Pagination({
     page,
     hasMore,

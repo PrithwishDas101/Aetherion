@@ -2282,10 +2282,10 @@ const Chat = ({ socket }) => {
         <button
           type="button"
           onClick={leaveChat}
-          className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#f9fbf2] transition hover:bg-[#d8f45a]/10 md:hidden"
-          aria-label="Back to chats"
-        >
-          <FiArrowLeft className="text-xl" />
+          className="aetherion-button mr-3 h-9 w-9 text-base md:hidden" aria-label="Back to chats">
+          <span>
+            <FiArrowLeft />
+          </span>
         </button>
 
         <div className="min-w-0 flex-1">

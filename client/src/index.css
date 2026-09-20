@@ -129,6 +129,18 @@ body {
   }
 }
 
+.aetherion-button {
+  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#858d84] transition-colors duration-300 hover:text-[#e8e8e5];
+}
+
+.aetherion-button > span {
+  @apply transition-transform duration-500 ease-out;
+}
+
+.aetherion-button:hover > span {
+  @apply -translate-x-0.5;
+}
+
 /* Makes solid text bubbles visibly participate in the highlight */
 .text-message-highlight {
   animation: text-message-highlight 1.2s ease-out;

@@ -33,14 +33,23 @@ export const startChatWithUser = async ({
 
     const chat = response.data;
 
-    const existingChats = allChats || [];
+    if (!chat?._id) {
+      toast.error("Unable to open chat.");
+      return false;
+    }
+
+    const existingChats = Array.isArray(allChats) ? allChats : [];
 
     const chatAlreadyExists = existingChats.some(
       (existingChat) => String(existingChat._id) === String(chat._id),
     );
 
+    // Always create a new array.
+    // Redux state may be frozen, so never sort/mutate it directly.
     const updatedChats = chatAlreadyExists
-      ? existingChats
+      ? existingChats.map((existingChat) =>
+          String(existingChat._id) === String(chat._id) ? chat : existingChat,
+        )
       : [...existingChats, chat];
 
     updatedChats.sort(
