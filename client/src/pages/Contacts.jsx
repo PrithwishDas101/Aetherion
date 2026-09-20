@@ -12,17 +12,20 @@ import { getContacts } from "../apiCalls/contactApi.js";
 import { startChatWithUser } from "../utils/startChat.js";
 import {
     getEffectivePresenceStatus,
+    PRESENCE_STATUS,
 } from "../utils/presenceStatus.js";
 import PresenceIcon from "../components/PresenceIcon.jsx";
 
 const CONTACTS_PER_PAGE = 50;
 
-const getInitials = (user) => {
-    const firstName = (user?.firstName || "")
-        .trim();
+const CONTACT_FILTER = {
+    ALL: "all",
+    ONLINE: "online",
+};
 
-    const lastName = (user?.lastName || "")
-        .trim();
+const getInitials = (user) => {
+    const firstName = (user?.firstName || "").trim();
+    const lastName = (user?.lastName || "").trim();
 
     const initials = [
         firstName.charAt(0),
@@ -35,8 +38,26 @@ const getInitials = (user) => {
 };
 
 const getFullName = (user) => {
-    return `${user?.firstName || ""} ${user?.lastName || ""
-        }`.trim();
+    return `${user?.firstName || ""} ${user?.lastName || ""}`.trim();
+};
+
+const getPresenceLabel = (status) => {
+    switch (status) {
+        case PRESENCE_STATUS.ONLINE:
+            return "Online";
+
+        case PRESENCE_STATUS.IDLE:
+            return "Idle";
+
+        case PRESENCE_STATUS.DND:
+            return "Do not disturb";
+
+        case PRESENCE_STATUS.OFF_PLANET:
+            return "Off planet";
+
+        default:
+            return "Offline";
+    }
 };
 
 const groupContacts = (contacts) => {
@@ -57,6 +78,15 @@ const groupContacts = (contacts) => {
     }, {});
 };
 
+const sortContacts = (contacts) => {
+    return [...contacts].sort((firstContact, secondContact) => {
+        const firstName = getFullName(firstContact);
+        const secondName = getFullName(secondContact);
+
+        return firstName.localeCompare(secondName);
+    });
+};
+
 function Contacts() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -69,24 +99,18 @@ function Contacts() {
     );
 
     const [contacts, setContacts] = useState([]);
-    const [searchInput, setSearchInput] =
-        useState("");
+    const [searchInput, setSearchInput] = useState("");
+    const [filter, setFilter] = useState(
+        CONTACT_FILTER.ALL,
+    );
 
     const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] =
-        useState(false);
-
+    const [hasMore, setHasMore] = useState(false);
     const [total, setTotal] = useState(0);
 
-    const [loading, setLoading] =
-        useState(true);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    const [error, setError] =
-        useState("");
-
-    /*
-     * Load contacts whenever the search or page changes.
-     */
     useEffect(() => {
         let cancelled = false;
 
@@ -137,24 +161,56 @@ function Contacts() {
         };
     }, [searchInput, page]);
 
-    /*
-     * Search always starts from page 1.
-     */
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value);
         setPage(1);
     };
 
-    /*
-     * Group only when we are NOT searching.
-     */
+    const handleClearSearch = () => {
+        setSearchInput("");
+        setPage(1);
+    };
+
+    const handleFilterChange = (nextFilter) => {
+        setFilter(nextFilter);
+        setPage(1);
+    };
+
+    const filteredContacts = useMemo(() => {
+        const sortedContacts = sortContacts(
+            contacts,
+        );
+
+        if (filter === CONTACT_FILTER.ONLINE) {
+            return sortedContacts.filter(
+                (contact) => {
+                    const status =
+                        getEffectivePresenceStatus({
+                            user: contact,
+                            livePresence: null,
+                        });
+
+                    return (
+                        status ===
+                        PRESENCE_STATUS.ONLINE
+                    );
+                },
+            );
+        }
+
+        return sortedContacts;
+    }, [contacts, filter]);
+
     const groupedContacts = useMemo(() => {
         if (searchInput.trim()) {
             return {};
         }
 
-        return groupContacts(contacts);
-    }, [contacts, searchInput]);
+        return groupContacts(filteredContacts);
+    }, [
+        filteredContacts,
+        searchInput,
+    ]);
 
     const groupedLetters = Object.keys(
         groupedContacts,
@@ -174,10 +230,6 @@ function Contacts() {
             dispatch,
         });
 
-        /*
-         * Home owns the actual chat panel.
-         * After selecting the chat, take the user there.
-         */
         navigate("/");
     };
 
@@ -188,9 +240,12 @@ function Contacts() {
     const isSearching =
         searchInput.trim().length > 0;
 
+    const hasContacts =
+        filteredContacts.length > 0;
+
     return (
-        <div className="min-h-screen bg-[#080b08] text-[#f1eee8]">
-            <div className="mx-auto min-h-screen w-full max-w-4xl px-4 py-4 sm:px-6 sm:py-6">
+        <div className="min-h-screen w-full bg-[#080b08] text-[#f1eee8]">
+            <div className="w-full px-5 py-5 sm:px-8 lg:px-10 xl:px-14">
                 {/* HEADER */}
 
                 <header className="flex items-center justify-between">
@@ -198,33 +253,34 @@ function Contacts() {
                         <button
                             type="button"
                             onClick={handleBack}
-                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#a5ada2] transition hover:bg-[#151b15] hover:text-[#f1eee8]"
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#8a9288] transition hover:bg-[#151a15] hover:text-[#f1eee8]"
                             aria-label="Go back"
                         >
-                            <IoArrowBack className="text-xl" />
+                            <IoArrowBack className="text-lg" />
                         </button>
 
                         <div className="min-w-0">
-                            <h1 className="truncate text-lg font-semibold tracking-tight text-[#f1eee8]">
-                                Contacts
-                            </h1>
+                            <div className="flex items-center gap-2">
+                                <h1 className="truncate text-lg font-semibold tracking-tight text-[#f1eee8]">
+                                    Contacts
+                                </h1>
 
-                            <p className="text-xs text-[#697168]">
-                                {total}{" "}
-                                {total === 1
-                                    ? "contact"
-                                    : "contacts"}
+                                <span className="text-xs text-[#50584f]">
+                                    {total}
+                                </span>
+                            </div>
+
+                            <p className="mt-0.5 text-xs text-[#646c63]">
+                                Your people on Aetherion
                             </p>
                         </div>
                     </div>
 
-                    {/* FUTURE ADD CONTACT */}
-
                     <button
                         type="button"
                         disabled
-                        className="flex shrink-0 items-center gap-2 rounded-xl border border-[#d8f45a]/10 bg-[#101510] px-3 py-2 text-xs font-semibold text-[#555d54] opacity-70"
                         title="Add Contact is coming later"
+                        className="flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-medium text-[#596158] opacity-70"
                     >
                         <IoPersonAddOutline className="text-base" />
 
@@ -234,111 +290,135 @@ function Contacts() {
                     </button>
                 </header>
 
-                {/* SEARCH */}
+                {/* SEARCH + FILTERS */}
 
-                <div className="mt-5">
-                    <div className="flex h-11 items-center gap-3 rounded-xl border border-[#d8f45a]/10 bg-[#101510] px-4 transition focus-within:border-[#d8f45a]/30">
-                        <IoSearch className="shrink-0 text-lg text-[#687166]" />
+                <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="w-full lg:max-w-xl">
+                        <div className="flex h-10 items-center gap-3 border-b border-[#ffffff]/[0.08] px-1 transition focus-within:border-[#d8f45a]/35">
+                            <IoSearch className="shrink-0 text-lg text-[#697168]" />
 
-                        <input
-                            type="text"
-                            value={searchInput}
-                            onChange={handleSearchChange}
-                            placeholder="Search contacts..."
-                            className="min-w-0 flex-1 bg-transparent text-sm text-[#f1eee8] outline-none placeholder:text-[#596158]"
-                        />
+                            <input
+                                type="text"
+                                value={searchInput}
+                                onChange={
+                                    handleSearchChange
+                                }
+                                placeholder="Search contacts..."
+                                className="min-w-0 flex-1 bg-transparent text-sm text-[#f1eee8] outline-none placeholder:text-[#596158]"
+                            />
 
-                        {searchInput && (
+                            {searchInput && (
+                                <button
+                                    type="button"
+                                    onClick={
+                                        handleClearSearch
+                                    }
+                                    className="text-xs text-[#687166] transition hover:text-[#d8f45a]"
+                                >
+                                    Clear
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {!isSearching && (
+                        <div className="flex items-center gap-1 self-start rounded-full bg-[#0d120d] p-1 lg:self-auto">
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setSearchInput("");
-                                    setPage(1);
-                                }}
-                                className="text-xs text-[#687166] transition hover:text-[#d8f45a]"
+                                onClick={() =>
+                                    handleFilterChange(
+                                        CONTACT_FILTER.ALL,
+                                    )
+                                }
+                                className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${filter ===
+                                        CONTACT_FILTER.ALL
+                                        ? "bg-[#171d17] text-[#f1eee8]"
+                                        : "text-[#687166] hover:text-[#aeb6aa]"
+                                    }`}
                             >
-                                Clear
+                                All
                             </button>
-                        )}
-                    </div>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    handleFilterChange(
+                                        CONTACT_FILTER.ONLINE,
+                                    )
+                                }
+                                className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${filter ===
+                                        CONTACT_FILTER.ONLINE
+                                        ? "bg-[#171d17] text-[#f1eee8]"
+                                        : "text-[#687166] hover:text-[#aeb6aa]"
+                                    }`}
+                            >
+                                Online
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* CONTENT */}
 
-                <main className="mt-6">
+                <main className="mt-8">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-20">
-                            <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#d8f45a]" />
-
-                            <p className="mt-4 text-xs text-[#626960]">
-                                Loading contacts...
-                            </p>
-                        </div>
+                        <LoadingState />
                     ) : error ? (
-                        <div className="rounded-2xl border border-red-400/10 bg-[#120d0d] px-6 py-10 text-center">
-                            <p className="text-sm font-medium text-[#e8b4b4]">
-                                {error}
-                            </p>
-
-                            <button
-                                type="button"
-                                onClick={() => setPage(1)}
-                                className="mt-4 rounded-lg bg-[#d8f45a] px-4 py-2 text-xs font-semibold text-[#10120d]"
-                            >
-                                Try Again
-                            </button>
-                        </div>
-                    ) : contacts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#111711] text-[#687166]">
-                                <IoPersonAddOutline className="text-2xl" />
-                            </div>
-
-                            <h2 className="mt-4 text-sm font-semibold text-[#f1eee8]">
-                                {isSearching
-                                    ? "No contacts found"
-                                    : "No contacts yet"}
-                            </h2>
-
-                            <p className="mt-2 max-w-sm text-xs leading-5 text-[#626960]">
-                                {isSearching
-                                    ? `No contacts match "${searchInput.trim()}".`
-                                    : "Start a chat with someone and they will automatically appear here."}
-                            </p>
-                        </div>
+                        <ErrorState
+                            message={error}
+                            onRetry={() =>
+                                setPage(1)
+                            }
+                        />
+                    ) : !hasContacts ? (
+                        <EmptyState
+                            isSearching={
+                                isSearching ||
+                                filter ===
+                                CONTACT_FILTER.ONLINE
+                            }
+                            searchValue={searchInput}
+                            filter={filter}
+                        />
                     ) : isSearching ? (
-                        /* SEARCH RESULTS */
-
-                        <div className="overflow-hidden rounded-2xl border border-[#d8f45a]/10 bg-[#0d120d]">
-                            {contacts.map(
-                                (contact, index) => (
+                        <div>
+                            {filteredContacts.map(
+                                (
+                                    contact,
+                                    index,
+                                ) => (
                                     <ContactRow
-                                        key={contact._id}
-                                        contact={contact}
-                                        currentUser={currentUser}
-                                        onChat={handleStartChat}
+                                        key={
+                                            contact._id
+                                        }
+                                        contact={
+                                            contact
+                                        }
+                                        onChat={
+                                            handleStartChat
+                                        }
                                         isLast={
                                             index ===
-                                            contacts.length - 1
+                                            filteredContacts.length -
+                                            1
                                         }
                                     />
                                 ),
                             )}
                         </div>
                     ) : (
-                        /* ALPHABETICAL CONTACT LIST */
-
-                        <div className="space-y-6">
+                        <div>
                             {groupedLetters.map(
                                 (letter) => (
                                     <section
                                         key={letter}
+                                        className="mb-8 last:mb-0"
                                     >
-                                        <div className="mb-2 px-2 text-xs font-bold uppercase tracking-[0.18em] text-[#70786f]">
+                                        <div className="mb-2 px-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#70786f]">
                                             {letter}
                                         </div>
 
-                                        <div className="overflow-hidden rounded-2xl border border-[#d8f45a]/10 bg-[#0d120d]">
+                                        <div>
                                             {groupedContacts[
                                                 letter
                                             ].map(
@@ -352,9 +432,6 @@ function Contacts() {
                                                         }
                                                         contact={
                                                             contact
-                                                        }
-                                                        currentUser={
-                                                            currentUser
                                                         }
                                                         onChat={
                                                             handleStartChat
@@ -380,45 +457,32 @@ function Contacts() {
 
                     {!loading &&
                         !error &&
-                        contacts.length > 0 && (
-                            <div className="mt-6 flex items-center justify-center gap-3">
-                                {page > 1 && (
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setPage(
-                                                (currentPage) =>
-                                                    Math.max(
-                                                        currentPage - 1,
-                                                        1,
-                                                    ),
-                                            )
-                                        }
-                                        className="rounded-lg border border-[#d8f45a]/10 bg-[#101510] px-4 py-2 text-xs font-semibold text-[#aab1a6] transition hover:border-[#d8f45a]/25 hover:text-[#f1eee8]"
-                                    >
-                                        Previous
-                                    </button>
-                                )}
-
-                                <span className="text-xs text-[#596158]">
-                                    Page {page}
-                                </span>
-
-                                {hasMore && (
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setPage(
-                                                (currentPage) =>
-                                                    currentPage + 1,
-                                            )
-                                        }
-                                        className="rounded-lg bg-[#d8f45a] px-4 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e5ff70]"
-                                    >
-                                        Next
-                                    </button>
-                                )}
-                            </div>
+                        hasContacts && (
+                            <Pagination
+                                page={page}
+                                hasMore={hasMore}
+                                onPrevious={() =>
+                                    setPage(
+                                        (
+                                            currentPage,
+                                        ) =>
+                                            Math.max(
+                                                currentPage -
+                                                1,
+                                                1,
+                                            ),
+                                    )
+                                }
+                                onNext={() =>
+                                    setPage(
+                                        (
+                                            currentPage,
+                                        ) =>
+                                            currentPage +
+                                            1,
+                                    )
+                                }
+                            />
                         )}
                 </main>
             </div>
@@ -432,7 +496,6 @@ function Contacts() {
 
 function ContactRow({
     contact,
-    currentUser,
     onChat,
     isLast,
 }) {
@@ -442,10 +505,18 @@ function ContactRow({
             livePresence: null,
         });
 
+    const presenceLabel =
+        getPresenceLabel(
+            effectivePresenceStatus,
+        );
+
+    const fullName =
+        getFullName(contact);
+
     return (
         <div
-            className={`group flex items-center gap-3 px-4 py-3.5 transition hover:bg-[#111811] sm:px-5 ${!isLast
-                    ? "border-b border-[#d8f45a]/10"
+            className={`group flex min-h-[68px] items-center gap-3 border-b border-[#ffffff]/[0.06] px-2 py-3 transition hover:bg-[#0d120d] ${isLast
+                    ? "border-b-0"
                     : ""
                 }`}
         >
@@ -455,56 +526,174 @@ function ContactRow({
                 {contact.profilePic ? (
                     <img
                         src={contact.profilePic}
-                        alt={getFullName(contact)}
-                        className="h-11 w-11 rounded-full bg-[#cacfb4] object-cover"
+                        alt={fullName}
+                        className="h-10 w-10 rounded-full bg-[#cacfb4] object-cover"
                     />
                 ) : (
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#cacfb4] text-xs font-bold text-[#10120d]">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#cacfb4] text-xs font-bold text-[#10120d]">
                         {getInitials(contact)}
                     </div>
                 )}
 
                 <div className="absolute -bottom-0.5 -right-0.5">
                     <PresenceIcon
-                        status={effectivePresenceStatus}
+                        status={
+                            effectivePresenceStatus
+                        }
                         size="small"
                     />
                 </div>
             </div>
 
-            {/* NAME */}
+            {/* USER INFO */}
 
             <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-semibold text-[#f1eee8]">
-                    {getFullName(contact)}
+                <div className="truncate text-sm font-medium text-[#e8e5de]">
+                    {fullName}
                 </div>
 
                 <div className="mt-0.5 truncate text-xs text-[#626960]">
-                    {contact.publicPresenceStatus ===
-                        "off_planet"
-                        ? "Off planet"
-                        : contact.publicPresenceStatus ===
-                            "dnd"
-                            ? "Do not disturb"
-                            : contact.publicPresenceStatus ===
-                                "idle"
-                                ? "Idle"
-                                : "Available to chat"}
+                    {presenceLabel}
                 </div>
             </div>
 
-            {/* CHAT */}
+            {/* CHAT ACTION */}
 
             <button
                 type="button"
                 onClick={() =>
                     onChat(contact._id)
                 }
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#d8f45a]/10 bg-[#121812] text-[#8f998c] transition hover:border-[#d8f45a]/30 hover:bg-[#d8f45a] hover:text-[#10120d]"
-                aria-label={`Open chat with ${getFullName(contact)}`}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#697168] opacity-60 transition hover:bg-[#151a15] hover:text-[#d8f45a] group-hover:opacity-100"
+                aria-label={`Open chat with ${fullName}`}
             >
                 <IoChatbubbleOutline className="text-base" />
             </button>
+        </div>
+    );
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+function LoadingState() {
+    return (
+        <div className="py-20 text-center">
+            <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#d8f45a]" />
+
+            <p className="mt-4 text-xs text-[#626960]">
+                Loading contacts...
+            </p>
+        </div>
+    );
+}
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+function ErrorState({
+    message,
+    onRetry,
+}) {
+    return (
+        <div className="py-20 text-center">
+            <p className="text-sm font-medium text-[#e8b4b4]">
+                {message}
+            </p>
+
+            <button
+                type="button"
+                onClick={onRetry}
+                className="mt-4 rounded-lg bg-[#d8f45a] px-4 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e5ff70]"
+            >
+                Try Again
+            </button>
+        </div>
+    );
+}
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+function EmptyState({
+    isSearching,
+    searchValue,
+    filter,
+}) {
+    let title = "No contacts yet";
+    let description =
+        "Start a chat with someone and they will automatically appear here.";
+
+    if (searchValue.trim()) {
+        title = "No contacts found";
+        description = `No contacts match "${searchValue.trim()}".`;
+    } else if (
+        filter === CONTACT_FILTER.ONLINE
+    ) {
+        title = "Nobody is online";
+        description =
+            "None of your contacts are currently online.";
+    }
+
+    return (
+        <div className="py-20 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#111711] text-[#697168]">
+                <IoPersonAddOutline className="text-xl" />
+            </div>
+
+            <h2 className="mt-4 text-sm font-semibold text-[#f1eee8]">
+                {title}
+            </h2>
+
+            <p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-[#626960]">
+                {description}
+            </p>
+        </div>
+    );
+}
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+function Pagination({
+    page,
+    hasMore,
+    onPrevious,
+    onNext,
+}) {
+    if (page === 1 && !hasMore) {
+        return null;
+    }
+
+    return (
+        <div className="mt-8 flex items-center justify-center gap-4 border-t border-[#ffffff]/[0.06] pt-5">
+            {page > 1 && (
+                <button
+                    type="button"
+                    onClick={onPrevious}
+                    className="rounded-lg px-3 py-2 text-xs font-medium text-[#737b71] transition hover:bg-[#151a15] hover:text-[#f1eee8]"
+                >
+                    Previous
+                </button>
+            )}
+
+            <span className="text-xs text-[#596158]">
+                Page {page}
+            </span>
+
+            {hasMore && (
+                <button
+                    type="button"
+                    onClick={onNext}
+                    className="rounded-lg px-3 py-2 text-xs font-medium text-[#a8b19f] transition hover:bg-[#151a15] hover:text-[#d8f45a]"
+                >
+                    Next
+                </button>
+            )}
         </div>
     );
 }

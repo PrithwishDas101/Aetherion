@@ -125,10 +125,10 @@ const ContactList = () => {
                                                 <img
                                                     src={contact.profilePic}
                                                     alt={getFullName(contact,)}
-                                                    className="h-10 w-10 sm:h-12 sm:w-12 lg:h-[62px] lg:w-[62px] rounded-full bg-[#cacfb4] object-cover ring-2 ring-[#080d09] transition duration-200 group-hover:z-10 group-hover:scale-105"
+                                                    className="h-10 w-10 sm:h-12 sm:w-12 lg:h-[50px] lg:w-[50px] rounded-full bg-[#cacfb4] object-cover ring-2 ring-[#080d09] transition duration-200 group-hover:z-10 group-hover:scale-105"
                                                 />
                                             ) : (
-                                                <div className="flex h-10 w-10 sm:h-12 sm:w-12 lg:h-[62px] lg:w-[62px] items-center justify-center rounded-full bg-[#cacfb4] text-xs font-bold text-[#10120d] ring-2 ring-[#080d09] transition duration-200 group-hover:z-10 group-hover:scale-105 sm:text-sm lg:text-base"
+                                                <div className="flex h-10 w-10 sm:h-12 sm:w-12 lg:h-[50px] lg:w-[50px] items-center justify-center rounded-full bg-[#cacfb4] text-xs font-bold text-[#10120d] ring-2 ring-[#080d09] transition duration-200 group-hover:z-10 group-hover:scale-105 sm:text-sm lg:text-base"
                                                 >
                                                     {getInitials(contact,)}
                                                 </div>
