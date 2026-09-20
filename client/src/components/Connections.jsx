@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 
 import {
     FaInstagram,
+    FaChevronDown,
     FaLinkedinIn,
     FaRedditAlien,
     FaGithub,
@@ -338,6 +339,93 @@ const PLATFORM_CONFIG = [
     },
 ];
 
+const PLATFORM_GROUPS = [
+    {
+        name: "Social",
+        platforms: [
+            "Instagram",
+            "X",
+            "Facebook",
+            "Threads",
+            "Reddit",
+            "Snapchat",
+            "Pinterest",
+            "Bluesky",
+            "Tumblr",
+            "TikTok",
+        ],
+    },
+    {
+        name: "Developer",
+        platforms: [
+            "GitHub",
+            "GitLab",
+            "LeetCode",
+            "Codeforces",
+            "CodeChef",
+            "HackerRank",
+            "HackerEarth",
+            "Kaggle",
+            "Stack Overflow",
+            "Replit",
+            "CodeSandbox",
+            "npm",
+        ],
+    },
+    {
+        name: "Professional",
+        platforms: [
+            "LinkedIn",
+            "Medium",
+            "Dev.to",
+            "Substack",
+        ],
+    },
+    {
+        name: "Creative",
+        platforms: [
+            "Behance",
+            "Dribbble",
+            "ArtStation",
+            "Figma",
+        ],
+    },
+    {
+        name: "Video & Streaming",
+        platforms: [
+            "YouTube",
+            "Twitch",
+            "Kick",
+            "Vimeo",
+        ],
+    },
+    {
+        name: "Gaming",
+        platforms: [
+            "Discord",
+            "Steam",
+            "Epic Games",
+            "PlayStation",
+        ],
+    },
+    {
+        name: "Music",
+        platforms: [
+            "Spotify",
+            "SoundCloud",
+            "Apple Music",
+            "Bandcamp",
+        ],
+    },
+    {
+        name: "Personal",
+        platforms: [
+            "Linktree",
+            "OnlyFans",
+        ],
+    },
+];
+
 const getHostname = (url) => {
     try {
         return new URL(url)
@@ -596,13 +684,15 @@ const normalizeConnectionUrl = (url) => {
     }
 };
 
-const Connections = ({
-    connections = [],
-    onSave,
-}) => {
+const Connections = ({ connections = [], onSave, }) => {
+
     const [showModal, setShowModal] = useState(false);
     const [draftConnections, setDraftConnections] = useState([]);
     const [saving, setSaving] = useState(false);
+
+    const [activePlatformIndex, setActivePlatformIndex] = useState(null);
+    const [platformSearch, setPlatformSearch] = useState("");
+    const [selectedPlatforms, setSelectedPlatforms] = useState([]);
 
     const visibleConnections = useMemo(() =>
         Array.isArray(connections)
@@ -655,12 +745,44 @@ const Connections = ({
 
     const hasDuplicateConnections = duplicateIndexes.size > 0;
 
+    const filteredPlatformGroups = useMemo(() => {
+        const query = platformSearch.trim().toLowerCase();
+
+        return PLATFORM_GROUPS
+            .map((group) => {
+                const platforms = group.platforms
+                    .map((name) =>
+                        PLATFORM_CONFIG.find(
+                            (platform) =>
+                                platform.name === name,
+                        ),
+                    )
+                    .filter(Boolean)
+                    .filter((platform) =>
+                        query
+                            ? platform.name
+                                .toLowerCase()
+                                .includes(query)
+                            : true,
+                    );
+
+                return {
+                    ...group,
+                    platforms,
+                };
+            })
+            .filter(
+                (group) =>
+                    group.platforms.length > 0,
+            );
+    }, [platformSearch]);
+
     useEffect(() => {
         if (!showModal) {
             return;
         }
 
-        setDraftConnections(
+        const initialConnections =
             visibleConnections.length
                 ? visibleConnections.map(
                     normalizeConnection,
@@ -670,14 +792,26 @@ const Connections = ({
                         name: "",
                         url: "",
                     },
-                ],
+                ];
+
+        setDraftConnections(initialConnections);
+
+        setSelectedPlatforms(
+            initialConnections.map(
+                (connection) =>
+                    detectPlatform(connection.url).name,
+            ),
         );
-    }, [
-        showModal,
-        visibleConnections,
-    ]);
+
+        setActivePlatformIndex(null);
+        setPlatformSearch("");
+
+    }, [showModal, visibleConnections,]);
 
     const openModal = () => {
+        setActivePlatformIndex(null);
+        setPlatformSearch("");
+
         setShowModal(true);
     };
 
@@ -689,13 +823,10 @@ const Connections = ({
         setShowModal(false);
     };
 
-    const updateConnection = (index, value,) => {
+    const updateConnection = (index, value) => {
         setDraftConnections((current) =>
             current.map(
-                (
-                    connection,
-                    itemIndex,
-                ) =>
+                (connection, itemIndex) =>
                     itemIndex === index
                         ? {
                             ...connection,
@@ -708,6 +839,19 @@ const Connections = ({
                         : connection,
             ),
         );
+
+        const detected = detectPlatform(value);
+
+        if (detected.name) {
+            setSelectedPlatforms((current) =>
+                current.map(
+                    (platform, itemIndex) =>
+                        itemIndex === index
+                            ? detected.name
+                            : platform,
+                ),
+            );
+        }
     };
 
     const addConnection = () => {
@@ -729,6 +873,11 @@ const Connections = ({
                 url: "",
             },
         ]);
+
+        setSelectedPlatforms((current) => [
+            ...current,
+            "",
+        ]);
     };
 
     const removeConnection = (index) => {
@@ -738,6 +887,15 @@ const Connections = ({
                     itemIndex !== index,
             ),
         );
+
+        setSelectedPlatforms((current) =>
+            current.filter(
+                (_, itemIndex) =>
+                    itemIndex !== index,
+            ),
+        );
+
+        setActivePlatformIndex(null);
     };
 
     const handleSave = async () => {
@@ -865,7 +1023,17 @@ const Connections = ({
                     <div className="mt-3 flex flex-wrap items-center gap-1.5">
                         {visibleConnections.map(
                             (connection, index,) => {
-                                const platform = detectPlatform(connection.url,);
+                                const detectedPlatform = detectPlatform(
+                                    connection.url,
+                                );
+
+                                const selectedPlatform = PLATFORM_CONFIG.find(
+                                    (item) =>
+                                        item.name === selectedPlatforms[index],
+                                );
+
+                                const platform =
+                                    selectedPlatform || detectedPlatform;
 
                                 const Icon = platform.icon;
 
@@ -959,11 +1127,15 @@ const Connections = ({
                             <div className="space-y-3">
                                 {draftConnections.map(
                                     (connection, index,) => {
-                                        const platform = detectPlatform(connection.url,);
+                                        const detectedPlatform = detectPlatform(connection.url,);
+
+                                        const selectedPlatform = PLATFORM_CONFIG.find((item) => item.name === selectedPlatforms[index],);
+
+                                        const platform = selectedPlatform || detectedPlatform;
 
                                         const Icon = platform.icon;
 
-                                        const isDuplicate = duplicateIndexes.has(index,);
+                                        const isDuplicate = duplicateIndexes.has(index);
 
                                         return (
                                             <div
@@ -974,28 +1146,61 @@ const Connections = ({
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-2.5">
-                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.035]">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setActivePlatformIndex(
+                                                                activePlatformIndex === index
+                                                                    ? null
+                                                                    : index,
+                                                            );
+
+                                                            setPlatformSearch("");
+                                                        }}
+                                                        disabled={saving}
+                                                        className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition ${activePlatformIndex === index
+                                                            ? "border-[#d8f45a]/30 bg-[#d8f45a]/[0.08]"
+                                                            : "border-white/[0.07] bg-white/[0.035] hover:border-white/[0.12] hover:bg-white/[0.06]"
+                                                            }`}
+                                                        aria-label={`Choose platform${platform.name
+                                                            ? `, currently ${platform.name}`
+                                                            : ""
+                                                            }`}
+                                                        title={
+                                                            platform.name
+                                                                ? `Platform: ${platform.name}`
+                                                                : "Choose platform"
+                                                        }
+                                                    >
                                                         <Icon
                                                             className="h-4 w-4"
                                                             style={{
-                                                                color:
-                                                                    platform.color,
+                                                                color: platform.color,
                                                             }}
                                                         />
-                                                    </div>
+
+                                                        <FaChevronDown
+                                                            className={`absolute bottom-1 right-1 h-2 w-2 text-[#777d76] transition-transform ${activePlatformIndex === index
+                                                                ? "rotate-180"
+                                                                : ""
+                                                                }`}
+                                                        />
+                                                    </button>
 
                                                     <input
                                                         type="url"
                                                         value={connection.url}
-                                                        onChange={(event,) =>
+                                                        onChange={(event) =>
                                                             updateConnection(
                                                                 index,
-                                                                event
-                                                                    .target
-                                                                    .value,
+                                                                event.target.value,
                                                             )
                                                         }
-                                                        placeholder="Paste a profile or website link"
+                                                        placeholder={
+                                                            selectedPlatform
+                                                                ? `Paste your ${selectedPlatform.name} link`
+                                                                : "Paste a profile or website link"
+                                                        }
                                                         disabled={saving}
                                                         className={`h-10 min-w-0 flex-1 rounded-xl border bg-white/[0.025] px-3.5 text-sm text-[#f1eee8] outline-none transition placeholder:text-[#4f564f] focus:bg-white/[0.04] ${isDuplicate
                                                             ? "border-red-400/40 focus:border-red-400/60"
@@ -1005,16 +1210,110 @@ const Connections = ({
 
                                                     <button
                                                         type="button"
-                                                        onClick={() => removeConnection(index,)}
+                                                        onClick={() =>
+                                                            removeConnection(index)
+                                                        }
                                                         disabled={saving}
                                                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-red-400 transition hover:bg-red-400/[0.08] hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
-                                                        aria-label={`Remove connection ${index +
-                                                            1
+                                                        aria-label={`Remove connection ${index + 1
                                                             }`}
                                                     >
                                                         <FaTrash className="h-4 w-4" />
                                                     </button>
                                                 </div>
+
+                                                {activePlatformIndex === index && (
+                                                    <div className="mt-2 overflow-hidden rounded-xl border border-white/[0.07] bg-[#0d120e]">
+                                                        {/* SEARCH */}
+                                                        <div className="border-b border-white/[0.06] p-2.5">
+                                                            <input
+                                                                type="text"
+                                                                value={platformSearch}
+                                                                onChange={(event) =>
+                                                                    setPlatformSearch(event.target.value)
+                                                                }
+                                                                placeholder="Search platforms..."
+                                                                autoFocus
+                                                                className="h-9 w-full rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 text-xs text-[#f1eee8] outline-none placeholder:text-[#4f564f] focus:border-[#d8f45a]/30"
+                                                            />
+                                                        </div>
+
+                                                        {/* PLATFORM LIST */}
+                                                        <div className="max-h-64 overflow-y-auto p-2.5">
+                                                            {filteredPlatformGroups.length ? (
+                                                                <div className="space-y-4">
+                                                                    {filteredPlatformGroups.map(
+                                                                        (group) => (
+                                                                            <div
+                                                                                key={group.name}
+                                                                            >
+                                                                                <p className="mb-2 px-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#666d65]">
+                                                                                    {group.name}
+                                                                                </p>
+
+                                                                                <div className="flex flex-wrap gap-1.5">
+                                                                                    {group.platforms.map(
+                                                                                        (
+                                                                                            platform,
+                                                                                        ) => {
+                                                                                            const PlatformIcon =
+                                                                                                platform.icon;
+
+                                                                                            const isSelected =
+                                                                                                selectedPlatforms[
+                                                                                                index
+                                                                                                ] ===
+                                                                                                platform.name;
+
+                                                                                            return (
+                                                                                                <button
+                                                                                                    key={platform.name}
+                                                                                                    type="button"
+                                                                                                    onClick={() => {
+                                                                                                        setSelectedPlatforms((current) =>
+                                                                                                            current.map(
+                                                                                                                (item, itemIndex) =>
+                                                                                                                    itemIndex === index
+                                                                                                                        ? platform.name
+                                                                                                                        : item,
+                                                                                                            ),
+                                                                                                        );
+
+                                                                                                        setActivePlatformIndex(null);
+                                                                                                        setPlatformSearch("");
+                                                                                                    }}
+                                                                                                    className={`group relative flex h-10 w-10 items-center justify-center rounded-lg border transition ${isSelected
+                                                                                                        ? "border-[#d8f45a]/30 bg-[#d8f45a]/[0.08]"
+                                                                                                        : "border-white/[0.05] bg-white/[0.025] hover:border-white/[0.12] hover:bg-white/[0.06]"
+                                                                                                        }`}
+                                                                                                    aria-label={platform.name}
+                                                                                                    title={platform.name}
+                                                                                                >
+                                                                                                    <PlatformIcon
+                                                                                                        className="h-4 w-4"
+                                                                                                        style={{
+                                                                                                            color: platform.color,
+                                                                                                        }}
+                                                                                                    />
+                                                                                                </button>
+                                                                                            );
+                                                                                        },
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        ),
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="px-2 py-6 text-center">
+                                                                    <p className="text-[11px] text-[#555d55]">
+                                                                        No platform found.
+                                                                    </p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
 
                                                 {isDuplicate && (
                                                     <p className="mt-1.5 pl-[3.25rem] text-[10px] font-medium text-red-400/80">
