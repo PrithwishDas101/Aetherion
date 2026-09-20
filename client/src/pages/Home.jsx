@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 import Header from "../components/Header.jsx";
 import Sidebar from "../components/SideBar.jsx";
@@ -24,6 +25,7 @@ const Home = () => {
     (state) => state.userReducer,
   );
   const dispatch = useDispatch();
+  const location = useLocation();
   const searchInputRef = useRef(null);
   const [highlightSearch, setHighlightSearch] = useState(false);
 
@@ -38,6 +40,28 @@ const Home = () => {
       setHighlightSearch(false);
     }, 1800);
   };
+
+  useEffect(() => {
+    if (!location.state?.focusUserSearch) {
+      return;
+    }
+
+    // Sidebar/Search mounts as part of Home. Wait one frame so the ref is available.
+    const frame = window.requestAnimationFrame(() => {
+      handleFindSomeone();
+    });
+
+    // Clear the navigation state so pressing back/re-rendering doesn't repeatedly focus the search field.
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname,
+    );
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [location.state?.focusUserSearch]);
 
   useEffect(() => {
     if (!user?._id) {

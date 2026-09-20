@@ -291,7 +291,7 @@ const Profile = () => {
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="group flex h-10 w-10 items-center justify-center rounded-full text-xl text-[#858d84] transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a]"
+            className="group flex h-10 w-10 items-center justify-center rounded-full text-xl text-[#858d84] transitio hover:text-[#e8e8e5]"
             aria-label="Back to home"
           >
             <span className="transition-transform group-hover:-translate-x-0.5">
@@ -303,10 +303,6 @@ const Profile = () => {
             <h1 className="text-base font-bold tracking-tight sm:text-lg">
               Profile
             </h1>
-
-            <p className="hidden text-xs text-[#626960] sm:block">
-              Your Aetherion identity
-            </p>
           </div>
         </div>
       </header>
@@ -463,21 +459,14 @@ const Profile = () => {
               </button>
             </div>
 
-            {/* =================================================
-    PROFILE INFORMATION
-================================================= */}
-
+            {/* PROFILE INFORMATION */}
             <div className="mt-8 border-t border-white/[0.06] pt-8">
               <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
 
-                {/* =================================================
-        LEFT — BIO + MEMBER SINCE
-    ================================================= */}
-
+                {/* LEFT — BIO + MEMBER SINCE */}
                 <div className="min-w-0">
 
                   {/* BIO */}
-
                   <div>
                     <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8d918c]">
                       Bio
@@ -495,7 +484,6 @@ const Profile = () => {
                   </div>
 
                   {/* MEMBER SINCE */}
-
                   <div className="pt-4 space-y-5">
                     <div>
                       <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/35">
@@ -558,15 +546,14 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* =================================================
-              CONTACTS
-          ================================================= */}
-
+          {/* CONTACTS */}
           <section
             id="profile-contacts"
-            className="border-t border-white/[0.06] pt-8"
+            className="pt-8"
           >
-            <ContactList />
+            <div className="-mt-6 mx-5 border-t border-white/[0.06] pt-8 sm:mx-8 lg:mx-10">
+              <ContactList />
+            </div>
           </section>
         </div>
       </main>
@@ -584,7 +571,6 @@ const Profile = () => {
             }
           >
             {/* HEADER */}
-
             <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3.5">
               <div>
                 <h2 className="text-sm font-semibold text-[#f1eee8]">
@@ -605,7 +591,6 @@ const Profile = () => {
 
             <div className="p-5 sm:p-6">
               {/* PREVIEW */}
-
               <div className="border-b border-white/[0.06] pb-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#1a211a] text-sm font-bold text-[#d8f45a]">
@@ -633,7 +618,6 @@ const Profile = () => {
               </div>
 
               {/* FIELD */}
-
               <div className="mt-5">
                 <div className="flex items-center justify-between">
                   <label
@@ -664,7 +648,6 @@ const Profile = () => {
               </div>
 
               {/* ACTIONS */}
-
               <div className="mt-5 flex items-center justify-between">
                 <button
                   type="button"
@@ -703,10 +686,7 @@ const Profile = () => {
         </div>
       )}
 
-      {/* =====================================================
-          PRESENCE MODAL
-      ===================================================== */}
-
+      {/* PRESENCE MODAL */}
       {showPresenceModal && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
@@ -719,7 +699,6 @@ const Profile = () => {
             }
           >
             {/* HEADER */}
-
             <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3.5">
               <h2 className="text-sm font-semibold text-[#f1eee8]">
                 Online Status
@@ -737,7 +716,6 @@ const Profile = () => {
             </div>
 
             {/* OPTIONS */}
-
             <div className="p-5 sm:p-6">
               <div className="space-y-2">
                 <PresenceOption
@@ -830,9 +808,7 @@ const Profile = () => {
   );
 };
 
-/* =========================================================
-   PRESENCE OPTION
-========================================================= */
+/* PRESENCE OPTION */
 
 const PresenceOption = ({
   label,

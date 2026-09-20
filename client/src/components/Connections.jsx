@@ -2,57 +2,23 @@ import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 import {
-    FaInstagram,
-    FaChevronDown,
-    FaLinkedinIn,
-    FaRedditAlien,
-    FaGithub,
-    FaYoutube,
-    FaDiscord,
-    FaTwitch,
-    FaTiktok,
-    FaFacebook,
-    FaPinterest,
-    FaTumblr,
-    FaGlobe,
-    FaTrash,
-    FaGitlab,
-    FaStackOverflow,
-    FaMedium,
-    FaDev,
-    FaVimeo,
-    FaSteam,
-    FaSpotify,
-    FaSoundcloud,
-    FaApple,
+    FaInstagram, FaChevronDown, FaLinkedinIn, FaRedditAlien,
+    FaGithub, FaYoutube, FaDiscord, FaTwitch,
+    FaTiktok, FaFacebook, FaPinterest, FaTumblr,
+    FaGlobe, FaTrash, FaGitlab, FaStackOverflow,
+    FaMedium, FaDev, FaVimeo, FaSteam,
+    FaSpotify, FaSoundcloud, FaApple,
 } from "react-icons/fa";
 
 import { FaXTwitter } from "react-icons/fa6";
 
 import {
-    SiThreads,
-    SiSnapchat,
-    SiBluesky,
-    SiCodeforces,
-    SiCodechef,
-    SiHackerrank,
-    SiHackerearth,
-    SiKaggle,
-    SiReplit,
-    SiCodesandbox,
-    SiNpm,
-    SiSubstack,
-    SiBehance,
-    SiDribbble,
-    SiArtstation,
-    SiFigma,
-    SiKick,
-    SiEpicgames,
-    SiPlaystation,
-    SiLinktree,
-    SiBandcamp,
-    SiLeetcode,
-    SiOnlyfans,
+    SiThreads, SiSnapchat, SiBluesky, SiCodeforces,
+    SiCodechef, SiHackerrank, SiHackerearth, SiKaggle,
+    SiReplit, SiCodesandbox, SiNpm, SiSubstack,
+    SiBehance, SiDribbble, SiArtstation, SiFigma,
+    SiKick, SiEpicgames, SiPlaystation, SiLinktree,
+    SiBandcamp, SiLeetcode, SiOnlyfans,
 } from "react-icons/si";
 
 const MAX_CONNECTIONS = 20;
@@ -1032,14 +998,11 @@ const Connections = ({ connections = [], onSave, }) => {
                                         item.name === selectedPlatforms[index],
                                 );
 
-                                const platform =
-                                    selectedPlatform || detectedPlatform;
+                                const platform = selectedPlatform || detectedPlatform;
 
                                 const Icon = platform.icon;
 
-                                const personName = extractPersonName(
-                                    connection.url,
-                                ) || connection.name || platform.name;
+                                const personName = extractPersonName(connection.url,) || connection.name || platform.name;
 
                                 return (
                                     <a
@@ -1166,10 +1129,9 @@ const Connections = ({ connections = [], onSave, }) => {
                                                             ? `, currently ${platform.name}`
                                                             : ""
                                                             }`}
-                                                        title={
-                                                            platform.name
-                                                                ? `Platform: ${platform.name}`
-                                                                : "Choose platform"
+                                                        title={platform.name
+                                                            ? `Platform: ${platform.name}`
+                                                            : "Choose platform"
                                                         }
                                                     >
                                                         <Icon
@@ -1190,12 +1152,7 @@ const Connections = ({ connections = [], onSave, }) => {
                                                     <input
                                                         type="url"
                                                         value={connection.url}
-                                                        onChange={(event) =>
-                                                            updateConnection(
-                                                                index,
-                                                                event.target.value,
-                                                            )
-                                                        }
+                                                        onChange={(event) => updateConnection(index, event.target.value,)}
                                                         placeholder={
                                                             selectedPlatform
                                                                 ? `Paste your ${selectedPlatform.name} link`
@@ -1210,13 +1167,10 @@ const Connections = ({ connections = [], onSave, }) => {
 
                                                     <button
                                                         type="button"
-                                                        onClick={() =>
-                                                            removeConnection(index)
-                                                        }
+                                                        onClick={() => removeConnection(index)}
                                                         disabled={saving}
                                                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-red-400 transition hover:bg-red-400/[0.08] hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
-                                                        aria-label={`Remove connection ${index + 1
-                                                            }`}
+                                                        aria-label={`Remove connection ${index + 1}`}
                                                     >
                                                         <FaTrash className="h-4 w-4" />
                                                     </button>
@@ -1229,9 +1183,7 @@ const Connections = ({ connections = [], onSave, }) => {
                                                             <input
                                                                 type="text"
                                                                 value={platformSearch}
-                                                                onChange={(event) =>
-                                                                    setPlatformSearch(event.target.value)
-                                                                }
+                                                                onChange={(event) => setPlatformSearch(event.target.value)}
                                                                 placeholder="Search platforms..."
                                                                 autoFocus
                                                                 className="h-9 w-full rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 text-xs text-[#f1eee8] outline-none placeholder:text-[#4f564f] focus:border-[#d8f45a]/30"
@@ -1252,52 +1204,44 @@ const Connections = ({ connections = [], onSave, }) => {
                                                                                 </p>
 
                                                                                 <div className="flex flex-wrap gap-1.5">
-                                                                                    {group.platforms.map(
-                                                                                        (
-                                                                                            platform,
-                                                                                        ) => {
-                                                                                            const PlatformIcon =
-                                                                                                platform.icon;
+                                                                                    {group.platforms.map((platform,) => {
+                                                                                        const PlatformIcon = platform.icon;
 
-                                                                                            const isSelected =
-                                                                                                selectedPlatforms[
-                                                                                                index
-                                                                                                ] ===
-                                                                                                platform.name;
+                                                                                        const isSelected = selectedPlatforms[index] === platform.name;
 
-                                                                                            return (
-                                                                                                <button
-                                                                                                    key={platform.name}
-                                                                                                    type="button"
-                                                                                                    onClick={() => {
-                                                                                                        setSelectedPlatforms((current) =>
-                                                                                                            current.map(
-                                                                                                                (item, itemIndex) =>
-                                                                                                                    itemIndex === index
-                                                                                                                        ? platform.name
-                                                                                                                        : item,
-                                                                                                            ),
-                                                                                                        );
+                                                                                        return (
+                                                                                            <button
+                                                                                                key={platform.name}
+                                                                                                type="button"
+                                                                                                onClick={() => {
+                                                                                                    setSelectedPlatforms((current) =>
+                                                                                                        current.map(
+                                                                                                            (item, itemIndex) =>
+                                                                                                                itemIndex === index
+                                                                                                                    ? platform.name
+                                                                                                                    : item,
+                                                                                                        ),
+                                                                                                    );
 
-                                                                                                        setActivePlatformIndex(null);
-                                                                                                        setPlatformSearch("");
+                                                                                                    setActivePlatformIndex(null);
+                                                                                                    setPlatformSearch("");
+                                                                                                }}
+                                                                                                className={`group relative flex h-10 w-10 items-center justify-center rounded-lg border transition ${isSelected
+                                                                                                    ? "border-[#d8f45a]/30 bg-[#d8f45a]/[0.08]"
+                                                                                                    : "border-white/[0.05] bg-white/[0.025] hover:border-white/[0.12] hover:bg-white/[0.06]"
+                                                                                                    }`}
+                                                                                                aria-label={platform.name}
+                                                                                                title={platform.name}
+                                                                                            >
+                                                                                                <PlatformIcon
+                                                                                                    className="h-4 w-4"
+                                                                                                    style={{
+                                                                                                        color: platform.color,
                                                                                                     }}
-                                                                                                    className={`group relative flex h-10 w-10 items-center justify-center rounded-lg border transition ${isSelected
-                                                                                                        ? "border-[#d8f45a]/30 bg-[#d8f45a]/[0.08]"
-                                                                                                        : "border-white/[0.05] bg-white/[0.025] hover:border-white/[0.12] hover:bg-white/[0.06]"
-                                                                                                        }`}
-                                                                                                    aria-label={platform.name}
-                                                                                                    title={platform.name}
-                                                                                                >
-                                                                                                    <PlatformIcon
-                                                                                                        className="h-4 w-4"
-                                                                                                        style={{
-                                                                                                            color: platform.color,
-                                                                                                        }}
-                                                                                                    />
-                                                                                                </button>
-                                                                                            );
-                                                                                        },
+                                                                                                />
+                                                                                            </button>
+                                                                                        );
+                                                                                    },
                                                                                     )}
                                                                                 </div>
                                                                             </div>

@@ -16,6 +16,7 @@ import {
 
 import { createChat } from "../apiCalls/chatApi.js";
 import { hideLoader, showLoader } from "../redux/sliceLoader.js";
+import { startChatWithUser } from "../utils/startChat.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
 import store from "../redux/store.js";
 import registerSocketListeners from "../sockets/socketListeners.js";
@@ -77,35 +78,12 @@ function UserList({ searchKey, socket }) {
   }
 
   const startNewChat = async (searchedUserId) => {
-    try {
-      dispatch(showLoader());
-
-      const response = await createChat([currentUser._id, searchedUserId]);
-
-      if (response?.success) {
-        const newChat = response.data;
-
-        toast.success(response.message);
-
-        const chatAlreadyExists = (allChats || []).some(
-          (chat) => String(chat._id) === String(newChat._id),
-        );
-
-        dispatch(
-          setAllChats(
-            chatAlreadyExists ? allChats : [...(allChats || []), newChat],
-          ),
-        );
-
-        dispatch(setSelectedChat(newChat));
-      } else {
-        toast.error(response?.message || "Unable to create chat.");
-      }
-    } catch (error) {
-      toast.error("Unable to create chat.");
-    } finally {
-      dispatch(hideLoader());
-    }
+    await startChatWithUser({
+      currentUserId: currentUser._id,
+      targetUserId: searchedUserId,
+      allChats,
+      dispatch,
+    });
   };
 
   const findChatWithUser = (userId) => {

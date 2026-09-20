@@ -8,6 +8,7 @@ import Profile from "./pages/Profile.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Loader from "./components/Loader.jsx";
+import Contacts from "./pages/Contacts.jsx";
 
 function App() {
   const loader = useSelector((state) => state.loaderReducer.loader);
@@ -43,6 +44,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route path="/contacts" element={<ProtectedRoute> <Contacts /> </ProtectedRoute>} />
 
           <Route path="/login" element={<Login />} />
 

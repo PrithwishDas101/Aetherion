@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
+import { ensureContacts } from "./contactController.js";
 
 // CREATE ONE-TO-ONE CHAT
 export const createChat = async (req, res) => {
@@ -13,6 +14,24 @@ export const createChat = async (req, res) => {
         success: false,
 
         message: "A chat must have exactly two members.",
+      });
+    }
+
+    // Make sure both member IDs are valid MongoDB ObjectIds.
+    if (!members.every((member) => mongoose.Types.ObjectId.isValid(member))) {
+      return res.status(400).json({
+        success: false,
+
+        message: "Invalid chat member.",
+      });
+    }
+
+    // A user cannot start a chat with themselves.
+    if (String(members[0]) === String(members[1])) {
+      return res.status(400).json({
+        success: false,
+
+        message: "You cannot create a chat with yourself.",
       });
     }
 
@@ -34,7 +53,10 @@ export const createChat = async (req, res) => {
       .populate("members")
       .populate("lastMessage");
 
+    // Even if the chat already exists, make sure the contact relationship exists.
     if (existingChat) {
+      await ensureContacts(members);
+
       return res.status(200).json({
         success: true,
 
@@ -55,6 +77,10 @@ export const createChat = async (req, res) => {
 
       unreadMessageCount,
     });
+
+    // Creating a chat automatically creates the contact relationship for both users.
+
+    await ensureContacts(members);
 
     await chat.populate("members");
 
