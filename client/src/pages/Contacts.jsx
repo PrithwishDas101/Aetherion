@@ -15,6 +15,7 @@ import {
     PRESENCE_STATUS,
 } from "../utils/presenceStatus.js";
 import PresenceIcon from "../components/PresenceIcon.jsx";
+import AddFriendsModal from "../components/Contacts/AddFriendsModal.jsx";
 
 const CONTACTS_PER_PAGE = 50;
 
@@ -110,6 +111,7 @@ function Contacts() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [showAddFriends, setShowAddFriends] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -265,12 +267,7 @@ function Contacts() {
                         </div>
                     </div>
 
-                    <button
-                        type="button"
-                        disabled
-                        title="Add Contact is coming later"
-                        className="flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-medium text-[#596158] opacity-70"
-                    >
+                    <button type="button" onClick={() => setShowAddFriends(true)} className="flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-medium text-[#8a9288] transition-all duration-300 hover:bg-[#111711] hover:text-[#d8f45a]">
                         <IoPersonAddOutline className="text-base" />
 
                         <span className="hidden sm:inline">
@@ -280,7 +277,6 @@ function Contacts() {
                 </header>
 
                 {/* SEARCH + FILTERS */}
-
                 <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="w-full lg:max-w-xl">
                         <div className="flex h-10 items-center gap-3 border-b border-[#ffffff]/[0.08] px-1 transition focus-within:border-[#d8f45a]/35">
@@ -442,7 +438,6 @@ function Contacts() {
                     )}
 
                     {/* PAGINATION */}
-
                     {!loading &&
                         !error &&
                         hasContacts && (
@@ -474,6 +469,11 @@ function Contacts() {
                         )}
                 </main>
             </div>
+            {showAddFriends && (
+                <AddFriendsModal
+                    onClose={() => setShowAddFriends(false)}
+                />
+            )}
         </div>
     );
 }
