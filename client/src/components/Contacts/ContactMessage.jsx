@@ -53,7 +53,7 @@ const ContactMessage = ({
                 <button
                     type="button"
                     onClick={handleChat}
-                    className="text-xs font-medium text-[#d8f45a] transition-colors hover:text-[#e4ff6c] hover:underline"
+                    className="text-xs font-medium text-[#ebf6bb] transition-colors hover:text-[#f4f7e8] hover:underline"
                 >
                     Chat
                 </button>

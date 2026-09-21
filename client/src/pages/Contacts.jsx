@@ -267,7 +267,7 @@ function Contacts() {
                         </div>
                     </div>
 
-                    <button type="button" onClick={() => setShowAddFriends(true)} className="flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-medium text-[#8a9288] transition-all duration-300 hover:bg-[#111711] hover:text-[#d8f45a]">
+                    <button type="button" onClick={() => setShowAddFriends(true)} className="flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-medium text-[#8a9288] transition-all duration-300 hover:text-[#ecf0dd]">
                         <IoPersonAddOutline className="text-base" />
 
                         <span className="hidden sm:inline">
@@ -279,7 +279,7 @@ function Contacts() {
                 {/* SEARCH + FILTERS */}
                 <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="w-full lg:max-w-xl">
-                        <div className="flex h-10 items-center gap-3 border-b border-[#ffffff]/[0.08] px-1 transition focus-within:border-[#d8f45a]/35">
+                        <div className="flex h-10 items-center gap-3 border-b border-[#ffffff]/[0.08] px-1 transition focus-within:border-[#454644]">
                             <IoSearch className="shrink-0 text-lg text-[#697168]" />
 
                             <input
@@ -298,7 +298,7 @@ function Contacts() {
                                     onClick={
                                         handleClearSearch
                                     }
-                                    className="text-xs text-[#687166] transition hover:text-[#d8f45a]"
+                                    className="text-xs text-[#687166] transition hover:text-[#d3d3cf]"
                                 >
                                     Clear
                                 </button>
@@ -372,15 +372,9 @@ function Contacts() {
                                     index,
                                 ) => (
                                     <ContactRow
-                                        key={
-                                            contact._id
-                                        }
-                                        contact={
-                                            contact
-                                        }
-                                        onChat={
-                                            handleStartChat
-                                        }
+                                        key={contact._id}
+                                        contact={contact}
+                                        onChat={handleStartChat}
                                         isLast={
                                             index ===
                                             filteredContacts.length -
@@ -411,15 +405,9 @@ function Contacts() {
                                                     index,
                                                 ) => (
                                                     <ContactRow
-                                                        key={
-                                                            contact._id
-                                                        }
-                                                        contact={
-                                                            contact
-                                                        }
-                                                        onChat={
-                                                            handleStartChat
-                                                        }
+                                                        key={contact._id}
+                                                        contact={contact}
+                                                        onChat={handleStartChat}
                                                         isLast={
                                                             index ===
                                                             groupedContacts[
@@ -499,7 +487,7 @@ function ContactRow({
 
     return (
         <div
-            className={`group flex min-h-[68px] items-center gap-3 border-b border-[#ffffff]/[0.06] px-2 py-3 transition hover:bg-[#0d120d] ${isLast
+            className={`group flex min-h-[68px] items-center gap-3 border-b border-[#ffffff]/[0.06] px-2 py-3 transition hover:bg-[#101010bd] ${isLast
                 ? "border-b-0"
                 : ""
                 }`}
