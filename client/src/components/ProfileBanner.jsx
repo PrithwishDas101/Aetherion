@@ -2,21 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import {
     ImagePlus,
-    X,
     ZoomIn,
     ZoomOut,
+    Pencil
 } from "lucide-react";
 
-const BANNER_ASPECT = 4;
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 const clamp = (value, min, max) =>
     Math.min(Math.max(value, min), max);
 
-const ProfileBanner = ({
-    bannerUrl,
-    onBannerChange,
-}) => {
+const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
     const fileInputRef = useRef(null);
     const cropAreaRef = useRef(null);
     const imageRef = useRef(null);
@@ -557,20 +553,28 @@ const ProfileBanner = ({
 
                 {/* CHANGE BUTTON */}
 
-                <button
-                    type="button"
-                    onClick={openFilePicker}
-                    disabled={saving}
-                    className="absolute right-4 top-4 flex h-9 items-center gap-2 rounded-lg border border-white/[0.08] bg-black/45 px-3 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-black/65 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                    <ImagePlus className="h-4 w-4" />
-
-                    <span>
-                        {bannerUrl
-                            ? "Change banner"
-                            : "Add banner"}
-                    </span>
-                </button>
+                {editMode ? (
+                    <button
+                        type="button"
+                        onClick={openFilePicker}
+                        disabled={saving}
+                        className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:bg-black/80 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label="Change banner"
+                        title="Change banner"
+                    >
+                        <Pencil className="h-4 w-4 text-white" strokeWidth={3.5} />
+                    </button>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={openFilePicker}
+                        disabled={saving}
+                        className="absolute right-4 top-4 flex h-9 items-center gap-2 rounded-lg border border-white/[0.08] bg-black/45 px-3 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-black/65 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        <ImagePlus className="h-4 w-4" />
+                        <span>{bannerUrl ? "Change banner" : "Add banner"}</span>
+                    </button>
+                )}
 
                 <input
                     ref={fileInputRef}
@@ -639,8 +643,8 @@ const ProfileBanner = ({
                                 <div
                                     ref={cropAreaRef}
                                     className={`relative mt-3 aspect-[4/1] w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#080b09] ${dragging
-                                            ? "cursor-grabbing"
-                                            : "cursor-grab"
+                                        ? "cursor-grabbing"
+                                        : "cursor-grab"
                                         }`}
                                     onPointerDown={
                                         handlePointerDown
