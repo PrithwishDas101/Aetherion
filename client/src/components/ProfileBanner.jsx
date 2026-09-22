@@ -18,13 +18,8 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
     const imageRef = useRef(null);
 
     const [showEditor, setShowEditor] = useState(false);
-
-    const [selectedFile, setSelectedFile] =
-        useState(null);
-
-    const [previewUrl, setPreviewUrl] =
-        useState("");
-
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState("");
     const [zoom, setZoom] = useState(1);
 
     const [position, setPosition] = useState({
@@ -38,8 +33,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
             height: 0,
         });
 
-    const [dragging, setDragging] =
-        useState(false);
+    const [dragging, setDragging] = useState(false);
 
     const [dragStart, setDragStart] = useState({
         x: 0,
@@ -48,12 +42,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
 
     const [saving, setSaving] = useState(false);
 
-    /*
-     * =========================================================
-     * CLEAN PREVIEW URL
-     * =========================================================
-     */
-
+    // CLEAN PREVIEW URL
     useEffect(() => {
         return () => {
             if (previewUrl) {
@@ -62,12 +51,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         };
     }, [previewUrl]);
 
-    /*
-     * =========================================================
-     * OPEN FILE PICKER
-     * =========================================================
-     */
-
+    // OPEN FILE PICKER
     const openFilePicker = () => {
         if (saving) {
             return;
@@ -76,12 +60,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         fileInputRef.current?.click();
     };
 
-    /*
-     * =========================================================
-     * FILE SELECTED
-     * =========================================================
-     */
-
+    // FILE SELECTED
     const handleFileSelect = (event) => {
         const file = event.target.files?.[0];
 
@@ -128,15 +107,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         setShowEditor(true);
     };
 
-    /*
-     * =========================================================
-     * IMAGE LOAD
-     *
-     * Calculate the minimum image size required to completely
-     * cover the 4:1 crop area.
-     * =========================================================
-     */
-
+    // IMAGE LOAD
     const handleImageLoad = () => {
         const image = imageRef.current;
         const cropArea = cropAreaRef.current;
@@ -188,12 +159,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         });
     };
 
-    /*
-     * =========================================================
-     * ZOOM
-     * =========================================================
-     */
-
+    // ZOOM
     const changeZoom = (amount) => {
         if (saving) {
             return;
@@ -212,12 +178,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         });
     };
 
-    /*
-     * =========================================================
-     * POINTER DRAG
-     * =========================================================
-     */
-
+    // POINTER DRAG
     const handlePointerDown = (event) => {
         if (
             saving ||
@@ -303,12 +264,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         setDragging(false);
     };
 
-    /*
-     * =========================================================
-     * RESET / CLOSE
-     * =========================================================
-     */
-
+    // RESET / CLOSE
     const closeEditor = () => {
         if (saving) {
             return;
@@ -334,15 +290,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         setDragging(false);
     };
 
-    /*
-     * =========================================================
-     * CREATE CROPPED IMAGE
-     *
-     * The browser generates the exact 4:1 image that the user
-     * selected before sending it to Cloudinary.
-     * =========================================================
-     */
-
+    // CREATE CROPPED IMAGE
     const createCroppedImage = async () => {
         const image = imageRef.current;
         const cropArea =
@@ -481,12 +429,7 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         );
     };
 
-    /*
-     * =========================================================
-     * SAVE
-     * =========================================================
-     */
-
+    // SAVE
     const handleSave = async () => {
         if (
             !selectedFile ||
@@ -520,18 +463,10 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
         }
     };
 
-    /*
-     * =========================================================
-     * UI
-     * =========================================================
-     */
-
+    // UIS
     return (
         <>
-            {/* =====================================================
-          BANNER
-      ===================================================== */}
-
+            {/* BANNER */}
             <div className="relative h-24 w-full overflow-hidden bg-[#151a16] sm:h-28 lg:h-36">
                 {bannerUrl ? (
                     <img
@@ -542,17 +477,13 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
                 ) : (
                     <>
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(216,244,90,0.18),transparent_28%),radial-gradient(circle_at_85%_20%,rgba(75,110,70,0.22),transparent_35%),linear-gradient(135deg,#111811,#182119_45%,#0b100c)]" />
-
                         <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full border border-[#d8f45a]/[0.06]" />
-
                         <div className="absolute -right-4 -top-8 h-36 w-36 rounded-full border border-[#d8f45a]/[0.04]" />
-
                         <div className="absolute bottom-0 left-0 h-px w-full bg-white/[0.05]" />
                     </>
                 )}
 
                 {/* CHANGE BUTTON */}
-
                 {editMode ? (
                     <button
                         type="button"
@@ -569,10 +500,10 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
                         type="button"
                         onClick={openFilePicker}
                         disabled={saving}
-                        className="absolute right-4 top-4 flex h-9 items-center gap-2 rounded-lg border border-white/[0.08] bg-black/45 px-3 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-black/65 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-black/45 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-black/65 disabled:cursor-not-allowed disabled:opacity-50 sm:right-4 sm:top-4 sm:w-auto sm:gap-2 sm:px-3"
                     >
                         <ImagePlus className="h-4 w-4" />
-                        <span>{bannerUrl ? "Change banner" : "Add banner"}</span>
+                        <span className="hidden sm:inline">{bannerUrl ? "Change banner" : "Add banner"}</span>
                     </button>
                 )}
 

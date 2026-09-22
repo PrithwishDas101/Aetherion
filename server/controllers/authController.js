@@ -121,6 +121,7 @@ export const signup = async (req, res) => {
         lastName: newUser.lastName,
         email: newUser.email,
         profilePic: newUser.profilePic,
+        avatarDecoration: newUser.avatarDecoration,
       },
     });
   } catch (error) {
@@ -234,6 +235,7 @@ export const login = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         profilePic: user.profilePic,
+        avatarDecoration: user.avatarDecoration,
       },
     });
   } catch (error) {

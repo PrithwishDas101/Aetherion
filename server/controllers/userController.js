@@ -230,6 +230,7 @@ export const updatePersonalProfile = async (req, res) => {
       bio,
       customStatus,
       publicPresenceStatus,
+      avatarDecoration,
     } = req.body;
 
     // Update only fields that are actually provided.
@@ -270,6 +271,19 @@ export const updatePersonalProfile = async (req, res) => {
       }
 
       user.publicPresenceStatus = publicPresenceStatus;
+    }
+
+    if (avatarDecoration !== undefined) {
+      const allowedDecorations = ["none", "aether-orbit"];
+
+      if (!allowedDecorations.includes(avatarDecoration)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid avatar decoration.",
+        });
+      }
+
+      user.avatarDecoration = avatarDecoration;
     }
 
     await user.save();

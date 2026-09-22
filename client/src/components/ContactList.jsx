@@ -6,6 +6,7 @@ import {
 } from "react-icons/io5";
 
 import { getRecentContacts } from "../apiCalls/contactApi.js";
+import Avatar from "./Avatar.jsx";
 import PresenceIcon from "./PresenceIcon.jsx";
 import {
     getEffectivePresenceStatus,
@@ -121,18 +122,14 @@ const ContactList = () => {
                                             className="group relative shrink-0"
                                             aria-label={getFullName(contact,)}
                                         >
-                                            {contact.profilePic ? (
-                                                <img
-                                                    src={contact.profilePic}
-                                                    alt={getFullName(contact,)}
-                                                    className="h-10 w-10 sm:h-12 sm:w-12 lg:h-[50px] lg:w-[50px] rounded-full bg-[#cacfb4] object-cover ring-2 ring-[#080d09] transition duration-200 group-hover:z-10 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="flex h-10 w-10 sm:h-12 sm:w-12 lg:h-[50px] lg:w-[50px] items-center justify-center rounded-full bg-[#cacfb4] text-xs font-bold text-[#10120d] ring-2 ring-[#080d09] transition duration-200 group-hover:z-10 group-hover:scale-105 sm:text-sm lg:text-base"
-                                                >
-                                                    {getInitials(contact,)}
-                                                </div>
-                                            )}
+                                            <Avatar
+                                                profilePic={contact.profilePic}
+                                                initials={getInitials(contact)}
+                                                alt={getFullName(contact)}
+                                                decoration={contact.avatarDecoration}
+                                                size="xs"
+                                                avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold ring-2 ring-[#080d09] transition duration-200 group-hover:z-10 group-hover:scale-105 sm:h-12 sm:w-12 sm:text-sm lg:h-[50px] lg:w-[50px] lg:text-base"
+                                            />
 
                                             {/* PRESENCE */}
                                             <div className="absolute bottom-0 right-0 rounded-full bg-[#080d09] p-0.5 sm:p-[3px] lg:p-1">

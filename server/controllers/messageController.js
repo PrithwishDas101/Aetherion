@@ -33,7 +33,7 @@ export const sendMessage = async (req, res) => {
       fileMimeType: uploadedFile?.mimetype,
       fileSize: uploadedFile?.size,
       location,
-      contact
+      contact,
     });
 
     if (!chatId) {
@@ -296,6 +296,10 @@ export const sendMessage = async (req, res) => {
                 typeof contact.profilePic === "string"
                   ? contact.profilePic.trim()
                   : null,
+              avatarDecoration:
+                typeof contact.avatarDecoration === "string"
+                  ? contact.avatarDecoration.trim()
+                  : "none",
             }
           : undefined,
 

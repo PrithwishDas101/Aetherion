@@ -14,6 +14,7 @@ import {
 } from "../utils/presenceStatus.js";
 import { setUser } from "../redux/userSlice.js";
 import ContactList from "../components/ContactList.jsx";
+import Avatar from "../components/Avatar.jsx";
 import PresenceIcon from "../components/PresenceIcon.jsx";
 import Connections from "../components/Connections.jsx";
 import AetherionDayBadge from "../components/AetherionDayBadge.jsx";
@@ -322,38 +323,17 @@ const Profile = () => {
               {/* AVATAR */}
 
               <div className="absolute left-0 top-0 z-10 -translate-y-16 sm:-translate-y-20">
-                <div className="relative shrink-0">
-
-                  <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[4px] border-[#101218] bg-[#171d17] text-3xl font-bold text-[#d8f45a] shadow-xl sm:h-32 sm:w-32 sm:text-4xl lg:h-36 lg:w-36">
-                    {user?.profilePic ? (
-                      <img
-                        src={user.profilePic}
-                        alt={fullName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span>{initials}</span>
-                    )}
-                  </div>
-
-                  {/* PRESENCE */}
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowPresenceModal(true)
-                    }
-                    className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full border-[2px] border-[#111317] bg-[#131613] shadow-md transition hover:scale-105 active:scale-95"
-                    aria-label="Change online status"
-                    title="Change online status"
-                  >
-                    <PresenceIcon
-                      status={effectivePresenceStatus}
-                      size="small"
-                    />
+                <Avatar
+                  profilePic={user?.profilePic}
+                  initials={initials}
+                  alt={fullName}
+                  decoration={user?.avatarDecoration}
+                  size="lg"
+                >
+                  <button type="button" onClick={() => setShowPresenceModal(true)} className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full border-[2px] border-[#111317] bg-[#131613] shadow-md transition hover:scale-105 active:scale-95" aria-label="Change online status" title="Change online status">
+                    <PresenceIcon status={effectivePresenceStatus} size="small" />
                   </button>
-
-                </div>
+                </Avatar>
               </div>
 
               {/* STATUS */}
@@ -580,18 +560,15 @@ const Profile = () => {
               {/* PREVIEW */}
               <div className="border-b border-white/[0.06] pb-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#1a211a] text-sm font-bold text-[#d8f45a]">
-                    {user?.profilePic ? (
-                      <img
-                        src={user.profilePic}
-                        alt={fullName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      initials
-                    )}
-                  </div>
-
+                  <Avatar
+                    profilePic={user?.profilePic}
+                    initials={initials}
+                    alt={fullName}
+                    decoration={user?.avatarDecoration}
+                    size="xs"
+                    avatarClassName="bg-[#1a211a] text-sm font-bold text-[#d8f45a]"
+                  />
+                  
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-[#f1eee8]">
                       {fullName}

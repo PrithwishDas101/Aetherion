@@ -15,6 +15,7 @@ import {
 import MediaZoomSurface from "./MediaZoomSurface.jsx";
 import PhotoPreview from "./PhotoPreview.jsx";
 import VideoPreview from "./VideoPreview.jsx";
+import Avatar from "../Avatar.jsx";
 
 const getInitials = (person) => {
   if (!person) {
@@ -494,20 +495,19 @@ const MediaViewer = ({
                 </span>
               </button>
 
-              {sender?.profilePic ? (
-                <img
-                  src={sender.profilePic}
-                  alt={senderName}
-                  className="h-12 w-12 shrink-0 rounded-full object-cover"
-                />
-              ) : (
-                <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white"
-                  aria-label={senderName}
-                >
-                  {senderInitials}
-                </div>
-              )}
+              <Avatar
+                profilePic={sender?.profilePic}
+                initials={senderName
+                  .split(" ")
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((part) => part.charAt(0).toUpperCase())
+                  .join("")}
+                alt={senderName}
+                decoration={sender?.avatarDecoration}
+                size="md"
+                avatarClassName="bg-white/10 text-white font-semibold"
+              />
 
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-white">
@@ -604,20 +604,19 @@ const MediaViewer = ({
           {/* SENDER */}
 
           <div className="flex min-w-0 items-center gap-3">
-            {sender?.profilePic ? (
-              <img
-                src={sender.profilePic}
-                alt={senderName}
-                className="h-10 w-10 shrink-0 rounded-full object-cover"
-              />
-            ) : (
-              <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white"
-                aria-label={senderName}
-              >
-                {senderInitials}
-              </div>
-            )}
+            <Avatar
+              profilePic={sender?.profilePic}
+              initials={senderName
+                .split(" ")
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((part) => part.charAt(0).toUpperCase())
+                .join("")}
+              alt={senderName}
+              decoration={sender?.avatarDecoration}
+              size="xs"
+              avatarClassName="bg-white/10 text-white font-semibold"
+            />
 
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-white">

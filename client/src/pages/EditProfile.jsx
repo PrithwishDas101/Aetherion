@@ -11,6 +11,8 @@ import {
     updateProfileBanner,
 } from "../apiCalls/userApi.js";
 import { setUser } from "../redux/userSlice.js";
+import Avatar from "../components/Avatar.jsx";
+import AvatarDecorationPicker from "../components/AvatarDecorationPicker.jsx";
 import Connections from "../components/Connections.jsx";
 import ProfileBanner from "../components/ProfileBanner.jsx";
 
@@ -29,6 +31,9 @@ const EditProfile = () => {
 
     const [showAvatarModal, setShowAvatarModal] = useState(false);
     const [showStatusModal, setShowStatusModal] = useState(false);
+
+    const [isDecorationPickerOpen, setIsDecorationPickerOpen] = useState(false);
+    const [isSavingDecoration, setIsSavingDecoration] = useState(false);
 
     const [isSaving, setIsSaving] = useState(false);
     const [isSavingStatus, setIsSavingStatus] = useState(false);
@@ -156,6 +161,35 @@ const EditProfile = () => {
         }
     };
 
+    const handleApplyDecoration = async (decorationId) => {
+        if (isSavingDecoration) {
+            return;
+        }
+
+        setIsSavingDecoration(true);
+
+        try {
+            const response = await updatePersonalProfile({
+                avatarDecoration: decorationId,
+            });
+
+            if (!response?.success) {
+                toast.error(response?.message || "Couldn't update your avatar decoration.");
+                return;
+            }
+
+            dispatch(setUser(response.data));
+
+            toast.success("Avatar decoration updated.");
+            setIsDecorationPickerOpen(false);
+        } catch (error) {
+            console.error("Avatar decoration update error:", error);
+            toast.error("Couldn't update your avatar decoration.");
+        } finally {
+            setIsSavingDecoration(false);
+        }
+    };
+
     const handleBannerChange = async (bannerFile) => {
         const formData = new FormData();
 
@@ -275,20 +309,24 @@ const EditProfile = () => {
                     <div className="relative px-5 pb-10 sm:px-8 sm:pb-12 lg:px-10 lg:pb-14">
                         <div className="relative min-h-[6rem] sm:min-h-[6.5rem] lg:min-h-[7rem]">
                             <div className="absolute left-0 top-0 z-10 -translate-y-16 sm:-translate-y-20">
-                                <div className="relative shrink-0">
-                                    <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[4px] border-[#101218] bg-[#171d17] text-3xl font-bold text-[#d8f45a] shadow-xl sm:h-32 sm:w-32 sm:text-4xl lg:h-36 lg:w-36">
-                                        {user?.profilePic ? (
-                                            <img src={user.profilePic} alt={fullName} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <span>{initials}</span>
-                                        )}
-                                    </div>
-
-                                    {/* AVATAR PENCIL — INSIDE TOP RIGHT */}
-                                    <button type="button" onClick={() => setShowAvatarModal(true)} className="absolute right-1 top-1 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:bg-black/80 hover:scale-105 active:scale-95" aria-label="Edit profile picture" title="Edit profile picture">
+                                <Avatar
+                                    profilePic={user?.profilePic}
+                                    initials={initials}
+                                    alt={fullName}
+                                    decoration={user?.avatarDecoration}
+                                    size="lg"
+                                >
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowAvatarModal(false);
+                                            setIsDecorationPickerOpen(true);
+                                        }}
+                                        className="absolute right-1 top-1 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:scale-105 active:scale-95" aria-label="Edit profile picture" title="Edit profile picture"
+                                    >
                                         <Pencil className="h-4 w-4 text-white" strokeWidth={3.5} />
                                     </button>
-                                </div>
+                                </Avatar>
                             </div>
 
                             {/* CUSTOM STATUS */}
@@ -428,11 +466,7 @@ const EditProfile = () => {
                             <button
                                 type="button"
                                 disabled={isUploadingAvatar}
-                                onClick={() =>
-                                    toast(
-                                        "Avatar decoration is coming later.",
-                                    )
-                                }
+                                onClick={() => setIsDecorationPickerOpen(true)}
                                 className="group flex w-full items-center gap-3 py-5 text-left transition-colors hover:bg-white/[0.02] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.025] text-base text-[#858d84] transition group-hover:border-white/[0.1] group-hover:bg-white/[0.04] group-hover:text-[#aeb5aa]">
@@ -499,9 +533,14 @@ const EditProfile = () => {
                         <div className="p-5 sm:p-6">
                             <div className="border-b border-white/[0.06] pb-5">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#1a211a] text-sm font-bold text-[#d8f45a]">
-                                        {user?.profilePic ? <img src={user.profilePic} alt={fullName} className="h-full w-full object-cover" /> : initials}
-                                    </div>
+                                    <Avatar
+                                        profilePic={user?.profilePic}
+                                        initials={initials}
+                                        alt={fullName}
+                                        decoration={user?.avatarDecoration}
+                                        size="xs"
+                                        avatarClassName="bg-[#1a211a] text-sm font-bold text-[#d8f45a]"
+                                    />
 
                                     <div className="min-w-0">
                                         <p className="text-sm font-semibold text-[#f1eee8]">{fullName}</p>
@@ -534,6 +573,17 @@ const EditProfile = () => {
                     </div>
                 </div>
             )}
+
+            <AvatarDecorationPicker
+                isOpen={isDecorationPickerOpen}
+                onClose={() => setIsDecorationPickerOpen(false)}
+                currentDecoration={user?.avatarDecoration}
+                profilePic={user?.profilePic}
+                initials={initials}
+                fullName={fullName}
+                onApply={handleApplyDecoration}
+                saving={isSavingDecoration}
+            />
         </div>
     );
 };

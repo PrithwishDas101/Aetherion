@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import Contact from "../models/Contact.js";
 
 const CONTACT_PROJECTION =
-  "_id firstName lastName profilePic publicPresenceStatus lastSeen";
+  "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen";
 
 // ENSURE TWO USERS ARE CONTACTS
 export const ensureContacts = async (members) => {
@@ -236,6 +236,8 @@ export const getContacts = async (req, res) => {
               lastName: "$contactUser.lastName",
 
               profilePic: "$contactUser.profilePic",
+              
+              avatarDecoration: "$contactUser.avatarDecoration",
 
               publicPresenceStatus: "$contactUser.publicPresenceStatus",
 

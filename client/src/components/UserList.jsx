@@ -21,6 +21,7 @@ import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
 import store from "../redux/store.js";
 import registerSocketListeners from "../sockets/socketListeners.js";
 import { formatChatPreviewTime } from "../utils/messageDate.js";
+import Avatar from "./Avatar.jsx";
 import {
   getEffectivePresenceStatus,
   PRESENCE_STATUS,
@@ -224,36 +225,31 @@ function UserList({ searchKey, socket }) {
               <div className="flex items-center gap-3">
                 {/* PROFILE PICTURE */}
 
-                <div className="relative shrink-0">
-                  {user.profilePic ? (
-                    <img
-                      src={user.profilePic}
-                      alt={`${user.firstName} ${user.lastName}`}
-                      className="h-12 w-12 rounded-full bg-[#cacfb4] object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#cacfb4] text-sm font-bold text-[#10120d]">
-                      {[
-                        (user.firstName || "").trim().charAt(0),
-                        ...(user.lastName || "")
-                          .trim()
-                          .split(/\s+/)
-                          .map((name) => name.charAt(0)),
-                      ]
-                        .filter(Boolean)
-                        .slice(0, 3)
-                        .join("")
-                        .toUpperCase()}
-                    </div>
-                  )}
-
-                  <div className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center">
+                <Avatar
+                  profilePic={user.profilePic}
+                  initials={[
+                    (user.firstName || "").trim().charAt(0),
+                    ...(user.lastName || "")
+                      .trim()
+                      .split(/\s+/)
+                      .map((name) => name.charAt(0)),
+                  ]
+                    .filter(Boolean)
+                    .slice(0, 3)
+                    .join("")
+                    .toUpperCase()}
+                  alt={`${user.firstName} ${user.lastName}`}
+                  decoration={user.avatarDecoration}
+                  size="md"
+                  avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold"
+                >
+                  <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center">
                     <PresenceIcon
                       status={effectivePresenceStatus}
                       size="small"
                     />
                   </div>
-                </div>
+                </Avatar>
 
                 <div className="min-w-0 flex-1">
                   {/* NAME + TIME */}

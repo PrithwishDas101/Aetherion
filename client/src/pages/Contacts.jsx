@@ -16,6 +16,7 @@ import {
 } from "../utils/presenceStatus.js";
 import PresenceIcon from "../components/PresenceIcon.jsx";
 import AddFriendsModal from "../components/Contacts/AddFriendsModal.jsx";
+import Avatar from "../components/Avatar.jsx";
 
 const CONTACTS_PER_PAGE = 50;
 
@@ -494,17 +495,14 @@ function ContactRow({
         >
             {/* AVATAR */}
             <div className="relative shrink-0">
-                {contact.profilePic ? (
-                    <img
-                        src={contact.profilePic}
-                        alt={fullName}
-                        className="h-10 w-10 rounded-full bg-[#cacfb4] object-cover"
-                    />
-                ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#cacfb4] text-xs font-bold text-[#10120d]">
-                        {getInitials(contact)}
-                    </div>
-                )}
+                <Avatar
+                    profilePic={contact.profilePic}
+                    initials={getInitials(contact)}
+                    alt={fullName}
+                    decoration={contact.avatarDecoration}
+                    size="xs"
+                    avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold"
+                />
 
                 <div className="absolute -bottom-0.5 -right-0.5">
                     <PresenceIcon

@@ -46,6 +46,12 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    avatarDecoration: {
+      type: String,
+      enum: ["none", "aether-orbit"],
+      default: "none",
+    },
+
     // PROFILE BANNER
     profileBanner: {
       type: String,

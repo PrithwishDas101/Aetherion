@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FiLogOut, FiUser } from "react-icons/fi";
 
+import Avatar from "./Avatar.jsx";
 import { logoutUser } from "../apiCalls/authApi.js";
 
 function Header() {
@@ -124,7 +125,7 @@ function Header() {
               dismissProfileHint();
               setShowProfileMenu((prev) => !prev);
             }}
-            className={`relative flex h-8 w-8 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-[#d8f45a] text-sm font-bold text-[#10120d] transition active:scale-95 sm:h-10 sm:w-10 sm:text-base ${showProfileHint
+            className={`relative cursor-pointer transition active:scale-95 ${showProfileHint
               ? "z-[60] ring-4 ring-[#d8f45a]/40 shadow-[0_0_25px_rgba(216,244,90,0.6)]"
               : ""
               }`}
@@ -132,21 +133,14 @@ function Header() {
             aria-haspopup="menu"
             aria-expanded={showProfileMenu}
           >
-            {user?.profilePic ? (
-              <img
-                src={user.profilePic}
-                alt={
-                  `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
-                  "Profile"
-                }
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <>
-                {user?.firstName?.[0]}
-                {user?.lastName?.[0]}
-              </>
-            )}
+            <Avatar
+              profilePic={user?.profilePic}
+              initials={`${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`}
+              alt={`${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Profile"}
+              decoration={user?.avatarDecoration}
+              size="xs"
+              avatarClassName="bg-[#d8f45a] text-[#10120d] font-bold sm:h-10 sm:w-10 sm:text-base"
+            />
           </button>
 
           {/* PROFILE DROPDOWN */}
@@ -159,21 +153,15 @@ function Header() {
             <div className="w-[250px] rounded-2xl border border-white/10 bg-[#101610]/95 p-2 shadow-2xl backdrop-blur-md sm:w-[270px]">
               {/* User info */}
               <div className="flex items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#d8f45a] text-sm font-bold text-[#10120d]">
-                  {user?.profilePic ? (
-                    <img
-                      src={user.profilePic}
-                      alt="Profile"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <>
-                      {user?.firstName?.[0]}
-                      {user?.lastName?.[0]}
-                    </>
-                  )}
-                </div>
-
+                <Avatar
+                  profilePic={user?.profilePic}
+                  initials={`${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`}
+                  alt="Profile"
+                  decoration={user?.avatarDecoration}
+                  size="xs"
+                  avatarClassName="bg-[#d8f45a] text-[#10120d] font-bold"
+                />
+                
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-[#f1eee8]">
                     {user?.firstName} {user?.lastName}
@@ -213,7 +201,7 @@ function Header() {
           </div>
         </div>
       </header>
-      
+
       {/* LOGOUT CONFIRMATION */}
       {showLogoutConfirm && (
         <div

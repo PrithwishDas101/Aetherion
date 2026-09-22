@@ -114,6 +114,12 @@ const messageSchema = new mongoose.Schema(
         trim: true,
         default: null,
       },
+
+      avatarDecoration: {
+        type: String,
+        enum: ["none", "aether-orbit"],
+        default: "none",
+      },
     },
 
     replyTo: {

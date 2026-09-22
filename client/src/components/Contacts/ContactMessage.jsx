@@ -1,3 +1,5 @@
+import Avatar from "../Avatar.jsx";
+
 const ContactMessage = ({
     contact,
     onChat,
@@ -23,17 +25,14 @@ const ContactMessage = ({
             <div className="flex items-center gap-3">
                 {/* DP */}
                 <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-[#0d120e]">
-                    {contact?.profilePic ? (
-                        <img
-                            src={contact.profilePic}
-                            alt={fullName}
-                            className="h-full w-full object-cover"
-                        />
-                    ) : (
-                        <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#d8f45a]">
-                            {fullName.charAt(0).toUpperCase()}
-                        </div>
-                    )}
+                    <Avatar
+                        profilePic={contact?.profilePic}
+                        initials={fullName.charAt(0).toUpperCase()}
+                        alt={fullName}
+                        decoration={contact?.avatarDecoration}
+                        size="md"
+                        avatarClassName="bg-[#0d120e] text-[#d8f45a] font-semibold"
+                    />
                 </div>
 
                 {/* NAME + EMAIL */}

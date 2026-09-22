@@ -141,6 +141,27 @@ body {
   @apply -translate-x-0.5;
 }
 
+@keyframes aether-orbit-drift {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.aether-orbit-rotation {
+  transform-origin: 50% 50%;
+  animation: aether-orbit-drift 18s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aether-orbit-rotation {
+    animation: none;
+  }
+}
+
 /* Makes solid text bubbles visibly participate in the highlight */
 .text-message-highlight {
   animation: text-message-highlight 1.2s ease-out;
