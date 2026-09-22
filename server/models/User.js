@@ -48,7 +48,12 @@ const userSchema = new mongoose.Schema(
 
     avatarDecoration: {
       type: String,
-      enum: ["none", "aether-orbit"],
+      enum: [
+        "none",
+        "aether-orbit",
+        "initial",
+        "moonlit"
+      ],
       default: "none",
     },
 

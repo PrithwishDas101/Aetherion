@@ -274,7 +274,12 @@ export const updatePersonalProfile = async (req, res) => {
     }
 
     if (avatarDecoration !== undefined) {
-      const allowedDecorations = ["none", "aether-orbit"];
+      const allowedDecorations = [
+        "none",
+        "aether-orbit",
+        "initial",
+        "moonlit"
+      ];
 
       if (!allowedDecorations.includes(avatarDecoration)) {
         return res.status(400).json({
