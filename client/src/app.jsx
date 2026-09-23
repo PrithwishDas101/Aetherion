@@ -9,6 +9,7 @@ import EditProfile from "./pages/EditProfile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Loader from "./components/Loader.jsx";
 import Contacts from "./pages/Contacts.jsx";
+import ContactProfile from "./pages/ContactProfile.jsx";
 
 function App() {
   const loader = useSelector((state) => state.loaderReducer.loader);
@@ -41,6 +42,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/contact-profile/:userId"
+            element={
+              <ProtectedRoute>
+                <ContactProfile />
               </ProtectedRoute>
             }
           />
