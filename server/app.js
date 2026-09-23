@@ -7,6 +7,7 @@ import chatRoutes from "./routes/chatRoute.js";
 import contactRoutes from "./routes/contactRoute.js";
 import messageRoutes from "./routes/messageRoute.js";
 import pollRoutes from "./routes/pollRoute.js";
+import contactProfileRoutes from "./routes/contactProfileRoute.js";
 
 const app = express();
 
@@ -54,5 +55,6 @@ app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/contact", contactRoutes);
 app.use("/api/v1/message", messageRoutes);
 app.use("/api/v1/poll", pollRoutes);
+app.use("/api/v1/contact-profile", contactProfileRoutes);
 
 export default app;
