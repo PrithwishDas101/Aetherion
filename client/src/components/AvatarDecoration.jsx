@@ -9,7 +9,7 @@ const AetherOrbit = () => {
     return (
         <svg
             viewBox="0 0 100 100"
-            className="pointer-events-none absolute inset-[-9%] z-0 h-[118%] w-[118%] overflow-visible"
+            className="pointer-events-none absolute inset-[-9%] z-10 h-[118%] w-[118%] overflow-visible"
             aria-hidden="true"
         >
             <defs>
@@ -98,7 +98,6 @@ const Initial = () => {
             className="pointer-events-none absolute inset-[-8%] z-0 h-[116%] w-[116%] overflow-visible"
             aria-hidden="true"
         >
-            {/* Outer subtle border */}
             <circle
                 cx="50"
                 cy="50"
@@ -108,7 +107,6 @@ const Initial = () => {
                 strokeWidth="1.2"
             />
 
-            {/* Dark structural ring */}
             <circle
                 cx="50"
                 cy="50"
@@ -118,7 +116,6 @@ const Initial = () => {
                 strokeWidth="5"
             />
 
-            {/* Bright inner ring */}
             <circle
                 cx="50"
                 cy="50"
@@ -128,7 +125,6 @@ const Initial = () => {
                 strokeWidth="3.8"
             />
 
-            {/* Very subtle inner edge */}
             <circle
                 cx="50"
                 cy="50"
@@ -152,26 +148,26 @@ const Moonlit = () => {
     return (
         <svg
             viewBox="0 0 100 100"
-            className="pointer-events-none absolute inset-[-10%] z-0 h-[120%] w-[120%] overflow-visible"
+            className="pointer-events-none absolute inset-[-12%] z-0 h-[124%] w-[124%] overflow-visible"
             aria-hidden="true"
         >
             <defs>
-                {/* Soft periwinkle → lavender metallic ring */}
+                {/* Main metallic lunar ring */}
                 <linearGradient
                     id={ringGradientId}
-                    x1="8%"
+                    x1="5%"
                     y1="5%"
-                    x2="92%"
+                    x2="95%"
                     y2="95%"
                 >
-                    <stop offset="0%" stopColor="#eef0ff" />
-                    <stop offset="18%" stopColor="#cfd3f4" />
-                    <stop offset="42%" stopColor="#aeb4dc" />
-                    <stop offset="68%" stopColor="#c5c9eb" />
-                    <stop offset="100%" stopColor="#9298c4" />
+                    <stop offset="0%" stopColor="#f4f5ff" />
+                    <stop offset="18%" stopColor="#d8dcf7" />
+                    <stop offset="42%" stopColor="#aeb5dc" />
+                    <stop offset="68%" stopColor="#d0d4f0" />
+                    <stop offset="100%" stopColor="#8f96c2" />
                 </linearGradient>
 
-                {/* Moon / orb metallic white */}
+                {/* Crescent */}
                 <linearGradient
                     id={moonGradientId}
                     x1="15%"
@@ -180,8 +176,8 @@ const Moonlit = () => {
                     y2="90%"
                 >
                     <stop offset="0%" stopColor="#ffffff" />
-                    <stop offset="48%" stopColor="#f1f3ff" />
-                    <stop offset="100%" stopColor="#c7cbea" />
+                    <stop offset="45%" stopColor="#f1f3ff" />
+                    <stop offset="100%" stopColor="#c3c8e8" />
                 </linearGradient>
 
                 <filter
@@ -192,7 +188,7 @@ const Moonlit = () => {
                     height="300%"
                 >
                     <feGaussianBlur
-                        stdDeviation="1.15"
+                        stdDeviation="1.05"
                         result="blur"
                     />
 
@@ -204,76 +200,55 @@ const Moonlit = () => {
             </defs>
 
             {/* =========================================================
-                MAIN CIRCULAR FRAME
-               ========================================================= */}
+                OUTER METALLIC RING
+            ========================================================= */}
 
-            {/* Soft outer metallic edge */}
             <circle
                 cx="50"
                 cy="50"
-                r="46.7"
+                r="47"
                 fill="none"
-                stroke="#777da8"
+                stroke="#7077a2"
                 strokeWidth="4.8"
-                opacity="0.32"
+                opacity="0.28"
             />
 
-            {/* Main continuous metallic ring */}
             <circle
                 cx="50"
                 cy="50"
                 r="46"
                 fill="none"
                 stroke={`url(#${ringGradientId})`}
-                strokeWidth="3.5"
+                strokeWidth="3.4"
             />
 
-            {/* Fine inner highlight */}
             <circle
                 cx="50"
                 cy="50"
-                r="43.8"
+                r="43.9"
                 fill="none"
-                stroke="#f3f4ff"
+                stroke="#f5f6ff"
                 strokeWidth="0.65"
-                opacity="0.42"
+                opacity="0.38"
             />
 
             {/* =========================================================
-                UPPER-LEFT MOON EMBLEM
+                NORTH-WEST CELESTIAL CLUSTER
 
-                The emblem follows the circular border instead of
-                floating separately from it.
-               ========================================================= */}
+                Deliberately kept OUTSIDE the avatar boundary.
+            ========================================================= */}
 
             <g filter={`url(#${glowId})`}>
-                {/* Small metallic mounting arc behind emblem */}
-                <path
-                    d="M17.2 31.8C19.8 22.2 27.0 15.0 36.2 11.9"
-                    fill="none"
-                    stroke="#dfe2ff"
-                    strokeWidth="2.1"
-                    strokeLinecap="round"
-                    opacity="0.75"
-                />
 
-                {/* -----------------------------------------------------
-                    CRESCENT
-
-                    Positioned directly over the upper-left section
-                    of the circular frame.
-                   ----------------------------------------------------- */}
-
+                {/* Crescent */}
                 <path
                     d="
-                        M31.8 14.9
-                        C25.1 16.2 20.0 21.9 19.8 28.9
-                        C19.5 36.8 25.4 43.2 33.0 43.8
-                        C38.0 44.2 42.6 41.9 45.4 38.0
-                        C42.6 39.8 39.3 40.4 36.2 39.2
-                        C30.4 37.1 27.1 31.1 28.6 25.1
-                        C29.5 21.0 32.1 17.7 35.6 15.5
-                        C34.3 15.0 33.1 14.8 31.8 14.9
+                        M24.5 4.8
+                        C16.8 5.6 11.2 11.0 10.9 17.8
+                        C10.6 24.8 16.0 30.2 22.7 30.0
+                        C26.0 29.9 29.0 28.4 31.1 25.8
+                        C26.4 26.5 22.2 24.1 20.3 20.3
+                        C17.2 14.2 19.0 8.3 24.5 4.8
                         Z
                     "
                     fill={`url(#${moonGradientId})`}
@@ -282,84 +257,65 @@ const Moonlit = () => {
                     opacity="0.98"
                 />
 
-                {/* -----------------------------------------------------
-                    CENTRAL ORB
-
-                    Smaller than before. It sits INSIDE the crescent
-                    rather than becoming the whole decoration.
-                   ----------------------------------------------------- */}
-
+                {/* Tiny lunar highlight */}
                 <circle
-                    cx="32.8"
-                    cy="28.9"
-                    r="5.9"
+                    cx="17.2"
+                    cy="14.5"
+                    r="2.35"
                     fill={`url(#${moonGradientId})`}
                 />
 
-                {/* Orb highlight */}
                 <circle
-                    cx="31.0"
-                    cy="27.0"
-                    r="1.65"
+                    cx="16.5"
+                    cy="13.8"
+                    r="0.65"
                     fill="#ffffff"
                     opacity="0.9"
                 />
 
-                {/* Tiny lower orb reflection */}
                 <ellipse
-                    cx="34.2"
-                    cy="31.1"
-                    rx="1.8"
-                    ry="1.1"
+                    cx="17.8"
+                    cy="15.7"
+                    rx="0.8"
+                    ry="0.48"
                     fill="#d9dcf5"
                     opacity="0.55"
                 />
             </g>
 
             {/* =========================================================
-                FOUR FOUR-POINTED STARS
+                CELESTIAL SPARKLES
+            ========================================================= */}
 
-                1 + 2 = larger stars immediately around emblem
-                3 + 4 = smaller trailing stars along the ring
-               ========================================================= */}
-
-            {/* ---------------------------------------------------------
-                LARGE STAR #1
-                Above-left of moon
-               --------------------------------------------------------- */}
-
+            {/* Main northwest sparkle */}
             <path
                 d="
-                    M24.4 8.0
-                    L25.9 12.6
-                    L30.5 14.1
-                    L25.9 15.6
-                    L24.4 20.2
-                    L22.9 15.6
-                    L18.3 14.1
-                    L22.9 12.6
+                    M30.8 1.8
+                    L32.2 5.4
+                    L35.8 6.8
+                    L32.2 8.2
+                    L30.8 11.8
+                    L29.4 8.2
+                    L25.8 6.8
+                    L29.4 5.4
                     Z
                 "
                 fill="#ffffff"
-                opacity="0.96"
+                opacity="0.98"
                 filter={`url(#${glowId})`}
             />
 
-            {/* ---------------------------------------------------------
-                LARGE STAR #2
-                Immediately to the right / upper-right of moon
-               --------------------------------------------------------- */}
-
+            {/* Far-left sparkle */}
             <path
                 d="
-                    M42.0 11.0
-                    L43.3 15.1
-                    L47.4 16.4
-                    L43.3 17.7
-                    L42.0 21.8
-                    L40.7 17.7
-                    L36.6 16.4
-                    L40.7 15.1
+                    M6.8 17.2
+                    L7.9 20.2
+                    L10.9 21.3
+                    L7.9 22.4
+                    L6.8 25.4
+                    L5.7 22.4
+                    L2.7 21.3
+                    L5.7 20.2
                     Z
                 "
                 fill="#f9faff"
@@ -367,21 +323,17 @@ const Moonlit = () => {
                 filter={`url(#${glowId})`}
             />
 
-            {/* ---------------------------------------------------------
-                SMALL TRAILING STAR #1
-                Follows the upper ring
-               --------------------------------------------------------- */}
-
+            {/* Small upper sparkle */}
             <path
                 d="
-                    M51.0 12.6
-                    L51.8 15.3
-                    L54.5 16.1
-                    L51.8 16.9
-                    L51.0 19.6
-                    L50.2 16.9
-                    L47.5 16.1
-                    L50.2 15.3
+                    M45.0 1.8
+                    L45.7 4.1
+                    L48.0 4.8
+                    L45.7 5.5
+                    L45.0 7.8
+                    L44.3 5.5
+                    L42.0 4.8
+                    L44.3 4.1
                     Z
                 "
                 fill="#e9ecff"
@@ -389,21 +341,17 @@ const Moonlit = () => {
                 filter={`url(#${glowId})`}
             />
 
-            {/* ---------------------------------------------------------
-                SMALL TRAILING STAR #2
-                Further along the blue ring
-               --------------------------------------------------------- */}
-
+            {/* Tiny secondary sparkle */}
             <path
                 d="
-                    M58.7 17.8
-                    L59.4 20.2
-                    L61.8 20.9
-                    L59.4 21.6
-                    L58.7 24.0
-                    L58.0 21.6
-                    L55.6 20.9
-                    L58.0 20.2
+                    M56.8 7.0
+                    L57.4 9.0
+                    L59.4 9.6
+                    L57.4 10.2
+                    L56.8 12.2
+                    L56.2 10.2
+                    L54.2 9.6
+                    L56.2 9.0
                     Z
                 "
                 fill="#e3e7ff"
@@ -412,28 +360,31 @@ const Moonlit = () => {
             />
 
             {/* =========================================================
-                SUBTLE LIGHT CATCHES ON RING
-
-                These keep the frame metallic without turning it into
-                a neon/glowing circle.
-               ========================================================= */}
+                SUBTLE LUNAR ACCENTS
+            ========================================================= */}
 
             <path
-                d="M19.4 37.2C22.0 48.2 28.5 57.0 37.6 62.3"
+                d="
+                    M15.0 36.0
+                    C18.4 47.5 25.7 56.5 36.2 62.0
+                "
                 fill="none"
                 stroke="#f4f5ff"
                 strokeWidth="0.7"
                 strokeLinecap="round"
-                opacity="0.24"
+                opacity="0.22"
             />
 
             <path
-                d="M62.5 89.0C73.7 84.4 82.4 75.4 86.7 64.2"
+                d="
+                    M63.0 89.5
+                    C74.0 84.8 82.8 75.5 87.0 64.0
+                "
                 fill="none"
                 stroke="#858bb5"
                 strokeWidth="0.75"
                 strokeLinecap="round"
-                opacity="0.24"
+                opacity="0.22"
             />
         </svg>
     );
@@ -451,10 +402,10 @@ const AvatarDecoration = ({ decoration = "none" }) => {
             return <AetherOrbit />;
 
         case "initial":
-            return <Initial />
+            return <Initial />;
 
         case "moonlit":
-            return <Moonlit />
+            return <Moonlit />;
 
         default:
             return null;
