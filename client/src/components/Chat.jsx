@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FiArrowLeft, FiSmile } from "react-icons/fi";
 import { MdKeyboard } from "react-icons/md";
@@ -27,6 +28,7 @@ import {
 import MessageBubble from "./MessageBubble.jsx";
 import DateSeparator from "./DateSeparator.jsx";
 import ReplyPreview from "./ReplyPreview.jsx";
+import Avatar from "./Avatar.jsx";
 import MessageMediaPicker from "./MessageMediaPicker.jsx";
 import MessageComposer from "./MessageComposer/MessageComposer.jsx";
 import CameraModal from "./Camera/CameraModal.jsx";
@@ -55,6 +57,7 @@ import registerSocketListeners from "../sockets/socketListeners.js";
 
 const Chat = ({ socket }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { selectedChat, user, allUsers, allChats, typingChats, presence } = useSelector(
     (state) => state.userReducer,
@@ -1865,6 +1868,15 @@ const Chat = ({ socket }) => {
     }
   };
 
+  // open contactPage for users
+  const openSelectedUserProfile = () => {
+    if (!selectedUser?._id) {
+      return;
+    }
+
+    navigate(`/contact-profile/${selectedUser._id}`);
+  };
+
   // TYPING
   const handleMessageChange = (event) => {
     const value = event.target.value;
@@ -2279,25 +2291,41 @@ const Chat = ({ socket }) => {
     <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
       {/* CHAT HEADER */}
       <div className="mb-4 flex shrink-0 items-center border-b border-[#d8f45a]/15 px-2 py-3 sm:mb-5 sm:px-4">
+        {/* BACK */}
         <button
           type="button"
           onClick={leaveChat}
-          className="aetherion-button mr-3 h-9 w-9 text-base md:hidden" aria-label="Back to chats">
+          className="aetherion-button mr-3 h-9 w-9 shrink-0 text-base md:hidden"
+          aria-label="Back to chats"
+        >
           <span>
             <FiArrowLeft />
           </span>
         </button>
 
-        <div className="min-w-0 flex-1">
-          <div className="text-right">
-            <p className="truncate font-bold text-[#edefe5]">
+        {/* CONTACT PROFILE */}
+        <button
+          type="button"
+          onClick={openSelectedUserProfile}
+          disabled={!selectedUser?._id}
+          className="group flex min-w-0 flex-1 items-center justify-end gap-3 rounded-xl px-2 py-1.5 text-right transition disabled:cursor-default disabled:hover:bg-transparent"
+          aria-label={
+            selectedUser
+              ? `View ${selectedUser.firstName} ${selectedUser.lastName}'s profile`
+              : "View contact profile"
+          }
+        >
+          {/* NAME + PRESENCE */}
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-bold text-[#edefe5] transition group-hover:text-[#f5f7ef]">
               {selectedUser
                 ? `${selectedUser.firstName} ${selectedUser.lastName}`
                 : "Chat"}
             </p>
 
             {selectedUser &&
-              selectedUser.publicPresenceStatus !== PRESENCE_STATUS.AUTOMATIC ? (
+              selectedUser.publicPresenceStatus !==
+              PRESENCE_STATUS.AUTOMATIC ? (
               <p className="flex items-center justify-end gap-1 text-xs text-[#8a9385]">
                 <PresenceIcon
                   status={effectivePresenceStatus}
@@ -2305,16 +2333,20 @@ const Chat = ({ socket }) => {
                 />
 
                 <span>
-                  {effectivePresenceStatus === PRESENCE_STATUS.ONLINE &&
+                  {effectivePresenceStatus ===
+                    PRESENCE_STATUS.ONLINE &&
                     "Online"}
 
-                  {effectivePresenceStatus === PRESENCE_STATUS.OFF_PLANET &&
+                  {effectivePresenceStatus ===
+                    PRESENCE_STATUS.OFF_PLANET &&
                     "Off Planet"}
 
-                  {effectivePresenceStatus === PRESENCE_STATUS.IDLE &&
+                  {effectivePresenceStatus ===
+                    PRESENCE_STATUS.IDLE &&
                     "Idle"}
 
-                  {effectivePresenceStatus === PRESENCE_STATUS.DND &&
+                  {effectivePresenceStatus ===
+                    PRESENCE_STATUS.DND &&
                     "DND"}
                 </span>
               </p>
@@ -2332,16 +2364,48 @@ const Chat = ({ socket }) => {
                   : formatLastSeen(selectedUserLastSeen)}
               </p>
             )}
+
+            {isTyping && (
+              <p className="text-right text-xs text-[#eaf7b3]">
+                typing...
+              </p>
+            )}
           </div>
 
-          {isTyping && (
-            <p className="text-right text-xs text-[#eaf7b3]">typing...</p>
+          {/* AVATAR */}
+          {selectedUser && (
+            <div className="relative shrink-0">
+              <Avatar
+                profilePic={selectedUser.profilePic}
+                initials={[
+                  (selectedUser.firstName || "")
+                    .trim()
+                    .charAt(0),
+                  (selectedUser.lastName || "")
+                    .trim()
+                    .charAt(0),
+                ]
+                  .filter(Boolean)
+                  .join("")
+                  .toUpperCase()}
+                alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
+                decoration={selectedUser.avatarDecoration}
+                size="sm"
+                avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold transition duration-200 group-hover:scale-[1.04]"
+              />
+
+              <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-4 w-4 items-center justify-center">
+                <PresenceIcon
+                  status={effectivePresenceStatus}
+                  size="small"
+                />
+              </div>
+            </div>
           )}
-        </div>
+        </button>
       </div>
 
       {/* CHAT MESSAGES */}
-
       <div
         ref={messagesContainerRef}
         onScroll={handleMessagesScroll}
@@ -2349,7 +2413,6 @@ const Chat = ({ socket }) => {
       >
         <div className="flex min-h-full min-w-0 flex-col gap-2">
           {/* EMPTY CHAT */}
-
           {allMessages.length === 0 && (
             <div className="flex flex-1 items-center justify-center">
               <p className="text-sm text-[#70786f]">No messages yet.</p>
@@ -2394,7 +2457,6 @@ const Chat = ({ socket }) => {
                 }
               >
                 {/* NEW MESSAGE DIVIDER */}
-
                 {showNewMessagesDivider && (
                   <NewMessageDivider
                     count={newMessageCount}
@@ -2403,7 +2465,6 @@ const Chat = ({ socket }) => {
                 )}
 
                 {/* DATE */}
-
                 {showDate && (
                   <DateSeparator
                     label={formatDateLabel(currentMessage.createdAt)}

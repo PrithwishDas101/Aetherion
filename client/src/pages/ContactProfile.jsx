@@ -9,6 +9,10 @@ import {
     IoPersonRemoveOutline,
     IoPlay,
     IoDocumentTextOutline,
+    IoDownloadOutline,
+    IoImageOutline,
+    IoVideocamOutline,
+    IoGridOutline,
 } from "react-icons/io5";
 
 import Avatar from "../components/Avatar.jsx";
