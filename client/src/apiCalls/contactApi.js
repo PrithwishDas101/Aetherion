@@ -66,3 +66,28 @@ export const removeContact = async (contactId) => {
     );
   }
 };
+
+// ADD CONTACT
+export const addContact = async (contactId) => {
+  try {
+    if (!contactId) {
+      return {
+        success: false,
+        message: "Contact ID is required.",
+      };
+    }
+
+    const response = await axiosInstance.post(
+      `/api/v1/contact/${contactId}`,
+    );
+
+    return response.data;
+  } catch (error) {
+    return (
+      error.response?.data || {
+        success: false,
+        message: "Unable to add contact.",
+      }
+    );
+  }
+};

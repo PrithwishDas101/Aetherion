@@ -333,3 +333,52 @@ export const removeContact = async (req, res) => {
     });
   }
 };
+
+
+// ADD CONTACT
+export const addContact = async (req, res) => {
+  try {
+    const ownerId = String(req.user.userId);
+    const { contactId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(contactId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid contact.",
+      });
+    }
+
+    if (ownerId === String(contactId)) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot add yourself.",
+      });
+    }
+
+    const existingContact = await Contact.exists({
+      owner: ownerId,
+      contact: contactId,
+    });
+
+    if (existingContact) {
+      return res.status(200).json({
+        success: true,
+        message: "User is already a contact.",
+      });
+    }
+
+    await ensureContacts([ownerId, contactId]);
+
+    return res.status(201).json({
+      success: true,
+      message: "Contact added successfully.",
+    });
+  } catch (error) {
+    console.error("Add contact error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to add contact.",
+    });
+  }
+};

@@ -4,6 +4,7 @@ import {
   getRecentContacts,
   getContacts,
   removeContact,
+  addContact,
 } from "../controllers/contactController.js";
 
 import { protectRoute } from "../middleware/authMiddleware.js";
@@ -14,7 +15,9 @@ const router = express.Router();
 router.get("/recent", protectRoute, getRecentContacts);
 // Contacts page: Supports: ?search=user ?page=1 ?limit=50
 router.get("/", protectRoute, getContacts);
-// Remove a contact relationship. This removes the relationship from BOTH users. It does NOT delete the chat.
+// Add a contact relationship from both sides.
+router.post("/:contactId", protectRoute, addContact);
+// Remove a contact relationship from both sides.
 router.delete("/:contactId", protectRoute, removeContact);
 
 export default router;
