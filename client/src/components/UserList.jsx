@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
@@ -39,6 +40,7 @@ function UserList({ searchKey, socket }) {
   } = useSelector((state) => state.userReducer);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleReceiveMessage = (data) => {
@@ -225,31 +227,47 @@ function UserList({ searchKey, socket }) {
               <div className="flex items-center gap-3">
                 {/* PROFILE PICTURE */}
 
-                <Avatar
-                  profilePic={user.profilePic}
-                  initials={[
-                    (user.firstName || "").trim().charAt(0),
-                    ...(user.lastName || "")
-                      .trim()
-                      .split(/\s+/)
-                      .map((name) => name.charAt(0)),
-                  ]
-                    .filter(Boolean)
-                    .slice(0, 3)
-                    .join("")
-                    .toUpperCase()}
-                  alt={`${user.firstName} ${user.lastName}`}
-                  decoration={user.avatarDecoration}
-                  size="md"
-                  avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold"
+                <button
+                  type="button"
+                  onMouseDown={(event) => {
+                    event.stopPropagation();
+                  }}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    navigate(`/contact-profile/${user._id}`);
+                  }}
+                  className="group/avatar relative z-30 shrink-0 rounded-full"
+                  aria-label={`View ${user.firstName} ${user.lastName}'s profile`}
+                  title={`View ${user.firstName} ${user.lastName}'s profile`}
                 >
-                  <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center">
-                    <PresenceIcon
-                      status={effectivePresenceStatus}
-                      size="small"
-                    />
-                  </div>
-                </Avatar>
+                  <Avatar
+                    profilePic={user.profilePic}
+                    initials={[
+                      (user.firstName || "").trim().charAt(0),
+                      ...(user.lastName || "")
+                        .trim()
+                        .split(/\s+/)
+                        .map((name) => name.charAt(0)),
+                    ]
+                      .filter(Boolean)
+                      .slice(0, 3)
+                      .join("")
+                      .toUpperCase()}
+                    alt={`${user.firstName} ${user.lastName}`}
+                    decoration={user.avatarDecoration}
+                    size="md"
+                    avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold transition duration-200 group-hover/avatar:scale-[1.04]"
+                  >
+                    <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center">
+                      <PresenceIcon
+                        status={effectivePresenceStatus}
+                        size="small"
+                      />
+                    </div>
+                  </Avatar>
+                </button>
 
                 <div className="min-w-0 flex-1">
                   {/* NAME + TIME */}

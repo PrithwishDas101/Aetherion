@@ -236,6 +236,14 @@ function Contacts() {
         navigate("/");
     };
 
+    const handleOpenProfile = (contactId) => {
+    if (!contactId) {
+        return;
+    }
+
+    navigate(`/contact-profile/${contactId}`);
+};
+
     const handleBack = () => {
         navigate(-1);
     };
@@ -376,6 +384,7 @@ function Contacts() {
                                         key={contact._id}
                                         contact={contact}
                                         onChat={handleStartChat}
+                                        onProfile={handleOpenProfile}
                                         isLast={
                                             index ===
                                             filteredContacts.length -
@@ -409,6 +418,7 @@ function Contacts() {
                                                         key={contact._id}
                                                         contact={contact}
                                                         onChat={handleStartChat}
+                                                        onProfile={handleOpenProfile}
                                                         isLast={
                                                             index ===
                                                             groupedContacts[
@@ -471,6 +481,7 @@ function Contacts() {
 function ContactRow({
     contact,
     onChat,
+    onProfile,
     isLast,
 }) {
     const effectivePresenceStatus =
@@ -494,14 +505,22 @@ function ContactRow({
                 }`}
         >
             {/* AVATAR */}
-            <div className="relative shrink-0">
+            <button
+                type="button"
+                onClick={() =>
+                    onProfile(contact._id)
+                }
+                className="group/avatar relative shrink-0 rounded-full"
+                aria-label={`View ${fullName}'s profile`}
+                title={`View ${fullName}'s profile`}
+            >
                 <Avatar
                     profilePic={contact.profilePic}
                     initials={getInitials(contact)}
                     alt={fullName}
                     decoration={contact.avatarDecoration}
                     size="xs"
-                    avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold"
+                    avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold transition duration-200 group-hover/avatar:scale-[1.04]"
                 />
 
                 <div className="absolute -bottom-0.5 -right-0.5">
@@ -512,7 +531,7 @@ function ContactRow({
                         size="small"
                     />
                 </div>
-            </div>
+            </button>
 
             {/* USER INFO */}
             <div className="min-w-0 flex-1">

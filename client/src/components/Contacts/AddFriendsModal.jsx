@@ -226,6 +226,16 @@ function AddFriendsModal({ onClose }) {
         }
     };
 
+    const handleOpenProfile = (userId) => {
+        if (!userId) {
+            return;
+        }
+
+        onClose();
+
+        navigate(`/contact-profile/${userId}`);
+    };
+
     const isSearching = searchInput.trim().length > 0;
 
     return (
@@ -352,19 +362,31 @@ function AddFriendsModal({ onClose }) {
                                                 return (
                                                     <div key={user._id} className={`group flex min-h-[68px] items-center gap-3 bg-[#0d120d] px-4 py-3 transition hover:bg-[#121812] ${index === results.length - 1 ? "" : "border-b border-[#ffffff]/[0.06]"}`}>
                                                         {/* AVATAR */}
-                                                        <Avatar
-                                                            profilePic={user.profilePic}
-                                                            initials={fullName
-                                                                .split(" ")
-                                                                .filter(Boolean)
-                                                                .slice(0, 2)
-                                                                .map((part) => part.charAt(0).toUpperCase())
-                                                                .join("")}
-                                                            alt={fullName}
-                                                            decoration={user.avatarDecoration}
-                                                            size="xs"
-                                                            avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold"
-                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleOpenProfile(user._id)
+                                                            }
+                                                            className="group/avatar relative shrink-0 rounded-full"
+                                                            aria-label={`View ${fullName}'s profile`}
+                                                            title={`View ${fullName}'s profile`}
+                                                        >
+                                                            <Avatar
+                                                                profilePic={user.profilePic}
+                                                                initials={fullName
+                                                                    .split(" ")
+                                                                    .filter(Boolean)
+                                                                    .slice(0, 2)
+                                                                    .map((part) =>
+                                                                        part.charAt(0).toUpperCase(),
+                                                                    )
+                                                                    .join("")}
+                                                                alt={fullName}
+                                                                decoration={user.avatarDecoration}
+                                                                size="xs"
+                                                                avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold transition duration-200 group-hover/avatar:scale-[1.04]"
+                                                            />
+                                                        </button>
                                                         {/* USER INFO */}
                                                         <div className="min-w-0 flex-1">
                                                             <div className="truncate text-sm font-medium text-[#e8e5de]">

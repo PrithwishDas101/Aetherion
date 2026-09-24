@@ -78,6 +78,14 @@ const ContactList = () => {
         navigate("/contacts");
     };
 
+    const openContactProfile = (contactId) => {
+        if (!contactId) {
+            return;
+        }
+
+        navigate(`/contact-profile/${contactId}`);
+    };
+
     const focusHomeSearch = () => {
         navigate("/", {
             state: {
@@ -118,9 +126,10 @@ const ContactList = () => {
                                         <button
                                             key={contact._id}
                                             type="button"
-                                            onClick={openContacts}
+                                            onClick={() => openContactProfile(contact._id)}
                                             className="group relative shrink-0"
-                                            aria-label={getFullName(contact,)}
+                                            aria-label={`View ${getFullName(contact)}'s profile`}
+                                            title={`View ${getFullName(contact)}'s profile`}
                                         >
                                             <Avatar
                                                 profilePic={contact.profilePic}
