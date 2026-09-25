@@ -1073,7 +1073,7 @@ const Connections = ({ connections = [], onSave, }) => {
                         </div>
 
                         {/* BODY */}
-                        <div className="max-h-[60vh] overflow-y-auto px-5 py-5 sm:px-6">
+                        <div className="scrollbar-aetherion max-h-[60vh] overflow-y-auto px-5 py-5 sm:px-6">
                             {hasDuplicateConnections && (
                                 <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/[0.05] px-3.5 py-3">
                                     <p className="text-[11px] font-semibold text-red-400">
@@ -1191,7 +1191,7 @@ const Connections = ({ connections = [], onSave, }) => {
                                                         </div>
 
                                                         {/* PLATFORM LIST */}
-                                                        <div className="max-h-64 overflow-y-auto p-2.5">
+                                                        <div className="scrollbar-aetherion max-h-64 overflow-y-auto p-2.5">
                                                             {filteredPlatformGroups.length ? (
                                                                 <div className="space-y-4">
                                                                     {filteredPlatformGroups.map(

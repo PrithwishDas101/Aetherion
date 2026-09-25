@@ -315,96 +315,97 @@ const ContactProfile = () => {
 
     return (
         <div className="min-h-screen bg-[#0b100c] text-[#f1eee8]">
-            {/* HEADER */}
-
-            <div className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#0b100c]/90 backdrop-blur-xl">
-                <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-6">
-                    <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="flex h-9 w-9 items-center justify-center rounded-full text-[#9aa198] transition hover:bg-white/[0.05] hover:text-[#f1eee8]"
-                        aria-label="Go back"
-                    >
-                        <IoArrowBack className="text-lg" />
-                    </button>
-
-                    <p className="text-sm font-semibold text-[#c5c9c2]">
-                        Profile
-                    </p>
-
-                    {profileData.isContact ? (
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setShowRemoveContactModal(true)
-                            }
-                            className="flex h-9 w-9 items-center justify-center rounded-full text-[#9aa198] transition hover:bg-white/[0.05] hover:text-[#f1eee8]"
-                            aria-label="Remove contact"
-                            title="Remove contact"
-                        >
-                            <IoPersonRemoveOutline className="text-lg" />
-                        </button>
-                    ) : (
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setShowAddContactModal(true)
-                            }
-                            className="flex h-9 w-9 items-center justify-center rounded-full text-[#9aa198] transition hover:bg-white/[0.05] hover:text-[#d8f45a]"
-                            aria-label="Add contact"
-                            title="Add contact"
-                        >
-                            <IoPersonAddOutline className="text-lg" />
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            <main className="mx-auto max-w-4xl pb-12">
+            <main className="w-full pb-12">
                 {/* BANNER */}
-
-                <div className="pointer-events-none">
+                <div className="relative">
                     <ProfileBanner
                         bannerUrl={profile.profileBanner}
                         editMode={false}
+                        showAction={false}
                     />
+
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="absolute left-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.12] bg-black/45 text-white shadow-lg backdrop-blur-md transition hover:bg-black/65 active:scale-95 sm:left-5 sm:top-5"
+                        aria-label="Go back"
+                        title="Go back"
+                    >
+                        <IoArrowBack className="text-lg" />
+                    </button>
                 </div>
 
                 {/* PROFILE IDENTITY */}
 
                 <section className="px-5 sm:px-8">
-                    <div className="relative -mt-10 flex flex-col sm:-mt-12">
-                        <Avatar
-                            profilePic={profile.profilePic}
-                            initials={initials}
-                            alt={fullName}
-                            decoration={profile.avatarDecoration}
-                            size="lg"
-                            avatarClassName="border-4 border-[#0b100c] bg-[#151a16] font-bold text-[#d8f45a]"
-                        >
-                            <div className="absolute bottom-1 right-1 z-20 flex h-7 w-7 items-center justify-center rounded-full border-4 border-[#0b100c] bg-[#0b100c]">
-                                <PresenceIcon
-                                    status={presenceStatus}
-                                    size="small"
-                                />
-                            </div>
-                        </Avatar>
+                    <div className="relative">
 
-                        <div className="mt-4">
-                            <h1 className="text-xl font-bold tracking-tight text-[#f1eee8]">
+                        {/* AVATAR + STATUS */}
+
+                        <div className="relative min-h-[8rem] sm:min-h-[9rem] lg:min-h-[10rem]">
+
+                            {/* AVATAR */}
+
+                            <div className="absolute left-0 top-0 z-10 -translate-y-10 sm:-translate-y-12">
+                                <Avatar
+                                    profilePic={profile.profilePic}
+                                    initials={initials}
+                                    alt={fullName}
+                                    decoration={profile.avatarDecoration}
+                                    size="lg"
+                                    avatarClassName="border-4 border-[#0b100c] bg-[#151a16] font-bold text-[#d8f45a]"
+                                >
+                                    <div className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full border-[2px] border-[#111317] bg-[#131613] shadow-md">
+                                        <PresenceIcon
+                                            status={presenceStatus}
+                                            size="small"
+                                        />
+                                    </div>
+                                </Avatar>
+                            </div>
+
+                            {/* CUSTOM STATUS */}
+
+                            {profile.customStatus?.trim() && (
+                                <div className="absolute left-[7.5rem] top-0 z-20 sm:left-[8.5rem] lg:left-[9.5rem]">
+                                    <div className="flex items-start">
+
+                                        {/* CONNECTOR DOTS */}
+
+                                        <div className="mr-1 mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1a1c1a]" />
+
+                                        <div className="mr-1.5 mt-4 h-3 w-3 shrink-0 rounded-full bg-[#1a1c1a]" />
+
+                                        {/* STATUS BUBBLE */}
+
+                                        <div className="max-w-[calc(100vw-10rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:max-w-[24rem] lg:max-w-[28rem]">
+                                            <span className="block max-h-[3.75rem] overflow-hidden break-words">
+                                                {profile.customStatus}
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* IDENTITY — BELOW AVATAR */}
+                        <div className="-mt-8 max-w-3xl">
+                            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                                 {fullName}
                             </h1>
 
-                            <p className="mt-1 text-sm text-[#70786f]">
+                            <p className="mt-1.5 break-words text-sm text-[#b5b8b3]">
                                 {profile.email}
+                                {profile.pronouns?.trim() && (
+                                    <>
+                                        {" • "}
+                                        {profile.pronouns}
+                                    </>
+                                )}
                             </p>
 
-                            {profile.pronouns && (
-                                <p className="mt-1 text-xs text-[#626960]">
-                                    {profile.pronouns}
-                                </p>
-                            )}
-
+                            {/* PRESENCE */}
                             <div className="mt-3 flex items-center gap-2">
                                 <PresenceIcon
                                     status={presenceStatus}
@@ -422,11 +423,11 @@ const ContactProfile = () => {
                                 </span>
                             </div>
                         </div>
+
                     </div>
                 </section>
 
                 {/* MEDIA */}
-
                 <section className="mt-8 px-5 sm:px-8">
                     <div className="flex items-center justify-between">
                         <div>
@@ -453,64 +454,72 @@ const ContactProfile = () => {
                             </p>
                         </div>
                     ) : (
-                        <div className="mt-3 grid grid-cols-3 gap-1.5 overflow-hidden rounded-2xl border border-white/[0.06] bg-[#101510] sm:grid-cols-4">
-                            {media.map((item) => {
-                                const visual = isVisualMedia(item);
+                        <div className="mt-3 overflow-hidden rounded-2xl border border-white/[0.06] bg-[#101510]">
+                            <div className="scrollbar-aetherion flex gap-2 overflow-x-auto p-2 scrollbar-hide">
+                                {media.map((item, index) => {
+                                    const visual = isVisualMedia(item);
 
-                                return (
-                                    <button
-                                        key={item._id}
-                                        type="button"
-                                        onClick={() =>
-                                            visual &&
-                                            openMediaViewer(item)
-                                        }
-                                        disabled={!visual}
-                                        className={`group relative aspect-square overflow-hidden bg-[#151a16] ${visual
-                                            ? "cursor-pointer"
-                                            : "cursor-default"
-                                            }`}
-                                    >
-                                        {visual && item.mediaUrl ? (
-                                            <>
-                                                <img
-                                                    src={item.mediaUrl}
-                                                    alt="Shared media"
-                                                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                                                />
+                                    const visibilityClass =
+                                        index >= 15
+                                            ? "hidden lg:flex"
+                                            : index >= 10
+                                                ? "hidden sm:flex"
+                                                : "flex";
 
-                                                {item.type === "video" && (
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                                                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
-                                                            <IoPlay className="ml-0.5 text-sm" />
+                                    return (
+                                        <button
+                                            key={item._id}
+                                            type="button"
+                                            onClick={() =>
+                                                visual &&
+                                                openMediaViewer(item)
+                                            }
+                                            disabled={!visual}
+                                            className={`${visibilityClass} group relative aspect-square shrink-0 basis-[22%] overflow-hidden rounded-xl bg-[#151a16] sm:basis-[18%] lg:basis-[14%] ${visual
+                                                    ? "cursor-pointer"
+                                                    : "cursor-default"
+                                                }`}
+                                        >
+                                            {visual && item.mediaUrl ? (
+                                                <>
+                                                    <img
+                                                        src={item.mediaUrl}
+                                                        alt="Shared media"
+                                                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                                    />
+
+                                                    {item.type === "video" && (
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                                                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm sm:h-9 sm:w-9">
+                                                                <IoPlay className="ml-0.5 text-sm" />
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {item.type === "gif" && (
+                                                        <span className="absolute bottom-1.5 left-1.5 rounded-md bg-black/65 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                                                            GIF
                                                         </span>
-                                                    </div>
-                                                )}
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-2">
+                                                    <IoDocumentTextOutline className="text-xl text-[#777f76] sm:text-2xl" />
 
-                                                {item.type === "gif" && (
-                                                    <span className="absolute bottom-2 left-2 rounded-md bg-black/65 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-                                                        GIF
-                                                    </span>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-3">
-                                                <IoDocumentTextOutline className="text-2xl text-[#777f76]" />
-
-                                                <p className="line-clamp-2 text-center text-[10px] font-medium text-[#858d84]">
-                                                    {getDocumentName(item)}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                                                    <p className="line-clamp-2 text-center text-[9px] font-medium leading-4 text-[#858d84] sm:text-[10px]">
+                                                        {getDocumentName(item)}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div >
                     )}
                 </section>
 
                 {/* BIO */}
-
                 {profile.bio && (
                     <section className="mt-8 px-5 sm:px-8">
                         <h2 className="text-sm font-semibold text-[#f1eee8]">
@@ -600,7 +609,7 @@ const ContactProfile = () => {
                                 </button>
                             </div>
 
-                            <div className="mt-4 flex gap-4 overflow-x-auto pb-2">
+                            <div className="scrollbar-aetherion mt-4 flex gap-4 overflow-x-auto pb-2">
                                 {profileData.contacts.map(
                                     (contact) => {
                                         const contactName =
@@ -616,7 +625,7 @@ const ContactProfile = () => {
                                                 type="button"
                                                 onClick={() =>
                                                     navigate(
-                                                        `/contact-profile/${contact._id}`,
+                                                        `/ contact - profile / ${contact._id} `,
                                                     )
                                                 }
                                                 className="group flex w-16 shrink-0 flex-col items-center gap-2"

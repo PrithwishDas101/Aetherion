@@ -12,7 +12,12 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const clamp = (value, min, max) =>
     Math.min(Math.max(value, min), max);
 
-const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
+const ProfileBanner = ({
+    bannerUrl,
+    onBannerChange,
+    editMode = false,
+    showAction = true,
+}) => {
     const fileInputRef = useRef(null);
     const cropAreaRef = useRef(null);
     const imageRef = useRef(null);
@@ -483,28 +488,39 @@ const ProfileBanner = ({ bannerUrl, onBannerChange, editMode = false }) => {
                     </>
                 )}
 
-                {/* CHANGE BUTTON */}
-                {editMode ? (
-                    <button
-                        type="button"
-                        onClick={openFilePicker}
-                        disabled={saving}
-                        className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:bg-black/80 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-                        aria-label="Change banner"
-                        title="Change banner"
-                    >
-                        <Pencil className="h-4 w-4 text-white" strokeWidth={3.5} />
-                    </button>
-                ) : (
-                    <button
-                        type="button"
-                        onClick={openFilePicker}
-                        disabled={saving}
-                        className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-black/45 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-black/65 disabled:cursor-not-allowed disabled:opacity-50 sm:right-4 sm:top-4 sm:w-auto sm:gap-2 sm:px-3"
-                    >
-                        <ImagePlus className="h-4 w-4" />
-                        <span className="hidden sm:inline">{bannerUrl ? "Change banner" : "Add banner"}</span>
-                    </button>
+                {/* BANNER ACTION */}
+
+                {showAction && (
+                    editMode ? (
+                        <button
+                            type="button"
+                            onClick={openFilePicker}
+                            disabled={saving}
+                            className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:scale-105 hover:bg-black/80 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                            aria-label="Change banner"
+                            title="Change banner"
+                        >
+                            <Pencil
+                                className="h-4 w-4 text-white"
+                                strokeWidth={3.5}
+                            />
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={openFilePicker}
+                            disabled={saving}
+                            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-black/45 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-black/65 disabled:cursor-not-allowed disabled:opacity-50 sm:right-4 sm:top-4 sm:w-auto sm:gap-2 sm:px-3"
+                            aria-label={bannerUrl ? "Change banner" : "Add banner"}
+                            title={bannerUrl ? "Change banner" : "Add banner"}
+                        >
+                            <ImagePlus className="h-4 w-4" />
+
+                            <span className="hidden sm:inline">
+                                {bannerUrl ? "Change banner" : "Add banner"}
+                            </span>
+                        </button>
+                    )
                 )}
 
                 <input

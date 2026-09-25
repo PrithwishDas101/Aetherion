@@ -12,8 +12,7 @@ const AvatarDecorationPicker = ({
     onApply,
     saving = false,
 }) => {
-    const [selectedDecoration, setSelectedDecoration] =
-        useState(currentDecoration);
+    const [selectedDecoration, setSelectedDecoration] =        useState(currentDecoration);
 
     useEffect(() => {
         if (isOpen) {
@@ -51,10 +50,7 @@ const AvatarDecorationPicker = ({
                 className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101510] shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
                 onMouseDown={(event) => event.stopPropagation()}
             >
-                {/* ========================================================
-                    HEADER
-                ======================================================== */}
-
+                {/* HEADER */}
                 <div className="flex shrink-0 items-center justify-between border-b border-white/[0.06] px-5 py-4 sm:px-6">
                     <h2 className="text-base font-semibold tracking-tight text-[#f1eee8] sm:text-lg">
                         Change Avatar Decoration
@@ -71,10 +67,7 @@ const AvatarDecorationPicker = ({
                     </button>
                 </div>
 
-                {/* ========================================================
-                    AVATAR PREVIEW
-                ======================================================== */}
-
+                {/* AVATAR PREVIEW */}
                 <div className="flex shrink-0 items-center justify-center px-5 pb-6 pt-7 sm:pb-7 sm:pt-8">
                     <Avatar
                         profilePic={profilePic}
@@ -86,27 +79,8 @@ const AvatarDecorationPicker = ({
                     />
                 </div>
 
-                {/* ========================================================
-                    DECORATION GRID
-
-                    4 columns on desktop
-                    3 columns on mobile/tablet
-
-                    The grid itself scrolls so we can add unlimited
-                    decorations without making the modal enormous.
-                ======================================================== */}
-
-                <div
-                    className="
-                        aetherion-scrollbar
-                        min-h-0
-                        flex-1
-                        overflow-y-auto
-                        px-4
-                        pb-5
-                        sm:px-6
-                    "
-                >
+                {/* DECORATION GRID */}
+                <div className="aetherion-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-5 sm:px-6">
                     <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 sm:gap-3">
                         {decorations.map((decoration) => {
                             const isSelected =

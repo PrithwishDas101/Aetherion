@@ -18,6 +18,7 @@ const PUBLIC_PROFILE_PROJECTION = [
   "profileBanner",
   "avatarDecoration",
   "publicPresenceStatus",
+  "customStatus",
   "lastSeen",
   "connections",
   "createdAt",
@@ -141,7 +142,7 @@ export const getContactProfile = async (req, res) => {
       .select("_id")
       .lean();
 
-    // LATEST 10 MEDIA / DOCUMENT MESSAGES
+    // LATEST 20 MEDIA / DOCUMENT MESSAGES
     let media = [];
 
     if (chat?._id) {
@@ -155,7 +156,7 @@ export const getContactProfile = async (req, res) => {
         .sort({
           createdAt: -1,
         })
-        .limit(10)
+        .limit(20)
         .lean();
     }
 

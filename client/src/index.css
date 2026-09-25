@@ -27,7 +27,6 @@ body {
 }
 
 /* AETHERION SCROLLBAR */
-
 .scrollbar-aetherion::-webkit-scrollbar {
   width: 8px;
 }
@@ -50,7 +49,7 @@ body {
 
 .scrollbar-aetherion {
   scrollbar-width: thin;
-  scrollbar-color: #9ea5af transparent;
+  scrollbar-color: #708bb2 transparent;
 }
 
 @keyframes typingDot {
@@ -84,7 +83,6 @@ body {
 }
 
 /* AETHERION MEDIA PICKER SCROLLBAR */
-
 .scrollbar-media-picker::-webkit-scrollbar {
   width: 2px;
 }

@@ -253,7 +253,7 @@ function AddFriendsModal({ onClose }) {
                 </header>
 
                 {/* CONTENT */}
-                <main className="flex-1 overflow-y-auto px-5 py-8 sm:px-8 lg:px-12">
+                <main className="scrollbar-aetherion flex-1 overflow-y-auto px-5 py-8 sm:px-8 lg:px-12">
                     <div className="mx-auto w-full max-w-2xl">
                         {/* SEARCH */}
                         <div className="flex h-12 items-center gap-3 rounded-xl border border-[#ffffff]/[0.08] bg-[#0d120d] px-4 transition focus-within:border-[#d8f45a]/35">
