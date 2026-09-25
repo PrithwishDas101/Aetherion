@@ -17,17 +17,16 @@ import PresenceIcon from "../components/PresenceIcon.jsx";
 import ProfileBanner from "../components/ProfileBanner.jsx";
 import Connections from "../components/Connections.jsx";
 import MediaViewer from "../components/Camera/MediaViewer.jsx";
+import ContactList from "../components/ContactList.jsx";
 
 import {
     getContactProfile,
     getContactProfileMedia,
 } from "../apiCalls/contactProfileApi.js";
-import {
-    removeContact,
-    addContact,
-} from "../apiCalls/contactApi.js";
+import AetherionDayBadge from "../components/AetherionDayBadge.jsx";
+import { removeContact, addContact, } from "../apiCalls/contactApi.js";
 import { getEffectivePresenceStatus } from "../utils/presenceStatus.js";
-import { getAetherionDays } from "../utils/aetherionDays.js";
+import { getAetherionDays, getAetherionDayMilestone, } from "../utils/aetherionDays.js";
 
 const getFullName = (user) => {
     return (
@@ -226,6 +225,11 @@ const ContactProfile = () => {
     const aetherionDays = useMemo(
         () => getAetherionDays(profile?.createdAt),
         [profile?.createdAt],
+    );
+
+    const aetherionMilestone = useMemo(
+        () => getAetherionDayMilestone(aetherionDays),
+        [aetherionDays],
     );
 
     const media = Array.isArray(profileData?.media)
@@ -480,80 +484,79 @@ const ContactProfile = () => {
 
     return (
         <div className="min-h-screen bg-[#0b100c] text-[#f1eee8]">
-            <main className="w-full pb-12">
-                {/* BANNER */}
-                <div className="relative">
-                    <ProfileBanner
-                        bannerUrl={profile.profileBanner}
-                        editMode={false}
-                        showAction={false}
-                    />
+            <main className="w-full px-4 py-7 sm:px-7 sm:py-10 lg:px-10">
+                <div className="w-full">
 
-                    <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="absolute left-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full text-white shadow-lg transition active:scale-95 sm:left-5 sm:top-5"
-                        aria-label="Go back"
-                        title="Go back"
-                    >
-                        <IoArrowBack className="text-lg" />
-                    </button>
-                </div>
-
-                {/* PROFILE IDENTITY */}
-                <section className="px-5 sm:px-8">
+                    {/* BANNER */}
                     <div className="relative">
-                        <div className="relative min-h-[8rem] sm:min-h-[9rem] lg:min-h-[10rem]">
-                            {/* AVATAR */}
-                            <div className="absolute left-0 top-0 z-10 -translate-y-10 sm:-translate-y-12">
+                        <ProfileBanner
+                            bannerUrl={profile.profileBanner}
+                            editMode={false}
+                            showAction={false}
+                        />
+
+                        <button
+                            type="button"
+                            onClick={() => navigate(-1)}
+                            className="absolute left-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full text-white shadow-lg transition active:scale-95 sm:left-5 sm:top-5"
+                            aria-label="Go back"
+                            title="Go back"
+                        >
+                            <IoArrowBack className="text-lg" />
+                        </button>
+                    </div>
+
+                    {/* PROFILE CONTENT */}
+
+                    <div className="relative px-5 pb-10 sm:px-8 sm:pb-12 lg:px-10 lg:pb-14">
+
+                        {/* AVATAR */}
+                        <div className="relative min-h-[6rem] sm:min-h-[6.5rem] lg:min-h-[7rem]">
+                            <div className="absolute left-0 top-0 z-10 -translate-y-16 sm:-translate-y-20">
                                 <Avatar
-                                    profilePic={
-                                        profile.profilePic
-                                    }
+                                    profilePic={profile.profilePic}
                                     initials={initials}
                                     alt={fullName}
-                                    decoration={
-                                        profile.avatarDecoration
-                                    }
+                                    decoration={profile.avatarDecoration}
                                     size="lg"
                                     avatarClassName="border-4 border-[#0b100c] bg-[#151a16] font-bold text-[#d8f45a]"
                                 >
                                     <div className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full border-[2px] border-[#111317] bg-[#131613] shadow-md">
                                         <PresenceIcon
-                                            status={
-                                                presenceStatus
-                                            }
+                                            status={presenceStatus}
                                             size="small"
                                         />
                                     </div>
                                 </Avatar>
                             </div>
 
-                            {/* CUSTOM STATUS */}
+                            {/* STATUS */}
                             {profile.customStatus?.trim() && (
-                                <div className="absolute left-[7.5rem] top-0 z-20 sm:left-[8.5rem] lg:left-[9.5rem]">
-                                    <div className="flex items-start">
-                                        <div className="mr-1 mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1a1c1a]" />
+                                <div className="absolute left-[7.5rem] right-0 -top-[8px] z-20 sm:left-[8.5rem] lg:left-[9.5rem]">
+                                    <div className="flex min-w-0 items-start">
 
+                                        {/* CONNECTOR DOTS */}
+                                        <div className="mr-1 mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1a1c1a]" />
                                         <div className="mr-1.5 mt-4 h-3 w-3 shrink-0 rounded-full bg-[#1a1c1a]" />
 
-                                        <div className="max-w-[calc(100vw-10rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:max-w-[24rem] lg:max-w-[28rem]">
-                                            <span className="block max-h-[3.75rem] overflow-hidden break-words">
-                                                {
-                                                    profile.customStatus
-                                                }
+                                        {/* READ-ONLY STATUS BUBBLE */}
+                                        <div className="min-w-0 max-w-[calc(100vw-9rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:max-w-[calc(100vw-10rem)] lg:max-w-[28rem]">
+                                            <span className="block max-h-[3.75rem] overflow-hidden break-all">
+                                                {profile.customStatus}
                                             </span>
                                         </div>
+
                                     </div>
                                 </div>
                             )}
+
                         </div>
 
                         {/* IDENTITY */}
-                        <div className="-mt-8 max-w-3xl">
-                            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                        <div className="-mt-4 max-w-3xl">
+                            <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                                 {fullName}
-                            </h1>
+                            </h2>
 
                             <p className="mt-1.5 break-words text-sm text-[#b5b8b3]">
                                 {profile.email}
@@ -566,254 +569,292 @@ const ContactProfile = () => {
                                 )}
                             </p>
                         </div>
-                    </div>
-                </section>
 
-                {/* MEDIA */}
-                <section className="mt-8 px-5 sm:px-8">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-sm font-semibold text-[#f1eee8]">
-                            Media and docs
-                        </h2>
+                        {/* MEDIA */}
+                        <section className="mt-8">
 
-                        <div className="flex items-center gap-1 text-xs font-medium text-[#858d84]">
-                            <span>{mediaTotal}</span>
-                            <IoChevronForward className="text-sm" />
-                        </div>
-                    </div>
-
-                    {mediaTotal > 0 && (
-                        <div
-                            role="button"
-                            tabIndex={0}
-                            onClick={openAllMedia}
-                            onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === " ") {
-                                    event.preventDefault();
-                                    openAllMedia();
-                                }
-                            }}
-                            className="mt-3 cursor-pointer overflow-hidden rounded-2xl border border-white/[0.06] bg-[#101510] transition"
-                        >
-                            <div className="scrollbar-aetherion flex gap-2 overflow-x-auto p-2">
-                                {media.map((item, index) => {
-                                    const visual = isVisualMedia(item);
-
-                                    const visibilityClass =
-                                        index >= 15
-                                            ? "hidden lg:flex"
-                                            : index >= 10
-                                                ? "hidden sm:flex"
-                                                : "flex";
-
-                                    return (
-                                        <div
-                                            key={item._id}
-                                            role={visual ? "button" : undefined}
-                                            tabIndex={visual ? 0 : undefined}
-                                            onClick={(event) => {
-                                                if (visual) {
-                                                    event.stopPropagation();
-                                                    openMediaViewer(item);
-                                                } else {
-                                                    openAllMedia();
-                                                }
-                                            }}
-                                            onKeyDown={(event) => {
-                                                if (
-                                                    visual &&
-                                                    (event.key === "Enter" ||
-                                                        event.key === " ")
-                                                ) {
-                                                    event.preventDefault();
-                                                    event.stopPropagation();
-                                                    openMediaViewer(item);
-                                                }
-                                            }}
-                                            className={`${visibilityClass} group relative aspect-square shrink-0 basis-[22%] overflow-hidden rounded-xl bg-[#151a16] sm:basis-[18%] lg:basis-[14%]} ${visual
-                                                ? "cursor-pointer"
-                                                : "cursor-pointer"
-                                                }`}
-                                        >
-                                            {item.type === "image" ||
-                                                item.type === "gif" ? (
-                                                <img
-                                                    src={item.mediaUrl}
-                                                    alt=""
-                                                    className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.03]"
-                                                    loading="lazy"
-                                                />
-                                            ) : item.type === "video" ? (
-                                                <>
-                                                    <video
-                                                        src={item.mediaUrl}
-                                                        className="h-full w-full object-cover"
-                                                        muted
-                                                        playsInline
-                                                        preload="metadata"
-                                                    />
-
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/15">
-                                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm">
-                                                            <IoPlay className="text-base" />
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-2 text-center">
-                                                    <IoDocumentTextOutline className="text-xl text-[#858d84]" />
-
-                                                    <span className="line-clamp-2 text-[10px] text-[#aeb5ac]">
-                                                        {getDocumentName(item)}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
-                </section>
-
-                {/* BIO */}
-                {profile.bio && (
-                    <section className="mt-8 px-5 sm:px-8">
-                        <h2 className="text-sm font-semibold text-[#f1eee8]">
-                            About
-                        </h2>
-
-                        <div className="mt-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-4">
-                            <p className="whitespace-pre-wrap text-sm leading-6 text-[#aeb5aa]">
-                                {profile.bio}
-                            </p>
-                        </div>
-                    </section>
-                )}
-
-                {/* CONNECTIONS */}
-                {Array.isArray(profile.connections) &&
-                    profile.connections.length > 0 && (
-                        <section className="mt-8 px-5 sm:px-8">
-                            <h2 className="mb-3 text-sm font-semibold text-[#f1eee8]">
-                                Connections
-                            </h2>
-
-                            <div className="pointer-events-none">
-                                <Connections
-                                    connections={
-                                        profile.connections
+                            <div
+                                role="button"
+                                tabIndex={0}
+                                onClick={openAllMedia}
+                                onKeyDown={(event) => {
+                                    if (
+                                        event.key === "Enter" ||
+                                        event.key === " "
+                                    ) {
+                                        event.preventDefault();
+                                        openAllMedia();
                                     }
-                                />
-                            </div>
-                        </section>
-                    )}
-
-                {/* MEMBER SINCE */}
-                <section className="mt-8 px-5 sm:px-8">
-                    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-4">
-                        <div className="flex items-center justify-between gap-4">
-                            <div>
-                                <p className="text-sm font-semibold text-[#f1eee8]">
-                                    On Aetherion
-                                </p>
-
-                                <p className="mt-1 text-xs text-[#626960]">
-                                    Member since{" "}
-                                    {formatDate(
-                                        profile.createdAt,
-                                    )}
-                                </p>
-                            </div>
-
-                            <div className="text-right">
-                                <p className="text-lg font-bold text-[#d8f45a]">
-                                    {aetherionDays}
-                                </p>
-
-                                <p className="text-[10px] uppercase tracking-wider text-[#626960]">
-                                    days
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* CONTACTS */}
-                {Array.isArray(profileData.contacts) &&
-                    profileData.contacts.length > 0 && (
-                        <section className="mt-8 px-5 sm:px-8">
-                            <div className="flex items-center justify-between">
-                                <div>
+                                }}
+                                className="cursor-pointer"
+                            >
+                                <div className="flex items-center justify-between">
                                     <h2 className="text-sm font-semibold text-[#f1eee8]">
-                                        Contacts
+                                        Media and docs
                                     </h2>
 
-                                    <p className="mt-0.5 text-xs text-[#626960]">
-                                        People in their Aetherion
-                                        contacts
-                                    </p>
+                                    <div className="flex items-center gap-1 text-xs font-medium text-[#858d84]">
+                                        <span>
+                                            {mediaTotal}
+                                        </span>
+
+                                        <IoChevronForward className="text-sm" />
+                                    </div>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    className="flex items-center gap-1 text-xs font-medium text-[#858d84] transition hover:text-[#d8f45a]"
-                                >
-                                    See all
-                                    <IoChevronForward />
-                                </button>
-                            </div>
+                                {mediaTotal > 0 && (
+                                    <div className="mt-3 overflow-hidden rounded-2xl bg-[#0b100c] transition">
+                                        <div className="scrollbar-aetherion flex gap-2 overflow-x-auto p-2">
+                                            {media.map(
+                                                (
+                                                    item,
+                                                    index,
+                                                ) => {
+                                                    const visual =
+                                                        isVisualMedia(
+                                                            item,
+                                                        );
 
-                            <div className="scrollbar-aetherion mt-4 flex gap-4 overflow-x-auto pb-2">
-                                {profileData.contacts.map(
-                                    (contact) => {
-                                        const contactName =
-                                            getFullName(
-                                                contact,
-                                            );
+                                                    const visibilityClass =
+                                                        index >=
+                                                            15
+                                                            ? "hidden lg:flex"
+                                                            : index >=
+                                                                10
+                                                                ? "hidden sm:flex"
+                                                                : "flex";
 
-                                        return (
-                                            <button
-                                                key={
-                                                    contact._id
-                                                }
-                                                type="button"
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/contact-profile/${contact._id}`,
-                                                    )
-                                                }
-                                                className="group flex w-16 shrink-0 flex-col items-center gap-2"
-                                            >
-                                                <Avatar
-                                                    profilePic={
-                                                        contact.profilePic
-                                                    }
-                                                    initials={getInitials(
-                                                        contact,
-                                                    )}
-                                                    alt={
-                                                        contactName
-                                                    }
-                                                    decoration={
-                                                        contact.avatarDecoration
-                                                    }
-                                                    size="sm"
-                                                    avatarClassName="bg-[#151a16] text-xs font-bold text-[#d8f45a]"
-                                                />
+                                                    return (
+                                                        <div
+                                                            key={
+                                                                item._id
+                                                            }
+                                                            role={
+                                                                visual
+                                                                    ? "button"
+                                                                    : undefined
+                                                            }
+                                                            tabIndex={
+                                                                visual
+                                                                    ? 0
+                                                                    : undefined
+                                                            }
+                                                            onClick={(
+                                                                event,
+                                                            ) => {
+                                                                if (
+                                                                    visual
+                                                                ) {
+                                                                    event.stopPropagation();
 
-                                                <span className="w-full truncate text-center text-[10px] font-medium text-[#858d84] transition group-hover:text-[#f1eee8]">
-                                                    {
-                                                        contactName
-                                                    }
-                                                </span>
-                                            </button>
-                                        );
-                                    },
+                                                                    openMediaViewer(
+                                                                        item,
+                                                                    );
+                                                                } else {
+                                                                    openAllMedia();
+                                                                }
+                                                            }}
+                                                            onKeyDown={(
+                                                                event,
+                                                            ) => {
+                                                                if (
+                                                                    visual &&
+                                                                    (
+                                                                        event.key ===
+                                                                        "Enter" ||
+                                                                        event.key ===
+                                                                        " "
+                                                                    )
+                                                                ) {
+                                                                    event.preventDefault();
+                                                                    event.stopPropagation();
+
+                                                                    openMediaViewer(
+                                                                        item,
+                                                                    );
+                                                                }
+                                                            }}
+                                                            className={`${visibilityClass} group relative aspect-square shrink-0 basis-[22%] overflow-hidden rounded-xl bg-[#151a16] sm:basis-[18%] lg:basis-[14%]`}
+                                                        >
+                                                            {item.type ===
+                                                                "image" ||
+                                                                item.type ===
+                                                                "gif" ? (
+                                                                <img
+                                                                    src={
+                                                                        item.mediaUrl
+                                                                    }
+                                                                    alt=""
+                                                                    className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.03]"
+                                                                    loading="lazy"
+                                                                />
+                                                            ) : item.type ===
+                                                                "video" ? (
+                                                                <>
+                                                                    <video
+                                                                        src={
+                                                                            item.mediaUrl
+                                                                        }
+                                                                        className="h-full w-full object-cover"
+                                                                        muted
+                                                                        playsInline
+                                                                        preload="metadata"
+                                                                    />
+
+                                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/15">
+                                                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm">
+                                                                            <IoPlay className="text-base" />
+                                                                        </div>
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-2 text-center">
+                                                                    <IoDocumentTextOutline className="text-xl text-[#858d84]" />
+
+                                                                    <span className="line-clamp-2 text-[10px] text-[#aeb5ac]">
+                                                                        {getDocumentName(
+                                                                            item,
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                },
+                                            )}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </section>
-                    )}
+
+                        {/* PROFILE INFORMATION */}
+
+                        <div className="mt-8 border-t border-white/[0.06] pt-8">
+                            <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
+
+                                {/* LEFT — BIO + MEMBER SINCE + DAYS */}
+                                <div className="min-w-0">
+
+                                    {/* BIO */}
+                                    <div>
+                                        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8d918c]">
+                                            Bio
+                                        </p>
+
+                                        <p className="mt-3 max-w-3xl whitespace-pre-wrap break-words text-sm leading-6 text-[#d0d2ce]">
+                                            {profile.bio?.trim() ? (
+                                                profile.bio
+                                            ) : (
+                                                <span className="text-[#777b76]">
+                                                    No bio yet.
+                                                </span>
+                                            )}
+                                        </p>
+                                    </div>
+
+                                    {/* MEMBER SINCE + DAYS */}
+                                    <div className="space-y-5 pt-4">
+
+                                        {/* MEMBER SINCE */}
+                                        <div>
+                                            <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/35">
+                                                Member Since
+                                            </p>
+
+                                            <div className="mt-2 flex items-center gap-2.5 text-sm text-white/65">
+                                                <div className="flex h-7 w-7 items-center justify-center rounded-full">
+                                                    <img
+                                                        src="/favicon.png"
+                                                        alt="Aetherion"
+                                                        className="h-15 w-15 object-contain"
+                                                    />
+                                                </div>
+
+                                                <span>
+                                                    {profile.createdAt
+                                                        ? new Date(
+                                                            profile.createdAt,
+                                                        ).toLocaleDateString(
+                                                            undefined,
+                                                            {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                                year: "numeric",
+                                                            },
+                                                        )
+                                                        : "—"}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* DAYS ON AETHERION */}
+                                        <div>
+                                            <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/35">
+                                                Days on Aetherion
+                                            </p>
+
+                                            <div className="mt-1 flex items-center">
+                                                <span className="text-sm font-medium text-white/80">
+                                                    {aetherionDays}{" "}
+                                                    {aetherionDays === 1
+                                                        ? "day"
+                                                        : "days"}
+                                                </span>
+
+                                                {aetherionMilestone && (
+                                                    <AetherionDayBadge
+                                                        milestone={
+                                                            aetherionMilestone
+                                                        }
+                                                        size="small"
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                {/* RIGHT — CONNECTIONS */}
+                                <div className="min-w-0">
+                                    <p className="text-sm font-medium text-[#bebdbc]">
+                                        Connections
+                                    </p>
+
+                                    {profile.connections?.length > 0 ? (
+                                        <Connections
+                                            connections={profile.connections}
+                                            readOnly
+                                        />
+                                    ) : (
+                                        <div className="border-l border-white/[0.08] pl-4 mt-3">
+                                            <p className="text-sm text-[#777b76]">
+                                                No connections
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* CONTACTS */}
+                    <section
+                        id="contact-profile-contacts"
+                        className="pt-8"
+                    >
+                        <div className="-mt-6 mx-5 border-t border-white/[0.06] pt-8 sm:mx-8 lg:mx-10">
+                            <ContactList
+                                ownerId={profile?._id}
+                                isOwnProfile={false}
+                            />
+                        </div>
+                    </section>
+
+                </div>
             </main>
 
             {/* ALL MEDIA MODAL */}

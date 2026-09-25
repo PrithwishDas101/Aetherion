@@ -1,11 +1,19 @@
-
 import { axiosInstance } from "./index.js";
 
 // GET RECENT CONTACTS
-export const getRecentContacts = async () => {
+export const getRecentContacts = async (
+  ownerId = null,
+) => {
   try {
     const response = await axiosInstance.get(
       "/api/v1/contact/recent",
+      {
+        params: ownerId
+          ? {
+              ownerId,
+            }
+          : {},
+      },
     );
 
     return response.data;
@@ -13,22 +21,33 @@ export const getRecentContacts = async () => {
     return (
       error.response?.data || {
         success: false,
-        message: "Unable to fetch recent contacts.",
+        message:
+          "Unable to fetch recent contacts.",
       }
     );
   }
 };
 
-// GET CONTACTS, Supports: search, page, limit
-// /api/v1/contact?search=adrish&page=1&limit=50
+// GET CONTACTS
+// Supports:
+// search
+// page
+// limit
+// ownerId
+//
+// No ownerId = logged-in user's contacts.
+// ownerId = another user's contacts.
 export const getContacts = async ({
   search = "",
   page = 1,
   limit = 50,
+  ownerId = null,
 } = {}) => {
   try {
     const response = await axiosInstance.get(
-      "/api/v1/contact",
+      ownerId
+        ? `/api/v1/contact/user/${ownerId}`
+        : "/api/v1/contact",
       {
         params: {
           search,
@@ -43,32 +62,39 @@ export const getContacts = async ({
     return (
       error.response?.data || {
         success: false,
-        message: "Unable to fetch contacts.",
+        message:
+          "Unable to fetch contacts.",
       }
     );
   }
 };
 
 // REMOVE CONTACT
-export const removeContact = async (contactId) => {
+export const removeContact = async (
+  contactId,
+) => {
   try {
-    const response = await axiosInstance.delete(
-      `/api/v1/contact/${contactId}`,
-    );
+    const response =
+      await axiosInstance.delete(
+        `/api/v1/contact/${contactId}`,
+      );
 
     return response.data;
   } catch (error) {
     return (
       error.response?.data || {
         success: false,
-        message: "Unable to remove contact.",
+        message:
+          "Unable to remove contact.",
       }
     );
   }
 };
 
 // ADD CONTACT
-export const addContact = async (contactId) => {
+export const addContact = async (
+  contactId,
+) => {
   try {
     if (!contactId) {
       return {
@@ -77,16 +103,18 @@ export const addContact = async (contactId) => {
       };
     }
 
-    const response = await axiosInstance.post(
-      `/api/v1/contact/${contactId}`,
-    );
+    const response =
+      await axiosInstance.post(
+        `/api/v1/contact/${contactId}`,
+      );
 
     return response.data;
   } catch (error) {
     return (
       error.response?.data || {
         success: false,
-        message: "Unable to add contact.",
+        message:
+          "Unable to add contact.",
       }
     );
   }

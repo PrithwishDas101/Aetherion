@@ -31,11 +31,15 @@ const getInitials = (contact) => {
 };
 
 const getFullName = (contact) => {
-    return `${contact?.firstName || ""} ${contact?.lastName || ""
-        }`.trim();
+    return `${contact?.firstName || ""} ${
+        contact?.lastName || ""
+    }`.trim();
 };
 
-const ContactList = () => {
+const ContactList = ({
+    ownerId,
+    isOwnProfile = true,
+}) => {
     const navigate = useNavigate();
 
     const [contacts, setContacts] = useState([]);
@@ -48,7 +52,11 @@ const ContactList = () => {
             setLoading(true);
 
             const response =
-                await getRecentContacts();
+                await getRecentContacts(
+                    isOwnProfile
+                        ? null
+                        : ownerId,
+                );
 
             if (cancelled) {
                 return;
@@ -70,12 +78,19 @@ const ContactList = () => {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [ownerId, isOwnProfile]);
 
     const hasContacts = contacts.length > 0;
 
     const openContacts = () => {
-        navigate("/contacts");
+        if (isOwnProfile) {
+            navigate("/contacts");
+            return;
+        }
+
+        if (ownerId) {
+            navigate(`/contacts/${ownerId}`);
+        }
     };
 
     const openContactProfile = (contactId) => {
@@ -83,7 +98,9 @@ const ContactList = () => {
             return;
         }
 
-        navigate(`/contact-profile/${contactId}`);
+        navigate(
+            `/contact-profile/${contactId}`,
+        );
     };
 
     const focusHomeSearch = () => {
@@ -126,16 +143,32 @@ const ContactList = () => {
                                         <button
                                             key={contact._id}
                                             type="button"
-                                            onClick={() => openContactProfile(contact._id)}
+                                            onClick={() =>
+                                                openContactProfile(
+                                                    contact._id,
+                                                )
+                                            }
                                             className="group relative shrink-0"
-                                            aria-label={`View ${getFullName(contact)}'s profile`}
-                                            title={`View ${getFullName(contact)}'s profile`}
+                                            aria-label={`View ${getFullName(
+                                                contact,
+                                            )}'s profile`}
+                                            title={`View ${getFullName(
+                                                contact,
+                                            )}'s profile`}
                                         >
                                             <Avatar
-                                                profilePic={contact.profilePic}
-                                                initials={getInitials(contact)}
-                                                alt={getFullName(contact)}
-                                                decoration={contact.avatarDecoration}
+                                                profilePic={
+                                                    contact.profilePic
+                                                }
+                                                initials={getInitials(
+                                                    contact,
+                                                )}
+                                                alt={getFullName(
+                                                    contact,
+                                                )}
+                                                decoration={
+                                                    contact.avatarDecoration
+                                                }
                                                 size="xs"
                                                 avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold ring-2 ring-[#080d09] transition duration-200 group-hover:z-10 group-hover:scale-105 sm:h-12 sm:w-12 sm:text-sm lg:h-[50px] lg:w-[50px] lg:text-base"
                                             />
@@ -156,12 +189,11 @@ const ContactList = () => {
                         <button
                             type="button"
                             onClick={openContacts}
-                            className="ml-3 flex h-9 w-9 sm:h-10 sm:w-10 lg:h-11 lg:w-11 shrink-0 items-center justify-center rounded-full text-[#687166] transition hover:text-[#ededea]"
+                            className="ml-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#687166] transition hover:text-[#ededea] sm:h-10 sm:w-10 lg:h-11 lg:w-11"
                             aria-label="View all contacts"
                             title="View all contacts"
                         >
-                            <IoChevronForward className="text-base sm:text-lg lg:text-xl"
-                            />
+                            <IoChevronForward className="text-base sm:text-lg lg:text-xl" />
                         </button>
                     </div>
                 ) : null}
@@ -178,15 +210,17 @@ const ContactList = () => {
                         Start a chat to add someone
                     </p>
 
-                    <button
-                        type="button"
-                        onClick={focusHomeSearch}
-                        className=" mt-5 flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.025] text-[#687166] transition hover:border-[#d8f45a]/30 hover:bg-[#d8f45a] hover:text-[#10120d] active:scale-95"
-                        aria-label="Find someone"
-                        title="Find someone"
-                    >
-                        <IoSearch className="text-base" />
-                    </button>
+                    {isOwnProfile && (
+                        <button
+                            type="button"
+                            onClick={focusHomeSearch}
+                            className="mt-5 flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.025] text-[#687166] transition hover:border-[#d8f45a]/30 hover:bg-[#d8f45a] hover:text-[#10120d] active:scale-95"
+                            aria-label="Find someone"
+                            title="Find someone"
+                        >
+                            <IoSearch className="text-base" />
+                        </button>
+                    )}
                 </div>
             )}
 

@@ -519,7 +519,10 @@ const Profile = () => {
             className="pt-8"
           >
             <div className="-mt-6 mx-5 border-t border-white/[0.06] pt-8 sm:mx-8 lg:mx-10">
-              <ContactList />
+              <ContactList
+                ownerId={user?._id}
+                isOwnProfile={true}
+              />
             </div>
           </section>
         </div>
@@ -568,7 +571,7 @@ const Profile = () => {
                     size="xs"
                     avatarClassName="bg-[#1a211a] text-sm font-bold text-[#d8f45a]"
                   />
-                  
+
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-[#f1eee8]">
                       {fullName}

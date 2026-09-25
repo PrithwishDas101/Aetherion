@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import {
+    useNavigate,
+    useParams,
+} from "react-router-dom";
 import {
     IoArrowBack,
     IoChatbubbleOutline,
@@ -93,6 +96,9 @@ function Contacts() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    const { userId } = useParams();
+
+    const isOwnContacts = !userId;
     const {
         user: currentUser,
         allChats,
@@ -122,6 +128,7 @@ function Contacts() {
             setError("");
 
             const response = await getContacts({
+                ownerId: userId || null,
                 search: searchInput.trim(),
                 page,
                 limit: CONTACTS_PER_PAGE,
@@ -162,7 +169,7 @@ function Contacts() {
         return () => {
             cancelled = true;
         };
-    }, [searchInput, page]);
+    }, [searchInput, page, userId]);
 
     const handleSearchChange = (event) => {
         setSearchInput(event.target.value);
@@ -237,12 +244,12 @@ function Contacts() {
     };
 
     const handleOpenProfile = (contactId) => {
-    if (!contactId) {
-        return;
-    }
+        if (!contactId) {
+            return;
+        }
 
-    navigate(`/contact-profile/${contactId}`);
-};
+        navigate(`/contact-profile/${contactId}`);
+    };
 
     const handleBack = () => {
         navigate(-1);
@@ -276,13 +283,21 @@ function Contacts() {
                         </div>
                     </div>
 
-                    <button type="button" onClick={() => setShowAddFriends(true)} className="flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-medium text-[#8a9288] transition-all duration-300 hover:text-[#ecf0dd]">
-                        <IoPersonAddOutline className="text-base" />
+                    {isOwnContacts && (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setShowAddFriends(true)
+                            }
+                            className="flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-medium text-[#8a9288] transition-all duration-300 hover:text-[#ecf0dd]"
+                        >
+                            <IoPersonAddOutline className="text-base" />
 
-                        <span className="hidden sm:inline">
-                            Add Contact
-                        </span>
-                    </button>
+                            <span className="hidden sm:inline">
+                                Add Contact
+                            </span>
+                        </button>
+                    )}
                 </header>
 
                 {/* SEARCH + FILTERS */}
@@ -468,9 +483,11 @@ function Contacts() {
                         )}
                 </main>
             </div>
-            {showAddFriends && (
+            {isOwnContacts && showAddFriends && (
                 <AddFriendsModal
-                    onClose={() => setShowAddFriends(false)}
+                    onClose={() =>
+                        setShowAddFriends(false)
+                    }
                 />
             )}
         </div>

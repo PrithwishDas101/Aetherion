@@ -11,9 +11,12 @@ import { protectRoute } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Profile: Returns the 5 most recently created contacts.
+// Profile: Returns the 5 most recently created
+// contacts for the logged-in user or a requested user.
 router.get("/recent", protectRoute, getRecentContacts);
-// Contacts page: Supports: ?search=user ?page=1 ?limit=50
+// Contacts page: another user's contacts.
+router.get("/user/:userId", protectRoute, getContacts);
+// Contacts page: logged-in user's contacts.
 router.get("/", protectRoute, getContacts);
 // Add a contact relationship from both sides.
 router.post("/:contactId", protectRoute, addContact);

@@ -55,7 +55,23 @@ function App() {
             }
           />
 
-          <Route path="/contacts" element={<ProtectedRoute> <Contacts /> </ProtectedRoute>} />
+          <Route
+            path="/contacts"
+            element={
+              <ProtectedRoute>
+                <Contacts />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/contacts/:userId"
+            element={
+              <ProtectedRoute>
+                <Contacts />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="/login" element={<Login />} />
 

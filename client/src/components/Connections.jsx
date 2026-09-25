@@ -1,24 +1,59 @@
 import { useEffect, useMemo, useState } from "react";
+
 import toast from "react-hot-toast";
 
 import {
-    FaInstagram, FaChevronDown, FaLinkedinIn, FaRedditAlien,
-    FaGithub, FaYoutube, FaDiscord, FaTwitch,
-    FaTiktok, FaFacebook, FaPinterest, FaTumblr,
-    FaGlobe, FaTrash, FaGitlab, FaStackOverflow,
-    FaMedium, FaDev, FaVimeo, FaSteam,
-    FaSpotify, FaSoundcloud, FaApple,
+    FaInstagram,
+    FaChevronDown,
+    FaLinkedinIn,
+    FaRedditAlien,
+    FaGithub,
+    FaYoutube,
+    FaDiscord,
+    FaTwitch,
+    FaTiktok,
+    FaFacebook,
+    FaPinterest,
+    FaTumblr,
+    FaGlobe,
+    FaTrash,
+    FaGitlab,
+    FaStackOverflow,
+    FaMedium,
+    FaDev,
+    FaVimeo,
+    FaSteam,
+    FaSpotify,
+    FaSoundcloud,
+    FaApple,
 } from "react-icons/fa";
 
 import { FaXTwitter } from "react-icons/fa6";
 
 import {
-    SiThreads, SiSnapchat, SiBluesky, SiCodeforces,
-    SiCodechef, SiHackerrank, SiHackerearth, SiKaggle,
-    SiReplit, SiCodesandbox, SiNpm, SiSubstack,
-    SiBehance, SiDribbble, SiArtstation, SiFigma,
-    SiKick, SiEpicgames, SiPlaystation, SiLinktree,
-    SiBandcamp, SiLeetcode, SiOnlyfans,
+    SiThreads,
+    SiSnapchat,
+    SiBluesky,
+    SiCodeforces,
+    SiCodechef,
+    SiHackerrank,
+    SiHackerearth,
+    SiKaggle,
+    SiReplit,
+    SiCodesandbox,
+    SiNpm,
+    SiSubstack,
+    SiBehance,
+    SiDribbble,
+    SiArtstation,
+    SiFigma,
+    SiKick,
+    SiEpicgames,
+    SiPlaystation,
+    SiLinktree,
+    SiBandcamp,
+    SiLeetcode,
+    SiOnlyfans,
 } from "react-icons/si";
 
 const MAX_CONNECTIONS = 20;
@@ -489,6 +524,7 @@ const extractPersonName = (url) => {
                 .split(".")[0];
         }
 
+        // LinkedIn
         if (
             hostname === "linkedin.com" ||
             hostname.endsWith(".linkedin.com")
@@ -508,6 +544,7 @@ const extractPersonName = (url) => {
             }
         }
 
+        // Reddit
         if (
             hostname === "reddit.com" ||
             hostname.endsWith(".reddit.com")
@@ -527,6 +564,7 @@ const extractPersonName = (url) => {
             }
         }
 
+        // YouTube
         if (
             hostname === "youtube.com" ||
             hostname.endsWith(".youtube.com")
@@ -565,6 +603,8 @@ const extractPersonName = (url) => {
             }
         }
 
+        // Platforms where the first path segment is
+        // normally the person's username.
         if (
             hostname === "instagram.com" ||
             hostname.endsWith(".instagram.com") ||
@@ -581,9 +621,7 @@ const extractPersonName = (url) => {
             hostname === "onlyfans.com" ||
             hostname.endsWith(".onlyfans.com")
         ) {
-            return cleanPathSegment(
-                segments[0],
-            );
+            return cleanPathSegment(segments[0]);
         }
 
         return cleanPathSegment(
@@ -595,13 +633,10 @@ const extractPersonName = (url) => {
 };
 
 const normalizeConnection = (connection) => {
-    const url =
-        connection?.url?.trim() || "";
+    const url = connection?.url?.trim() || "";
 
     const detected = detectPlatform(url);
-
-    const extractedName =
-        extractPersonName(url);
+    const extractedName = extractPersonName(url);
 
     return {
         name:
@@ -613,7 +648,7 @@ const normalizeConnection = (connection) => {
     };
 };
 
-//Used for checking duplicate URLs
+// Used for checking duplicate URLs.
 const normalizeConnectionUrl = (url) => {
     try {
         const parsed = new URL(url.trim());
@@ -650,23 +685,35 @@ const normalizeConnectionUrl = (url) => {
     }
 };
 
-const Connections = ({ connections = [], onSave, }) => {
-
+const Connections = ({
+    connections = [],
+    onSave,
+    readOnly = false,
+}) => {
     const [showModal, setShowModal] = useState(false);
-    const [draftConnections, setDraftConnections] = useState([]);
+
+    const [draftConnections, setDraftConnections] =
+        useState([]);
+
     const [saving, setSaving] = useState(false);
 
-    const [activePlatformIndex, setActivePlatformIndex] = useState(null);
-    const [platformSearch, setPlatformSearch] = useState("");
-    const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+    const [activePlatformIndex, setActivePlatformIndex] =
+        useState(null);
 
-    const visibleConnections = useMemo(() =>
-        Array.isArray(connections)
-            ? connections.filter(
-                (connection) =>
-                    connection?.url?.trim(),
-            )
-            : [],
+    const [platformSearch, setPlatformSearch] =
+        useState("");
+
+    const [selectedPlatforms, setSelectedPlatforms] =
+        useState([]);
+
+    const visibleConnections = useMemo(
+        () =>
+            Array.isArray(connections)
+                ? connections.filter(
+                    (connection) =>
+                        connection?.url?.trim(),
+                )
+                : [],
         [connections],
     );
 
@@ -690,9 +737,7 @@ const Connections = ({ connections = [], onSave, }) => {
                     return;
                 }
 
-                if (
-                    seen.has(normalizedUrl)
-                ) {
+                if (seen.has(normalizedUrl)) {
                     duplicates.add(index);
                     duplicates.add(
                         seen.get(normalizedUrl),
@@ -709,10 +754,12 @@ const Connections = ({ connections = [], onSave, }) => {
         return duplicates;
     }, [draftConnections]);
 
-    const hasDuplicateConnections = duplicateIndexes.size > 0;
+    const hasDuplicateConnections =
+        duplicateIndexes.size > 0;
 
     const filteredPlatformGroups = useMemo(() => {
-        const query = platformSearch.trim().toLowerCase();
+        const query =
+            platformSearch.trim().toLowerCase();
 
         return PLATFORM_GROUPS
             .map((group) => {
@@ -720,7 +767,8 @@ const Connections = ({ connections = [], onSave, }) => {
                     .map((name) =>
                         PLATFORM_CONFIG.find(
                             (platform) =>
-                                platform.name === name,
+                                platform.name ===
+                                name,
                         ),
                     )
                     .filter(Boolean)
@@ -765,19 +813,25 @@ const Connections = ({ connections = [], onSave, }) => {
         setSelectedPlatforms(
             initialConnections.map(
                 (connection) =>
-                    detectPlatform(connection.url).name,
+                    detectPlatform(
+                        connection.url,
+                    ).name,
             ),
         );
 
         setActivePlatformIndex(null);
         setPlatformSearch("");
-
-    }, [showModal, visibleConnections,]);
+    }, [showModal, visibleConnections]);
 
     const openModal = () => {
+        // Extra protection:
+        // read-only instances can never open the editor.
+        if (readOnly) {
+            return;
+        }
+
         setActivePlatformIndex(null);
         setPlatformSearch("");
-
         setShowModal(true);
     };
 
@@ -806,7 +860,8 @@ const Connections = ({ connections = [], onSave, }) => {
             ),
         );
 
-        const detected = detectPlatform(value);
+        const detected =
+            detectPlatform(value);
 
         if (detected.name) {
             setSelectedPlatforms((current) =>
@@ -828,7 +883,6 @@ const Connections = ({ connections = [], onSave, }) => {
             toast.error(
                 `You can add up to ${MAX_CONNECTIONS} connections.`,
             );
-
             return;
         }
 
@@ -865,7 +919,7 @@ const Connections = ({ connections = [], onSave, }) => {
     };
 
     const handleSave = async () => {
-        if (saving) {
+        if (saving || readOnly) {
             return;
         }
 
@@ -878,7 +932,9 @@ const Connections = ({ connections = [], onSave, }) => {
 
                     return {
                         name:
-                            extractPersonName(url) ||
+                            extractPersonName(
+                                url,
+                            ) ||
                             connection.name?.trim() ||
                             "",
                         url,
@@ -896,7 +952,6 @@ const Connections = ({ connections = [], onSave, }) => {
             toast.error(
                 `You can add up to ${MAX_CONNECTIONS} connections.`,
             );
-
             return;
         }
 
@@ -922,7 +977,6 @@ const Connections = ({ connections = [], onSave, }) => {
                 toast.error(
                     "Don't add the same connection more than once.",
                 );
-
                 return;
             }
 
@@ -946,7 +1000,6 @@ const Connections = ({ connections = [], onSave, }) => {
                 toast.error(
                     `Invalid connection URL: ${connection.url}`,
                 );
-
                 return;
             }
         }
@@ -954,10 +1007,7 @@ const Connections = ({ connections = [], onSave, }) => {
         setSaving(true);
 
         try {
-            await onSave(
-                cleanedConnections,
-            );
-
+            await onSave(cleanedConnections);
             setShowModal(false);
         } catch (error) {
             console.error(
@@ -988,26 +1038,44 @@ const Connections = ({ connections = [], onSave, }) => {
                 {visibleConnections.length ? (
                     <div className="mt-3 flex flex-wrap items-center gap-1.5">
                         {visibleConnections.map(
-                            (connection, index,) => {
-                                const detectedPlatform = detectPlatform(
-                                    connection.url,
-                                );
+                            (
+                                connection,
+                                index,
+                            ) => {
+                                const detectedPlatform =
+                                    detectPlatform(
+                                        connection.url,
+                                    );
 
-                                const selectedPlatform = PLATFORM_CONFIG.find(
-                                    (item) =>
-                                        item.name === selectedPlatforms[index],
-                                );
+                                const selectedPlatform =
+                                    PLATFORM_CONFIG.find(
+                                        (item) =>
+                                            item.name ===
+                                            selectedPlatforms[
+                                            index
+                                            ],
+                                    );
 
-                                const platform = selectedPlatform || detectedPlatform;
+                                const platform =
+                                    selectedPlatform ||
+                                    detectedPlatform;
 
-                                const Icon = platform.icon;
+                                const Icon =
+                                    platform.icon;
 
-                                const personName = extractPersonName(connection.url,) || connection.name || platform.name;
+                                const personName =
+                                    extractPersonName(
+                                        connection.url,
+                                    ) ||
+                                    connection.name ||
+                                    platform.name;
 
                                 return (
                                     <a
                                         key={`${connection.url}-${index}`}
-                                        href={connection.url}
+                                        href={
+                                            connection.url
+                                        }
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-white/[0.05] bg-white/[0.018] px-2 py-1 text-[10px] font-medium text-[#aeb4ac] transition hover:border-white/[0.1] hover:bg-white/[0.045] hover:text-white"
@@ -1021,7 +1089,9 @@ const Connections = ({ connections = [], onSave, }) => {
                                         />
 
                                         <span className="max-w-[10rem] truncate">
-                                            {personName}
+                                            {
+                                                personName
+                                            }
                                         </span>
                                     </a>
                                 );
@@ -1030,28 +1100,33 @@ const Connections = ({ connections = [], onSave, }) => {
                     </div>
                 ) : null}
 
-                <button
-                    type="button"
-                    onClick={openModal}
-                    className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-medium text-[#777d76] transition hover:text-[#f1eee8]"
-                >
-                    <span className="text-sm leading-none">
-                        +
-                    </span>
+                {/* EDITING IS AVAILABLE ONLY ON YOUR OWN PROFILE */}
+                {!readOnly && (
+                    <button
+                        type="button"
+                        onClick={openModal}
+                        className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-medium text-[#777d76] transition hover:text-[#f1eee8]"
+                    >
+                        <span className="text-sm leading-none">
+                            +
+                        </span>
 
-                    Add more
-                </button>
+                        Add more
+                    </button>
+                )}
             </div>
 
             {/* ADD CONNECTIONS MODAL */}
-            {showModal && (
+            {!readOnly && showModal && (
                 <div
                     className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
                     onMouseDown={closeModal}
                 >
                     <div
                         className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111611] shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
-                        onMouseDown={(event,) => event.stopPropagation()}
+                        onMouseDown={(event) =>
+                            event.stopPropagation()
+                        }
                     >
                         {/* HEADER */}
                         <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
@@ -1077,191 +1152,304 @@ const Connections = ({ connections = [], onSave, }) => {
                             {hasDuplicateConnections && (
                                 <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/[0.05] px-3.5 py-3">
                                     <p className="text-[11px] font-semibold text-red-400">
-                                        Duplicate connection
+                                        Duplicate
+                                        connection
                                     </p>
 
                                     <p className="mt-1 text-[11px] leading-relaxed text-red-300/70">
-                                        You already added this connection.
-                                        Remove the duplicate before saving.
+                                        You already
+                                        added this
+                                        connection.
+                                        Remove the
+                                        duplicate
+                                        before
+                                        saving.
                                     </p>
                                 </div>
                             )}
 
                             <div className="space-y-3">
                                 {draftConnections.map(
-                                    (connection, index,) => {
-                                        const detectedPlatform = detectPlatform(connection.url,);
+                                    (
+                                        connection,
+                                        index,
+                                    ) => {
+                                        const detectedPlatform =
+                                            detectPlatform(
+                                                connection.url,
+                                            );
 
-                                        const selectedPlatform = PLATFORM_CONFIG.find((item) => item.name === selectedPlatforms[index],);
+                                        const selectedPlatform =
+                                            PLATFORM_CONFIG.find(
+                                                (
+                                                    item,
+                                                ) =>
+                                                    item.name ===
+                                                    selectedPlatforms[
+                                                    index
+                                                    ],
+                                            );
 
-                                        const platform = selectedPlatform || detectedPlatform;
+                                        const platform =
+                                            selectedPlatform ||
+                                            detectedPlatform;
 
-                                        const Icon = platform.icon;
+                                        const Icon =
+                                            platform.icon;
 
-                                        const isDuplicate = duplicateIndexes.has(index);
+                                        const isDuplicate =
+                                            duplicateIndexes.has(
+                                                index,
+                                            );
 
                                         return (
                                             <div
-                                                key={index}
+                                                key={
+                                                    index
+                                                }
                                                 className={`rounded-xl ${isDuplicate
-                                                    ? "bg-red-500/[0.04] p-1.5"
-                                                    : ""
+                                                        ? "bg-red-500/[0.04] p-1.5"
+                                                        : ""
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-2.5">
+                                                    {/* PLATFORM SELECTOR */}
                                                     <button
                                                         type="button"
                                                         onClick={() => {
                                                             setActivePlatformIndex(
-                                                                activePlatformIndex === index
+                                                                activePlatformIndex ===
+                                                                    index
                                                                     ? null
                                                                     : index,
                                                             );
 
-                                                            setPlatformSearch("");
+                                                            setPlatformSearch(
+                                                                "",
+                                                            );
                                                         }}
-                                                        disabled={saving}
-                                                        className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition ${activePlatformIndex === index
-                                                            ? "border-[#d8f45a]/30 bg-[#d8f45a]/[0.08]"
-                                                            : "border-white/[0.07] bg-white/[0.035] hover:border-white/[0.12] hover:bg-white/[0.06]"
+                                                        disabled={
+                                                            saving
+                                                        }
+                                                        className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition ${activePlatformIndex ===
+                                                                index
+                                                                ? "border-[#d8f45a]/30 bg-[#d8f45a]/[0.08]"
+                                                                : "border-white/[0.07] bg-white/[0.035] hover:border-white/[0.12] hover:bg-white/[0.06]"
                                                             }`}
                                                         aria-label={`Choose platform${platform.name
-                                                            ? `, currently ${platform.name}`
-                                                            : ""
+                                                                ? `, currently ${platform.name}`
+                                                                : ""
                                                             }`}
-                                                        title={platform.name
-                                                            ? `Platform: ${platform.name}`
-                                                            : "Choose platform"
+                                                        title={
+                                                            platform.name
+                                                                ? `Platform: ${platform.name}`
+                                                                : "Choose platform"
                                                         }
                                                     >
                                                         <Icon
                                                             className="h-4 w-4"
                                                             style={{
-                                                                color: platform.color,
+                                                                color:
+                                                                    platform.color,
                                                             }}
                                                         />
 
                                                         <FaChevronDown
-                                                            className={`absolute bottom-1 right-1 h-2 w-2 text-[#777d76] transition-transform ${activePlatformIndex === index
-                                                                ? "rotate-180"
-                                                                : ""
+                                                            className={`absolute bottom-1 right-1 h-2 w-2 text-[#777d76] transition-transform ${activePlatformIndex ===
+                                                                    index
+                                                                    ? "rotate-180"
+                                                                    : ""
                                                                 }`}
                                                         />
                                                     </button>
 
+                                                    {/* URL INPUT */}
                                                     <input
                                                         type="url"
-                                                        value={connection.url}
-                                                        onChange={(event) => updateConnection(index, event.target.value,)}
+                                                        value={
+                                                            connection.url
+                                                        }
+                                                        onChange={(
+                                                            event,
+                                                        ) =>
+                                                            updateConnection(
+                                                                index,
+                                                                event
+                                                                    .target
+                                                                    .value,
+                                                            )
+                                                        }
                                                         placeholder={
                                                             selectedPlatform
                                                                 ? `Paste your ${selectedPlatform.name} link`
                                                                 : "Paste a profile or website link"
                                                         }
-                                                        disabled={saving}
+                                                        disabled={
+                                                            saving
+                                                        }
                                                         className={`h-10 min-w-0 flex-1 rounded-xl border bg-white/[0.025] px-3.5 text-sm text-[#f1eee8] outline-none transition placeholder:text-[#4f564f] focus:bg-white/[0.04] ${isDuplicate
-                                                            ? "border-red-400/40 focus:border-red-400/60"
-                                                            : "border-white/[0.08] focus:border-[#d8f45a]/30"
+                                                                ? "border-red-400/40 focus:border-red-400/60"
+                                                                : "border-white/[0.08] focus:border-[#d8f45a]/30"
                                                             }`}
                                                     />
 
+                                                    {/* REMOVE */}
                                                     <button
                                                         type="button"
-                                                        onClick={() => removeConnection(index)}
-                                                        disabled={saving}
+                                                        onClick={() =>
+                                                            removeConnection(
+                                                                index,
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            saving
+                                                        }
                                                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-red-400 transition hover:bg-red-400/[0.08] hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
-                                                        aria-label={`Remove connection ${index + 1}`}
+                                                        aria-label={`Remove connection ${index +
+                                                            1
+                                                            }`}
                                                     >
                                                         <FaTrash className="h-4 w-4" />
                                                     </button>
                                                 </div>
 
-                                                {activePlatformIndex === index && (
-                                                    <div className="mt-2 overflow-hidden rounded-xl border border-white/[0.07] bg-[#0d120e]">
-                                                        {/* SEARCH */}
-                                                        <div className="border-b border-white/[0.06] p-2.5">
-                                                            <input
-                                                                type="text"
-                                                                value={platformSearch}
-                                                                onChange={(event) => setPlatformSearch(event.target.value)}
-                                                                placeholder="Search platforms..."
-                                                                autoFocus
-                                                                className="h-9 w-full rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 text-xs text-[#f1eee8] outline-none placeholder:text-[#4f564f] focus:border-[#d8f45a]/30"
-                                                            />
-                                                        </div>
+                                                {/* PLATFORM PICKER */}
+                                                {activePlatformIndex ===
+                                                    index && (
+                                                        <div className="mt-2 overflow-hidden rounded-xl border border-white/[0.07] bg-[#0d120e]">
+                                                            {/* SEARCH */}
+                                                            <div className="border-b border-white/[0.06] p-2.5">
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        platformSearch
+                                                                    }
+                                                                    onChange={(
+                                                                        event,
+                                                                    ) =>
+                                                                        setPlatformSearch(
+                                                                            event
+                                                                                .target
+                                                                                .value,
+                                                                        )
+                                                                    }
+                                                                    placeholder="Search platforms..."
+                                                                    autoFocus
+                                                                    className="h-9 w-full rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 text-xs text-[#f1eee8] outline-none placeholder:text-[#4f564f] focus:border-[#d8f45a]/30"
+                                                                />
+                                                            </div>
 
-                                                        {/* PLATFORM LIST */}
-                                                        <div className="scrollbar-aetherion max-h-64 overflow-y-auto p-2.5">
-                                                            {filteredPlatformGroups.length ? (
-                                                                <div className="space-y-4">
-                                                                    {filteredPlatformGroups.map(
-                                                                        (group) => (
-                                                                            <div
-                                                                                key={group.name}
-                                                                            >
-                                                                                <p className="mb-2 px-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#666d65]">
-                                                                                    {group.name}
-                                                                                </p>
+                                                            {/* PLATFORM LIST */}
+                                                            <div className="scrollbar-aetherion max-h-64 overflow-y-auto p-2.5">
+                                                                {filteredPlatformGroups.length ? (
+                                                                    <div className="space-y-4">
+                                                                        {filteredPlatformGroups.map(
+                                                                            (
+                                                                                group,
+                                                                            ) => (
+                                                                                <div
+                                                                                    key={
+                                                                                        group.name
+                                                                                    }
+                                                                                >
+                                                                                    <p className="mb-2 px-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#666d65]">
+                                                                                        {
+                                                                                            group.name
+                                                                                        }
+                                                                                    </p>
 
-                                                                                <div className="flex flex-wrap gap-1.5">
-                                                                                    {group.platforms.map((platform,) => {
-                                                                                        const PlatformIcon = platform.icon;
+                                                                                    <div className="flex flex-wrap gap-1.5">
+                                                                                        {group.platforms.map(
+                                                                                            (
+                                                                                                platform,
+                                                                                            ) => {
+                                                                                                const PlatformIcon =
+                                                                                                    platform.icon;
 
-                                                                                        const isSelected = selectedPlatforms[index] === platform.name;
+                                                                                                const isSelected =
+                                                                                                    selectedPlatforms[
+                                                                                                    index
+                                                                                                    ] ===
+                                                                                                    platform.name;
 
-                                                                                        return (
-                                                                                            <button
-                                                                                                key={platform.name}
-                                                                                                type="button"
-                                                                                                onClick={() => {
-                                                                                                    setSelectedPlatforms((current) =>
-                                                                                                        current.map(
-                                                                                                            (item, itemIndex) =>
-                                                                                                                itemIndex === index
-                                                                                                                    ? platform.name
-                                                                                                                    : item,
-                                                                                                        ),
-                                                                                                    );
+                                                                                                return (
+                                                                                                    <button
+                                                                                                        key={
+                                                                                                            platform.name
+                                                                                                        }
+                                                                                                        type="button"
+                                                                                                        onClick={() => {
+                                                                                                            setSelectedPlatforms(
+                                                                                                                (
+                                                                                                                    current,
+                                                                                                                ) =>
+                                                                                                                    current.map(
+                                                                                                                        (
+                                                                                                                            item,
+                                                                                                                            itemIndex,
+                                                                                                                        ) =>
+                                                                                                                            itemIndex ===
+                                                                                                                                index
+                                                                                                                                ? platform.name
+                                                                                                                                : item,
+                                                                                                                    ),
+                                                                                                            );
 
-                                                                                                    setActivePlatformIndex(null);
-                                                                                                    setPlatformSearch("");
-                                                                                                }}
-                                                                                                className={`group relative flex h-10 w-10 items-center justify-center rounded-lg border transition ${isSelected
-                                                                                                    ? "border-[#d8f45a]/30 bg-[#d8f45a]/[0.08]"
-                                                                                                    : "border-white/[0.05] bg-white/[0.025] hover:border-white/[0.12] hover:bg-white/[0.06]"
-                                                                                                    }`}
-                                                                                                aria-label={platform.name}
-                                                                                                title={platform.name}
-                                                                                            >
-                                                                                                <PlatformIcon
-                                                                                                    className="h-4 w-4"
-                                                                                                    style={{
-                                                                                                        color: platform.color,
-                                                                                                    }}
-                                                                                                />
-                                                                                            </button>
-                                                                                        );
-                                                                                    },
-                                                                                    )}
+                                                                                                            setActivePlatformIndex(
+                                                                                                                null,
+                                                                                                            );
+
+                                                                                                            setPlatformSearch(
+                                                                                                                "",
+                                                                                                            );
+                                                                                                        }}
+                                                                                                        className={`group relative flex h-10 w-10 items-center justify-center rounded-lg border transition ${isSelected
+                                                                                                                ? "border-[#d8f45a]/30 bg-[#d8f45a]/[0.08]"
+                                                                                                                : "border-white/[0.05] bg-white/[0.025] hover:border-white/[0.12] hover:bg-white/[0.06]"
+                                                                                                            }`}
+                                                                                                        aria-label={
+                                                                                                            platform.name
+                                                                                                        }
+                                                                                                        title={
+                                                                                                            platform.name
+                                                                                                        }
+                                                                                                    >
+                                                                                                        <PlatformIcon
+                                                                                                            className="h-4 w-4"
+                                                                                                            style={{
+                                                                                                                color:
+                                                                                                                    platform.color,
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </button>
+                                                                                                );
+                                                                                            },
+                                                                                        )}
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                        ),
-                                                                    )}
-                                                                </div>
-                                                            ) : (
-                                                                <div className="px-2 py-6 text-center">
-                                                                    <p className="text-[11px] text-[#555d55]">
-                                                                        No platform found.
-                                                                    </p>
-                                                                </div>
-                                                            )}
+                                                                            ),
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="px-2 py-6 text-center">
+                                                                        <p className="text-[11px] text-[#555d55]">
+                                                                            No
+                                                                            platform
+                                                                            found.
+                                                                        </p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                    )}
 
+                                                {/* DUPLICATE WARNING */}
                                                 {isDuplicate && (
                                                     <p className="mt-1.5 pl-[3.25rem] text-[10px] font-medium text-red-400/80">
-                                                        This connection is already added.
+                                                        This
+                                                        connection
+                                                        is already
+                                                        added.
                                                     </p>
                                                 )}
                                             </div>
@@ -1270,10 +1458,15 @@ const Connections = ({ connections = [], onSave, }) => {
                                 )}
                             </div>
 
+                            {/* ADD MORE */}
                             <button
                                 type="button"
                                 onClick={addConnection}
-                                disabled={saving || draftConnections.length >= MAX_CONNECTIONS}
+                                disabled={
+                                    saving ||
+                                    draftConnections.length >=
+                                    MAX_CONNECTIONS
+                                }
                                 className="mt-4 flex items-center gap-2 text-xs font-semibold text-[#838371] transition hover:text-[#f1eee8] disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 <span className="text-base">
@@ -1287,7 +1480,10 @@ const Connections = ({ connections = [], onSave, }) => {
                         {/* FOOTER */}
                         <div className="flex items-center justify-between border-t border-white/[0.06] px-5 py-4 sm:px-6">
                             <span className="text-[11px] text-[#4f564f]">
-                                {draftConnections.length} / {MAX_CONNECTIONS}
+                                {
+                                    draftConnections.length
+                                }{" "}
+                                / {MAX_CONNECTIONS}
                             </span>
 
                             <div className="flex items-center gap-2">
@@ -1303,10 +1499,15 @@ const Connections = ({ connections = [], onSave, }) => {
                                 <button
                                     type="button"
                                     onClick={handleSave}
-                                    disabled={saving || hasDuplicateConnections}
+                                    disabled={
+                                        saving ||
+                                        hasDuplicateConnections
+                                    }
                                     className="rounded-lg bg-[#d8f45a] px-4 py-2 text-xs font-bold text-[#10120d] transition hover:bg-[#e4ff6f] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    {saving ? "Saving..." : "Save"}
+                                    {saving
+                                        ? "Saving..."
+                                        : "Save"}
                                 </button>
                             </div>
                         </div>

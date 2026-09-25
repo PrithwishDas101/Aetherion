@@ -7,7 +7,7 @@ if (import.meta.env.DEV) {
   eruda.init();
 }
 
-import App from "./App.jsx";
+import App from "./app.jsx";
 import "./index.css";
 import store from "./redux/store.js";
 

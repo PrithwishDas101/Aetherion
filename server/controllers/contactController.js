@@ -59,7 +59,14 @@ export const ensureContacts = async (members) => {
 // GET RECENT CONTACTS
 export const getRecentContacts = async (req, res) => {
   try {
-    const ownerId = req.user.userId;
+    const ownerId = req.query.ownerId || req.user.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(ownerId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user.",
+      });
+    }
 
     const contacts = await Contact.find({
       owner: ownerId,
@@ -98,7 +105,7 @@ export const getRecentContacts = async (req, res) => {
 // GET FULL CONTACT LIST
 export const getContacts = async (req, res) => {
   try {
-    const ownerId = req.user.userId;
+    const ownerId = req.params.userId || req.user.userId;
 
     if (!mongoose.Types.ObjectId.isValid(ownerId)) {
       return res.status(401).json({
@@ -236,7 +243,7 @@ export const getContacts = async (req, res) => {
               lastName: "$contactUser.lastName",
 
               profilePic: "$contactUser.profilePic",
-              
+
               avatarDecoration: "$contactUser.avatarDecoration",
 
               publicPresenceStatus: "$contactUser.publicPresenceStatus",
@@ -333,7 +340,6 @@ export const removeContact = async (req, res) => {
     });
   }
 };
-
 
 // ADD CONTACT
 export const addContact = async (req, res) => {
