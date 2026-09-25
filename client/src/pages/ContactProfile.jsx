@@ -9,10 +9,7 @@ import {
     IoPersonRemoveOutline,
     IoPlay,
     IoDocumentTextOutline,
-    IoDownloadOutline,
     IoImageOutline,
-    IoVideocamOutline,
-    IoGridOutline,
 } from "react-icons/io5";
 
 import Avatar from "../components/Avatar.jsx";
@@ -21,8 +18,14 @@ import ProfileBanner from "../components/ProfileBanner.jsx";
 import Connections from "../components/Connections.jsx";
 import MediaViewer from "../components/Camera/MediaViewer.jsx";
 
-import { getContactProfile } from "../apiCalls/contactProfileApi.js";
-import { removeContact, addContact } from "../apiCalls/contactApi.js";
+import {
+    getContactProfile,
+    getContactProfileMedia,
+} from "../apiCalls/contactProfileApi.js";
+import {
+    removeContact,
+    addContact,
+} from "../apiCalls/contactApi.js";
 import { getEffectivePresenceStatus } from "../utils/presenceStatus.js";
 import { getAetherionDays } from "../utils/aetherionDays.js";
 
@@ -88,17 +91,68 @@ const isVisualMedia = (media) => {
     );
 };
 
+const getMediaDateGroup = (value) => {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "Older";
+    }
+
+    const now = new Date();
+
+    const startOfToday = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+    );
+
+    const itemDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+    );
+
+    const difference =
+        startOfToday.getTime() -
+        itemDate.getTime();
+
+    const daysAgo = Math.floor(
+        difference / (1000 * 60 * 60 * 24),
+    );
+
+    if (daysAgo <= 0) {
+        return "Today";
+    }
+
+    if (daysAgo <= 7) {
+        return "Last week";
+    }
+
+    if (daysAgo <= 30) {
+        return "Last month";
+    }
+
+    return "Older";
+};
+
 const ContactProfile = () => {
     const navigate = useNavigate();
     const { userId } = useParams();
 
-    const presence = useSelector((state) => state.userReducer?.presence || {},);
+    const presence = useSelector(
+        (state) => state.userReducer?.presence || {},
+    );
 
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
     const [mediaViewerIndex, setMediaViewerIndex] = useState(0);
+
+    const [allMediaOpen, setAllMediaOpen] = useState(false);
+    const [allMediaLoading, setAllMediaLoading] = useState(false);
+    const [allMedia, setAllMedia] = useState([]);
+    const [allMediaTab, setAllMediaTab] = useState("media");
 
     const [showRemoveContactModal, setShowRemoveContactModal] = useState(false);
     const [isRemovingContact, setIsRemovingContact] = useState(false);
@@ -125,7 +179,6 @@ const ContactProfile = () => {
                 );
 
                 navigate(-1);
-
                 return;
             }
 
@@ -175,12 +228,45 @@ const ContactProfile = () => {
         [profile?.createdAt],
     );
 
-    const media = Array.isArray(profileData?.media) ? profileData.media : [];
+    const media = Array.isArray(profileData?.media)
+        ? profileData.media
+        : [];
+
+    const mediaTotal = Number(
+        profileData?.mediaTotal ?? media.length,
+    );
 
     const visualMedia = useMemo(
         () => media.filter(isVisualMedia),
         [media],
     );
+
+    const groupedAllMedia = useMemo(() => {
+        const source = allMedia.filter((item) =>
+            allMediaTab === "media"
+                ? isVisualMedia(item)
+                : item?.type === "document",
+        );
+
+        const groups = {
+            Today: [],
+            "Last week": [],
+            "Last month": [],
+            Older: [],
+        };
+
+        source.forEach((item) => {
+            const group = getMediaDateGroup(
+                item.createdAt,
+            );
+
+            groups[group].push(item);
+        });
+
+        return Object.entries(groups).filter(
+            ([, items]) => items.length > 0,
+        );
+    }, [allMedia, allMediaTab]);
 
     const openMediaViewer = (mediaItem) => {
         const index = visualMedia.findIndex(
@@ -199,6 +285,81 @@ const ContactProfile = () => {
         setMediaViewerOpen(false);
     };
 
+    const openAllMedia = async () => {
+        setAllMediaOpen(true);
+
+        if (allMedia.length > 0) {
+            return;
+        }
+
+        setAllMediaLoading(true);
+
+        try {
+            const response =
+                await getContactProfileMedia(userId);
+
+            if (!response?.success) {
+                toast.error(
+                    response?.message ||
+                    "Unable to load media.",
+                );
+
+                setAllMediaOpen(false);
+                return;
+            }
+
+            setAllMedia(
+                Array.isArray(response.data?.media)
+                    ? response.data.media
+                    : [],
+            );
+        } catch (error) {
+            console.error(
+                "Load all contact media error:",
+                error,
+            );
+
+            toast.error("Unable to load media.");
+            setAllMediaOpen(false);
+        } finally {
+            setAllMediaLoading(false);
+        }
+    };
+
+    const openAllMediaItem = (item) => {
+        if (!isVisualMedia(item)) {
+            return;
+        }
+
+        const index = allMedia.findIndex(
+            (mediaItem) => mediaItem?._id === item?._id,
+        );
+
+        if (index < 0) {
+            return;
+        }
+
+        const allVisualMedia = allMedia.filter(
+            isVisualMedia,
+        );
+
+        const visualIndex = allVisualMedia.findIndex(
+            (mediaItem) => mediaItem?._id === item?._id,
+        );
+
+        if (visualIndex < 0) {
+            return;
+        }
+
+        setAllMediaOpen(false);
+
+        setMediaViewerIndex(visualIndex);
+
+        setMediaViewerOpen(true);
+
+        setAllMediaTab("media");
+    };
+
     const handleRemoveContact = async () => {
         if (!profile?._id || isRemovingContact) {
             return;
@@ -207,7 +368,9 @@ const ContactProfile = () => {
         setIsRemovingContact(true);
 
         try {
-            const response = await removeContact(profile._id);
+            const response = await removeContact(
+                profile._id,
+            );
 
             if (!response?.success) {
                 toast.error(
@@ -254,7 +417,9 @@ const ContactProfile = () => {
         setIsAddingContact(true);
 
         try {
-            const response = await addContact(profile._id);
+            const response = await addContact(
+                profile._id,
+            );
 
             if (!response?.success) {
                 toast.error(
@@ -327,7 +492,7 @@ const ContactProfile = () => {
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        className="absolute left-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.12] bg-black/45 text-white shadow-lg backdrop-blur-md transition hover:bg-black/65 active:scale-95 sm:left-5 sm:top-5"
+                        className="absolute left-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full text-white shadow-lg transition active:scale-95 sm:left-5 sm:top-5"
                         aria-label="Go back"
                         title="Go back"
                     >
@@ -336,28 +501,28 @@ const ContactProfile = () => {
                 </div>
 
                 {/* PROFILE IDENTITY */}
-
                 <section className="px-5 sm:px-8">
                     <div className="relative">
-
-                        {/* AVATAR + STATUS */}
-
                         <div className="relative min-h-[8rem] sm:min-h-[9rem] lg:min-h-[10rem]">
-
                             {/* AVATAR */}
-
                             <div className="absolute left-0 top-0 z-10 -translate-y-10 sm:-translate-y-12">
                                 <Avatar
-                                    profilePic={profile.profilePic}
+                                    profilePic={
+                                        profile.profilePic
+                                    }
                                     initials={initials}
                                     alt={fullName}
-                                    decoration={profile.avatarDecoration}
+                                    decoration={
+                                        profile.avatarDecoration
+                                    }
                                     size="lg"
                                     avatarClassName="border-4 border-[#0b100c] bg-[#151a16] font-bold text-[#d8f45a]"
                                 >
                                     <div className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full border-[2px] border-[#111317] bg-[#131613] shadow-md">
                                         <PresenceIcon
-                                            status={presenceStatus}
+                                            status={
+                                                presenceStatus
+                                            }
                                             size="small"
                                         />
                                     </div>
@@ -365,31 +530,26 @@ const ContactProfile = () => {
                             </div>
 
                             {/* CUSTOM STATUS */}
-
                             {profile.customStatus?.trim() && (
                                 <div className="absolute left-[7.5rem] top-0 z-20 sm:left-[8.5rem] lg:left-[9.5rem]">
                                     <div className="flex items-start">
-
-                                        {/* CONNECTOR DOTS */}
-
                                         <div className="mr-1 mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1a1c1a]" />
 
                                         <div className="mr-1.5 mt-4 h-3 w-3 shrink-0 rounded-full bg-[#1a1c1a]" />
 
-                                        {/* STATUS BUBBLE */}
-
                                         <div className="max-w-[calc(100vw-10rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:max-w-[24rem] lg:max-w-[28rem]">
                                             <span className="block max-h-[3.75rem] overflow-hidden break-words">
-                                                {profile.customStatus}
+                                                {
+                                                    profile.customStatus
+                                                }
                                             </span>
                                         </div>
-
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        {/* IDENTITY — BELOW AVATAR */}
+                        {/* IDENTITY */}
                         <div className="-mt-8 max-w-3xl">
                             <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                                 {fullName}
@@ -397,6 +557,7 @@ const ContactProfile = () => {
 
                             <p className="mt-1.5 break-words text-sm text-[#b5b8b3]">
                                 {profile.email}
+
                                 {profile.pronouns?.trim() && (
                                     <>
                                         {" • "}
@@ -404,58 +565,37 @@ const ContactProfile = () => {
                                     </>
                                 )}
                             </p>
-
-                            {/* PRESENCE */}
-                            <div className="mt-3 flex items-center gap-2">
-                                <PresenceIcon
-                                    status={presenceStatus}
-                                    size="small"
-                                />
-
-                                <span className="text-xs font-medium text-[#858d84]">
-                                    {presenceStatus === "online"
-                                        ? "Online"
-                                        : presenceStatus === "idle"
-                                            ? "Idle"
-                                            : presenceStatus === "dnd"
-                                                ? "Do Not Disturb"
-                                                : "Off Planet"}
-                                </span>
-                            </div>
                         </div>
-
                     </div>
                 </section>
 
                 {/* MEDIA */}
                 <section className="mt-8 px-5 sm:px-8">
                     <div className="flex items-center justify-between">
-                        <div>
-                            <h2 className="text-sm font-semibold text-[#f1eee8]">
-                                Media and documents
-                            </h2>
+                        <h2 className="text-sm font-semibold text-[#f1eee8]">
+                            Media and docs
+                        </h2>
 
-                            <p className="mt-0.5 text-xs text-[#626960]">
-                                Shared in your conversations
-                            </p>
+                        <div className="flex items-center gap-1 text-xs font-medium text-[#858d84]">
+                            <span>{mediaTotal}</span>
+                            <IoChevronForward className="text-sm" />
                         </div>
-
-                        {media.length > 0 && (
-                            <span className="text-[11px] text-[#555d55]">
-                                Latest {media.length}
-                            </span>
-                        )}
                     </div>
 
-                    {media.length === 0 ? (
-                        <div className="mt-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-8 text-center">
-                            <p className="text-sm text-[#626960]">
-                                No shared media or documents yet.
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="mt-3 overflow-hidden rounded-2xl border border-white/[0.06] bg-[#101510]">
-                            <div className="scrollbar-aetherion flex gap-2 overflow-x-auto p-2 scrollbar-hide">
+                    {mediaTotal > 0 && (
+                        <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={openAllMedia}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    openAllMedia();
+                                }
+                            }}
+                            className="mt-3 cursor-pointer overflow-hidden rounded-2xl border border-white/[0.06] bg-[#101510] transition"
+                        >
+                            <div className="scrollbar-aetherion flex gap-2 overflow-x-auto p-2">
                                 {media.map((item, index) => {
                                     const visual = isVisualMedia(item);
 
@@ -467,55 +607,72 @@ const ContactProfile = () => {
                                                 : "flex";
 
                                     return (
-                                        <button
+                                        <div
                                             key={item._id}
-                                            type="button"
-                                            onClick={() =>
-                                                visual &&
-                                                openMediaViewer(item)
-                                            }
-                                            disabled={!visual}
-                                            className={`${visibilityClass} group relative aspect-square shrink-0 basis-[22%] overflow-hidden rounded-xl bg-[#151a16] sm:basis-[18%] lg:basis-[14%] ${visual
-                                                    ? "cursor-pointer"
-                                                    : "cursor-default"
+                                            role={visual ? "button" : undefined}
+                                            tabIndex={visual ? 0 : undefined}
+                                            onClick={(event) => {
+                                                if (visual) {
+                                                    event.stopPropagation();
+                                                    openMediaViewer(item);
+                                                } else {
+                                                    openAllMedia();
+                                                }
+                                            }}
+                                            onKeyDown={(event) => {
+                                                if (
+                                                    visual &&
+                                                    (event.key === "Enter" ||
+                                                        event.key === " ")
+                                                ) {
+                                                    event.preventDefault();
+                                                    event.stopPropagation();
+                                                    openMediaViewer(item);
+                                                }
+                                            }}
+                                            className={`${visibilityClass} group relative aspect-square shrink-0 basis-[22%] overflow-hidden rounded-xl bg-[#151a16] sm:basis-[18%] lg:basis-[14%]} ${visual
+                                                ? "cursor-pointer"
+                                                : "cursor-pointer"
                                                 }`}
                                         >
-                                            {visual && item.mediaUrl ? (
+                                            {item.type === "image" ||
+                                                item.type === "gif" ? (
+                                                <img
+                                                    src={item.mediaUrl}
+                                                    alt=""
+                                                    className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.03]"
+                                                    loading="lazy"
+                                                />
+                                            ) : item.type === "video" ? (
                                                 <>
-                                                    <img
+                                                    <video
                                                         src={item.mediaUrl}
-                                                        alt="Shared media"
-                                                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                                        className="h-full w-full object-cover"
+                                                        muted
+                                                        playsInline
+                                                        preload="metadata"
                                                     />
 
-                                                    {item.type === "video" && (
-                                                        <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                                                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm sm:h-9 sm:w-9">
-                                                                <IoPlay className="ml-0.5 text-sm" />
-                                                            </span>
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/15">
+                                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm">
+                                                            <IoPlay className="text-base" />
                                                         </div>
-                                                    )}
-
-                                                    {item.type === "gif" && (
-                                                        <span className="absolute bottom-1.5 left-1.5 rounded-md bg-black/65 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-                                                            GIF
-                                                        </span>
-                                                    )}
+                                                    </div>
                                                 </>
                                             ) : (
-                                                <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-2">
-                                                    <IoDocumentTextOutline className="text-xl text-[#777f76] sm:text-2xl" />
+                                                <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-2 text-center">
+                                                    <IoDocumentTextOutline className="text-xl text-[#858d84]" />
 
-                                                    <p className="line-clamp-2 text-center text-[9px] font-medium leading-4 text-[#858d84] sm:text-[10px]">
+                                                    <span className="line-clamp-2 text-[10px] text-[#aeb5ac]">
                                                         {getDocumentName(item)}
-                                                    </p>
+                                                    </span>
                                                 </div>
                                             )}
-                                        </button>
+                                        </div>
                                     );
                                 })}
                             </div>
-                        </div >
+                        </div>
                     )}
                 </section>
 
@@ -535,7 +692,6 @@ const ContactProfile = () => {
                 )}
 
                 {/* CONNECTIONS */}
-
                 {Array.isArray(profile.connections) &&
                     profile.connections.length > 0 && (
                         <section className="mt-8 px-5 sm:px-8">
@@ -554,7 +710,6 @@ const ContactProfile = () => {
                     )}
 
                 {/* MEMBER SINCE */}
-
                 <section className="mt-8 px-5 sm:px-8">
                     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-4">
                         <div className="flex items-center justify-between gap-4">
@@ -585,7 +740,6 @@ const ContactProfile = () => {
                 </section>
 
                 {/* CONTACTS */}
-
                 {Array.isArray(profileData.contacts) &&
                     profileData.contacts.length > 0 && (
                         <section className="mt-8 px-5 sm:px-8">
@@ -596,7 +750,8 @@ const ContactProfile = () => {
                                     </h2>
 
                                     <p className="mt-0.5 text-xs text-[#626960]">
-                                        People in their Aetherion contacts
+                                        People in their Aetherion
+                                        contacts
                                     </p>
                                 </div>
 
@@ -625,7 +780,7 @@ const ContactProfile = () => {
                                                 type="button"
                                                 onClick={() =>
                                                     navigate(
-                                                        `/ contact - profile / ${contact._id} `,
+                                                        `/contact-profile/${contact._id}`,
                                                     )
                                                 }
                                                 className="group flex w-16 shrink-0 flex-col items-center gap-2"
@@ -661,85 +816,273 @@ const ContactProfile = () => {
                     )}
             </main>
 
-            {/* MEDIA VIEWER */}
-
-            {mediaViewerOpen && visualMedia.length > 0 && (
-                <MediaViewer
-                    mediaItems={visualMedia}
-                    initialIndex={mediaViewerIndex}
-                    onClose={closeMediaViewer}
-                    currentUser={null}
-                    otherUser={profile}
-                />
-            )}
-
-            {/* REMOVE CONTACT MODAL */}
-            {showRemoveContactModal && (
-                <div
-                    className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 px-3 pb-3 backdrop-blur-sm sm:items-center sm:px-5 sm:pb-0"
-                    onMouseDown={() => {
-                        if (!isRemovingContact) {
-                            setShowRemoveContactModal(false);
-                        }
-                    }}
-                >
-                    <div
-                        className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111611] shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
-                        onMouseDown={(event) =>
-                            event.stopPropagation()
-                        }
-                    >
+            {/* ALL MEDIA MODAL */}
+            {allMediaOpen && (
+                <div className="fixed inset-0 z-[80] bg-[#0b100c]">
+                    <div className="flex h-full flex-col">
                         {/* HEADER */}
-
-                        <div className="border-b border-white/[0.06] px-5 py-4">
-                            <h2 className="text-sm font-semibold text-[#f1eee8]">
-                                Remove contact?
-                            </h2>
-
-                            <p className="mt-1.5 text-xs leading-5 text-[#777f76]">
-                                Remove{" "}
-                                <span className="font-medium text-[#b9beb7]">
-                                    {fullName}
-                                </span>{" "}
-                                from your contacts?
-                            </p>
-                        </div>
-
-                        {/* ACTIONS */}
-
-                        <div className="flex flex-col gap-2 p-4">
-                            <button
-                                type="button"
-                                onClick={handleRemoveContact}
-                                disabled={isRemovingContact}
-                                className="flex h-10 w-full items-center justify-center rounded-xl bg-[#d8f45a] px-4 text-sm font-semibold text-[#10120d] transition hover:bg-[#e4ff6f] disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {isRemovingContact
-                                    ? "Removing..."
-                                    : "Remove contact"}
-                            </button>
-
+                        <div className="flex shrink-0 items-center gap-3 border-b border-white/[0.06] px-4 py-4 sm:px-6">
                             <button
                                 type="button"
                                 onClick={() =>
-                                    setShowRemoveContactModal(false)
+                                    setAllMediaOpen(false)
                                 }
-                                disabled={isRemovingContact}
-                                className="flex h-10 w-full items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 text-sm font-medium text-[#aeb5aa] transition hover:bg-white/[0.05] hover:text-[#f1eee8] disabled:cursor-not-allowed disabled:opacity-40"
+                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#aeb5aa] transition hover:text-white"
+                                aria-label="Back"
                             >
-                                Cancel
+                                <IoArrowBack className="text-lg" />
                             </button>
+
+                            <div className="min-w-0">
+                                <h2 className="text-base font-semibold text-[#f1eee8]">
+                                    All Media
+                                </h2>
+
+                                <p className="mt-0.5 text-xs text-[#626960]">
+                                    {mediaTotal} shared items
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* TABS */}
+                        <div className="flex border-b border-[#d8f45a]/10">
+                            <button
+                                type="button"
+                                onClick={() => setAllMediaTab("media")}
+                                className={`flex flex-1 items-center justify-center py-3 text-sm font-semibold transition ${allMediaTab === "media"
+                                    ? "border-b-2 border-[#c1e344] text-[#d8f45a]"
+                                    : "text-[#858d84] hover:text-[#f1eee8]"
+                                    }`}
+                            >
+                                Media
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => setAllMediaTab("docs")}
+                                className={`flex flex-1 items-center justify-center py-3 text-sm font-semibold transition ${allMediaTab === "docs"
+                                    ? "border-b-2 border-[#d8f45a] text-[#d8f45a]"
+                                    : "text-[#858d84] hover:text-[#f1eee8]"
+                                    }`}
+                            >
+                                Docs
+                            </button>
+                        </div>
+
+                        {/* CONTENT */}
+                        <div className="scrollbar-aetherion flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+                            {allMediaLoading ? (
+                                <div className="flex min-h-[40vh] items-center justify-center">
+                                    <p className="text-sm text-[#626960]">
+                                        Loading...
+                                    </p>
+                                </div>
+                            ) : groupedAllMedia.length ===
+                                0 ? (
+                                <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
+                                    {allMediaTab ===
+                                        "media" ? (
+                                        <IoImageOutline className="text-3xl text-[#454c45]" />
+                                    ) : (
+                                        <IoDocumentTextOutline className="text-3xl text-[#454c45]" />
+                                    )}
+
+                                    <p className="mt-3 text-sm text-[#626960]">
+                                        No{" "}
+                                        {allMediaTab ===
+                                            "media"
+                                            ? "media"
+                                            : "documents"}{" "}
+                                        shared yet.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="mx-auto w-full max-w-6xl space-y-8">
+                                    {groupedAllMedia.map(
+                                        ([
+                                            groupName,
+                                            items,
+                                        ]) => (
+                                            <section
+                                                key={
+                                                    groupName
+                                                }
+                                            >
+                                                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#626960]">
+                                                    {
+                                                        groupName
+                                                    }
+                                                </h3>
+
+                                                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
+                                                    {items.map(
+                                                        (
+                                                            item,
+                                                        ) => {
+                                                            const visual =
+                                                                isVisualMedia(
+                                                                    item,
+                                                                );
+
+                                                            return (
+                                                                <button
+                                                                    key={
+                                                                        item._id
+                                                                    }
+                                                                    type="button"
+                                                                    disabled={
+                                                                        !visual
+                                                                    }
+                                                                    onClick={() =>
+                                                                        openAllMediaItem(
+                                                                            item,
+                                                                        )
+                                                                    }
+                                                                    className={`group relative aspect-square overflow-hidden rounded-xl bg-[#151a16] ${visual
+                                                                        ? "cursor-pointer"
+                                                                        : "cursor-default"
+                                                                        }`}
+                                                                >
+                                                                    {visual &&
+                                                                        item.mediaUrl ? (
+                                                                        <>
+                                                                            <img
+                                                                                src={
+                                                                                    item.mediaUrl
+                                                                                }
+                                                                                alt="Shared media"
+                                                                                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                                                            />
+
+                                                                            {item.type ===
+                                                                                "video" && (
+                                                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                                                                                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
+                                                                                            <IoPlay className="ml-0.5 text-sm" />
+                                                                                        </span>
+                                                                                    </div>
+                                                                                )}
+
+                                                                            {item.type ===
+                                                                                "gif" && (
+                                                                                    <span className="absolute bottom-1.5 left-1.5 rounded-md bg-black/65 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+                                                                                        GIF
+                                                                                    </span>
+                                                                                )}
+                                                                        </>
+                                                                    ) : (
+                                                                        <div className="flex h-full flex-col items-center justify-center gap-3 px-3">
+                                                                            <IoDocumentTextOutline className="text-2xl text-[#777f76]" />
+
+                                                                            <p className="line-clamp-3 text-center text-[10px] leading-4 text-[#858d84]">
+                                                                                {getDocumentName(
+                                                                                    item,
+                                                                                )}
+                                                                            </p>
+                                                                        </div>
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        },
+                                                    )}
+                                                </div>
+                                            </section>
+                                        ),
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             )}
 
+            {/* MEDIA VIEWER */}
+            {mediaViewerOpen &&
+                visualMedia.length > 0 && (
+                    <MediaViewer
+                        mediaItems={visualMedia}
+                        initialIndex={
+                            mediaViewerIndex
+                        }
+                        onClose={closeMediaViewer}
+                        currentUser={null}
+                        otherUser={profile}
+                    />
+                )}
+
+            {/* REMOVE CONTACT MODAL */}
+            {showRemoveContactModal && (<div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 px-3 pb-3 backdrop-blur-sm sm:items-center sm:px-5 sm:pb-0" onMouseDown={() => {
+                if (!isRemovingContact) {
+                    setShowRemoveContactModal(
+                        false,
+                    );
+                }
+            }}
+            >
+                <div
+                    className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111611] shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+                    onMouseDown={(event) =>
+                        event.stopPropagation()
+                    }
+                >
+                    <div className="border-b border-white/[0.06] px-5 py-4">
+                        <h2 className="text-sm font-semibold text-[#f1eee8]">
+                            Remove contact?
+                        </h2>
+
+                        <p className="mt-1.5 text-xs leading-5 text-[#777f76]">
+                            Remove{" "}
+                            <span className="font-medium text-[#b9beb7]">
+                                {fullName}
+                            </span>{" "}
+                            from your contacts?
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2 p-4">
+                        <button
+                            type="button"
+                            onClick={
+                                handleRemoveContact
+                            }
+                            disabled={
+                                isRemovingContact
+                            }
+                            className="flex h-10 w-full items-center justify-center rounded-xl bg-[#d8f45a] px-4 text-sm font-semibold text-[#10120d] transition hover:bg-[#e4ff6f] disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {isRemovingContact
+                                ? "Removing..."
+                                : "Remove contact"}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setShowRemoveContactModal(
+                                    false,
+                                )
+                            }
+                            disabled={
+                                isRemovingContact
+                            }
+                            className="flex h-10 w-full items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 text-sm font-medium text-[#aeb5aa] transition hover:bg-white/[0.05] hover:text-[#f1eee8] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+            )}
+
+            {/* ADD CONTACT MODAL */}
             {showAddContactModal && (
                 <div
                     className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 px-3 pb-3 backdrop-blur-sm sm:items-center sm:px-5 sm:pb-0"
                     onMouseDown={() => {
                         if (!isAddingContact) {
-                            setShowAddContactModal(false);
+                            setShowAddContactModal(
+                                false,
+                            );
                         }
                     }}
                 >
@@ -767,7 +1110,9 @@ const ContactProfile = () => {
                             <button
                                 type="button"
                                 onClick={handleAddContact}
-                                disabled={isAddingContact}
+                                disabled={
+                                    isAddingContact
+                                }
                                 className="flex h-10 w-full items-center justify-center rounded-xl bg-[#d8f45a] px-4 text-sm font-semibold text-[#10120d] transition hover:bg-[#e4ff6f] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {isAddingContact
@@ -778,9 +1123,13 @@ const ContactProfile = () => {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    setShowAddContactModal(false)
+                                    setShowAddContactModal(
+                                        false,
+                                    )
                                 }
-                                disabled={isAddingContact}
+                                disabled={
+                                    isAddingContact
+                                }
                                 className="flex h-10 w-full items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 text-sm font-medium text-[#aeb5aa] transition hover:bg-white/[0.05] hover:text-[#f1eee8] disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 Cancel

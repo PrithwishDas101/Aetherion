@@ -160,6 +160,17 @@ export const getContactProfile = async (req, res) => {
         .lean();
     }
 
+    let mediaTotal = 0;
+
+    if (chat?._id) {
+      mediaTotal = await Message.countDocuments({
+        chatId: chat._id,
+        type: {
+          $in: MEDIA_TYPES,
+        },
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "Contact profile fetched successfully.",
@@ -168,6 +179,7 @@ export const getContactProfile = async (req, res) => {
         isContact,
         contacts,
         media,
+        mediaTotal,
       },
     });
   } catch (error) {
@@ -176,6 +188,85 @@ export const getContactProfile = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Unable to fetch contact profile.",
+    });
+  }
+};
+
+// GET ALL CONTACT MEDIA / DOCUMENTS
+export const getContactProfileMedia = async (req, res) => {
+  try {
+    const viewerId = String(req.user.userId);
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID.",
+      });
+    }
+
+    if (viewerId === String(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot open your own media as a contact profile.",
+      });
+    }
+
+    const viewerObjectId = new mongoose.Types.ObjectId(viewerId);
+    const targetUserId = new mongoose.Types.ObjectId(userId);
+
+    const chat = await Chat.findOne({
+      members: {
+        $all: [viewerObjectId, targetUserId],
+      },
+      $expr: {
+        $eq: [
+          {
+            $size: "$members",
+          },
+          2,
+        ],
+      },
+    })
+      .select("_id")
+      .lean();
+
+    if (!chat?._id) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          media: [],
+          total: 0,
+        },
+      });
+    }
+
+    const media = await Message.find({
+      chatId: chat._id,
+      type: {
+        $in: MEDIA_TYPES,
+      },
+    })
+      .select(MEDIA_PROJECTION)
+      .sort({
+        createdAt: -1,
+      })
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      message: "Contact profile media fetched successfully.",
+      data: {
+        media,
+        total: media.length,
+      },
+    });
+  } catch (error) {
+    console.error("Get contact profile media error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to fetch contact media.",
     });
   }
 };
