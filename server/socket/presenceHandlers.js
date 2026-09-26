@@ -7,31 +7,30 @@ import User from "../models/User.js";
 
 const registerPresenceHandlers = (io) => {
   io.on("connection", (socket) => {
-    let userId = null;
+    const userId = socket.data.userId;
 
-    socket.on("join-room", (incomingUserId) => {
-      if (!incomingUserId) {
-        return;
-      }
+    if (!userId) {
+      socket.disconnect(true);
+      return;
+    }
 
-      userId = String(incomingUserId);
+    socket.join(userId);
 
-      socket.join(userId);
+    const becameOnline = addConnection(userId);
 
-      const becameOnline = addConnection(userId);
+    if (becameOnline) {
+      io.emit("user-online", {
+        userId,
+      });
+    }
 
-      if (becameOnline) {
-        io.emit("user-online", {
-          userId,
-        });
-      }
+    socket.on("get-presence", () => {
+      socket.emit("presence-state", {
+        userIds: getOnlineUsers(),
+      });
     });
 
     socket.on("disconnect", async () => {
-      if (!userId) {
-        return;
-      }
-
       const result = removeConnection(userId);
 
       if (!result.becameOffline) {
@@ -43,7 +42,7 @@ const registerPresenceHandlers = (io) => {
           lastSeen: result.lastSeen,
         });
       } catch (error) {
-        console.error("Failed to update last seen:", error);
+        console.error("Failed to update last seen:", error.message);
 
         return;
       }
@@ -51,12 +50,6 @@ const registerPresenceHandlers = (io) => {
       io.emit("user-offline", {
         userId,
         lastSeen: result.lastSeen,
-      });
-    });
-
-    socket.on("get-presence", () => {
-      socket.emit("presence-state", {
-        userIds: getOnlineUsers(),
       });
     });
   });

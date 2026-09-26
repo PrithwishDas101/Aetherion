@@ -3,19 +3,16 @@ import { Search, MessageCircle } from "lucide-react";
 const EmptyChatState = ({ onFindSomeone }) => {
   return (
     <div className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden px-5 py-8 sm:px-6 sm:py-10">
-      {/* Ambient glow */}
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d8f45a]/[0.035] blur-3xl" />
-
       <div className="relative flex w-full max-w-md flex-col items-center text-center">
         {/* Icon */}
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-[20px] border border-[#d8f45a]/20 bg-[#111711] shadow-[0_0_35px_rgba(216,244,90,0.06)] sm:h-20 sm:w-20 sm:rounded-[22px] sm:shadow-[0_0_45px_rgba(216,244,90,0.08)]">
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#111711] shadow-[0_0_35px_rgba(216,244,90,0.06)] sm:h-20 sm:w-20 sm:rounded-[22px] sm:shadow-[0_0_45px_rgba(216,244,90,0.08)]">
           <MessageCircle
             className="h-7 w-7 text-[#d8f45a] sm:h-9 sm:w-9"
             strokeWidth={1.5}
           />
 
           {/* Small accent */}
-          <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-[#d8f45a] shadow-[0_0_12px_rgba(216,244,90,0.6)]" />
+          <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-[#def76f] shadow-[0_0_12px_rgba(216,244,90,0.6)]" />
         </div>
 
         {/* Heading */}

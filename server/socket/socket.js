@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { Server } from "socket.io";
 
 import { registerSocketHandlers } from "./socketHandlers.js";
@@ -18,6 +19,31 @@ const initializeSocket = (server) => {
       methods: ["GET", "POST"],
       credentials: true,
     },
+  });
+
+  // Authenticate every Socket.IO connection before it can reach any handler.
+  io.use((socket, next) => {
+    try {
+      const token = socket.handshake.auth?.token;
+
+      if (!token) {
+        return next(new Error("Authentication required"));
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      if (!decoded?.userId) {
+        return next(new Error("Invalid authentication token"));
+      }
+
+      socket.data.userId = String(decoded.userId);
+
+      return next();
+    } catch (error) {
+      console.error("Socket authentication error:", error.message);
+
+      return next(new Error("Invalid or expired authentication token"));
+    }
   });
 
   registerSocketHandlers(io);

@@ -68,14 +68,16 @@ const Home = () => {
       return;
     }
 
-    const handleConnect = () => {
-      joinRoom(socket, user._id);
+    socket.auth = {
+      token: localStorage.getItem("token"),
+    };
 
+    const handleConnect = () => {
       getPresence(socket);
     };
 
-    if (socket.connected) {
-      handleConnect();
+    if (!socket.connected) {
+      socket.connect();
     }
 
     socket.on("connect", handleConnect);
