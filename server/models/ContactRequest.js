@@ -13,17 +13,24 @@ const contactRequestSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
+    // Canonical unordered pair.
+    // This prevents A -> B and B -> A from existing simultaneously.
+    pairKey: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
   },
 );
 
-// Only one pending request in the same direction.
+// Only one pending request can exist for a user pair,
+// regardless of which direction the request was sent.
 contactRequestSchema.index(
   {
-    requester: 1,
-    recipient: 1,
+    pairKey: 1,
   },
   {
     unique: true,

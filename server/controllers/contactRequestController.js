@@ -35,6 +35,12 @@ export const sendContactRequest = async (req, res) => {
 
     const recipientObjectId = new mongoose.Types.ObjectId(recipientId);
 
+    const requesterObjectId = new mongoose.Types.ObjectId(requesterId);
+
+    const pairKey = [String(requesterObjectId), String(recipientObjectId)]
+      .sort()
+      .join(":");
+
     if (requesterId === String(recipientObjectId)) {
       return res.status(400).json({
         success: false,
@@ -96,16 +102,33 @@ export const sendContactRequest = async (req, res) => {
 
     try {
       request = await ContactRequest.create({
-        requester: requesterId,
+        requester: requesterObjectId,
         recipient: recipientObjectId,
+        pairKey,
       });
     } catch (error) {
-      // Unique index protects against duplicate concurrent requests.
+      // The unique pairKey index is the final protection against
+      // concurrent duplicate/reverse-direction requests.
       if (error?.code === 11000) {
+        const existingRequest = await ContactRequest.findOne({
+          pairKey,
+        }).lean();
+
+        if (
+          existingRequest &&
+          String(existingRequest.requester) === requesterId
+        ) {
+          return res.status(409).json({
+            success: false,
+            message: "Contact request already sent.",
+            code: "REQUEST_ALREADY_SENT",
+          });
+        }
+
         return res.status(409).json({
           success: false,
-          message: "Contact request already sent.",
-          code: "REQUEST_ALREADY_SENT",
+          message: "This user has already sent you a contact request.",
+          code: "INCOMING_REQUEST_EXISTS",
         });
       }
 
