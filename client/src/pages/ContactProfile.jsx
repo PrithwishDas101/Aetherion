@@ -7,6 +7,7 @@ import {
     IoChevronForward,
     IoPersonAddOutline,
     IoPersonRemoveOutline,
+    IoTimeOutline,
     IoPlay,
     IoDocumentTextOutline,
     IoImageOutline,
@@ -413,20 +414,35 @@ const ContactProfile = () => {
     };
 
     const handleSendContactRequest = async () => {
-        if (!profile?._id || profileData?.contactStatus === "outgoing_pending") {
+        if (
+            !profile?._id ||
+            profileData?.contactStatus === "outgoing_pending" ||
+            profileData?.contactStatus === "contact"
+        ) {
             return;
         }
 
-        const response =
-            await sendContactRequest(
-                profile._id,
-            );
+        const response = await sendContactRequest(
+            profile._id,
+        );
 
         if (!response?.success) {
             if (
                 response?.code ===
                 "REQUEST_ALREADY_SENT"
             ) {
+                setProfileData((current) => {
+                    if (!current) {
+                        return current;
+                    }
+
+                    return {
+                        ...current,
+                        contactStatus: "outgoing_pending",
+                        isContact: false,
+                    };
+                });
+
                 toast("Contact request already sent.");
                 return;
             }
@@ -445,6 +461,18 @@ const ContactProfile = () => {
                 response?.code ===
                 "ALREADY_CONTACT"
             ) {
+                setProfileData((current) => {
+                    if (!current) {
+                        return current;
+                    }
+
+                    return {
+                        ...current,
+                        contactStatus: "contact",
+                        isContact: true,
+                    };
+                });
+
                 toast(
                     "This user is already a contact.",
                 );
@@ -522,53 +550,53 @@ const ContactProfile = () => {
 
                         {/* CONTACT ACTION */}
                         <div className="absolute right-2 top-2 z-30 sm:right-3 sm:top-3">
-                            {profileData?.contactStatus ===
-                                "contact" ? (
+
+                            {/* ALREADY A CONTACT */}
+                            {profileData?.contactStatus === "contact" && (
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setShowRemoveContactModal(true)
                                     }
-                                    className="..."
+                                    className="group flex h-10 w-10 items-center justify-center rounded-full text-white transition active:scale-95"
                                     aria-label="Remove contact"
                                     title="Remove contact"
                                 >
-                                    <IoPersonRemoveOutline className="text-lg" />
-                                </button>
-                            ) : (
-                                <button
-                                    type="button"
-                                    onClick={
-                                        profileData?.contactStatus ===
-                                            "outgoing_pending"
-                                            ? undefined
-                                            : handleSendContactRequest
-                                    }
-                                    disabled={
-                                        profileData?.contactStatus ===
-                                        "outgoing_pending"
-                                    }
-                                    className={`... ${profileData?.contactStatus ===
-                                        "outgoing_pending"
-                                        ? "cursor-default opacity-40"
-                                        : ""
-                                        }`}
-                                    aria-label={
-                                        profileData?.contactStatus ===
-                                            "outgoing_pending"
-                                            ? "Contact request sent"
-                                            : "Send contact request"
-                                    }
-                                    title={
-                                        profileData?.contactStatus ===
-                                            "outgoing_pending"
-                                            ? "Request sent"
-                                            : "Send contact request"
-                                    }
-                                >
-                                    <IoPersonRemoveOutline className="text-lg" />
+                                    <IoPersonRemoveOutline
+                                        className="text-lg transition-colors duration-200 group-hover:text-red-400"
+                                    />
                                 </button>
                             )}
+
+                            {/* OUTGOING REQUEST SENT */}
+                            {profileData?.contactStatus === "outgoing_pending" && (
+                                <button
+                                    type="button"
+                                    disabled
+                                    className="flex h-10 w-10 cursor-default items-center justify-center rounded-full text-[#858d84]"
+                                    aria-label="Contact request sent"
+                                    title="Contact request sent"
+                                >
+                                    <IoTimeOutline className="text-lg" />
+                                </button>
+                            )}
+
+                            {/* NO CONTACT / NO OUTGOING REQUEST */}
+                            {profileData?.contactStatus !== "contact" &&
+                                profileData?.contactStatus !== "outgoing_pending" && (
+                                    <button
+                                        type="button"
+                                        onClick={handleSendContactRequest}
+                                        className="group flex h-10 w-10 items-center justify-center rounded-full text-white transition active:scale-95"
+                                        aria-label="Send contact request"
+                                        title="Add contact"
+                                    >
+                                        <IoPersonAddOutline
+                                            className="text-lg transition-colors duration-200 group-hover:text-[#5af48b]"
+                                        />
+                                    </button>
+                                )}
+
                         </div>
                     </div>
 
@@ -1116,68 +1144,74 @@ const ContactProfile = () => {
                     />
                 )}
 
-            {/* REMOVE CONTACT MODAL */}
-            {showRemoveContactModal && (<div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 px-3 pb-3 backdrop-blur-sm sm:items-center sm:px-5 sm:pb-0" onMouseDown={() => {
-                if (!isRemovingContact) {
-                    setShowRemoveContactModal(
-                        false,
-                    );
-                }
-            }}
-            >
+            {/* REMOVE CONTACT CONFIRMATION */}
+            {showRemoveContactModal && (
                 <div
-                    className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111611] shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
-                    onMouseDown={(event) =>
-                        event.stopPropagation()
-                    }
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-5"
+                    onClick={() => {
+                        if (!isRemovingContact) {
+                            setShowRemoveContactModal(false);
+                        }
+                    }}
                 >
-                    <div className="border-b border-white/[0.06] px-5 py-4">
-                        <h2 className="text-sm font-semibold text-[#f1eee8]">
-                            Remove contact?
-                        </h2>
+                    <div
+                        className="w-full max-w-[350px] overflow-hidden rounded-2xl border border-white/10 bg-[#111711] shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
+                        onClick={(event) =>
+                            event.stopPropagation()
+                        }
+                    >
+                        {/* Red accent */}
+                        <div className="h-[3px] w-full bg-red-500/80" />
 
-                        <p className="mt-1.5 text-xs leading-5 text-[#777f76]">
-                            Remove{" "}
-                            <span className="font-medium text-[#b9beb7]">
-                                {fullName}
-                            </span>{" "}
-                            from your contacts?
-                        </p>
-                    </div>
+                        <div className="p-5">
+                            {/* Header */}
+                            <div className="flex items-start gap-3">
+                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-400">
+                                    <IoPersonRemoveOutline className="h-[17px] w-[17px]" />
+                                </div>
 
-                    <div className="flex flex-col gap-2 p-4">
-                        <button
-                            type="button"
-                            onClick={
-                                handleRemoveContact
-                            }
-                            disabled={
-                                isRemovingContact
-                            }
-                            className="flex h-10 w-full items-center justify-center rounded-xl bg-[#d8f45a] px-4 text-sm font-semibold text-[#10120d] transition hover:bg-[#e4ff6f] disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            {isRemovingContact
-                                ? "Removing..."
-                                : "Remove contact"}
-                        </button>
+                                <div className="min-w-0">
+                                    <h2 className="text-[16px] font-semibold text-[#f1eee8]">
+                                        Remove contact?
+                                    </h2>
 
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setShowRemoveContactModal(
-                                    false,
-                                )
-                            }
-                            disabled={
-                                isRemovingContact
-                            }
-                            className="flex h-10 w-full items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 text-sm font-medium text-[#aeb5aa] transition hover:bg-white/[0.05] hover:text-[#f1eee8] disabled:cursor-not-allowed disabled:opacity-40"
-                        >
-                            Cancel
-                        </button>
+                                    <p className="mt-1 text-[13px] leading-5 text-[#8f998b]">
+                                        Remove{" "}
+                                        <span className="font-medium text-[#c9cec5]">
+                                            {fullName}
+                                        </span>{" "}
+                                        from your contacts?
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="mt-5 flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setShowRemoveContactModal(false)
+                                    }
+                                    disabled={isRemovingContact}
+                                    className="flex-1 rounded-xl border border-white/10 bg-[#151c15] px-4 py-2.5 text-sm font-medium text-[#c9cec5] transition hover:bg-[#1c261c] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handleRemoveContact}
+                                    disabled={isRemovingContact}
+                                    className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {isRemovingContact
+                                        ? "Removing..."
+                                        : "Remove contact"}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
             )}
         </div>
     );
