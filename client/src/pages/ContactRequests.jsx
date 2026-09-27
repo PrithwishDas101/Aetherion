@@ -43,21 +43,16 @@ function ContactRequests() {
     const navigate = useNavigate();
 
     const [requests, setRequests] = useState([]);
-    const [searchInput, setSearchInput] =
-        useState("");
+    const [searchInput, setSearchInput] = useState("");
 
     const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] =
-        useState(false);
+    const [hasMore, setHasMore] = useState(false);
     const [total, setTotal] = useState(0);
 
-    const [loading, setLoading] =
-        useState(true);
-    const [error, setError] =
-        useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    const [processingId, setProcessingId] =
-        useState(null);
+    const [processingId, setProcessingId] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -212,8 +207,7 @@ function ContactRequests() {
         setProcessingId(null);
     };
 
-    const isSearching =
-        searchInput.trim().length > 0;
+    const isSearching = searchInput.trim().length > 0;
 
     return (
         <div className="min-h-screen w-full bg-[#080b08] text-[#f1eee8]">
@@ -238,7 +232,7 @@ function ContactRequests() {
                             </h1>
 
                             {total > 0 && (
-                                <span className="rounded-full bg-[#d8f45a]/10 px-2 py-0.5 text-[10px] font-semibold text-[#d8f45a]">
+                                <span className="rounded-full bg-[#ffffff]/[0.08] px-2 py-0.5 text-[10px] font-semibold text-[#c9cec5]">
                                     {total}
                                 </span>
                             )}
@@ -373,30 +367,21 @@ function RequestRow({
     onDecline,
     isLast,
 }) {
-    const requester =
-        request?.requester;
-
-    const fullName =
-        getFullName(requester);
+    const requester = request?.requester;
+    const fullName = getFullName(requester);
 
     return (
         <div
             className={`group flex min-h-[68px] items-center gap-3 border-b border-[#ffffff]/[0.06] px-2 py-3 transition hover:bg-[#101010bd] ${isLast
-                    ? "border-b-0"
-                    : ""
+                ? "border-b-0"
+                : ""
                 }`}
         >
             <Avatar
-                profilePic={
-                    requester?.profilePic
-                }
-                initials={getInitials(
-                    requester,
-                )}
+                profilePic={requester?.profilePic}
+                initials={getInitials(requester,)}
                 alt={fullName}
-                decoration={
-                    requester?.avatarDecoration
-                }
+                decoration={requester?.avatarDecoration}
                 size="xs"
                 avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold"
             />
@@ -414,7 +399,7 @@ function RequestRow({
                         onAccept(request._id)
                     }
                     disabled={processing}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-[#d8f45a]/15 bg-[#d8f45a]/10 text-[#d8f45a] transition hover:bg-[#d8f45a]/20 disabled:cursor-wait disabled:opacity-40"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-[#5af48b]/15 bg-[#5af48b]/10 text-[#5af48b] transition hover:bg-[#5af48b]/20 disabled:cursor-wait disabled:opacity-40"
                     aria-label={`Accept contact request from ${fullName}`}
                     title="Accept"
                 >
@@ -427,7 +412,7 @@ function RequestRow({
                         onDecline(request._id)
                     }
                     disabled={processing}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-red-400/10 bg-red-400/5 text-[#a78f8f] transition hover:bg-red-400/10 hover:text-red-300 disabled:cursor-wait disabled:opacity-40"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-red-400/10 bg-red-400/5 text-[#ec5353] transition hover:bg-red-400/10 hover:text-red-500 disabled:cursor-wait disabled:opacity-40"
                     aria-label={`Decline contact request from ${fullName}`}
                     title="Decline"
                 >
@@ -441,7 +426,7 @@ function RequestRow({
 function LoadingState() {
     return (
         <div className="py-20 text-center">
-            <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#d8f45a]" />
+            <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#eceee3]" />
 
             <p className="mt-4 text-xs text-[#626960]">
                 Loading contact requests...
@@ -463,7 +448,7 @@ function ErrorState({
             <button
                 type="button"
                 onClick={onRetry}
-                className="mt-4 rounded-lg bg-[#d8f45a] px-4 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e5ff70]"
+                className="mt-4 rounded-lg bg-[#eef1de] px-4 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e5ff70]"
             >
                 Try Again
             </button>
