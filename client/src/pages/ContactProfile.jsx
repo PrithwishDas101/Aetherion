@@ -157,6 +157,7 @@ const ContactProfile = () => {
 
     const [showRemoveContactModal, setShowRemoveContactModal] = useState(false);
     const [isRemovingContact, setIsRemovingContact] = useState(false);
+    const [isSendingContactRequest, setIsSendingContactRequest] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -416,92 +417,108 @@ const ContactProfile = () => {
     const handleSendContactRequest = async () => {
         if (
             !profile?._id ||
+            isSendingContactRequest ||
             profileData?.contactStatus === "outgoing_pending" ||
             profileData?.contactStatus === "contact"
         ) {
             return;
         }
 
-        const response = await sendContactRequest(
-            profile._id,
-        );
+        setIsSendingContactRequest(true);
 
-        if (!response?.success) {
-            if (
-                response?.code ===
-                "REQUEST_ALREADY_SENT"
-            ) {
-                setProfileData((current) => {
-                    if (!current) {
-                        return current;
-                    }
-
-                    return {
-                        ...current,
-                        contactStatus: "outgoing_pending",
-                        isContact: false,
-                    };
-                });
-
-                toast("Contact request already sent.");
-                return;
-            }
-
-            if (
-                response?.code ===
-                "INCOMING_REQUEST_EXISTS"
-            ) {
-                toast(
-                    "This user already sent you a contact request.",
-                );
-                return;
-            }
-
-            if (
-                response?.code ===
-                "ALREADY_CONTACT"
-            ) {
-                setProfileData((current) => {
-                    if (!current) {
-                        return current;
-                    }
-
-                    return {
-                        ...current,
-                        contactStatus: "contact",
-                        isContact: true,
-                    };
-                });
-
-                toast(
-                    "This user is already a contact.",
-                );
-                return;
-            }
-
-            toast.error(
-                response?.message ||
-                "Couldn't send contact request.",
+        try {
+            const response = await sendContactRequest(
+                profile._id,
             );
 
-            return;
-        }
+            if (!response?.success) {
+                if (
+                    response?.code ===
+                    "REQUEST_ALREADY_SENT"
+                ) {
+                    setProfileData((current) => {
+                        if (!current) {
+                            return current;
+                        }
 
-        setProfileData((current) => {
-            if (!current) {
-                return current;
+                        return {
+                            ...current,
+                            contactStatus: "outgoing_pending",
+                            isContact: false,
+                        };
+                    });
+
+                    toast("Contact request already sent.");
+                    return;
+                }
+
+                if (
+                    response?.code ===
+                    "INCOMING_REQUEST_EXISTS"
+                ) {
+                    toast(
+                        "This user already sent you a contact request.",
+                    );
+                    return;
+                }
+
+                if (
+                    response?.code ===
+                    "ALREADY_CONTACT"
+                ) {
+                    setProfileData((current) => {
+                        if (!current) {
+                            return current;
+                        }
+
+                        return {
+                            ...current,
+                            contactStatus: "contact",
+                            isContact: true,
+                        };
+                    });
+
+                    toast(
+                        "This user is already a contact.",
+                    );
+                    return;
+                }
+
+                toast.error(
+                    response?.message ||
+                    "Couldn't send contact request.",
+                );
+
+                return;
             }
 
-            return {
-                ...current,
-                contactStatus: "outgoing_pending",
-                isContact: false,
-            };
-        });
+            setProfileData((current) => {
+                if (!current) {
+                    return current;
+                }
 
-        toast.success(
-            "Contact request sent.",
-        );
+                return {
+                    ...current,
+                    contactStatus: "outgoing_pending",
+                    isContact: false,
+                };
+            });
+
+            toast.success(
+                "Contact request sent.",
+            );
+        } catch (error) {
+            console.error(
+                "Send contact request error:",
+                error,
+            );
+
+            toast.error(
+                "Couldn't send contact request.",
+            );
+        } finally {
+            setIsSendingContactRequest(false);
+        }
     };
 
     if (loading) {
@@ -587,6 +604,7 @@ const ContactProfile = () => {
                                     <button
                                         type="button"
                                         onClick={handleSendContactRequest}
+                                        disabled={isSendingContactRequest}
                                         className="group flex h-10 w-10 items-center justify-center rounded-full text-white transition active:scale-95"
                                         aria-label="Send contact request"
                                         title="Add contact"
