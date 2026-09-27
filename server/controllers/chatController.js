@@ -12,8 +12,16 @@ export const createChat = async (req, res) => {
     if (!Array.isArray(members) || members.length !== 2) {
       return res.status(400).json({
         success: false,
-
         message: "A chat must have exactly two members.",
+      });
+    }
+
+    const authenticatedUserId = String(req.user.userId);
+
+    if (!members.some((member) => String(member) === authenticatedUserId)) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only create a chat that includes yourself.",
       });
     }
 
@@ -21,7 +29,6 @@ export const createChat = async (req, res) => {
     if (!members.every((member) => mongoose.Types.ObjectId.isValid(member))) {
       return res.status(400).json({
         success: false,
-
         message: "Invalid chat member.",
       });
     }
@@ -30,7 +37,6 @@ export const createChat = async (req, res) => {
     if (String(members[0]) === String(members[1])) {
       return res.status(400).json({
         success: false,
-
         message: "You cannot create a chat with yourself.",
       });
     }
