@@ -18,7 +18,7 @@ import {
     PRESENCE_STATUS,
 } from "../utils/presenceStatus.js";
 import PresenceIcon from "../components/PresenceIcon.jsx";
-import AddFriendsModal from "../components/Contacts/AddFriendsModal.jsx";
+import AddContactsModal from "../components/Contacts/AddContactsModal.jsx";
 import Avatar from "../components/Avatar.jsx";
 
 const CONTACTS_PER_PAGE = 50;
@@ -118,7 +118,7 @@ function Contacts() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [showAddFriends, setShowAddFriends] = useState(false);
+    const [showAddContacts, setShowAddContacts] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -287,7 +287,7 @@ function Contacts() {
                         <button
                             type="button"
                             onClick={() =>
-                                setShowAddFriends(true)
+                                setShowAddContacts(true)
                             }
                             className="flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-medium text-[#8a9288] transition-all duration-300 hover:text-[#ecf0dd]"
                         >
@@ -483,10 +483,10 @@ function Contacts() {
                         )}
                 </main>
             </div>
-            {isOwnContacts && showAddFriends && (
-                <AddFriendsModal
+            {isOwnContacts && showAddContacts && (
+                <AddContactsModal
                     onClose={() =>
-                        setShowAddFriends(false)
+                        setShowAddContacts(false)
                     }
                 />
             )}

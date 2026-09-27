@@ -495,19 +495,44 @@ const ContactProfile = () => {
                             showAction={false}
                         />
 
+                        {/* BACK BUTTON */}
                         <button
                             type="button"
                             onClick={() => navigate(-1)}
-                            className="absolute left-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full text-white shadow-lg transition active:scale-95 sm:left-5 sm:top-5"
+                            className="absolute left-1 top-2 z-30 flex h-10 w-10 items-center justify-center rounded-full text-white shadow-lg transition active:scale-95 sm:left-1 sm:top-2"
                             aria-label="Go back"
                             title="Go back"
                         >
                             <IoArrowBack className="text-lg" />
                         </button>
+
+                        {/* CONTACT ACTION */}
+                        <div className="absolute right-2 top-2 z-30 sm:right-3 sm:top-3">
+                            {profileData?.isContact ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowRemoveContactModal(true)}
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1a1a1a93] text-[#a9aaa7] transition hover:text-red-500 active:scale-95"
+                                    aria-label="Remove contact"
+                                    title="Remove contact"
+                                >
+                                    <IoPersonRemoveOutline className="text-lg" />
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddContactModal(true)}
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1a1a1a93] text-[#a9aaa7] transition hover:text-green-500 active:scale-95"
+                                    aria-label="Add contact"
+                                    title="Add contact"
+                                >
+                                    <IoPersonAddOutline className="text-lg" />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* PROFILE CONTENT */}
-
                     <div className="relative px-5 pb-10 sm:px-8 sm:pb-12 lg:px-10 lg:pb-14">
 
                         {/* AVATAR */}

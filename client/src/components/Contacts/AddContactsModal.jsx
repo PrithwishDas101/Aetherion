@@ -128,7 +128,7 @@ const findExistingChatWithUser = (allChats, userId) => {
     );
 };
 
-function AddFriendsModal({ onClose }) {
+function AddContactsModal({ onClose }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -243,12 +243,12 @@ function AddFriendsModal({ onClose }) {
             <div className="flex h-[90dvh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-[#ffffff]/[0.07] bg-[#080b08] text-[#f1eee8] shadow-2xl">
                 {/* HEADER */}
                 <header className="flex h-16 shrink-0 items-center gap-3 border-b border-[#ffffff]/[0.06] px-4 sm:px-6">
-                    <button type="button" onClick={onClose} className="aetherion-button h-9 w-9 text-base" aria-label="Close Add Friends">
+                    <button type="button" onClick={onClose} className="aetherion-button h-9 w-9 text-base" aria-label="Close Add Contacts">
                         <span><IoArrowBack /></span>
                     </button>
 
                     <h1 className="text-lg font-semibold tracking-tight text-[#f1eee8]">
-                        Add Friends
+                        Add Contacts
                     </h1>
                 </header>
 
@@ -484,4 +484,4 @@ function AddFriendsModal({ onClose }) {
     );
 }
 
-export default AddFriendsModal;
+export default AddContactsModal;
