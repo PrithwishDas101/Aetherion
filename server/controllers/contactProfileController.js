@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import Contact from "../models/Contact.js";
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
+import ContactRequest from "../models/ContactRequest.js";
 
 import { isOnline } from "../socket/presenceStore.js";
 
@@ -11,7 +12,6 @@ const PUBLIC_PROFILE_PROJECTION = [
   "_id",
   "firstName",
   "lastName",
-  "email",
   "pronouns",
   "bio",
   "profilePic",
@@ -104,6 +104,30 @@ export const getContactProfile = async (req, res) => {
 
     const isContact = Boolean(contactRelationship);
 
+    let contactStatus = "none";
+
+    if (isContact) {
+      contactStatus = "contact";
+    } else {
+      const outgoingRequest = await ContactRequest.exists({
+        requester: viewerObjectId,
+        recipient: targetUserId,
+      });
+
+      if (outgoingRequest) {
+        contactStatus = "outgoing_pending";
+      } else {
+        const incomingRequest = await ContactRequest.exists({
+          requester: targetUserId,
+          recipient: viewerObjectId,
+        });
+
+        if (incomingRequest) {
+          contactStatus = "incoming_pending";
+        }
+      }
+    }
+
     // VIEWED USER'S CONTACTS
     const contactDocuments = await Contact.find({
       owner: targetUserId,
@@ -177,6 +201,7 @@ export const getContactProfile = async (req, res) => {
       data: {
         profile: publicProfile,
         isContact,
+        contactStatus,
         contacts,
         media,
         mediaTotal,

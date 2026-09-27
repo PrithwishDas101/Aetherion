@@ -23,8 +23,9 @@ import {
     getContactProfile,
     getContactProfileMedia,
 } from "../apiCalls/contactProfileApi.js";
+import { removeContact } from "../apiCalls/contactApi.js";
+import { sendContactRequest, } from "../apiCalls/contactRequestApi.js";
 import AetherionDayBadge from "../components/AetherionDayBadge.jsx";
-import { removeContact, addContact, } from "../apiCalls/contactApi.js";
 import { getEffectivePresenceStatus } from "../utils/presenceStatus.js";
 import { getAetherionDays, getAetherionDayMilestone, } from "../utils/aetherionDays.js";
 
@@ -155,9 +156,6 @@ const ContactProfile = () => {
 
     const [showRemoveContactModal, setShowRemoveContactModal] = useState(false);
     const [isRemovingContact, setIsRemovingContact] = useState(false);
-
-    const [showAddContactModal, setShowAddContactModal] = useState(false);
-    const [isAddingContact, setIsAddingContact] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -393,6 +391,7 @@ const ContactProfile = () => {
                 return {
                     ...current,
                     isContact: false,
+                    contactStatus: "none",
                 };
             });
 
@@ -413,53 +412,68 @@ const ContactProfile = () => {
         }
     };
 
-    const handleAddContact = async () => {
-        if (!profile?._id || isAddingContact) {
+    const handleSendContactRequest = async () => {
+        if (!profile?._id || profileData?.contactStatus === "outgoing_pending") {
             return;
         }
 
-        setIsAddingContact(true);
-
-        try {
-            const response = await addContact(
+        const response =
+            await sendContactRequest(
                 profile._id,
             );
 
-            if (!response?.success) {
-                toast.error(
-                    response?.message ||
-                    "Couldn't add this contact.",
-                );
-
+        if (!response?.success) {
+            if (
+                response?.code ===
+                "REQUEST_ALREADY_SENT"
+            ) {
+                toast("Contact request already sent.");
                 return;
             }
 
-            setProfileData((current) => {
-                if (!current) {
-                    return current;
-                }
+            if (
+                response?.code ===
+                "INCOMING_REQUEST_EXISTS"
+            ) {
+                toast(
+                    "This user already sent you a contact request.",
+                );
+                return;
+            }
 
-                return {
-                    ...current,
-                    isContact: true,
-                };
-            });
-
-            setShowAddContactModal(false);
-
-            toast.success("Contact added.");
-        } catch (error) {
-            console.error(
-                "Add contact error:",
-                error,
-            );
+            if (
+                response?.code ===
+                "ALREADY_CONTACT"
+            ) {
+                toast(
+                    "This user is already a contact.",
+                );
+                return;
+            }
 
             toast.error(
-                "Couldn't add this contact.",
+                response?.message ||
+                "Couldn't send contact request.",
             );
-        } finally {
-            setIsAddingContact(false);
+
+            return;
         }
+
+        setProfileData((current) => {
+            if (!current) {
+                return current;
+            }
+
+            return {
+                ...current,
+                contactStatus: "outgoing_pending",
+                isContact: false,
+            };
+        });
+
+        toast.success(
+            "Contact request sent.",
+        );
     };
 
     if (loading) {
@@ -508,11 +522,14 @@ const ContactProfile = () => {
 
                         {/* CONTACT ACTION */}
                         <div className="absolute right-2 top-2 z-30 sm:right-3 sm:top-3">
-                            {profileData?.isContact ? (
+                            {profileData?.contactStatus ===
+                                "contact" ? (
                                 <button
                                     type="button"
-                                    onClick={() => setShowRemoveContactModal(true)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1a1a1a93] text-[#a9aaa7] transition hover:text-red-500 active:scale-95"
+                                    onClick={() =>
+                                        setShowRemoveContactModal(true)
+                                    }
+                                    className="..."
                                     aria-label="Remove contact"
                                     title="Remove contact"
                                 >
@@ -521,12 +538,35 @@ const ContactProfile = () => {
                             ) : (
                                 <button
                                     type="button"
-                                    onClick={() => setShowAddContactModal(true)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1a1a1a93] text-[#a9aaa7] transition hover:text-green-500 active:scale-95"
-                                    aria-label="Add contact"
-                                    title="Add contact"
+                                    onClick={
+                                        profileData?.contactStatus ===
+                                            "outgoing_pending"
+                                            ? undefined
+                                            : handleSendContactRequest
+                                    }
+                                    disabled={
+                                        profileData?.contactStatus ===
+                                        "outgoing_pending"
+                                    }
+                                    className={`... ${profileData?.contactStatus ===
+                                        "outgoing_pending"
+                                        ? "cursor-default opacity-40"
+                                        : ""
+                                        }`}
+                                    aria-label={
+                                        profileData?.contactStatus ===
+                                            "outgoing_pending"
+                                            ? "Contact request sent"
+                                            : "Send contact request"
+                                    }
+                                    title={
+                                        profileData?.contactStatus ===
+                                            "outgoing_pending"
+                                            ? "Request sent"
+                                            : "Send contact request"
+                                    }
                                 >
-                                    <IoPersonAddOutline className="text-lg" />
+                                    <IoPersonRemoveOutline className="text-lg" />
                                 </button>
                             )}
                         </div>
@@ -1138,71 +1178,6 @@ const ContactProfile = () => {
                     </div>
                 </div>
             </div>
-            )}
-
-            {/* ADD CONTACT MODAL */}
-            {showAddContactModal && (
-                <div
-                    className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 px-3 pb-3 backdrop-blur-sm sm:items-center sm:px-5 sm:pb-0"
-                    onMouseDown={() => {
-                        if (!isAddingContact) {
-                            setShowAddContactModal(
-                                false,
-                            );
-                        }
-                    }}
-                >
-                    <div
-                        className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111611] shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
-                        onMouseDown={(event) =>
-                            event.stopPropagation()
-                        }
-                    >
-                        <div className="border-b border-white/[0.06] px-5 py-4">
-                            <h2 className="text-sm font-semibold text-[#f1eee8]">
-                                Add contact?
-                            </h2>
-
-                            <p className="mt-1.5 text-xs leading-5 text-[#777f76]">
-                                Add{" "}
-                                <span className="font-medium text-[#b9beb7]">
-                                    {fullName}
-                                </span>{" "}
-                                to your contacts?
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col gap-2 p-4">
-                            <button
-                                type="button"
-                                onClick={handleAddContact}
-                                disabled={
-                                    isAddingContact
-                                }
-                                className="flex h-10 w-full items-center justify-center rounded-xl bg-[#d8f45a] px-4 text-sm font-semibold text-[#10120d] transition hover:bg-[#e4ff6f] disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {isAddingContact
-                                    ? "Adding..."
-                                    : "Add contact"}
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setShowAddContactModal(
-                                        false,
-                                    )
-                                }
-                                disabled={
-                                    isAddingContact
-                                }
-                                className="flex h-10 w-full items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 text-sm font-medium text-[#aeb5aa] transition hover:bg-white/[0.05] hover:text-[#f1eee8] disabled:cursor-not-allowed disabled:opacity-40"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
             )}
         </div>
     );

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { IoArrowBack, IoPersonAddOutline, IoSearch } from "react-icons/io5";
-import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
+import { sendContactRequest, } from "../../apiCalls/contactRequestApi.js";
 import { getAllUsers } from "../../apiCalls/userApi.js";
-import { startChatWithUser } from "../../utils/startChat.js";
 import Avatar from "../Avatar.jsx";
 
 const getFullName = (user) => {
@@ -129,7 +130,6 @@ const findExistingChatWithUser = (allChats, userId) => {
 };
 
 function AddContactsModal({ onClose }) {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const { user: currentUser, allChats } = useSelector(
@@ -141,6 +141,9 @@ function AddContactsModal({ onClose }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [openingChatId, setOpeningChatId] = useState(null);
+
+    const [requestingUserId, setRequestingUserId] = useState(null);
+    const [requestedUserIds, setRequestedUserIds] = useState(new Set()); 
 
     useEffect(() => {
         let cancelled = false;
@@ -204,26 +207,41 @@ function AddContactsModal({ onClose }) {
             .map((item) => item.user);
     }, [users, searchInput]);
 
-    const handleStartChat = async (userId) => {
-        if (!currentUser?._id || openingChatId) {
+    const handleSendRequest = async (
+        userId,
+    ) => {
+        if (
+            !userId ||
+            requestingUserId
+        ) {
             return;
         }
 
-        setOpeningChatId(userId);
+        setRequestingUserId(userId);
 
-        const started = await startChatWithUser({
-            currentUserId: currentUser._id,
-            targetUserId: userId,
-            allChats,
-            dispatch,
-        });
+        const response =
+            await sendContactRequest(userId);
 
-        setOpeningChatId(null);
+        if (response?.success) {
+            setRequestedUserIds(
+                (current) =>
+                    new Set([
+                        ...current,
+                        userId,
+                    ]),
+            );
 
-        if (started) {
-            onClose();
-            navigate("/");
+            toast.success(
+                "Contact request sent.",
+            );
+        } else {
+            toast.error(
+                response?.message ||
+                "Unable to send contact request.",
+            );
         }
+
+        setRequestingUserId(null);
     };
 
     const handleOpenProfile = (userId) => {
@@ -406,50 +424,27 @@ function AddContactsModal({ onClose }) {
                                                         </div>
 
                                                         {/* ACTION */}
-                                                        {isAlreadyContact ? (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    handleStartChat(
-                                                                        user._id,
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    Boolean(
-                                                                        openingChatId,
-                                                                    )
-                                                                }
-                                                                className="flex h-9 shrink-0 items-center rounded-full border border-[#ffffff]/[0.08] bg-[#111711] px-4 text-xs font-medium text-[#9da59a] transition hover:border-[#d8f45a]/30 hover:text-[#d8f45a] disabled:cursor-wait disabled:opacity-50"
-                                                            >
-                                                                {isOpening
-                                                                    ? "Opening..."
-                                                                    : "Added"}
-                                                            </button>
-                                                        ) : (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    handleStartChat(
-                                                                        user._id,
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    Boolean(
-                                                                        openingChatId,
-                                                                    )
-                                                                }
-                                                                className="flex h-9 shrink-0 items-center gap-2 rounded-full bg-[#d8f45a] px-3 text-xs font-semibold text-[#10120d] transition hover:bg-[#e5ff70] disabled:cursor-wait disabled:opacity-50"
-                                                            >
-                                                                {isOpening ? (
-                                                                    "Opening..."
-                                                                ) : (
-                                                                    <>
-                                                                        <IoPersonAddOutline className="text-sm" />
-                                                                        Add
-                                                                    </>
-                                                                )}
-                                                            </button>
-                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleSendRequest(user._id)
+                                                            }
+                                                            disabled={
+                                                                requestingUserId === user._id ||
+                                                                requestedUserIds.has(user._id)
+                                                            }
+                                                            className={`flex h-9 shrink-0 items-center rounded-full px-4 text-xs font-medium transition ${requestedUserIds.has(user._id)
+                                                                ? "border border-[#ffffff]/[0.08] bg-[#111711] text-[#697168]"
+                                                                : "bg-[#d8f45a] font-semibold text-[#10120d] hover:bg-[#e5ff70]"
+                                                                } disabled:cursor-default disabled:opacity-70`}
+                                                        >
+                                                            {requestedUserIds.has(user._id)
+                                                                ? "Requested"
+                                                                : requestingUserId ===
+                                                                    user._id
+                                                                    ? "Sending..."
+                                                                    : "Request"}
+                                                        </button>
                                                     </div>
                                                 );
                                             },

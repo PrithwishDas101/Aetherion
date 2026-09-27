@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
-import { ensureContacts } from "./contactController.js";
 
 // CREATE ONE-TO-ONE CHAT
 export const createChat = async (req, res) => {
@@ -61,8 +60,6 @@ export const createChat = async (req, res) => {
 
     // Even if the chat already exists, make sure the contact relationship exists.
     if (existingChat) {
-      await ensureContacts(members);
-
       return res.status(200).json({
         success: true,
 
@@ -83,10 +80,6 @@ export const createChat = async (req, res) => {
 
       unreadMessageCount,
     });
-
-    // Creating a chat automatically creates the contact relationship for both users.
-
-    await ensureContacts(members);
 
     await chat.populate("members");
 

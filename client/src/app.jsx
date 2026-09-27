@@ -9,6 +9,7 @@ import EditProfile from "./pages/EditProfile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Loader from "./components/Loader.jsx";
 import Contacts from "./pages/Contacts.jsx";
+import ContactRequests from "./pages/ContactRequests.jsx";
 import ContactProfile from "./pages/ContactProfile.jsx";
 
 function App() {
@@ -51,6 +52,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <ContactProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/requests"
+            element={
+              <ProtectedRoute>
+                <ContactRequests />
               </ProtectedRoute>
             }
           />

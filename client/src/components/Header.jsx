@@ -1,7 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { FiLogOut, FiUser } from "react-icons/fi";
+import {
+  FiLogOut,
+  FiUser,
+  FiUserPlus,
+} from "react-icons/fi";
+
+import socket from "../sockets/socket.js";
+
+import {
+  getContactRequestCount,
+} from "../apiCalls/contactRequestApi.js";
 
 import Avatar from "./Avatar.jsx";
 import { logoutUser } from "../apiCalls/authApi.js";
@@ -14,6 +24,7 @@ function Header() {
   const [showProfileHint, setShowProfileHint] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [contactRequestCount, setContactRequestCount] = useState(0);
 
   const profileMenuRef = useRef(null);
 
@@ -64,6 +75,69 @@ function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!user?._id) {
+      setContactRequestCount(0);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadRequestCount = async () => {
+      const response =
+        await getContactRequestCount();
+
+      if (cancelled) {
+        return;
+      }
+
+      if (response?.success) {
+        setContactRequestCount(
+          Number(response.count) || 0,
+        );
+      }
+    };
+
+    loadRequestCount();
+
+    const handleIncomingRequest = () => {
+      setContactRequestCount(
+        (current) => current + 1,
+      );
+    };
+
+    const handleRequestCountDelta = ({ delta = 0 } = {}) => {
+      setContactRequestCount((current) => {
+        const nextValue = current + Number(delta || 0);
+        return Math.max(nextValue, 0);
+      });
+    };
+
+    socket.on(
+      "contact-request-received",
+      handleIncomingRequest,
+    );
+
+    socket.on(
+      "contact-request-count-updated",
+      handleRequestCountDelta,
+    );
+
+    return () => {
+      cancelled = true;
+
+      socket.off(
+        "contact-request-received",
+        handleIncomingRequest,
+      );
+
+      socket.off(
+        "contact-request-count-updated",
+        handleRequestCountDelta,
+      );
+    };
+  }, [user?._id]);
+
   const dismissProfileHint = () => {
     if (!user?._id) {
       return;
@@ -81,6 +155,11 @@ function Header() {
     dismissProfileHint();
     setShowProfileMenu(false);
     navigate("/profile");
+  };
+
+  const handleRequestsClick = () => {
+    setShowProfileMenu(false);
+    navigate("/requests");
   };
 
   const handleLogout = async () => {
@@ -161,7 +240,7 @@ function Header() {
                   size="xs"
                   avatarClassName="bg-[#d8f45a] text-[#10120d] font-bold"
                 />
-                
+
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-[#f1eee8]">
                     {user?.firstName} {user?.lastName}
@@ -182,6 +261,30 @@ function Header() {
                 <FiUser className="h-[18px] w-[18px]" />
 
                 <span>Profile</span>
+              </button>
+
+              {/* Divider */}
+              <div className="my-2 h-px bg-white/10" />
+
+              {/* Requests */}
+              <button
+                type="button"
+                onClick={handleRequestsClick}
+                className="mt-2 flex w-full items-center justify-between rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-[#5a64f4] active:scale-[0.98]"
+              >
+                <span className="flex items-center gap-3">
+                  <FiUserPlus className="h-[18px] w-[18px]" />
+
+                  <span>Requests</span>
+                </span>
+
+                {contactRequestCount > 0 && (
+                  <span className="flex min-w-[22px] items-center justify-center rounded-full bg-[#d8f45a] px-1.5 py-0.5 text-[10px] font-bold text-[#10120d]">
+                    {contactRequestCount > 99
+                      ? "99+"
+                      : contactRequestCount}
+                  </span>
+                )}
               </button>
 
               {/* Divider */}
