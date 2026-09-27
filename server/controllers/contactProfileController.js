@@ -4,8 +4,7 @@ import User from "../models/User.js";
 import Contact from "../models/Contact.js";
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
-import ContactRequest from "../models/ContactRequest.js";
-
+import ContactRequest from "../models/ContactRequest.js"
 import { isOnline } from "../socket/presenceStore.js";
 
 const PUBLIC_PROFILE_PROJECTION = [
