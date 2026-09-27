@@ -367,9 +367,10 @@ export const getContactRequestCount = async (req, res) => {
 
 // ACCEPT REQUEST
 export const acceptContactRequest = async (req, res) => {
+  const session = await mongoose.startSession();
+
   try {
     const recipientId = String(req.user.userId);
-
     const { requestId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(requestId)) {
@@ -379,32 +380,46 @@ export const acceptContactRequest = async (req, res) => {
       });
     }
 
-    const request = await ContactRequest.findOne({
-      _id: requestId,
-      recipient: recipientId,
-    }).lean();
+    let requesterId;
 
-    if (!request) {
-      return res.status(404).json({
-        success: false,
-        message: "Contact request not found.",
-      });
-    }
+    await session.withTransaction(async () => {
+      const request = await ContactRequest.findOne({
+        _id: requestId,
+        recipient: recipientId,
+      })
+        .session(session)
+        .lean();
 
-    const requesterId = String(request.requester);
+      if (!request) {
+        const error = new Error("Contact request not found.");
+        error.code = "REQUEST_NOT_FOUND";
+        throw error;
+      }
 
-    await ensureContacts([recipientId, requesterId]);
+      requesterId = String(request.requester);
 
-    await ContactRequest.deleteOne({
-      _id: request._id,
-      recipient: recipientId,
+      // Create both sides of the contact relationship
+      // inside the same transaction.
+      await ensureContacts([recipientId, requesterId], { session });
+
+      // Delete the request in the same transaction.
+      const deleteResult = await ContactRequest.deleteOne({
+        _id: request._id,
+        recipient: recipientId,
+      }).session(session);
+
+      if (deleteResult.deletedCount !== 1) {
+        throw new Error(
+          "Contact request could not be removed after acceptance.",
+        );
+      }
     });
 
     const io = req.app.get("io");
 
     if (io) {
       io.to(requesterId).emit("contact-request-accepted", {
-        requestId: String(request._id),
+        requestId: String(requestId),
         contactId: recipientId,
       });
     }
@@ -414,12 +429,21 @@ export const acceptContactRequest = async (req, res) => {
       message: "Contact request accepted.",
     });
   } catch (error) {
+    if (error?.code === "REQUEST_NOT_FOUND") {
+      return res.status(404).json({
+        success: false,
+        message: "Contact request not found.",
+      });
+    }
+
     console.error("Accept contact request error:", error);
 
     return res.status(500).json({
       success: false,
       message: "Unable to accept contact request.",
     });
+  } finally {
+    await session.endSession();
   }
 };
 

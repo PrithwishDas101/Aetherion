@@ -6,10 +6,12 @@ const CONTACT_PROJECTION =
   "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen";
 
 // ENSURE TWO USERS ARE CONTACTS
-export const ensureContacts = async (members) => {
+export const ensureContacts = async (members, options = {}) => {
   if (!Array.isArray(members) || members.length !== 2) {
     throw new Error("A one-to-one contact relationship requires two users.");
   }
+
+  const { session } = options;
 
   const [userA, userB] = members.map(String);
 
@@ -17,43 +19,46 @@ export const ensureContacts = async (members) => {
     throw new Error("A user cannot be their own contact.");
   }
 
-  await Contact.bulkWrite([
-    {
-      updateOne: {
-        filter: {
-          owner: userA,
-          contact: userB,
-        },
-
-        update: {
-          $setOnInsert: {
+  await Contact.bulkWrite(
+    [
+      {
+        updateOne: {
+          filter: {
             owner: userA,
             contact: userB,
           },
-        },
 
-        upsert: true,
+          update: {
+            $setOnInsert: {
+              owner: userA,
+              contact: userB,
+            },
+          },
+
+          upsert: true,
+        },
       },
-    },
 
-    {
-      updateOne: {
-        filter: {
-          owner: userB,
-          contact: userA,
-        },
-
-        update: {
-          $setOnInsert: {
+      {
+        updateOne: {
+          filter: {
             owner: userB,
             contact: userA,
           },
-        },
 
-        upsert: true,
+          update: {
+            $setOnInsert: {
+              owner: userB,
+              contact: userA,
+            },
+          },
+
+          upsert: true,
+        },
       },
-    },
-  ]);
+    ],
+    session ? { session } : undefined,
+  );
 };
 
 // GET RECENT CONTACTS
