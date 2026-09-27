@@ -14,6 +14,7 @@ import {
     declineContactRequest,
     getIncomingContactRequests,
 } from "../apiCalls/contactRequestApi.js";
+import socket from "../sockets/socket.js";
 
 const REQUESTS_PER_PAGE = 50;
 
@@ -46,6 +47,7 @@ function ContactRequests() {
     const [searchInput, setSearchInput] = useState("");
 
     const [page, setPage] = useState(1);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [hasMore, setHasMore] = useState(false);
     const [total, setTotal] = useState(0);
 
@@ -53,6 +55,32 @@ function ContactRequests() {
     const [error, setError] = useState("");
 
     const [processingId, setProcessingId] = useState(null);
+
+    useEffect(() => {
+        socket.auth = {
+            token: localStorage.getItem("token"),
+        };
+
+        const handleIncomingRequest = () => {
+            setRefreshKey((current) => current + 1);
+        };
+
+        socket.on(
+            "contact-request-received",
+            handleIncomingRequest,
+        );
+
+        if (!socket.connected) {
+            socket.connect();
+        }
+
+        return () => {
+            socket.off(
+                "contact-request-received",
+                handleIncomingRequest,
+            );
+        };
+    }, []);
 
     useEffect(() => {
         let cancelled = false;
@@ -105,7 +133,7 @@ function ContactRequests() {
         return () => {
             cancelled = true;
         };
-    }, [searchInput, page]);
+    }, [searchInput, page, refreshKey]);
 
     const handleSearchChange = (
         event,
