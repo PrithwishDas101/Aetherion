@@ -16,6 +16,7 @@ const Sidebar = ({
   const { allChats } = useSelector((state) => state.userReducer);
 
   const hasNoChats = Array.isArray(allChats) && allChats.length === 0;
+  const isSearching = searchKey.trim().length > 0;
 
   return (
     <div className="flex h-full w-full min-w-0 flex-col overflow-hidden">
@@ -30,7 +31,7 @@ const Sidebar = ({
       </div>
 
       {/* MOBILE EMPTY STATE */}
-      {hasNoChats && (
+      {hasNoChats && !isSearching && (
         <div className="min-h-0 flex-1 md:hidden">
           <EmptyChatState onFindSomeone={onFindSomeone} />
         </div>
@@ -38,9 +39,8 @@ const Sidebar = ({
 
       {/* USER LIST */}
       <div
-        className={`scrollbar-aetherion min-h-0 flex-1 overflow-y-auto ${
-          hasNoChats ? "hidden md:block" : "block"
-        }`}
+        className={`scrollbar-aetherion min-h-0 flex-1 overflow-y-auto ${hasNoChats && !isSearching ? "hidden md:block" : "block"
+          }`}
       >
         <UserList searchKey={searchKey} socket={socket} />
       </div>
