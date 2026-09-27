@@ -113,6 +113,27 @@ export const sendMessage = async (req, res) => {
       });
     }
 
+    if (replyTo) {
+      if (!mongoose.Types.ObjectId.isValid(replyTo)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid reply message ID.",
+        });
+      }
+
+      const repliedMessage = await Message.findOne({
+        _id: replyTo,
+        chatId: chat._id,
+      });
+
+      if (!repliedMessage) {
+        return res.status(400).json({
+          success: false,
+          message: "Reply message does not belong to this chat.",
+        });
+      }
+    }
+
     if (type === "contact") {
       const contactUserId = String(contact.userId);
 
