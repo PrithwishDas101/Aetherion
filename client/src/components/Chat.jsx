@@ -2374,7 +2374,7 @@ const Chat = ({ socket }) => {
 
           {/* AVATAR */}
           {selectedUser && (
-            <div className="relative shrink-0">
+            <div className="relative z-0 shrink-0">
               <Avatar
                 profilePic={selectedUser.profilePic}
                 initials={[
