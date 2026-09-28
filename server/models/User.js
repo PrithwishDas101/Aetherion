@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
+      select: false,
     },
 
     // PROFILE PICTURE

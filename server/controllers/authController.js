@@ -194,7 +194,7 @@ export const login = async (req, res) => {
     // 5. Find user
     const user = await User.findOne({
       email: normalizedEmail,
-    });
+    }).select("+password");
 
     if (!user) {
       return res.status(401).json({
