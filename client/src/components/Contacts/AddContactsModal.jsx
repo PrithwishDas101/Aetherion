@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { IoArrowBack, IoPersonAddOutline, IoSearch } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { IoChatbubbleOutline } from "react-icons/io5";
 import toast from "react-hot-toast";
 
 import { sendContactRequest, } from "../../apiCalls/contactRequestApi.js";
 import { getAllUsers } from "../../apiCalls/userApi.js";
+import { startChatWithUser } from "../../utils/startChat.js";
 import Avatar from "../Avatar.jsx";
 
 const getFullName = (user) => {
@@ -111,26 +113,9 @@ const getSearchScore = (user, query) => {
     return score;
 };
 
-const findExistingChatWithUser = (allChats, userId) => {
-    if (!Array.isArray(allChats)) {
-        return null;
-    }
-
-    return (
-        allChats.find((chat) => {
-            const users = chat?.users || chat?.members || [];
-
-            return users.some(
-                (user) =>
-                    String(user?._id || user) ===
-                    String(userId),
-            );
-        }) || null
-    );
-};
-
 function AddContactsModal({ onClose }) {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const { user: currentUser, allChats } = useSelector(
         (state) => state.userReducer,
@@ -143,8 +128,6 @@ function AddContactsModal({ onClose }) {
     const [openingChatId, setOpeningChatId] = useState(null);
 
     const [requestingUserId, setRequestingUserId] = useState(null);
-    const [requestedUserIds, setRequestedUserIds] = useState(new Set()); 
-
     useEffect(() => {
         let cancelled = false;
 
@@ -223,12 +206,15 @@ function AddContactsModal({ onClose }) {
             await sendContactRequest(userId);
 
         if (response?.success) {
-            setRequestedUserIds(
-                (current) =>
-                    new Set([
-                        ...current,
-                        userId,
-                    ]),
+            setUsers((currentUsers) =>
+                currentUsers.map((user) =>
+                    String(user._id) === String(userId)
+                        ? {
+                            ...user,
+                            relationshipStatus: "outgoing_pending",
+                        }
+                        : user,
+                ),
             );
 
             toast.success(
@@ -242,6 +228,28 @@ function AddContactsModal({ onClose }) {
         }
 
         setRequestingUserId(null);
+    };
+
+    const handleOpenChat = async (userId) => {
+        if (!userId || !currentUser?._id || openingChatId) {
+            return;
+        }
+
+        setOpeningChatId(userId);
+
+        const started = await startChatWithUser({
+            currentUserId: currentUser._id,
+            targetUserId: userId,
+            allChats,
+            dispatch,
+        });
+
+        setOpeningChatId(null);
+
+        if (started) {
+            onClose();
+            navigate("/");
+        }
     };
 
     const handleOpenProfile = (userId) => {
@@ -362,16 +370,20 @@ function AddContactsModal({ onClose }) {
                                                         user,
                                                     );
 
-                                                const existingChat =
-                                                    findExistingChatWithUser(
-                                                        allChats,
-                                                        user._id,
-                                                    );
+                                                const relationshipStatus =
+                                                    user.relationshipStatus || "none";
 
                                                 const isAlreadyContact =
-                                                    Boolean(
-                                                        existingChat,
-                                                    );
+                                                    relationshipStatus === "contact";
+
+                                                const isOutgoingPending =
+                                                    relationshipStatus === "outgoing_pending";
+
+                                                const isIncomingPending =
+                                                    relationshipStatus === "incoming_pending";
+
+                                                const isRequesting =
+                                                    requestingUserId === user._id;
 
                                                 const isOpening =
                                                     openingChatId ===
@@ -424,27 +436,53 @@ function AddContactsModal({ onClose }) {
                                                         </div>
 
                                                         {/* ACTION */}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                handleSendRequest(user._id)
-                                                            }
-                                                            disabled={
-                                                                requestingUserId === user._id ||
-                                                                requestedUserIds.has(user._id)
-                                                            }
-                                                            className={`flex h-9 shrink-0 items-center rounded-full px-4 text-xs font-medium transition ${requestedUserIds.has(user._id)
-                                                                ? "border border-[#ffffff]/[0.08] bg-[#111711] text-[#697168]"
-                                                                : "bg-[#d8f45a] font-semibold text-[#10120d] hover:bg-[#e5ff70]"
-                                                                } disabled:cursor-default disabled:opacity-70`}
-                                                        >
-                                                            {requestedUserIds.has(user._id)
-                                                                ? "Requested"
-                                                                : requestingUserId ===
-                                                                    user._id
-                                                                    ? "Sending..."
-                                                                    : "Request"}
-                                                        </button>
+                                                        <div className="flex shrink-0 items-center gap-2">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    handleSendRequest(user._id)
+                                                                }
+                                                                disabled={
+                                                                    isAlreadyContact ||
+                                                                    isOutgoingPending ||
+                                                                    isIncomingPending ||
+                                                                    isRequesting
+                                                                }
+                                                                className={`flex h-9 items-center rounded-full px-4 text-xs font-medium transition ${isAlreadyContact || isOutgoingPending || isIncomingPending
+                                                                    ? "border border-[#ffffff]/[0.08] bg-[#111711] text-[#697168]"
+                                                                    : "bg-[#d8f45a] font-semibold text-[#10120d] hover:bg-[#e5ff70]"
+                                                                    } disabled:cursor-default disabled:opacity-70`}
+                                                            >
+                                                                {isAlreadyContact
+                                                                    ? "Added"
+                                                                    : isOutgoingPending
+                                                                        ? "Requested"
+                                                                        : isIncomingPending
+                                                                            ? "Pending"
+                                                                            : isRequesting
+                                                                                ? "Sending..."
+                                                                                : "Request"}
+                                                            </button>
+
+                                                            {isAlreadyContact && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        handleOpenChat(user._id)
+                                                                    }
+                                                                    disabled={Boolean(openingChatId)}
+                                                                    className="flex h-9 w-9 items-center justify-center rounded-full text-[#8a9288] transition hover:bg-[#151a15] hover:text-[#d8f45a] disabled:cursor-default disabled:opacity-60"
+                                                                    aria-label={`Open chat with ${fullName}`}
+                                                                    title={`Open chat with ${fullName}`}
+                                                                >
+                                                                    {isOpening ? (
+                                                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#d8f45a]" />
+                                                                    ) : (
+                                                                        <IoChatbubbleOutline className="text-base" />
+                                                                    )}
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 );
                                             },

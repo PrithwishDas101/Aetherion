@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import Contact from "../models/Contact.js";
+import ContactRequest from "../models/ContactRequest.js";
 import {
   uploadImage,
   deleteImage,
@@ -37,15 +39,84 @@ export const getLoggedUser = async (req, res) => {
 // GET ALL USERS EXCEPT LOGGED-IN USER
 export const getAllUsers = async (req, res) => {
   try {
+    const currentUserId = String(req.user.userId);
     const users = await User.find({
       _id: {
-        $ne: req.user.userId,
+        $ne: currentUserId,
       },
-    }).select("-password");
+    }).select(
+      "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen",
+    );
+
+    const userIds = users.map((user) => user._id);
+
+    const [contacts, contactRequests] = await Promise.all([
+      Contact.find({
+        owner: currentUserId,
+        contact: {
+          $in: userIds,
+        },
+      })
+        .select("contact")
+        .lean(),
+      ContactRequest.find({
+        $or: [
+          {
+            requester: currentUserId,
+            recipient: {
+              $in: userIds,
+            },
+          },
+          {
+            recipient: currentUserId,
+            requester: {
+              $in: userIds,
+            },
+          },
+        ],
+      })
+        .select("requester recipient")
+        .lean(),
+    ]);
+
+    const contactIds = new Set(
+      contacts.map((relationship) => String(relationship.contact)),
+    );
+    const outgoingPendingIds = new Set();
+    const incomingPendingIds = new Set();
+
+    for (const request of contactRequests) {
+      const requesterId = String(request.requester);
+      const recipientId = String(request.recipient);
+
+      if (requesterId === currentUserId) {
+        outgoingPendingIds.add(recipientId);
+      } else if (recipientId === currentUserId) {
+        incomingPendingIds.add(requesterId);
+      }
+    }
+
+    const usersWithRelationshipStatus = users.map((user) => {
+      const userObject = user.toObject();
+      const userId = String(user._id);
+
+      const relationshipStatus = contactIds.has(userId)
+        ? "contact"
+        : outgoingPendingIds.has(userId)
+          ? "outgoing_pending"
+          : incomingPendingIds.has(userId)
+            ? "incoming_pending"
+            : "none";
+
+      return {
+        ...userObject,
+        relationshipStatus,
+      };
+    });
 
     return res.status(200).json({
       success: true,
-      users,
+      users: usersWithRelationshipStatus,
     });
   } catch (error) {
     console.error("Get all users error:", error);
