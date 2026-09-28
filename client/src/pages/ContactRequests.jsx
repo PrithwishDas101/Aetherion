@@ -26,17 +26,12 @@ const getFullName = (user) => {
 };
 
 const getInitials = (user) => {
-    const first = String(
-        user?.firstName || "",
-    ).trim();
-
-    const last = String(
-        user?.lastName || "",
-    ).trim();
+    const first = String(user?.firstName || "").trim();
+    const last = String(user?.lastName || "").trim();
 
     return (
-        `${first.charAt(0)}${last.charAt(0)}`
-            .toUpperCase() || "?"
+        `${first.charAt(0)}${last.charAt(0)}`.toUpperCase() ||
+        "?"
     );
 };
 
@@ -56,13 +51,41 @@ function ContactRequests() {
 
     const [processingId, setProcessingId] = useState(null);
 
+    // Ensure the socket is authenticated and connected.
     useEffect(() => {
         socket.auth = {
             token: localStorage.getItem("token"),
         };
 
+        if (!socket.connected) {
+            socket.connect();
+        }
+    }, []);
+
+    // Realtime contact-request lifecycle.
+    useEffect(() => {
         const handleIncomingRequest = () => {
+            setPage(1);
             setRefreshKey((current) => current + 1);
+        };
+
+        const handleCancelledRequest = ({
+            requestId,
+        } = {}) => {
+            if (!requestId) {
+                return;
+            }
+
+            setRequests((current) =>
+                current.filter(
+                    (request) =>
+                        request._id !== requestId,
+                ),
+            );
+
+            setTotal((current) =>
+                Math.max(current - 1, 0),
+            );
         };
 
         socket.on(
@@ -70,18 +93,25 @@ function ContactRequests() {
             handleIncomingRequest,
         );
 
-        if (!socket.connected) {
-            socket.connect();
-        }
+        socket.on(
+            "contact-request-cancelled",
+            handleCancelledRequest,
+        );
 
         return () => {
             socket.off(
                 "contact-request-received",
                 handleIncomingRequest,
             );
+
+            socket.off(
+                "contact-request-cancelled",
+                handleCancelledRequest,
+            );
         };
     }, []);
 
+    // Load incoming contact requests.
     useEffect(() => {
         let cancelled = false;
 
@@ -101,12 +131,10 @@ function ContactRequests() {
             }
 
             if (response?.success) {
-                setRequests(
-                    response.data || [],
-                );
+                setRequests(response.data || []);
 
                 setTotal(
-                    response.pagination?.total || 0,
+                    Number(response.pagination?.total) || 0,
                 );
 
                 setHasMore(
@@ -135,32 +163,20 @@ function ContactRequests() {
         };
     }, [searchInput, page, refreshKey]);
 
-    const handleSearchChange = (
-        event,
-    ) => {
-        setSearchInput(
-            event.target.value,
-        );
-
+    const handleSearchChange = (event) => {
+        setSearchInput(event.target.value);
         setPage(1);
     };
 
-    const handleAccept = async (
-        requestId,
-    ) => {
-        if (
-            !requestId ||
-            processingId
-        ) {
+    const handleAccept = async (requestId) => {
+        if (!requestId || processingId) {
             return;
         }
 
         setProcessingId(requestId);
 
         const response =
-            await acceptContactRequest(
-                requestId,
-            );
+            await acceptContactRequest(requestId);
 
         if (!response?.success) {
             toast.error(
@@ -190,22 +206,15 @@ function ContactRequests() {
         setProcessingId(null);
     };
 
-    const handleDecline = async (
-        requestId,
-    ) => {
-        if (
-            !requestId ||
-            processingId
-        ) {
+    const handleDecline = async (requestId) => {
+        if (!requestId || processingId) {
             return;
         }
 
         setProcessingId(requestId);
 
         const response =
-            await declineContactRequest(
-                requestId,
-            );
+            await declineContactRequest(requestId);
 
         if (!response?.success) {
             toast.error(
@@ -305,7 +314,12 @@ function ContactRequests() {
                     ) : error ? (
                         <ErrorState
                             message={error}
-                            onRetry={() => setPage(1)}
+                            onRetry={() => {
+                                setRefreshKey(
+                                    (current) =>
+                                        current + 1,
+                                );
+                            }}
                         />
                     ) : requests.length === 0 ? (
                         <EmptyState
@@ -315,10 +329,17 @@ function ContactRequests() {
                     ) : (
                         <div>
                             {requests.map(
-                                (request, index) => (
+                                (
+                                    request,
+                                    index,
+                                ) => (
                                     <RequestRow
-                                        key={request._id}
-                                        request={request}
+                                        key={
+                                            request._id
+                                        }
+                                        request={
+                                            request
+                                        }
                                         processing={
                                             processingId ===
                                             request._id
@@ -331,7 +352,8 @@ function ContactRequests() {
                                         }
                                         isLast={
                                             index ===
-                                            requests.length - 1
+                                            requests.length -
+                                            1
                                         }
                                     />
                                 ),
@@ -349,9 +371,12 @@ function ContactRequests() {
                                         type="button"
                                         onClick={() =>
                                             setPage(
-                                                (current) =>
+                                                (
+                                                    current,
+                                                ) =>
                                                     Math.max(
-                                                        current - 1,
+                                                        current -
+                                                        1,
                                                         1,
                                                     ),
                                             )
@@ -371,8 +396,11 @@ function ContactRequests() {
                                         type="button"
                                         onClick={() =>
                                             setPage(
-                                                (current) =>
-                                                    current + 1,
+                                                (
+                                                    current,
+                                                ) =>
+                                                    current +
+                                                    1,
                                             )
                                         }
                                         className="rounded-lg px-3 py-2 text-xs font-medium text-[#a8b19f] transition hover:bg-[#151a15] hover:text-[#d8f45a]"
@@ -400,16 +428,16 @@ function RequestRow({
 
     return (
         <div
-            className={`group flex min-h-[68px] items-center gap-3 border-b border-[#ffffff]/[0.06] px-2 py-3 transition hover:bg-[#101010bd] ${isLast
-                ? "border-b-0"
-                : ""
+            className={`group flex min-h-[68px] items-center gap-3 border-b border-[#ffffff]/[0.06] px-2 py-3 transition hover:bg-[#101010bd] ${isLast ? "border-b-0" : ""
                 }`}
         >
             <Avatar
                 profilePic={requester?.profilePic}
-                initials={getInitials(requester,)}
+                initials={getInitials(requester)}
                 alt={fullName}
-                decoration={requester?.avatarDecoration}
+                decoration={
+                    requester?.avatarDecoration
+                }
                 size="xs"
                 avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold"
             />

@@ -422,6 +422,10 @@ export const acceptContactRequest = async (req, res) => {
         requestId: String(requestId),
         contactId: recipientId,
       });
+
+      io.to(recipientId).emit("contact-request-count-updated", {
+        delta: -1,
+      });
     }
 
     return res.status(200).json({
@@ -473,11 +477,15 @@ export const declineContactRequest = async (req, res) => {
       });
     }
 
-    const io = req.app.get("io");
-
     if (io) {
-      io.to(String(request.requester)).emit("contact-request-declined", {
+      const requesterId = String(request.requester);
+
+      io.to(requesterId).emit("contact-request-declined", {
         requestId: String(request._id),
+      });
+
+      io.to(recipientId).emit("contact-request-count-updated", {
+        delta: -1,
       });
     }
 
@@ -518,6 +526,15 @@ export const cancelContactRequest = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Contact request not found.",
+      });
+    }
+
+    const io = req.app.get("io");
+
+    if (io) {
+      io.to(String(request.recipient)).emit("contact-request-cancelled", {
+        requestId: String(request._id),
+        requesterId,
       });
     }
 
