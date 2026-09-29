@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import Poll from "../models/Poll.js";
@@ -61,6 +63,27 @@ export const createPoll = async (req, res) => {
         success: false,
         message: "Chat not found.",
       });
+    }
+
+    if (replyTo) {
+      if (!mongoose.Types.ObjectId.isValid(replyTo)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid reply message ID.",
+        });
+      }
+
+      const repliedMessage = await Message.findOne({
+        _id: replyTo,
+        chatId: chat._id,
+      });
+
+      if (!repliedMessage) {
+        return res.status(400).json({
+          success: false,
+          message: "Reply message not found in this chat.",
+        });
+      }
     }
 
     const receiver = chat.members.find((member) => String(member) !== senderId);
