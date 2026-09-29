@@ -55,6 +55,43 @@ import {
 
 import registerSocketListeners from "../sockets/socketListeners.js";
 
+const VIDEO_FILE_EXTENSIONS = {
+  "video/mp4": ".mp4",
+  "video/webm": ".webm",
+  "video/quicktime": ".mov",
+  "video/ogg": ".ogg",
+  "video/x-matroska": ".mkv",
+};
+
+const getMediaMessageType = (file) => {
+  const mimeType = file?.type?.toLowerCase() || "";
+
+  if (mimeType === "image/gif") {
+    return "gif";
+  }
+
+  return mimeType.startsWith("video/") ? "video" : "image";
+};
+
+const getVideoFileExtension = (blob) => {
+  const mimeType = getVideoMimeType(blob);
+
+  return VIDEO_FILE_EXTENSIONS[mimeType] || ".webm";
+};
+
+const getVideoMimeType = (blob) =>
+  blob?.type?.split(";")[0]?.trim().toLowerCase() || "";
+
+const getVideoBlobForUpload = (blob) => {
+  const mimeType = getVideoMimeType(blob);
+
+  if (!mimeType || mimeType === blob.type) {
+    return blob;
+  }
+
+  return new Blob([blob], { type: mimeType });
+};
+
 const Chat = ({ socket }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -91,6 +128,41 @@ const Chat = ({ socket }) => {
   const highlightTimeoutRef = useRef(null);
 
   const messageRefs = useRef({});
+  const temporaryMediaUrlsRef = useRef(new Set());
+
+  const createTemporaryMediaUrl = (file) => {
+    const url = URL.createObjectURL(file);
+
+    temporaryMediaUrlsRef.current.add(url);
+
+    return url;
+  };
+
+  useEffect(() => {
+    const messageMediaUrls = new Set(
+      allMessages
+        .map((currentMessage) => currentMessage.mediaUrl)
+        .filter((mediaUrl) => typeof mediaUrl === "string"),
+    );
+
+    for (const url of temporaryMediaUrlsRef.current) {
+      if (!messageMediaUrls.has(url)) {
+        URL.revokeObjectURL(url);
+        temporaryMediaUrlsRef.current.delete(url);
+      }
+    }
+  }, [allMessages]);
+
+  useEffect(
+    () => () => {
+      for (const url of temporaryMediaUrlsRef.current) {
+        URL.revokeObjectURL(url);
+      }
+
+      temporaryMediaUrlsRef.current.clear();
+    },
+    [],
+  );
 
   // SCROLL STATE
   const hasInitialScrolledRef = useRef(false);
@@ -1314,7 +1386,7 @@ const Chat = ({ socket }) => {
 
     isNearBottomRef.current = true;
 
-    const localPreviewUrl = URL.createObjectURL(photoData.blob);
+    const localPreviewUrl = createTemporaryMediaUrl(photoData.blob);
 
     const temporaryMessageId = `temp-image-${Date.now()}`;
 
@@ -1388,8 +1460,6 @@ const Chat = ({ socket }) => {
           ),
         );
 
-        URL.revokeObjectURL(localPreviewUrl);
-
         toast.error(response?.message || "Unable to send photo.");
 
         return false;
@@ -1402,8 +1472,6 @@ const Chat = ({ socket }) => {
             : currentMessage,
         ),
       );
-
-      URL.revokeObjectURL(localPreviewUrl);
 
       emitSendMessage(socket, {
         message: response.data,
@@ -1430,8 +1498,6 @@ const Chat = ({ socket }) => {
         ),
       );
 
-      URL.revokeObjectURL(localPreviewUrl);
-
       toast.error("Unable to send photo.");
 
       return false;
@@ -1448,7 +1514,7 @@ const Chat = ({ socket }) => {
 
     isNearBottomRef.current = true;
 
-    const localPreviewUrl = URL.createObjectURL(videoData.blob);
+    const localPreviewUrl = createTemporaryMediaUrl(videoData.blob);
 
     const temporaryMessageId = `temp-video-${Date.now()}`;
 
@@ -1504,10 +1570,12 @@ const Chat = ({ socket }) => {
         videoData.caption?.trim() || "",
       );
 
+      const videoBlobForUpload = getVideoBlobForUpload(videoData.blob);
+
       formData.append(
         "media",
-        videoData.blob,
-        `aetherion-video-${Date.now()}.webm`,
+        videoBlobForUpload,
+        `aetherion-video-${Date.now()}${getVideoFileExtension(videoBlobForUpload)}`,
       );
 
       formData.append(
@@ -1517,7 +1585,7 @@ const Chat = ({ socket }) => {
 
       console.log("🎥 UPLOADING FINAL VIDEO:", {
         temporaryMessageId,
-        blobType: videoData.blob.type,
+        blobType: videoBlobForUpload.type,
         blobSize: videoData.blob.size,
       });
 
@@ -1526,16 +1594,6 @@ const Chat = ({ socket }) => {
       if (!response?.success) {
 
         setAllMessages((previousMessages) => {
-          const failedMessage = previousMessages.find(
-            (currentMessage) =>
-              String(currentMessage._id) ===
-              String(temporaryMessageId),
-          );
-
-          if (failedMessage?.mediaUrl?.startsWith("blob:")) {
-            URL.revokeObjectURL(failedMessage.mediaUrl);
-          }
-
           return previousMessages.filter(
             (currentMessage) =>
               String(currentMessage._id) !==
@@ -1558,17 +1616,6 @@ const Chat = ({ socket }) => {
             String(temporaryMessageId)
           ) {
             return currentMessage;
-          }
-
-          // Removing local preview URL now that the
-          if (
-            currentMessage.mediaUrl?.startsWith(
-              "blob:",
-            )
-          ) {
-            URL.revokeObjectURL(
-              currentMessage.mediaUrl,
-            );
           }
 
           return response.data;
@@ -1602,18 +1649,6 @@ const Chat = ({ socket }) => {
       });
 
       setAllMessages((previousMessages) => {
-        const failedMessage = previousMessages.find(
-          (currentMessage) =>
-            String(currentMessage._id) ===
-            String(temporaryMessageId),
-        );
-
-        if (failedMessage?.mediaUrl?.startsWith("blob:")) {
-          URL.revokeObjectURL(
-            failedMessage.mediaUrl,
-          );
-        }
-
         return previousMessages.filter(
           (currentMessage) =>
             String(currentMessage._id) !==
@@ -1642,21 +1677,23 @@ const Chat = ({ socket }) => {
 
     const temporaryMessages = items.map((item, index) => {
       const temporaryMessageId = `temp-gallery-${Date.now()}-${index}`;
+      const file = item.file;
+      const mediaType = getMediaMessageType(file);
 
       return {
         _id: temporaryMessageId,
         chatId: selectedChat._id,
         sender: user._id,
-        type: item.type === "video" ? "video" : "image",
+        type: mediaType,
         text: index === 0 ? caption.trim() : "",
-        mediaUrl: item.previewUrl,
+        mediaUrl: createTemporaryMediaUrl(file),
         replyTo: index === 0 ? replyingTo || null : null,
         read: false,
         createdAt: new Date().toISOString(),
         isUploading: true,
 
         // Keep the original file temporarily so we can upload it.
-        _galleryFile: item.file,
+        _galleryFile: file,
       };
     });
 
@@ -1683,13 +1720,13 @@ const Chat = ({ socket }) => {
 
         const formData = new FormData();
 
-        const isVideo = file.type.startsWith("video/");
+        const mediaType = getMediaMessageType(file);
 
         formData.append("chatId", selectedChat._id);
 
         formData.append(
           "type",
-          isVideo ? "video" : "image",
+          mediaType,
         );
 
         // Caption and reply only belong to the first item.
@@ -1730,16 +1767,6 @@ const Chat = ({ socket }) => {
                   String(currentMessage._id) ===
                   String(temporaryMessage._id)
                 ) {
-                  if (
-                    currentMessage.mediaUrl?.startsWith(
-                      "blob:",
-                    )
-                  ) {
-                    URL.revokeObjectURL(
-                      currentMessage.mediaUrl,
-                    );
-                  }
-
                   return false;
                 }
 
@@ -1765,16 +1792,6 @@ const Chat = ({ socket }) => {
                 String(temporaryMessage._id)
               ) {
                 return currentMessage;
-              }
-
-              if (
-                currentMessage.mediaUrl?.startsWith(
-                  "blob:",
-                )
-              ) {
-                URL.revokeObjectURL(
-                  currentMessage.mediaUrl,
-                );
               }
 
               return response.data;
@@ -1823,14 +1840,6 @@ const Chat = ({ socket }) => {
 
           if (!isGalleryTemporaryMessage) {
             return true;
-          }
-
-          if (
-            currentMessage.mediaUrl?.startsWith("blob:")
-          ) {
-            URL.revokeObjectURL(
-              currentMessage.mediaUrl,
-            );
           }
 
           return false;
@@ -2629,6 +2638,7 @@ const Chat = ({ socket }) => {
               }
               onPhotoCaptured={sendCameraPhoto}
               onVideoCaptured={sendCameraVideo}
+              onVideoProcessingStart={startVideoProcessing}
             />
 
             {/* GALLERY */}

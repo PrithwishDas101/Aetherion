@@ -27,6 +27,7 @@ const CameraModal = ({
   onGallery,
   onPhotoCaptured,
   onVideoCaptured,
+  onVideoProcessingStart,
   recipientName = "User",
 }) => {
   // CAMERA STATE
@@ -710,15 +711,19 @@ const CameraModal = ({
             onClose={closeCamera}
             onDownload={downloadVideo}
             onRetake={retakeVideo}
-            onSend={({ blob, caption }) => {
-              if (!blob) return;
+            onProcessingStart={onVideoProcessingStart}
+            onSend={({ blob, caption, temporaryMessageId }) => {
+              if (!blob) return false;
 
-              onVideoCaptured?.({
+              const sendPromise = onVideoCaptured?.({
                 blob,
                 caption,
+                temporaryMessageId,
               });
 
               closeCamera();
+
+              return sendPromise;
             }}
             recipientName={recipientName}
             videoCaption={videoCaption}
