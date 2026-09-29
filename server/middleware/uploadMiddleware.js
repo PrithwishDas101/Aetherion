@@ -1,12 +1,50 @@
 import multer from "multer";
+import { extname } from "node:path";
 
 const storage = multer.memoryStorage();
+const FILE_TYPES_BY_EXTENSION = {
+  ".jpg": ["image/jpeg"],
+  ".jpeg": ["image/jpeg"],
+  ".png": ["image/png"],
+  ".webp": ["image/webp"],
+  ".gif": ["image/gif"],
+  ".webm": ["video/webm"],
+  ".mp4": ["video/mp4"],
+  ".ogg": ["video/ogg"],
+  ".mov": ["video/quicktime"],
+  ".mkv": ["video/x-matroska"],
+  ".pdf": ["application/pdf"],
+  ".doc": ["application/msword"],
+  ".docx": [
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ],
+  ".xls": ["application/vnd.ms-excel"],
+  ".xlsx": [
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ],
+  ".ppt": ["application/vnd.ms-powerpoint"],
+  ".pptx": [
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ],
+  ".txt": ["text/plain"],
+  ".csv": ["text/csv", "application/vnd.ms-excel", "text/plain"],
+  ".zip": ["application/zip", "application/x-zip-compressed"],
+};
 
-const upload = multer({
+const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+
+const FILE_SIZE_LIMIT = 50 * 1024 * 1024;
+
+const createUpload = ({ fields, fieldSize }) => multer({
   storage,
 
   limits: {
-    fileSize: 50 * 1024 * 1024,
+    fileSize: FILE_SIZE_LIMIT,
+    files: 1,
+    fields,
+    parts: fields + 1,
+    fieldNameSize: 100,
+    fieldSize,
   },
 
   fileFilter: (req, file, cb) => {
@@ -46,40 +84,14 @@ const upload = multer({
     ];
 
     const fileName = file.originalname?.toLowerCase() || "";
+    const extension = extname(fileName);
+    const allowedExtensions = Object.keys(FILE_TYPES_BY_EXTENSION);
+    const allowedFileExtensions =
+      file.fieldname === "media"
+        ? allowedExtensions
+        : IMAGE_EXTENSIONS;
 
-    const allowedExtensions = [
-      ".webm",
-      ".mp4",
-      ".ogg",
-      ".mov",
-      ".mkv",
-
-      ".jpg",
-      ".jpeg",
-      ".png",
-      ".webp",
-      ".gif",
-
-      ".pdf",
-
-      ".doc",
-      ".docx",
-
-      ".xls",
-      ".xlsx",
-
-      ".ppt",
-      ".pptx",
-
-      ".txt",
-      ".csv",
-
-      ".zip",
-    ];
-
-    const extensionMatches = allowedExtensions.some((extension) =>
-      fileName.endsWith(extension),
-    );
+    const extensionMatches = allowedExtensions.includes(extension);
 
     console.log("📦 MULTER FILE:", {
       fieldname: file.fieldname,
@@ -87,7 +99,20 @@ const upload = multer({
       mimetype: file.mimetype,
     });
 
-    if (allowedTypes.includes(file.mimetype) || extensionMatches) {
+    const isGenericMimeType = [
+      "application/octet-stream",
+      "binary/octet-stream",
+    ].includes(file.mimetype?.toLowerCase());
+    const isAllowedMimeType =
+      allowedTypes.includes(file.mimetype?.toLowerCase()) || isGenericMimeType;
+
+    if (
+      extensionMatches &&
+      allowedFileExtensions.includes(extension) &&
+      isAllowedMimeType &&
+      (FILE_TYPES_BY_EXTENSION[extension]?.includes(file.mimetype?.toLowerCase()) ||
+        isGenericMimeType)
+    ) {
       cb(null, true);
 
       return;
@@ -97,4 +122,22 @@ const upload = multer({
   },
 });
 
-export default upload;
+export const signupUpload = createUpload({
+  fields: 4,
+  fieldSize: 64 * 1024,
+});
+
+export const profilePictureUpload = createUpload({
+  fields: 0,
+  fieldSize: 64 * 1024,
+});
+
+export const profileBannerUpload = createUpload({
+  fields: 0,
+  fieldSize: 64 * 1024,
+});
+
+export const messageUpload = createUpload({
+  fields: 4,
+  fieldSize: 1024 * 1024,
+});

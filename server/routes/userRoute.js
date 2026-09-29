@@ -1,5 +1,8 @@
 import express from "express";
-import upload from "../middleware/uploadMiddleware.js";
+import {
+  profileBannerUpload,
+  profilePictureUpload,
+} from "../middleware/uploadMiddleware.js";
 
 import {
   getLoggedUser,
@@ -25,7 +28,7 @@ router.post(
   "/profile-picture",
   profilePictureLimiter,
   protectRoute,
-  upload.single("profilePic"),
+  profilePictureUpload.single("profilePic"),
   updateProfilePicture,
 );
 router.delete(
@@ -38,7 +41,7 @@ router.post(
   "/profile-banner",
   profilePictureLimiter,
   protectRoute,
-  upload.single("profileBanner"),
+  profileBannerUpload.single("profileBanner"),
   updateProfileBanner,
 );
 router.put("/connections", protectRoute, updateConnections);
