@@ -44,19 +44,26 @@ function Signup() {
 
       const response = await signupUser(formData);
 
-      if (response.success) {
+      if (response.success && response.token && response.user) {
         localStorage.setItem("token", response.token);
 
         toast.success(response.message);
 
         navigate("/", { replace: true });
+      } else if (response.success) {
+        toast.success(response.message);
+
+        navigate("/login", {
+          replace: true,
+          state: { email: user.email.trim().toLowerCase() },
+        });
       } else {
         toast.error(response.message);
       }
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-          "Something went wrong. Please try again.",
+        "Something went wrong. Please try again.",
       );
     } finally {
       dispatch(hideLoader());

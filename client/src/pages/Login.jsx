@@ -1,6 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
@@ -11,9 +10,10 @@ function Login() {
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [user, setUser] = React.useState({
-    email: "",
+    email: location.state?.email || "",
     password: "",
   });
 
@@ -28,7 +28,7 @@ function Login() {
       if (response.success) {
         localStorage.setItem("token", response.token);
 
-        toast("Welcome to Aetherion", {
+        toast(`Welcome ${response.user.firstName}`, {
           icon: null,
         });
 

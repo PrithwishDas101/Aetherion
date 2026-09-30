@@ -4,6 +4,14 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { uploadImage, deleteImage } from "../services/cloudinaryService.js";
 
+const respondToSignup = (res, authPayload = {}) =>
+  res.status(200).json({
+    success: true,
+    message:
+      "Continue to sign in. If you already have an account, use your existing password.",
+    ...authPayload,
+  });
+
 // SIGNUP
 export const signup = async (req, res) => {
   let uploadedProfilePicPublicId = "";
@@ -58,22 +66,18 @@ export const signup = async (req, res) => {
       });
     }
 
-    // 7. Check if user already exists
+    // 7. Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const existingUser = await User.findOne({
       email: normalizedEmail,
     });
 
     if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "Email is already registered",
-      });
+      return respondToSignup(res);
     }
 
-    // 8. Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 9. Upload optional profile picture
+    // 8. Upload optional profile picture
     let profilePic = "";
     let profilePicPublicId = "";
 
@@ -89,7 +93,7 @@ export const signup = async (req, res) => {
       uploadedProfilePicPublicId = uploadResult.public_id;
     }
 
-    // 10. Create user
+    // 9. Create user
     const newUser = await User.create({
       firstName: normalizedFirstName,
       lastName: normalizedLastName,
@@ -99,7 +103,6 @@ export const signup = async (req, res) => {
       profilePicPublicId,
     });
 
-    // 11. Create JWT
     const token = jwt.sign(
       {
         userId: newUser._id,
@@ -110,10 +113,7 @@ export const signup = async (req, res) => {
       },
     );
 
-    // 12. Return token and safe user data
-    return res.status(201).json({
-      success: true,
-      message: "User created successfully",
+    return respondToSignup(res, {
       token,
       user: {
         id: newUser._id,
@@ -141,10 +141,7 @@ export const signup = async (req, res) => {
 
     // Duplicate email
     if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: "Email is already registered",
-      });
+      return respondToSignup(res);
     }
 
     // Mongoose validation error
