@@ -1,0 +1,11 @@
+warning: in the working copy of 'server/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/package.json', LF will be replaced by CRLF the next time Git touches it
+ client/src/components/Camera/CameraModal.jsx |  11 [32m+[m[31m-[m
+ client/src/components/Chat.jsx               | 145 [32m+++++++++++++[m[31m--------------[m
+ server/middleware/uploadMiddleware.js        | 119 [32m+++++++++++++++[m[31m-------[m
+ server/package-lock.json                     |  65 [32m+[m[31m-----------[m
+ server/package.json                          |   2 [32m+[m[31m-[m
+ server/routes/MessageRoute.js                |   9 [32m+[m[31m-[m
+ server/routes/authRoute.js                   |   4 [32m+[m[31m-[m
+ server/routes/userRoute.js                   |   9 [32m+[m[31m-[m
+ 8 files changed, 179 insertions(+), 185 deletions(-)

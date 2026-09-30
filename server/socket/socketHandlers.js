@@ -1,4 +1,6 @@
 import Chat from "../models/Chat.js";
+import Message from "../models/Message.js";
+import Poll from "../models/Poll.js";
 
 const getChatForUser = async (chatId, userId) => {
   if (!chatId || !userId) {
@@ -20,11 +22,11 @@ const registerSocketHandlers = (io) => {
       return;
     }
 
-    socket.on("send-message", async ({ message, chat }) => {
+    socket.on("send-message", async ({ message, chat } = {}) => {
       try {
         const chatId = chat?._id || message?.chatId;
 
-        if (!message || !chatId) {
+        if (!message?._id || !chatId) {
           return;
         }
 
@@ -34,18 +36,39 @@ const registerSocketHandlers = (io) => {
           return;
         }
 
-        const recipients = authorizedChat.members || [];
-
-        const safeMessage = {
-          ...message,
+        const persistedMessage = await Message.findOne({
+          _id: message._id,
+          chatId: authorizedChat._id,
           sender: userId,
-        };
+        })
+          .populate({
+            path: "replyTo",
+            select: "text sender type mediaUrl document poll location contact",
+          })
+          .populate("poll");
+
+        if (!persistedMessage) {
+          return;
+        }
+
+        const broadcastChat = await Chat.findOne({
+          _id: authorizedChat._id,
+          members: userId,
+        })
+          .populate("members")
+          .populate("lastMessage");
+
+        if (!broadcastChat) {
+          return;
+        }
+
+        const recipients = authorizedChat.members || [];
 
         recipients.forEach((memberId) => {
           if (String(memberId) !== userId) {
             socket.to(String(memberId)).emit("receive-message", {
-              message: safeMessage,
-              chat,
+              message: persistedMessage,
+              chat: broadcastChat,
             });
           }
         });
@@ -70,7 +93,7 @@ const registerSocketHandlers = (io) => {
           if (String(memberId) !== userId) {
             socket.to(String(memberId)).emit("typing", {
               sender: userId,
-              chatId,
+              chatId: String(authorizedChat._id),
             });
           }
         });
@@ -95,7 +118,7 @@ const registerSocketHandlers = (io) => {
           if (String(memberId) !== userId) {
             socket.to(String(memberId)).emit("stop-typing", {
               sender: userId,
-              chatId,
+              chatId: String(authorizedChat._id),
             });
           }
         });
@@ -104,7 +127,7 @@ const registerSocketHandlers = (io) => {
       }
     });
 
-    socket.on("poll-updated", async ({ poll, chatId }) => {
+    socket.on("poll-updated", async ({ poll, chatId } = {}) => {
       try {
         if (!poll?._id || !chatId) {
           return;
@@ -116,11 +139,20 @@ const registerSocketHandlers = (io) => {
           return;
         }
 
+        const persistedPoll = await Poll.findOne({
+          _id: poll._id,
+          chatId: authorizedChat._id,
+        });
+
+        if (!persistedPoll) {
+          return;
+        }
+
         authorizedChat.members.forEach((memberId) => {
           if (String(memberId) !== userId) {
             socket.to(String(memberId)).emit("poll-updated", {
-              poll,
-              chatId,
+              poll: persistedPoll,
+              chatId: String(authorizedChat._id),
             });
           }
         });

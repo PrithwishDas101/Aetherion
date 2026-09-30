@@ -4,6 +4,30 @@ import { Server } from "socket.io";
 import { registerSocketHandlers } from "./socketHandlers.js";
 import registerPresenceHandlers from "./presenceHandlers.js";
 
+export const authenticateSocket = (socket, next) => {
+  try {
+    const token = socket.handshake.auth?.token;
+
+    if (!token) {
+      return next(new Error("Authentication required"));
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decoded?.userId) {
+      return next(new Error("Invalid authentication token"));
+    }
+
+    socket.data.userId = String(decoded.userId);
+
+    return next();
+  } catch (error) {
+    console.error("Socket authentication error:", error.message);
+
+    return next(new Error("Invalid or expired authentication token"));
+  }
+};
+
 const initializeSocket = (server) => {
   const allowedOrigins = [
     "http://localhost:5173",
@@ -21,30 +45,7 @@ const initializeSocket = (server) => {
     },
   });
 
-  // Authenticate every Socket.IO connection before it can reach any handler.
-  io.use((socket, next) => {
-    try {
-      const token = socket.handshake.auth?.token;
-
-      if (!token) {
-        return next(new Error("Authentication required"));
-      }
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      if (!decoded?.userId) {
-        return next(new Error("Invalid authentication token"));
-      }
-
-      socket.data.userId = String(decoded.userId);
-
-      return next();
-    } catch (error) {
-      console.error("Socket authentication error:", error.message);
-
-      return next(new Error("Invalid or expired authentication token"));
-    }
-  });
+  io.use(authenticateSocket);
 
   registerSocketHandlers(io);
   registerPresenceHandlers(io);
