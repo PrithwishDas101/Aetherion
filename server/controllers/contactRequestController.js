@@ -477,6 +477,8 @@ export const declineContactRequest = async (req, res) => {
       });
     }
 
+    const io = req.app.get("io");
+
     if (io) {
       const requesterId = String(request.requester);
 
