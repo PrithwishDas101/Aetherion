@@ -241,9 +241,6 @@ const EditProfile = () => {
         const response = await updateProfileBanner(formData);
 
         if (!response?.success) {
-            toast.error(
-                response?.message || "Couldn't update your banner.",
-            );
             throw new Error(
                 response?.message || "Banner update failed.",
             );

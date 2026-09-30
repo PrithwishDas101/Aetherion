@@ -47,11 +47,11 @@ function Signup() {
       if (response.success && response.token && response.user) {
         localStorage.setItem("token", response.token);
 
-        toast.success(response.message);
+        toast.success("Account created.");
 
         navigate("/", { replace: true });
       } else if (response.success) {
-        toast.success(response.message);
+        toast("Sign in to continue.", { icon: null });
 
         navigate("/login", {
           replace: true,

@@ -510,8 +510,9 @@ const Chat = ({ socket }) => {
       const createdMessage = response.data;
 
       if (!createdMessage) {
-        toast.error(
-          "Location was sent, but the message could not be loaded.",
+        toast(
+          "Location sent. It could not be displayed in the chat yet.",
+          { icon: null },
         );
 
         return false;
@@ -967,8 +968,9 @@ const Chat = ({ socket }) => {
           response,
         );
 
-        toast.error(
-          "Poll was created, but the message could not be loaded.",
+        toast(
+          "Poll created. It could not be displayed in the chat yet.",
+          { icon: null },
         );
 
         return false;
@@ -1080,8 +1082,9 @@ const Chat = ({ socket }) => {
           response,
         );
 
-        toast.error(
-          "Vote was saved, but the poll could not be updated.",
+        toast(
+          "Vote saved. The poll could not be refreshed yet.",
+          { icon: null },
         );
 
         return false;

@@ -459,10 +459,6 @@ const ProfileBanner = ({
                 "Profile banner save error:",
                 error,
             );
-
-            toast.error(
-                "Couldn't update your banner.",
-            );
         } finally {
             setSaving(false);
         }

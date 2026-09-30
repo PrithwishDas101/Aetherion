@@ -173,11 +173,6 @@ const Profile = () => {
     );
 
     if (!response?.success) {
-      toast.error(
-        response?.message ||
-        "Couldn't update your banner.",
-      );
-
       throw new Error(
         response?.message ||
         "Banner update failed.",
@@ -197,11 +192,6 @@ const Profile = () => {
       await updateConnections(connections);
 
     if (!response?.success) {
-      toast.error(
-        response?.message ||
-        "Couldn't update your connections.",
-      );
-
       throw new Error(
         response?.message ||
         "Connections update failed.",

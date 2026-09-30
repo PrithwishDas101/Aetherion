@@ -1014,10 +1014,6 @@ const Connections = ({
                 "Connections save error:",
                 error,
             );
-
-            toast.error(
-                "Couldn't update your connections.",
-            );
         } finally {
             setSaving(false);
         }
