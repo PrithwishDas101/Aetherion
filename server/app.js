@@ -10,6 +10,7 @@ import contactRequestRoutes from "./routes/contactRequestRoute.js";
 import messageRoutes from "./routes/messageRoute.js";
 import pollRoutes from "./routes/pollRoute.js";
 import contactProfileRoutes from "./routes/contactProfileRoute.js";
+import { logSafeError } from "./utils/safeLogging.js";
 
 const app = express();
 
@@ -45,9 +46,9 @@ app.use(
         return callback(null, true);
       }
 
-      console.error("CORS blocked origin:", origin);
+      logSafeError("CORS origin rejected", new Error("Origin not allowed"));
 
-      return callback(new Error(`CORS blocked origin: ${origin}`));
+      return callback(new Error("CORS origin not allowed"));
     },
 
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],

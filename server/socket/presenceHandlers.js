@@ -5,6 +5,7 @@ import {
 } from "./presenceStore.js";
 import User from "../models/User.js";
 import { socketEventLimiter } from "./socketEventLimiter.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 const registerPresenceHandlers = (io, eventLimiter = socketEventLimiter) => {
   io.on("connection", (socket) => {
@@ -53,7 +54,7 @@ const registerPresenceHandlers = (io, eventLimiter = socketEventLimiter) => {
           lastSeen: result.lastSeen,
         });
       } catch (error) {
-        console.error("Failed to update last seen:", error.message);
+        logSafeError("Update presence lastSeen", error, { userId });
 
         return;
       }

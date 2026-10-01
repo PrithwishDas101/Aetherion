@@ -93,12 +93,6 @@ const createUpload = ({ fields, fieldSize }) => multer({
 
     const extensionMatches = allowedExtensions.includes(extension);
 
-    console.log("📦 MULTER FILE:", {
-      fieldname: file.fieldname,
-      originalname: file.originalname,
-      mimetype: file.mimetype,
-    });
-
     const isGenericMimeType = [
       "application/octet-stream",
       "binary/octet-stream",

@@ -39,7 +39,7 @@ try {
     method: "POST",
     body: form,
   });
-  console.log(response.status, await response.text());
+  console.log("Video upload filter smoke status:", response.status);
 } finally {
   await new Promise((resolve, reject) => {
     server.close((error) => (error ? reject(error) : resolve()));

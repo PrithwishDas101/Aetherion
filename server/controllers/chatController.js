@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import { socketEventLimiter } from "../socket/socketEventLimiter.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 // CREATE ONE-TO-ONE CHAT
 export const createChat = async (req, res) => {
@@ -92,7 +93,7 @@ export const createChat = async (req, res) => {
       data: chat,
     });
   } catch (error) {
-    console.error("Create chat error:", error);
+    logSafeError("Create chat", error);
 
     return res.status(500).json({
       success: false,
@@ -124,7 +125,7 @@ export const getAllChats = async (req, res) => {
       data: chats,
     });
   } catch (error) {
-    console.error("Get all chats error:", error);
+    logSafeError("Get all chats", error);
 
     return res.status(500).json({
       success: false,
@@ -234,7 +235,9 @@ export const clearUnreadMessages = async (req, res) => {
       data: updatedChat,
     });
   } catch (error) {
-    console.error("Clear unread messages error:", error);
+    logSafeError("Clear unread messages", error, {
+      chatId: req.body?.chatId,
+    });
 
     return res.status(500).json({
       success: false,

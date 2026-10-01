@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import toast from "react-hot-toast";
+import { logSafeClientError } from "../utils/safeLogging.js";
 
 import {
     FaInstagram,
@@ -1010,10 +1011,7 @@ const Connections = ({
             await onSave(cleanedConnections);
             setShowModal(false);
         } catch (error) {
-            console.error(
-                "Connections save error:",
-                error,
-            );
+            logSafeClientError("Connections save", error);
         } finally {
             setSaving(false);
         }

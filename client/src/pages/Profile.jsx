@@ -23,6 +23,7 @@ import {
   getAetherionDayMilestone,
 } from "../utils/aetherionDays.js";
 import ProfileBanner from "../components/ProfileBanner.jsx";
+import { logSafeClientError } from "../utils/safeLogging.js";
 
 const Profile = () => {
   const { user, presence } = useSelector(
@@ -107,10 +108,7 @@ const Profile = () => {
 
       setShowStatusModal(false);
     } catch (error) {
-      console.error(
-        "Status update error:",
-        error,
-      );
+      logSafeClientError("Status update", error);
 
       toast.error(
         "Couldn't update your status.",
@@ -149,10 +147,7 @@ const Profile = () => {
 
       setShowStatusModal(false);
     } catch (error) {
-      console.error(
-        "Status deletion error:",
-        error,
-      );
+      logSafeClientError("Status deletion", error);
 
       toast.error(
         "Couldn't delete your status.",
@@ -235,10 +230,7 @@ const Profile = () => {
 
       setShowPresenceModal(false);
     } catch (error) {
-      console.error(
-        "Presence status update error:",
-        error,
-      );
+      logSafeClientError("Presence status update", error);
 
       toast.error(
         "Couldn't update your online status.",

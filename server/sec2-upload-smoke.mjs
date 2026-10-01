@@ -32,13 +32,12 @@ const url = `http://127.0.0.1:${server.address().port}`;
 
 const check = async (path, form, expectedStatus) => {
   const response = await fetch(`${url}${path}`, { method: "POST", body: form });
-  const result = await response.text();
 
   if (response.status !== expectedStatus) {
-    throw new Error(`${path}: expected ${expectedStatus}, got ${response.status}: ${result}`);
+    throw new Error(`${path}: expected ${expectedStatus}, got ${response.status}`);
   }
 
-  console.log(`${path}: ${response.status} ${result}`);
+  console.log(`${path}: ${response.status}`);
 };
 
 try {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { logSafeClientError } from "../utils/safeLogging.js";
 import {
     IoArrowBack,
     IoChevronForward,
@@ -318,10 +319,7 @@ const ContactProfile = () => {
                     : [],
             );
         } catch (error) {
-            console.error(
-                "Load all contact media error:",
-                error,
-            );
+            logSafeClientError("Load all contact media", error);
 
             toast.error("Unable to load media.");
             setAllMediaOpen(false);
@@ -401,10 +399,7 @@ const ContactProfile = () => {
 
             toast.success("Contact removed.");
         } catch (error) {
-            console.error(
-                "Remove contact error:",
-                error,
-            );
+            logSafeClientError("Remove contact", error);
 
             toast.error(
                 "Couldn't remove this contact.",
@@ -508,10 +503,7 @@ const ContactProfile = () => {
                 "Contact request sent.",
             );
         } catch (error) {
-            console.error(
-                "Send contact request error:",
-                error,
-            );
+            logSafeClientError("Send contact request", error);
 
             toast.error(
                 "Couldn't send contact request.",

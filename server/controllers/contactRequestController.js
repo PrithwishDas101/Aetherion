@@ -4,6 +4,7 @@ import Contact from "../models/Contact.js";
 import ContactRequest from "../models/ContactRequest.js";
 import User from "../models/User.js";
 import { ensureContacts } from "./contactController.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 const REQUESTER_PROJECTION =
   "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen";
@@ -153,7 +154,7 @@ export const sendContactRequest = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Send contact request error:", error);
+    logSafeError("Send contact request", error);
 
     return res.status(500).json({
       success: false,
@@ -297,7 +298,7 @@ export const getIncomingContactRequests = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get incoming contact requests error:", error);
+    logSafeError("Get incoming contact requests", error);
 
     return res.status(500).json({
       success: false,
@@ -333,7 +334,7 @@ export const getOutgoingContactRequests = async (req, res) => {
         })),
     });
   } catch (error) {
-    console.error("Get outgoing contact requests error:", error);
+    logSafeError("Get outgoing contact requests", error);
 
     return res.status(500).json({
       success: false,
@@ -356,7 +357,7 @@ export const getContactRequestCount = async (req, res) => {
       count,
     });
   } catch (error) {
-    console.error("Get contact request count error:", error);
+    logSafeError("Get contact request count", error);
 
     return res.status(500).json({
       success: false,
@@ -440,7 +441,7 @@ export const acceptContactRequest = async (req, res) => {
       });
     }
 
-    console.error("Accept contact request error:", error);
+    logSafeError("Accept contact request", error);
 
     return res.status(500).json({
       success: false,
@@ -496,7 +497,7 @@ export const declineContactRequest = async (req, res) => {
       message: "Contact request declined.",
     });
   } catch (error) {
-    console.error("Decline contact request error:", error);
+    logSafeError("Decline contact request", error);
 
     return res.status(500).json({
       success: false,
@@ -545,7 +546,7 @@ export const cancelContactRequest = async (req, res) => {
       message: "Contact request cancelled.",
     });
   } catch (error) {
-    console.error("Cancel contact request error:", error);
+    logSafeError("Cancel contact request", error);
 
     return res.status(500).json({
       success: false,

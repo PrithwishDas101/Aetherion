@@ -96,14 +96,7 @@ const renderGif = ({
       scale,
     );
 
-    console.log("🎞️ GIF RENDER SETTINGS:", {
-      sourceWidth,
-      sourceHeight,
-      outputWidth,
-      outputHeight,
-      frameStep,
-      sourceFrames: frames.length,
-    });
+    console.log("GIF render started");
 
     const gifEncoder = new GIF({
       workers: 2,
@@ -273,12 +266,7 @@ export const composeGif = async ({ gifUrl, doodles = [], texts = [] }) => {
     Math.ceil(frames.length / MAX_TOTAL_FRAMES),
   );
 
-  console.log("🎞️ STARTING GIF COMPRESSION:", {
-    sourceWidth,
-    sourceHeight,
-    frameCount: frames.length,
-    initialFrameStep,
-  });
+  console.log("GIF compression started");
 
   let blob = await renderGif({
     frames,
@@ -290,10 +278,7 @@ export const composeGif = async ({ gifUrl, doodles = [], texts = [] }) => {
     frameStep: initialFrameStep,
   });
 
-  console.log("🎞️ GIF OUTPUT ATTEMPT 1:", {
-    size: blob.size,
-    sizeMB: (blob.size / 1024 / 1024).toFixed(2),
-  });
+  console.log("GIF compression pass completed");
 
   if (blob.size > MAX_OUTPUT_SIZE) {
     blob = await renderGif({
@@ -306,10 +291,7 @@ export const composeGif = async ({ gifUrl, doodles = [], texts = [] }) => {
       frameStep: Math.max(initialFrameStep, 2),
     });
 
-    console.log("🎞️ GIF OUTPUT ATTEMPT 2:", {
-      size: blob.size,
-      sizeMB: (blob.size / 1024 / 1024).toFixed(2),
-    });
+    console.log("GIF compression retry completed");
   }
 
   if (blob.size > MAX_OUTPUT_SIZE) {
@@ -323,10 +305,7 @@ export const composeGif = async ({ gifUrl, doodles = [], texts = [] }) => {
       frameStep: Math.max(initialFrameStep, 3),
     });
 
-    console.log("🎞️ GIF OUTPUT ATTEMPT 3:", {
-      size: blob.size,
-      sizeMB: (blob.size / 1024 / 1024).toFixed(2),
-    });
+    console.log("Final GIF compression retry completed");
   }
 
   if (blob.size > MAX_OUTPUT_SIZE) {

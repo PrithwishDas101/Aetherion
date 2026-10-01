@@ -3,6 +3,7 @@ import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import Poll from "../models/Poll.js";
 import { socketEventLimiter } from "./socketEventLimiter.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 const getChatForUser = async (chatId, userId) => {
   if (!chatId || !userId) {
@@ -79,7 +80,7 @@ const registerSocketHandlers = (io, eventLimiter = socketEventLimiter) => {
           }
         });
       } catch (error) {
-        console.error("Socket send-message error:", error.message);
+        logSafeError("Socket send-message", error, { userId, event: "send-message" });
       }
     });
 
@@ -113,7 +114,7 @@ const registerSocketHandlers = (io, eventLimiter = socketEventLimiter) => {
           }
         });
       } catch (error) {
-        console.error("Socket typing error:", error.message);
+        logSafeError("Socket typing", error, { userId, event: "typing" });
       }
     });
 
@@ -147,7 +148,7 @@ const registerSocketHandlers = (io, eventLimiter = socketEventLimiter) => {
           }
         });
       } catch (error) {
-        console.error("Socket stop-typing error:", error.message);
+        logSafeError("Socket stop-typing", error, { userId, event: "stop-typing" });
       }
     });
 
@@ -185,7 +186,10 @@ const registerSocketHandlers = (io, eventLimiter = socketEventLimiter) => {
           }
         });
       } catch (error) {
-        console.error("Socket poll-updated error:", error.message);
+        logSafeError("Socket poll-updated", error, {
+          userId,
+          event: "poll-updated",
+        });
       }
     });
   });

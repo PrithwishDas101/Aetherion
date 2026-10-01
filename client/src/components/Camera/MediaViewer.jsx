@@ -16,6 +16,7 @@ import MediaZoomSurface from "./MediaZoomSurface.jsx";
 import PhotoPreview from "./PhotoPreview.jsx";
 import VideoPreview from "./VideoPreview.jsx";
 import Avatar from "../Avatar.jsx";
+import { logSafeClientError } from "../../utils/safeLogging.js";
 
 const getInitials = (person) => {
   if (!person) {
@@ -222,7 +223,7 @@ const MediaViewer = ({
         URL.revokeObjectURL(blobUrl);
       }, 1000);
     } catch (error) {
-      console.error("Unable to download media:", error);
+      logSafeClientError("Download media", error);
 
       window.open(currentMedia.mediaUrl, "_blank", "noopener,noreferrer");
     } finally {
@@ -263,7 +264,7 @@ const MediaViewer = ({
 
         setIsEditing(true);
       } catch (error) {
-        console.error("Unable to prepare video for editing:", error);
+        logSafeClientError("Prepare video for editing", error);
       } finally {
         setIsLoadingEditor(false);
       }
@@ -305,7 +306,7 @@ const MediaViewer = ({
 
       return Boolean(didSend);
     } catch (error) {
-      console.error("Unable to send edited image:", error);
+      logSafeClientError("Send edited image", error);
 
       return false;
     } finally {
@@ -342,7 +343,7 @@ const MediaViewer = ({
 
       return temporaryMessageId || null;
     } catch (error) {
-      console.error("Unable to start video processing:", error);
+      logSafeClientError("Start video processing", error);
 
       return null;
     } finally {
@@ -370,7 +371,7 @@ const MediaViewer = ({
 
       return Boolean(didSend);
     } catch (error) {
-      console.error("Unable to send edited video:", error);
+      logSafeClientError("Send edited video", error);
 
       return false;
     }

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import User from "../models/User.js";
 import { uploadImage, deleteImage } from "../services/cloudinaryService.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 const respondToSignup = (res, authPayload = {}) =>
   res.status(200).json({
@@ -136,7 +137,7 @@ export const signup = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Signup error:", error);
+    logSafeError("Signup", error);
 
     // Clean up Cloudinary image if
     // MongoDB/user creation failed
@@ -146,7 +147,7 @@ export const signup = async (req, res) => {
 
         console.log("Cloudinary signup cleanup completed.");
       } catch (cleanupError) {
-        console.error("Cloudinary signup cleanup error:", cleanupError);
+        logSafeError("Signup image cleanup", cleanupError);
       }
     }
 
@@ -248,7 +249,7 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    logSafeError("Login", error);
 
     return res.status(500).json({
       success: false,
@@ -279,7 +280,7 @@ export const logout = async (req, res) => {
       try {
         await io.in(String(req.user.userId)).disconnectSockets(true);
       } catch (error) {
-        console.error("Logout socket disconnect error:", error.message);
+        logSafeError("Logout socket disconnect", error);
       }
     }
 
@@ -288,7 +289,7 @@ export const logout = async (req, res) => {
       message: "Logout successful",
     });
   } catch (error) {
-    console.error("Logout error:", error);
+    logSafeError("Logout", error);
 
     return res.status(500).json({
       success: false,

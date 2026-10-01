@@ -3,6 +3,7 @@ import { FiSearch, FiSmile } from "react-icons/fi";
 import EmojiPicker from "emoji-picker-react";
 
 import { searchEmojis } from "../utils/emojiSearch.js";
+import { logSafeClientError } from "../utils/safeLogging.js";
 import { searchGifs, getTrendingGifs } from "../apiCalls/giphyApi.js";
 
 const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
@@ -49,7 +50,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
 
       return stored ? JSON.parse(stored) : [];
     } catch (error) {
-      console.error("Get recent GIFs error:", error);
+      logSafeClientError("Get recent GIFs", error);
       return [];
     }
   };
@@ -115,7 +116,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
           setGifResults(results);
         }
       } catch (error) {
-        console.error("GIF loading error:", error);
+        logSafeClientError("GIF loading", error);
 
         if (!cancelled) {
           setGifResults([]);

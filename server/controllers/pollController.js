@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import Poll from "../models/Poll.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 // CREATE POLL
 export const createPoll = async (req, res) => {
@@ -163,7 +164,10 @@ export const createPoll = async (req, res) => {
       chat: updatedChat,
     });
   } catch (error) {
-    console.error("Create poll error:", error);
+    logSafeError("Create poll", error, {
+      chatId: req.body?.chatId,
+      type: "poll",
+    });
 
     return res.status(500).json({
       success: false,
@@ -262,7 +266,9 @@ export const voteOnPoll = async (req, res) => {
       data: poll,
     });
   } catch (error) {
-    console.error("Vote on poll error:", error);
+    logSafeError("Vote on poll", error, {
+      pollId: req.params?.pollId,
+    });
 
     return res.status(500).json({
       success: false,
@@ -305,7 +311,9 @@ export const getPoll = async (req, res) => {
       data: poll,
     });
   } catch (error) {
-    console.error("Get poll error:", error);
+    logSafeError("Get poll", error, {
+      pollId: req.params?.pollId,
+    });
 
     return res.status(500).json({
       success: false,

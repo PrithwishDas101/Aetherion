@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { logSafeClientError } from "../utils/safeLogging.js";
 import {
     ImagePlus,
     ZoomIn,
@@ -455,10 +456,7 @@ const ProfileBanner = ({
 
             closeEditor();
         } catch (error) {
-            console.error(
-                "Profile banner save error:",
-                error,
-            );
+            logSafeClientError("Profile banner save", error);
         } finally {
             setSaving(false);
         }

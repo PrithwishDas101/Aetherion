@@ -6,6 +6,7 @@ import { registerSocketHandlers } from "./socketHandlers.js";
 import registerPresenceHandlers from "./presenceHandlers.js";
 import { socketEventLimiter } from "./socketEventLimiter.js";
 import { createSocketConnectionLimiter } from "./socketConnectionLimiter.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 export const authenticateSocket = async (socket, next) => {
   try {
@@ -20,7 +21,7 @@ export const authenticateSocket = async (socket, next) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
-      console.error("Socket authentication error:", error.message);
+      logSafeError("Socket authentication", error);
 
       return next(new Error("Invalid or expired authentication token"));
     }
@@ -53,7 +54,7 @@ export const authenticateSocket = async (socket, next) => {
 
     return next();
   } catch (error) {
-    console.error("Socket authentication error:", error.message);
+    logSafeError("Socket authentication", error);
 
     return next(new Error("Invalid or expired authentication token"));
   }

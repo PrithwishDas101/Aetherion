@@ -18,6 +18,10 @@ import {
 import { clearUnreadMessage, createChat } from "../apiCalls/chatApi.js";
 import { showLoader, hideLoader } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
+import {
+  logSafeClientDiagnostic,
+  logSafeClientError,
+} from "../utils/safeLogging.js";
 
 import {
   formatDateLabel,
@@ -255,7 +259,7 @@ const Chat = ({ socket }) => {
       const response = await clearUnreadMessage(selectedChat._id);
 
       if (!response?.success) {
-        console.error(response?.message || "Unable to clear unread messages.");
+        console.error("Unable to clear unread messages.");
         return;
       }
 
@@ -263,7 +267,7 @@ const Chat = ({ socket }) => {
         updateChatWithoutReordering(response.data);
       }
     } catch (error) {
-      console.error("Clear unread messages error:", error);
+      logSafeClientError("Clear unread messages", error);
     } finally {
       isClearingUnreadRef.current = false;
     }
@@ -280,16 +284,16 @@ const Chat = ({ socket }) => {
     try {
       const response = await clearUnreadMessage(chatId);
 
-      console.log("🔥 LEAVE CLEAR RESPONSE:", {
+      logSafeClientDiagnostic("Leave chat unread clear completed", {
+        chatId,
         success: response?.success,
-        unread: response?.data?.unreadMessageCount,
       });
 
       if (response?.success && response?.data) {
         updateChatWithoutReordering(response.data);
       }
     } catch (error) {
-      console.error("Leave chat unread clear error:", error);
+      logSafeClientError("Leave chat unread clear", error);
     } finally {
       dividerVisibleRef.current = false;
       setDividerVisible(false);
@@ -446,10 +450,7 @@ const Chat = ({ socket }) => {
       dispatch(setSelectedChat(newChat));
       setShowContactsModal(false);
     } catch (error) {
-      console.error(
-        "Open contact chat error:",
-        error,
-      );
+      logSafeClientError("Open contact chat", error);
 
       toast.error(
         error?.response?.data?.message ||
@@ -559,10 +560,7 @@ const Chat = ({ socket }) => {
 
       return true;
     } catch (error) {
-      console.error(
-        "Send location error:",
-        error,
-      );
+      logSafeClientError("Send location", error);
 
       toast.error(
         error?.response?.data?.message ||
@@ -715,10 +713,7 @@ const Chat = ({ socket }) => {
 
             return true;
           } catch (error) {
-            console.error(
-              "Document upload error:",
-              error,
-            );
+            logSafeClientError("Document upload", error);
 
             setAllMessages(
               (previousMessages) =>
@@ -772,10 +767,7 @@ const Chat = ({ socket }) => {
 
       return true;
     } catch (error) {
-      console.error(
-        "Document sending error:",
-        error,
-      );
+      logSafeClientError("Document sending", error);
 
       toast.error(
         error?.response?.data?.message ||
@@ -871,10 +863,7 @@ const Chat = ({ socket }) => {
 
       return true;
     } catch (error) {
-      console.error(
-        "Send contacts error:",
-        error,
-      );
+      logSafeClientError("Send contacts", error);
 
       toast.error(
         error?.response?.data?.message ||
@@ -963,10 +952,7 @@ const Chat = ({ socket }) => {
         response.chat || response.data?.chat || null;
 
       if (!createdMessage) {
-        console.error(
-          "Poll created but no message was returned:",
-          response,
-        );
+        console.error("Poll created but no message was returned.");
 
         toast(
           "Poll created. It could not be displayed in the chat yet.",
@@ -1028,10 +1014,7 @@ const Chat = ({ socket }) => {
 
       return true;
     } catch (error) {
-      console.error(
-        "Create poll error:",
-        error,
-      );
+      logSafeClientError("Create poll", error);
 
       toast.error(
         error?.response?.data?.message ||
@@ -1077,10 +1060,7 @@ const Chat = ({ socket }) => {
         response.data;
 
       if (!updatedPoll?._id) {
-        console.error(
-          "Poll vote succeeded but no updated poll was returned:",
-          response,
-        );
+        console.error("Poll vote succeeded but no updated poll was returned.");
 
         toast(
           "Vote saved. The poll could not be refreshed yet.",
@@ -1127,10 +1107,7 @@ const Chat = ({ socket }) => {
 
       return true;
     } catch (error) {
-      console.error(
-        "Vote on poll error:",
-        error,
-      );
+      logSafeClientError("Vote on poll", error);
 
       toast.error(
         error?.response?.data?.message ||
@@ -1308,7 +1285,7 @@ const Chat = ({ socket }) => {
       // We are the sender and therefore already at the latest message.
       setNewMessagesState(0, null);
     } catch (error) {
-      console.error("Send message error:", error);
+      logSafeClientError("Send message", error);
 
       toast.error(error.response?.data?.message || "Unable to send message.");
     } finally {
@@ -1366,7 +1343,7 @@ const Chat = ({ socket }) => {
 
       setNewMessagesState(0, null);
     } catch (error) {
-      console.error("Send GIF error:", error);
+      logSafeClientError("Send GIF", error);
 
       toast.error(error.response?.data?.message || "Unable to send GIF.");
     } finally {
@@ -1378,9 +1355,9 @@ const Chat = ({ socket }) => {
   const sendCameraPhoto = async (photoData) => {
 
     if (!photoData?.blob || !selectedChat?._id || isSending) {
-      console.log("📸 PHOTO SEND REJECTED:", {
-        hasBlob: !!photoData?.blob,
+      logSafeClientDiagnostic("Photo send skipped", {
         chatId: selectedChat?._id,
+        hasBlob: !!photoData?.blob,
         isSending,
       });
 
@@ -1447,10 +1424,9 @@ const Chat = ({ socket }) => {
 
       formData.append("replyTo", replyingTo?._id || "");
 
-      console.log("📸 UPLOADING THIS EXACT BLOB:", {
-        blob: photoData.blob,
-        size: photoData.blob.size,
-        type: photoData.blob.type,
+      logSafeClientDiagnostic("Photo upload started", {
+        chatId: selectedChat._id,
+        type: mediaType,
       });
 
       const response = await createMediaMessage(formData);
@@ -1492,7 +1468,7 @@ const Chat = ({ socket }) => {
 
       return true;
     } catch (error) {
-      console.error("Send camera photo error:", error);
+      logSafeClientError("Send camera photo", error);
 
       setAllMessages((previousMessages) =>
         previousMessages.filter(
@@ -1586,10 +1562,9 @@ const Chat = ({ socket }) => {
         replyingTo?._id || "",
       );
 
-      console.log("🎥 UPLOADING FINAL VIDEO:", {
-        temporaryMessageId,
-        blobType: videoBlobForUpload.type,
-        blobSize: videoData.blob.size,
+      logSafeClientDiagnostic("Video upload started", {
+        chatId: selectedChat._id,
+        type: "video",
       });
 
       const response = await createMediaMessage(formData);
@@ -1643,13 +1618,7 @@ const Chat = ({ socket }) => {
 
       return true;
     } catch (error) {
-      console.error("🔥 SEND VIDEO FAILED", {
-        error,
-        message: error?.message,
-        response: error?.response,
-        responseData: error?.response?.data,
-        status: error?.response?.status,
-      });
+      logSafeClientError("Send video", error);
 
       setAllMessages((previousMessages) => {
         return previousMessages.filter(
@@ -1752,11 +1721,10 @@ const Chat = ({ socket }) => {
           `aetherion-gallery-${Date.now()}-${index}`,
         );
 
-        console.log("🖼️ UPLOADING GALLERY MEDIA:", {
+        logSafeClientDiagnostic("Gallery media upload started", {
+          chatId: selectedChat._id,
           index,
-          name: file.name,
-          type: file.type,
-          size: file.size,
+          type: mediaType,
         });
 
         const response = await createMediaMessage(formData);
@@ -1822,7 +1790,7 @@ const Chat = ({ socket }) => {
 
       return true;
     } catch (error) {
-      console.error("Gallery send error:", error);
+      logSafeClientError("Gallery send", error);
 
       toast.error(
         error?.response?.data?.message ||
@@ -1872,7 +1840,7 @@ const Chat = ({ socket }) => {
         toast.error(response?.message || "Unable to fetch messages.");
       }
     } catch (error) {
-      console.error("Get messages error:", error);
+      logSafeClientError("Get messages", error);
 
       toast.error("Unable to fetch messages.");
     } finally {
@@ -2173,10 +2141,6 @@ const Chat = ({ socket }) => {
           (currentMessage) =>
             String(currentMessage._id) === String(data.message._id),
         );
-
-        console.log("📨 SOCKET CHAT:", {
-          unread: data.chat?.unreadMessageCount,
-        });
 
         if (alreadyExists) {
           return previousMessages;

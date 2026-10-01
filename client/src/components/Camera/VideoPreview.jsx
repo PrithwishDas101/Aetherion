@@ -6,6 +6,7 @@ import PhotoTextEditor from "./TextEditor/PhotoTextEditor.jsx";
 import DoodleEditor from "./Doodle/DoodleEditor.jsx";
 import DoodleDisplay from "./Doodle/DoodleDisplay.jsx";
 import StickerEditor from "./Sticker/StickerEditor.jsx";
+import { logSafeClientError } from "../../utils/safeLogging.js";
 
 const VideoPreview = ({
   videoUrl,
@@ -74,7 +75,7 @@ const VideoPreview = ({
         temporaryMessageId,
       });
     } catch (error) {
-      console.error("Unable to render video overlays:", error);
+      logSafeClientError("Render video overlays", error);
 
       try {
         await onSend?.({
@@ -84,7 +85,7 @@ const VideoPreview = ({
           temporaryMessageId,
         });
       } catch (sendError) {
-        console.error("Unable to send fallback video:", sendError);
+        logSafeClientError("Send fallback video", sendError);
       }
     } finally {
       setIsProcessing(false);

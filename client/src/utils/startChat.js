@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { createChat } from "../apiCalls/chatApi.js";
 import { hideLoader, showLoader } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
+import { logSafeClientError } from "./safeLogging.js";
 
 // Creates a chat if necessary and selects it. Used by: UserList, Contacts
 export const startChatWithUser = async ({
@@ -67,7 +68,7 @@ export const startChatWithUser = async ({
 
     return true;
   } catch (error) {
-    console.error("Start chat error:", error);
+    logSafeClientError("Start chat", error);
 
     toast.error("Unable to open chat.");
 

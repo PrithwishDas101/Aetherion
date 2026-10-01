@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { logSafeError } from "../utils/safeLogging.js";
 
 const connectDB = async () => {
   try {
@@ -6,7 +7,7 @@ const connectDB = async () => {
 
     console.log("MongoDB connected");
   } catch (error) {
-    console.error("Database connection failed:", error.message);
+    logSafeError("Database connection", error);
     process.exit(1);
   }
 };

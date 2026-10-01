@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { FiPlus, FiTrash2, FiX, FiSend } from "react-icons/fi";
+import { logSafeClientError } from "../../utils/safeLogging.js";
 
 const MAX_OPTIONS = 10;
 
@@ -114,7 +115,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
             resetPoll();
             onClose?.();
         } catch (sendError) {
-            console.error("Poll send error:", sendError);
+            logSafeClientError("Poll send", sendError);
             setError("Unable to create the poll.");
         } finally {
             setIsSending(false);

@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { signupUser } from "../apiCalls/authApi.js";
 import { hideLoader, showLoader } from "../redux/sliceLoader.js";
 import compressImage from "../utils/compressImage.js";
+import { logSafeClientError } from "../utils/safeLogging.js";
 
 function Signup() {
   const dispatch = useDispatch();
@@ -82,15 +83,7 @@ function Signup() {
     try {
       const compressedFile = await compressImage(file);
 
-      console.log(
-        "Signup original image:",
-        `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-      );
-
-      console.log(
-        "Signup compressed image:",
-        `${(compressedFile.size / 1024).toFixed(2)} KB`,
-      );
+      console.log("Signup profile image compressed");
 
       setProfileFile(compressedFile);
 
@@ -98,7 +91,7 @@ function Signup() {
 
       setProfilePreview(previewUrl);
     } catch (error) {
-      console.error("Signup profile image compression error:", error);
+      logSafeClientError("Signup profile image compression", error);
 
       setProfileUploadError(
         "Couldn't process that image. Please try another one.",

@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import app from "./app.js";
 import connectDB from "./config/db.js";
 import initializeSocket from "./socket/socket.js";
+import { logSafeError } from "./utils/safeLogging.js";
 
 dotenv.config({
   quiet: true,
@@ -29,6 +30,6 @@ connectDB()
     });
   })
   .catch((error) => {
-    console.error("Database connection failed:", error);
+    logSafeError("Database connection", error);
     process.exit(1);
   });

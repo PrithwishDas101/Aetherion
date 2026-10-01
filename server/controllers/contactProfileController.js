@@ -6,6 +6,7 @@ import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import ContactRequest from "../models/ContactRequest.js"
 import { isOnline } from "../socket/presenceStore.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 const PUBLIC_PROFILE_PROJECTION = [
   "_id",
@@ -207,7 +208,7 @@ export const getContactProfile = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get contact profile error:", error);
+    logSafeError("Get contact profile", error);
 
     return res.status(500).json({
       success: false,
@@ -286,7 +287,7 @@ export const getContactProfileMedia = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get contact profile media error:", error);
+    logSafeError("Get contact profile media", error);
 
     return res.status(500).json({
       success: false,

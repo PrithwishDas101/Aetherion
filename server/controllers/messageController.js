@@ -8,6 +8,10 @@ import {
   uploadVideo,
   uploadDocument,
 } from "../services/cloudinaryService.js";
+import {
+  logSafeDiagnostic,
+  logSafeError,
+} from "../utils/safeLogging.js";
 
 // SEND MESSAGES
 export const sendMessage = async (req, res) => {
@@ -24,16 +28,10 @@ export const sendMessage = async (req, res) => {
 
     const uploadedFile = req.file;
 
-    console.log("📨 SEND MESSAGE REQUEST:", {
+    logSafeDiagnostic("Message request received", {
       chatId,
       type,
-      text,
       hasFile: Boolean(uploadedFile),
-      fileName: uploadedFile?.originalname,
-      fileMimeType: uploadedFile?.mimetype,
-      fileSize: uploadedFile?.size,
-      location,
-      contact,
     });
 
     if (!chatId) {
@@ -171,10 +169,7 @@ export const sendMessage = async (req, res) => {
         });
       }
 
-      console.log("🖼️ UPLOADING IMAGE:", {
-        size: uploadedFile.size,
-        mimeType: uploadedFile.mimetype,
-      });
+      logSafeDiagnostic("Message media upload started", { chatId, type });
 
       const uploadResult = await uploadImage(
         uploadedFile.buffer,
@@ -183,17 +178,13 @@ export const sendMessage = async (req, res) => {
 
       finalMediaUrl = uploadResult.secure_url;
 
-      console.log("🖼️ IMAGE UPLOADED:", finalMediaUrl);
+      logSafeDiagnostic("Message media upload completed", { chatId, type });
     }
 
     // GIF
     if (type === "gif") {
       if (uploadedFile) {
-        console.log("🎞️ EDITED GIF REACHED CONTROLLER:", {
-          size: uploadedFile.size,
-          sizeInMB: (uploadedFile.size / 1024 / 1024).toFixed(2),
-          mimetype: uploadedFile.mimetype,
-        });
+        logSafeDiagnostic("Message media upload started", { chatId, type });
 
         const uploadResult = await uploadGif(
           uploadedFile.buffer,
@@ -202,7 +193,7 @@ export const sendMessage = async (req, res) => {
 
         finalMediaUrl = uploadResult.secure_url;
 
-        console.log("🎞️ GIF UPLOADED:", finalMediaUrl);
+        logSafeDiagnostic("Message media upload completed", { chatId, type });
       } else if (incomingMediaUrl) {
         finalMediaUrl = incomingMediaUrl;
       } else {
@@ -222,11 +213,7 @@ export const sendMessage = async (req, res) => {
         });
       }
 
-      console.log("🎥 UPLOADING VIDEO:", {
-        size: uploadedFile.size,
-        mimeType: uploadedFile.mimetype,
-        originalName: uploadedFile.originalname,
-      });
+      logSafeDiagnostic("Message media upload started", { chatId, type });
 
       const uploadResult = await uploadVideo(
         uploadedFile.buffer,
@@ -235,7 +222,7 @@ export const sendMessage = async (req, res) => {
 
       finalMediaUrl = uploadResult.secure_url;
 
-      console.log("🎥 VIDEO UPLOADED:", finalMediaUrl);
+      logSafeDiagnostic("Message media upload completed", { chatId, type });
     }
 
     // DOCUMENT
@@ -247,11 +234,7 @@ export const sendMessage = async (req, res) => {
         });
       }
 
-      console.log("📄 UPLOADING DOCUMENT:", {
-        size: uploadedFile.size,
-        mimeType: uploadedFile.mimetype,
-        originalName: uploadedFile.originalname,
-      });
+      logSafeDiagnostic("Message media upload started", { chatId, type });
 
       const uploadResult = await uploadDocument(
         uploadedFile.buffer,
@@ -260,15 +243,12 @@ export const sendMessage = async (req, res) => {
 
       finalMediaUrl = uploadResult.secure_url;
 
-      console.log("📄 DOCUMENT UPLOADED:", finalMediaUrl);
+      logSafeDiagnostic("Message media upload completed", { chatId, type });
     }
 
-    console.log("💾 SAVING MESSAGE:", {
+    logSafeDiagnostic("Saving message", {
       chatId,
-      senderId,
       type,
-      mediaUrl: finalMediaUrl,
-      location,
     });
 
     const savedMessage = await Message.create({
@@ -356,11 +336,10 @@ export const sendMessage = async (req, res) => {
       .populate("members")
       .populate("lastMessage");
 
-    console.log("✅ MESSAGE SAVED:", {
+    logSafeDiagnostic("Message saved", {
+      chatId,
       messageId: savedMessage._id,
       type: savedMessage.type,
-      mediaUrl: savedMessage.mediaUrl,
-      location: savedMessage.location,
     });
 
     return res.status(201).json({
@@ -370,7 +349,10 @@ export const sendMessage = async (req, res) => {
       chat: updatedChat,
     });
   } catch (error) {
-    console.error(" Send message error:", error);
+    logSafeError("Send message", error, {
+      chatId: req.body?.chatId,
+      type: req.body?.type,
+    });
 
     return res.status(500).json({
       success: false,
@@ -416,7 +398,9 @@ export const getAllMessages = async (req, res) => {
       data: messages,
     });
   } catch (error) {
-    console.error("Get all messages error:", error);
+    logSafeError("Get all messages", error, {
+      chatId: req.params?.chatId,
+    });
 
     return res.status(500).json({
       success: false,

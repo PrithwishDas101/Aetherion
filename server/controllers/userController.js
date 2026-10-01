@@ -7,6 +7,7 @@ import {
   uploadProfileBanner,
 } from "../services/cloudinaryService.js";
 import { emitPublicPresenceUpdated } from "../socket/profileEvents.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 // GET LOGGED-IN USER
 export const getLoggedUser = async (req, res) => {
@@ -27,7 +28,7 @@ export const getLoggedUser = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    console.error("Get logged user error:", error);
+    logSafeError("Get logged user", error);
 
     return res.status(500).json({
       success: false,
@@ -119,7 +120,7 @@ export const getAllUsers = async (req, res) => {
       users: usersWithRelationshipStatus,
     });
   } catch (error) {
-    console.error("Get all users error:", error);
+    logSafeError("Get all users", error);
 
     return res.status(500).json({
       success: false,
@@ -184,7 +185,7 @@ export const updateProfilePicture = async (req, res) => {
 
         console.timeEnd("Old Cloudinary image delete");
       } catch (deleteError) {
-        console.error("Old profile picture deletion error:", deleteError);
+        logSafeError("Old profile picture deletion", deleteError);
       }
     }
 
@@ -202,7 +203,7 @@ export const updateProfilePicture = async (req, res) => {
       data: updatedUser,
     });
   } catch (error) {
-    console.error("Update profile picture error:", error);
+    logSafeError("Update profile picture", error);
 
     // If Cloudinary upload succeeded but
     // MongoDB save failed, remove the NEW image.
@@ -212,7 +213,7 @@ export const updateProfilePicture = async (req, res) => {
 
         console.log("New Cloudinary image cleanup completed.");
       } catch (cleanupError) {
-        console.error("New Cloudinary image cleanup error:", cleanupError);
+        logSafeError("New profile picture cleanup", cleanupError);
       }
     }
 
@@ -249,7 +250,7 @@ export const removeProfilePicture = async (req, res) => {
     try {
       await deleteImage(oldPublicId);
     } catch (deleteError) {
-      console.error("Profile picture deletion error:", deleteError);
+      logSafeError("Profile picture deletion", deleteError);
 
       return res.status(500).json({
         success: false,
@@ -273,7 +274,7 @@ export const removeProfilePicture = async (req, res) => {
       data: updatedUser,
     });
   } catch (error) {
-    console.error("Remove profile picture error:", error);
+    logSafeError("Remove profile picture", error);
 
     return res.status(500).json({
       success: false,
@@ -386,7 +387,7 @@ export const updatePersonalProfile = async (req, res) => {
       data: updatedUser,
     });
   } catch (error) {
-    console.error("Update personal profile error:", error);
+    logSafeError("Update personal profile", error);
 
     return res.status(500).json({
       success: false,
@@ -436,7 +437,7 @@ export const updateProfileBanner = async (req, res) => {
       try {
         await deleteImage(oldPublicId);
       } catch (deleteError) {
-        console.error("Old profile banner deletion error:", deleteError);
+        logSafeError("Old profile banner deletion", deleteError);
       }
     }
 
@@ -452,14 +453,14 @@ export const updateProfileBanner = async (req, res) => {
       data: updatedUser,
     });
   } catch (error) {
-    console.error("Update profile banner error:", error);
+    logSafeError("Update profile banner", error);
 
     // If Cloudinary succeeded but MongoDB failed,
     if (newProfileBannerPublicId) {
       try {
         await deleteImage(newProfileBannerPublicId);
       } catch (cleanupError) {
-        console.error("New profile banner cleanup error:", cleanupError);
+        logSafeError("New profile banner cleanup", cleanupError);
       }
     }
 
@@ -557,7 +558,7 @@ export const updateConnections = async (req, res) => {
       data: updatedUser,
     });
   } catch (error) {
-    console.error("Update connections error:", error);
+    logSafeError("Update connections", error);
 
     return res.status(500).json({
       success: false,

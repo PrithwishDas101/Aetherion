@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import toast from "react-hot-toast";
+import { logSafeClientError } from "../../utils/safeLogging.js";
 
 const DOCUMENT_ACCESS_KEY =
     "aetherion-document-access-granted";
@@ -169,10 +170,7 @@ const DocumentModal = ({
                 onClose?.();
             }
         } catch (error) {
-            console.error(
-                "Document send error:",
-                error,
-            );
+            logSafeClientError("Document send", error);
 
             toast.error(
                 "Unable to send selected document.",

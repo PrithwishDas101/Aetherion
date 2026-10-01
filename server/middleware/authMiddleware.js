@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import User from "../models/User.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
@@ -20,7 +21,7 @@ export const protectRoute = async (req, res, next) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
-      console.error("Authentication error:", error.message);
+      logSafeError("HTTP authentication", error);
 
       return res.status(401).json({
         success: false,
@@ -71,7 +72,7 @@ export const protectRoute = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Authentication error:", error.message);
+    logSafeError("HTTP authentication", error);
 
     return res.status(401).json({
       success: false,

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import toast from "react-hot-toast";
+import { logSafeClientError } from "../../utils/safeLogging.js";
 
 const GALLERY_PERMISSION_STORAGE_KEY =
     "aetherion_gallery_permission";
@@ -163,10 +164,7 @@ const GalleryModal = ({
 
                 onClose?.();
             } catch (error) {
-                console.error(
-                    "Gallery send error:",
-                    error,
-                );
+                logSafeClientError("Gallery send", error);
 
                 toast.error(
                     "Unable to send selected media.",

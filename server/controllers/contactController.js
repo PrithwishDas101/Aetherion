@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import Contact from "../models/Contact.js";
+import { logSafeError } from "../utils/safeLogging.js";
 
 const CONTACT_PROJECTION =
   "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen";
@@ -98,7 +99,7 @@ export const getRecentContacts = async (req, res) => {
       data,
     });
   } catch (error) {
-    console.error("Get recent contacts error:", error);
+    logSafeError("Get recent contacts", error);
 
     return res.status(500).json({
       success: false,
@@ -282,7 +283,7 @@ export const getContacts = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get contacts error:", error);
+    logSafeError("Get contacts", error);
 
     return res.status(500).json({
       success: false,
@@ -337,7 +338,7 @@ export const removeContact = async (req, res) => {
       message: "Contact removed successfully.",
     });
   } catch (error) {
-    console.error("Remove contact error:", error);
+    logSafeError("Remove contact", error);
 
     return res.status(500).json({
       success: false,

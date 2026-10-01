@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { logSafeClientError } from "../../utils/safeLogging.js";
 import {
     FiAlertCircle,
     FiArrowLeft,
@@ -43,7 +44,7 @@ const LocationModal = ({
                 setStatus("ready");
             },
             (error) => {
-                console.error("Location permission error:", error);
+                logSafeClientError("Location permission", error);
 
                 if (error.code === 1) {
                     setStatus("denied");

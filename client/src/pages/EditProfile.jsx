@@ -11,6 +11,7 @@ import {
     updateProfileBanner,
 } from "../apiCalls/userApi.js";
 import { setUser } from "../redux/userSlice.js";
+import { logSafeClientError } from "../utils/safeLogging.js";
 
 import Connections from "../components/Connections.jsx";
 import ProfileBanner from "../components/ProfileBanner.jsx";
@@ -106,7 +107,7 @@ const EditProfile = () => {
             toast.success("Profile updated.");
             navigate("/profile");
         } catch (error) {
-            console.error("Profile update error:", error);
+            logSafeClientError("Profile update", error);
             toast.error("Couldn't update your profile.");
         } finally {
             setIsSaving(false);
@@ -145,7 +146,7 @@ const EditProfile = () => {
             toast.success("Profile picture updated.");
             setShowAvatarModal(false);
         } catch (error) {
-            console.error("Profile picture update error:", error);
+            logSafeClientError("Profile picture update", error);
             toast.error("Couldn't update your profile picture.");
         } finally {
             setIsUploadingAvatar(false);
@@ -184,7 +185,7 @@ const EditProfile = () => {
             toast.success("Profile picture removed.");
             setShowAvatarModal(false);
         } catch (error) {
-            console.error("Profile picture removal error:", error);
+            logSafeClientError("Profile picture removal", error);
             toast.error("Couldn't remove your profile picture.");
         } finally {
             setIsUploadingAvatar(false);
@@ -221,7 +222,7 @@ const EditProfile = () => {
 
             setIsDecorationPickerOpen(false);
         } catch (error) {
-            console.error("Avatar decoration update error:", error);
+            logSafeClientError("Avatar decoration update", error);
 
             toast.error("Couldn't update your avatar decoration.");
         } finally {
@@ -278,7 +279,7 @@ const EditProfile = () => {
             toast.success("Status updated.");
             setShowStatusModal(false);
         } catch (error) {
-            console.error("Status update error:", error);
+            logSafeClientError("Status update", error);
             toast.error("Couldn't update your status.");
         } finally {
             setIsSavingStatus(false);
@@ -311,7 +312,7 @@ const EditProfile = () => {
             toast.success("Status deleted.");
             setShowStatusModal(false);
         } catch (error) {
-            console.error("Status deletion error:", error);
+            logSafeClientError("Status deletion", error);
             toast.error("Couldn't delete your status.");
         } finally {
             setIsSavingStatus(false);

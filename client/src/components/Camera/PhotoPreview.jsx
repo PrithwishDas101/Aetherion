@@ -9,6 +9,7 @@ import StickerEditor from "./Sticker/StickerEditor.jsx";
 import MediaZoomSurface from "./MediaZoomSurface.jsx";
 import { composePhoto } from "./Composition/composePhoto.js";
 import { composeGif } from "./Composition/composeGif.js";
+import { logSafeClientError } from "../../utils/safeLogging.js";
 
 const TRASH_RADIUS = 64;
 
@@ -274,7 +275,7 @@ const PhotoPreview = ({
         setIsSending(false);
       }
     } catch (error) {
-      console.error("Unable to send photo:", error);
+      logSafeClientError("Send photo", error);
 
       setIsSending(false);
     }
@@ -290,7 +291,7 @@ const PhotoPreview = ({
 
       onDownload?.(finalBlob);
     } catch (error) {
-      console.error("Unable to download photo:", error);
+      logSafeClientError("Download photo", error);
     }
   };
 
