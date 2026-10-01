@@ -15,7 +15,14 @@ const removeConnection = (userId) => {
 
   const count = connections.get(id) || 0;
 
-  if (count <= 1) {
+  if (count === 0) {
+    return {
+      becameOffline: false,
+      lastSeen: null,
+    };
+  }
+
+  if (count === 1) {
     connections.delete(id);
 
     return {

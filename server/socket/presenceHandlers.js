@@ -18,6 +18,7 @@ const registerPresenceHandlers = (io, eventLimiter = socketEventLimiter) => {
     socket.join(userId);
 
     const becameOnline = addConnection(userId);
+    let presenceTracked = true;
 
     if (becameOnline) {
       io.emit("user-online", {
@@ -36,6 +37,11 @@ const registerPresenceHandlers = (io, eventLimiter = socketEventLimiter) => {
     });
 
     socket.on("disconnect", async () => {
+      if (!presenceTracked) {
+        return;
+      }
+
+      presenceTracked = false;
       const result = removeConnection(userId);
 
       if (!result.becameOffline) {

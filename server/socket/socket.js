@@ -5,6 +5,7 @@ import User from "../models/User.js";
 import { registerSocketHandlers } from "./socketHandlers.js";
 import registerPresenceHandlers from "./presenceHandlers.js";
 import { socketEventLimiter } from "./socketEventLimiter.js";
+import { createSocketConnectionLimiter } from "./socketConnectionLimiter.js";
 
 export const authenticateSocket = async (socket, next) => {
   try {
@@ -76,6 +77,8 @@ const initializeSocket = (server) => {
   });
 
   io.use(authenticateSocket);
+  const connectionLimiter = createSocketConnectionLimiter();
+  io.use(connectionLimiter.middleware);
 
   registerSocketHandlers(io, socketEventLimiter);
   registerPresenceHandlers(io, socketEventLimiter);

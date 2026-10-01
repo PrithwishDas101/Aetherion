@@ -294,6 +294,9 @@ export const updatePersonalProfile = async (req, res) => {
       });
     }
 
+    const previousPublicPresenceStatus =
+      user.publicPresenceStatus || "automatic";
+
     const {
       firstName,
       lastName,
@@ -364,7 +367,10 @@ export const updatePersonalProfile = async (req, res) => {
 
     await user.save();
 
-    if (publicPresenceStatus !== undefined) {
+    if (
+      publicPresenceStatus !== undefined &&
+      publicPresenceStatus !== previousPublicPresenceStatus
+    ) {
       const io = req.app.get("io");
 
       emitPublicPresenceUpdated(io, user._id, user.publicPresenceStatus);
