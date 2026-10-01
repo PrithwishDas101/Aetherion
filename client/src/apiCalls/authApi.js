@@ -24,13 +24,25 @@ export const loginUser = async (userData) => {
 
 // LOGOUT
 export const logoutUser = async () => {
-  try {
-    const response = await axiosInstance.post("/api/v1/auth/logout");
+  const logoutToken = localStorage.getItem("token");
 
-    localStorage.removeItem("token");
+  try {
+    const response = await axiosInstance.post(
+      "/api/v1/auth/logout",
+      undefined,
+      {
+        headers: {
+          Authorization: logoutToken ? `Bearer ${logoutToken}` : "",
+        },
+      },
+    );
 
     return response.data;
   } catch (error) {
     return error.response?.data;
+  } finally {
+    if (logoutToken && localStorage.getItem("token") === logoutToken) {
+      localStorage.removeItem("token");
+    }
   }
 };

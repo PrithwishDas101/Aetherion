@@ -256,7 +256,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleProfileClick}
-                className="mt-2 flex w-full items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-[#5af48b] active:scale-[0.98]"
+                className="mt-2 flex w-full items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-[#5af48b] active:scale-[0.98] active:text-[#5af48be3]"
               >
                 <FiUser className="h-[18px] w-[18px]" />
 
@@ -270,7 +270,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleRequestsClick}
-                className="mt-2 flex w-full items-center justify-between rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-[#5a64f4] active:scale-[0.98]"
+                className="mt-2 flex w-full items-center justify-between rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-[#5a64f4] active:scale-[0.98] active:text-[#5a64f4e0]"
               >
                 <span className="flex items-center gap-3">
                   <FiUserPlus className="h-[18px] w-[18px]" />
@@ -294,7 +294,7 @@ function Header() {
               <button
                 type="button"
                 onClick={() => setShowLogoutConfirm(true)}
-                className="flex w-full items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-red-400 active:scale-[0.98]"
+                className="flex w-full items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-red-400 active:scale-[0.98] active:text-red-500"
               >
                 <FiLogOut className="h-[18px] w-[18px]" />
 

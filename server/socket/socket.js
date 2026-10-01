@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
 import { Server } from "socket.io";
 
+import User from "../models/User.js";
 import { registerSocketHandlers } from "./socketHandlers.js";
 import registerPresenceHandlers from "./presenceHandlers.js";
 
-export const authenticateSocket = (socket, next) => {
+export const authenticateSocket = async (socket, next) => {
   try {
     const token = socket.handshake.auth?.token;
 
@@ -12,10 +13,38 @@ export const authenticateSocket = (socket, next) => {
       return next(new Error("Authentication required"));
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let decoded;
 
-    if (!decoded?.userId) {
-      return next(new Error("Invalid authentication token"));
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      console.error("Socket authentication error:", error.message);
+
+      return next(new Error("Invalid or expired authentication token"));
+    }
+
+    if (
+      !decoded?.userId ||
+      !Number.isSafeInteger(decoded.authVersion) ||
+      decoded.authVersion < 0
+    ) {
+      return next(new Error("Invalid or expired authentication token"));
+    }
+
+    const currentUser = await User.findById(decoded.userId)
+      .select("+authVersion")
+      .lean();
+
+    const currentAuthVersion =
+      currentUser?.authVersion === undefined ? 0 : currentUser?.authVersion;
+
+    if (
+      !currentUser ||
+      !Number.isSafeInteger(currentAuthVersion) ||
+      currentAuthVersion < 0 ||
+      currentAuthVersion !== decoded.authVersion
+    ) {
+      return next(new Error("Invalid or expired authentication token"));
     }
 
     socket.data.userId = String(decoded.userId);

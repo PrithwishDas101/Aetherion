@@ -6,8 +6,11 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
+  const hasExplicitAuthorization =
+    config.headers?.Authorization !== undefined ||
+    config.headers?.authorization !== undefined;
 
-  if (token) {
+  if (token && !hasExplicitAuthorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 

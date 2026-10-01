@@ -1,28 +1,74 @@
 import jwt from "jsonwebtoken";
 
-export const protectRoute = (req, res, next) => {
+import User from "../models/User.js";
+
+export const protectRoute = async (req, res, next) => {
   try {
-    // Get Authorization header
     const authHeader = req.headers.authorization;
 
-    // Check if header exists and uses Bearer scheme
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized - No token provided",
+        message: "Unauthorized - Invalid or expired token",
       });
     }
 
-    // Extract token
     const token = authHeader.split(" ")[1];
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let decoded;
 
-    // Attach decoded user data to request
-    req.user = decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      console.error("Authentication error:", error.message);
 
-    // Continue to the next middleware/controller
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized - Invalid or expired token",
+      });
+    }
+
+    if (
+      !decoded?.userId ||
+      !Number.isSafeInteger(decoded.authVersion) ||
+      decoded.authVersion < 0
+    ) {
+      console.error(
+        "Authentication error: Missing or invalid authVersion in JWT payload.",
+      );
+
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized - Invalid or expired token",
+      });
+    }
+
+    const currentUser = await User.findById(decoded.userId)
+      .select("+authVersion")
+      .lean();
+
+    const currentAuthVersion =
+      currentUser?.authVersion === undefined ? 0 : currentUser?.authVersion;
+
+    if (
+      !currentUser ||
+      !Number.isSafeInteger(currentAuthVersion) ||
+      currentAuthVersion < 0 ||
+      currentAuthVersion !== decoded.authVersion
+    ) {
+      console.error("Authentication error: JWT authVersion mismatch.");
+
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized - Invalid or expired token",
+      });
+    }
+
+    req.user = {
+      ...decoded,
+      userId: String(decoded.userId),
+    };
+
     next();
   } catch (error) {
     console.error("Authentication error:", error.message);

@@ -12,6 +12,16 @@ const respondToSignup = (res, authPayload = {}) =>
     ...authPayload,
   });
 
+const getAuthVersion = (user) => {
+  const authVersion = user.authVersion === undefined ? 0 : user.authVersion;
+
+  if (!Number.isSafeInteger(authVersion) || authVersion < 0) {
+    throw new Error("Invalid user auth version");
+  }
+
+  return authVersion;
+};
+
 // SIGNUP
 export const signup = async (req, res) => {
   let uploadedProfilePicPublicId = "";
@@ -106,6 +116,7 @@ export const signup = async (req, res) => {
     const token = jwt.sign(
       {
         userId: newUser._id,
+        authVersion: getAuthVersion(newUser),
       },
       process.env.JWT_SECRET,
       {
@@ -191,7 +202,7 @@ export const login = async (req, res) => {
     // 5. Find user
     const user = await User.findOne({
       email: normalizedEmail,
-    }).select("+password");
+    }).select("+password +authVersion");
 
     if (!user) {
       return res.status(401).json({
@@ -214,6 +225,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       {
         userId: user._id,
+        authVersion: getAuthVersion(user),
       },
       process.env.JWT_SECRET,
       {
@@ -248,6 +260,29 @@ export const login = async (req, res) => {
 // LOGOUT
 export const logout = async (req, res) => {
   try {
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { $inc: { authVersion: 1 } },
+      { new: true, fields: { _id: 1 } },
+    );
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized - Invalid or expired token",
+      });
+    }
+
+    const io = req.app.get("io");
+
+    if (typeof io?.in === "function") {
+      try {
+        await io.in(String(req.user.userId)).disconnectSockets(true);
+      } catch (error) {
+        console.error("Logout socket disconnect error:", error.message);
+      }
+    }
+
     return res.status(200).json({
       success: true,
       message: "Logout successful",

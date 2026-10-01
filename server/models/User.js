@@ -36,6 +36,12 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
 
+    authVersion: {
+      type: Number,
+      default: 0,
+      select: false,
+    },
+
     // PROFILE PICTURE
     profilePic: {
       type: String,
