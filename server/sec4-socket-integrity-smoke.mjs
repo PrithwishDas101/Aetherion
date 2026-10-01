@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import Chat from "./models/Chat.js";
 import Message from "./models/Message.js";
 import Poll from "./models/Poll.js";
+import User from "./models/User.js";
 import { authenticateSocket } from "./socket/socket.js";
 import { registerSocketHandlers } from "./socket/socketHandlers.js";
 
@@ -24,6 +25,7 @@ const originals = {
   chatFindOne: Chat.findOne,
   messageFindOne: Message.findOne,
   pollFindOne: Poll.findOne,
+  userFindById: User.findById,
   jwtSecret: process.env.JWT_SECRET,
 };
 
@@ -156,6 +158,9 @@ const createSocketHarness = ({
     get pollLookup() {
       return pollLookup;
     },
+    get chatLookupCount() {
+      return chatLookupCount;
+    },
   };
 };
 
@@ -165,20 +170,34 @@ const emitFromClient = async (harness, event, payload) => {
 
 try {
   process.env.JWT_SECRET = "sec4-socket-integrity-smoke-secret";
+  User.findById = (userId) => ({
+    select(selection) {
+      assert.ok(selection.includes("+authVersion"));
+      return {
+        lean: async () => ({ _id: String(userId), authVersion: 0 }),
+      };
+    },
+  });
 
   let missingTokenError;
-  authenticateSocket({ handshake: { auth: {} }, data: {} }, (error) => {
-    missingTokenError = error;
-  });
+  await authenticateSocket(
+    { handshake: { auth: {} }, data: {} },
+    (error) => {
+      missingTokenError = error;
+    },
+  );
   assert.equal(missingTokenError?.message, "Authentication required");
 
-  const token = jwt.sign({ userId: ids.member }, process.env.JWT_SECRET);
+  const token = jwt.sign(
+    { userId: ids.member, authVersion: 0 },
+    process.env.JWT_SECRET,
+  );
   const authenticatedSocket = {
     handshake: { auth: { token } },
     data: {},
   };
   let authenticationError;
-  authenticateSocket(authenticatedSocket, (error) => {
+  await authenticateSocket(authenticatedSocket, (error) => {
     authenticationError = error;
   });
   assert.equal(authenticationError, undefined);
@@ -278,10 +297,68 @@ try {
     payload: { sender: ids.member, chatId: ids.chatA },
   });
   console.log("typing: authorized transient event still broadcasts server identity");
+
+  const legitimateStopTyping = createSocketHarness();
+  await emitFromClient(legitimateStopTyping, "stop-typing", {
+    chatId: ids.chatA,
+    sender: ids.recipient,
+  });
+  assert.deepEqual(legitimateStopTyping.emitted[0], {
+    recipientId: ids.recipient,
+    event: "stop-typing",
+    payload: { sender: ids.member, chatId: ids.chatA },
+  });
+  console.log("stop-typing: authorized transient event still broadcasts server identity");
+
+  const assertMalformedTypingHandled = async (event, payload, label) => {
+    const harness = createSocketHarness();
+    let unhandledRejection;
+    const observeUnhandledRejection = (error) => {
+      unhandledRejection = error;
+    };
+
+    process.on("unhandledRejection", observeUnhandledRejection);
+
+    try {
+      harness.listeners[event](payload);
+      await new Promise((resolve) => setImmediate(resolve));
+    } finally {
+      process.off("unhandledRejection", observeUnhandledRejection);
+    }
+
+    assert.equal(unhandledRejection, undefined, `${event} ${label}`);
+    assert.equal(harness.chatLookupCount, 0, `${event} ${label} queried chat`);
+    assert.equal(harness.emitted.length, 0, `${event} ${label} emitted`);
+  };
+
+  for (const event of ["typing", "stop-typing"]) {
+    for (const [label, payload] of [
+      ["undefined payload", undefined],
+      ["null payload", null],
+      ["empty payload", {}],
+      ["missing chatId", { sender: ids.member }],
+      ["invalid chatId", { chatId: "not-a-chat-id" }],
+      ["non-string chatId", { chatId: 42 }],
+      ["non-object payload", "invalid payload"],
+    ]) {
+      await assertMalformedTypingHandled(event, payload, label);
+    }
+  }
+  console.log("typing events: malformed payloads are ignored without rejection or database lookup");
+
+  const nonMemberTyping = createSocketHarness({ isMember: false });
+  await emitFromClient(nonMemberTyping, "typing", { chatId: ids.chatA });
+  assert.equal(nonMemberTyping.emitted.length, 0);
+
+  const nonMemberStopTyping = createSocketHarness({ isMember: false });
+  await emitFromClient(nonMemberStopTyping, "stop-typing", { chatId: ids.chatA });
+  assert.equal(nonMemberStopTyping.emitted.length, 0);
+  console.log("typing events: non-members remain unable to broadcast");
 } finally {
   Chat.findOne = originals.chatFindOne;
   Message.findOne = originals.messageFindOne;
   Poll.findOne = originals.pollFindOne;
+  User.findById = originals.userFindById;
 
   if (originals.jwtSecret === undefined) {
     delete process.env.JWT_SECRET;

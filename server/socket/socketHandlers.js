@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import Poll from "../models/Poll.js";
@@ -77,9 +78,14 @@ const registerSocketHandlers = (io) => {
       }
     });
 
-    socket.on("typing", async ({ chatId }) => {
+    socket.on("typing", async (payload) => {
       try {
-        if (!chatId) {
+        const chatId = payload?.chatId;
+
+        if (
+          typeof chatId !== "string" ||
+          !mongoose.Types.ObjectId.isValid(chatId)
+        ) {
           return;
         }
 
@@ -102,9 +108,14 @@ const registerSocketHandlers = (io) => {
       }
     });
 
-    socket.on("stop-typing", async ({ chatId }) => {
+    socket.on("stop-typing", async (payload) => {
       try {
-        if (!chatId) {
+        const chatId = payload?.chatId;
+
+        if (
+          typeof chatId !== "string" ||
+          !mongoose.Types.ObjectId.isValid(chatId)
+        ) {
           return;
         }
 
