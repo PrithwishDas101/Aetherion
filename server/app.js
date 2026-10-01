@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 
 import authRoutes from "./routes/authRoute.js";
 import userRoutes from "./routes/userRoute.js";
@@ -11,6 +12,15 @@ import pollRoutes from "./routes/pollRoute.js";
 import contactProfileRoutes from "./routes/contactProfileRoute.js";
 
 const app = express();
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    frameguard: { action: "deny" },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    strictTransportSecurity: false,
+  }),
+);
 
 const allowedOrigins = [
   "http://localhost:5173",
