@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import Contact from "../models/Contact.js";
 import { logSafeError } from "../utils/safeLogging.js";
+import { getBoundedPagination } from "../utils/pagination.js";
 
 const CONTACT_PROJECTION =
   "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen";
@@ -122,12 +123,7 @@ export const getContacts = async (req, res) => {
 
     const search = String(req.query.search || "").trim();
 
-    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
-
-    const limit = Math.min(
-      Math.max(Number.parseInt(req.query.limit, 10) || 50, 1),
-      100,
-    );
+    const { page, limit } = getBoundedPagination(req.query);
 
     const skip = (page - 1) * limit;
 

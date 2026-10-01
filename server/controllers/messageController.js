@@ -12,6 +12,7 @@ import {
   logSafeDiagnostic,
   logSafeError,
 } from "../utils/safeLogging.js";
+import { MAX_MESSAGES_PER_CHAT_HISTORY } from "../utils/queryLimits.js";
 
 // SEND MESSAGES
 export const sendMessage = async (req, res) => {
@@ -389,8 +390,12 @@ export const getAllMessages = async (req, res) => {
         path: "poll",
       })
       .sort({
-        createdAt: 1,
-      });
+        createdAt: -1,
+        _id: -1,
+      })
+      .limit(MAX_MESSAGES_PER_CHAT_HISTORY);
+
+    messages.reverse();
 
     return res.status(200).json({
       success: true,

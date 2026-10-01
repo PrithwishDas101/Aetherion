@@ -4,6 +4,7 @@ import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import { socketEventLimiter } from "../socket/socketEventLimiter.js";
 import { logSafeError } from "../utils/safeLogging.js";
+import { MAX_CHATS_PER_USER } from "../utils/queryLimits.js";
 
 // CREATE ONE-TO-ONE CHAT
 export const createChat = async (req, res) => {
@@ -115,7 +116,9 @@ export const getAllChats = async (req, res) => {
       .populate("lastMessage")
       .sort({
         updatedAt: -1,
-      });
+        _id: -1,
+      })
+      .limit(MAX_CHATS_PER_USER);
 
     return res.status(200).json({
       success: true,

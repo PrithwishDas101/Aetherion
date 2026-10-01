@@ -7,6 +7,7 @@ import Message from "../models/Message.js";
 import ContactRequest from "../models/ContactRequest.js"
 import { isOnline } from "../socket/presenceStore.js";
 import { logSafeError } from "../utils/safeLogging.js";
+import { MAX_CONTACT_PROFILE_MEDIA } from "../utils/queryLimits.js";
 
 const PUBLIC_PROFILE_PROJECTION = [
   "_id",
@@ -266,24 +267,30 @@ export const getContactProfileMedia = async (req, res) => {
       });
     }
 
-    const media = await Message.find({
+    const mediaFilter = {
       chatId: chat._id,
       type: {
         $in: MEDIA_TYPES,
       },
-    })
-      .select(MEDIA_PROJECTION)
-      .sort({
-        createdAt: -1,
-      })
-      .lean();
+    };
+    const [media, total] = await Promise.all([
+      Message.find(mediaFilter)
+        .select(MEDIA_PROJECTION)
+        .sort({
+          createdAt: -1,
+          _id: -1,
+        })
+        .limit(MAX_CONTACT_PROFILE_MEDIA)
+        .lean(),
+      Message.countDocuments(mediaFilter),
+    ]);
 
     return res.status(200).json({
       success: true,
       message: "Contact profile media fetched successfully.",
       data: {
         media,
-        total: media.length,
+        total,
       },
     });
   } catch (error) {

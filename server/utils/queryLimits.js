@@ -1,0 +1,8 @@
+export const MAX_MESSAGES_PER_CHAT_HISTORY = 500;
+export const MAX_CHATS_PER_USER = 500;
+export const MAX_USERS_PER_LIST = 500;
+export const MAX_CONTACT_PROFILE_MEDIA = 200;
+export const MAX_OUTGOING_CONTACT_REQUESTS = 100;
+export const MAX_LIST_PAGE = 1000;
+export const MAX_LIST_PAGE_SIZE = 100;
+export const DEFAULT_LIST_PAGE_SIZE = 50;

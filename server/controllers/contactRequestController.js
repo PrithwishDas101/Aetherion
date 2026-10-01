@@ -5,6 +5,8 @@ import ContactRequest from "../models/ContactRequest.js";
 import User from "../models/User.js";
 import { ensureContacts } from "./contactController.js";
 import { logSafeError } from "../utils/safeLogging.js";
+import { getBoundedPagination } from "../utils/pagination.js";
+import { MAX_OUTGOING_CONTACT_REQUESTS } from "../utils/queryLimits.js";
 
 const REQUESTER_PROJECTION =
   "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen";
@@ -170,12 +172,7 @@ export const getIncomingContactRequests = async (req, res) => {
 
     const search = String(req.query.search || "").trim();
 
-    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
-
-    const limit = Math.min(
-      Math.max(Number.parseInt(req.query.limit, 10) || 50, 1),
-      100,
-    );
+    const { page, limit } = getBoundedPagination(req.query);
 
     const skip = (page - 1) * limit;
 
@@ -322,6 +319,7 @@ export const getOutgoingContactRequests = async (req, res) => {
         path: "recipient",
         select: REQUESTER_PROJECTION,
       })
+      .limit(MAX_OUTGOING_CONTACT_REQUESTS)
       .lean();
 
     return res.status(200).json({

@@ -138,6 +138,9 @@ const messageSchema = new mongoose.Schema(
   },
 );
 
+messageSchema.index({ chatId: 1, createdAt: -1, _id: -1 });
+messageSchema.index({ chatId: 1, type: 1, createdAt: -1, _id: -1 });
+
 const Message = mongoose.model("Message", messageSchema);
 
 export default Message;

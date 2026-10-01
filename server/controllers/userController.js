@@ -8,6 +8,7 @@ import {
 } from "../services/cloudinaryService.js";
 import { emitPublicPresenceUpdated } from "../socket/profileEvents.js";
 import { logSafeError } from "../utils/safeLogging.js";
+import { MAX_USERS_PER_LIST } from "../utils/queryLimits.js";
 
 // GET LOGGED-IN USER
 export const getLoggedUser = async (req, res) => {
@@ -45,9 +46,12 @@ export const getAllUsers = async (req, res) => {
       _id: {
         $ne: currentUserId,
       },
-    }).select(
-      "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen",
-    );
+    })
+      .sort({ _id: -1 })
+      .limit(MAX_USERS_PER_LIST)
+      .select(
+        "_id firstName lastName profilePic avatarDecoration publicPresenceStatus lastSeen",
+      );
 
     const userIds = users.map((user) => user._id);
 
