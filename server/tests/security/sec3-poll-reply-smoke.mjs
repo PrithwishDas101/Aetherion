@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 
-import Chat from "./models/Chat.js";
-import Message from "./models/Message.js";
-import Poll from "./models/Poll.js";
-import { createPoll } from "./controllers/pollController.js";
+import Chat from "../../models/Chat.js";
+import Message from "../../models/Message.js";
+import Poll from "../../models/Poll.js";
+import { createPoll } from "../../controllers/pollController.js";
 
 const ids = {
   sender: "000000000000000000000001",

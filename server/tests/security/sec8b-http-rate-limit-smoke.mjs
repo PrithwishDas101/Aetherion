@@ -2,18 +2,18 @@ import assert from "node:assert/strict";
 import express from "express";
 import jwt from "jsonwebtoken";
 
-import Chat from "./models/Chat.js";
-import Poll from "./models/Poll.js";
-import User from "./models/User.js";
-import contactRequestRoutes from "./routes/contactRequestRoute.js";
-import messageRoutes from "./routes/MessageRoute.js";
-import pollRoutes from "./routes/pollRoute.js";
+import Chat from "../../models/Chat.js";
+import Poll from "../../models/Poll.js";
+import User from "../../models/User.js";
+import contactRequestRoutes from "../../routes/contactRequestRoute.js";
+import messageRoutes from "../../routes/MessageRoute.js";
+import pollRoutes from "../../routes/pollRoute.js";
 import { pdfFixture } from "./sec12-upload-fixtures.mjs";
 import {
   authLimiter,
   profilePictureLimiter,
   removeProfilePictureLimiter,
-} from "./middleware/rateLimiter.js";
+} from "../../middleware/rateLimiter.js";
 
 const secret = "sec8b-http-rate-limit-smoke-secret";
 const originalJwtSecret = process.env.JWT_SECRET;

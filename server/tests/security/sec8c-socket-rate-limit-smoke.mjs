@@ -1,15 +1,15 @@
 import assert from "node:assert/strict";
 import jwt from "jsonwebtoken";
 
-import { clearUnreadMessages } from "./controllers/chatController.js";
-import Chat from "./models/Chat.js";
-import Message from "./models/Message.js";
-import Poll from "./models/Poll.js";
-import User from "./models/User.js";
-import { authenticateSocket } from "./socket/socket.js";
-import { registerSocketHandlers } from "./socket/socketHandlers.js";
-import registerPresenceHandlers from "./socket/presenceHandlers.js";
-import { createSocketEventLimiter } from "./socket/socketEventLimiter.js";
+import { clearUnreadMessages } from "../../controllers/chatController.js";
+import Chat from "../../models/Chat.js";
+import Message from "../../models/Message.js";
+import Poll from "../../models/Poll.js";
+import User from "../../models/User.js";
+import { authenticateSocket } from "../../socket/socket.js";
+import { registerSocketHandlers } from "../../socket/socketHandlers.js";
+import registerPresenceHandlers from "../../socket/presenceHandlers.js";
+import { createSocketEventLimiter } from "../../socket/socketEventLimiter.js";
 
 const secret = "sec8c-socket-rate-limit-smoke-secret";
 const ids = {

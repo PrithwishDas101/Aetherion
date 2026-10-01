@@ -10,9 +10,9 @@ import {
   signupUpload,
   validateMessageUpload,
   validateProfileImageUpload,
-} from "./middleware/uploadMiddleware.js";
-import User from "./models/User.js";
-import { protectRoute } from "./middleware/authMiddleware.js";
+} from "../../middleware/uploadMiddleware.js";
+import User from "../../models/User.js";
+import { protectRoute } from "../../middleware/authMiddleware.js";
 import {
   jpegFixture,
   mp4VideoFixture,

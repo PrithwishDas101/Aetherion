@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import jwt from "jsonwebtoken";
 
-import app from "./app.js";
-import { profilePictureUpload } from "./middleware/uploadMiddleware.js";
-import initializeSocket from "./socket/socket.js";
-import User from "./models/User.js";
+import app from "../../app.js";
+import { profilePictureUpload } from "../../middleware/uploadMiddleware.js";
+import initializeSocket from "../../socket/socket.js";
+import User from "../../models/User.js";
 import { pngFixture } from "./sec12-upload-fixtures.mjs";
 
 const secret = "sec9-security-headers-smoke-secret";

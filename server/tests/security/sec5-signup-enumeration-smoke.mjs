@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import jwt from "jsonwebtoken";
 
-import User from "./models/User.js";
-import { signup } from "./controllers/authController.js";
+import User from "../../models/User.js";
+import { signup } from "../../controllers/authController.js";
 
 const originalFindOne = User.findOne;
 const originalCreate = User.create;

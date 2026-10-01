@@ -3,7 +3,7 @@ import {
   messageUpload,
   singleUpload,
   validateMessageUpload,
-} from "./middleware/uploadMiddleware.js";
+} from "../../middleware/uploadMiddleware.js";
 import { mp4VideoFixture } from "./sec12-upload-fixtures.mjs";
 
 const app = express();

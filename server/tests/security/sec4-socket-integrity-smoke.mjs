@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import jwt from "jsonwebtoken";
 
-import Chat from "./models/Chat.js";
-import Message from "./models/Message.js";
-import Poll from "./models/Poll.js";
-import User from "./models/User.js";
-import { authenticateSocket } from "./socket/socket.js";
-import { registerSocketHandlers } from "./socket/socketHandlers.js";
+import Chat from "../../models/Chat.js";
+import Message from "../../models/Message.js";
+import Poll from "../../models/Poll.js";
+import User from "../../models/User.js";
+import { authenticateSocket } from "../../socket/socket.js";
+import { registerSocketHandlers } from "../../socket/socketHandlers.js";
 
 const ids = {
   member: "000000000000000000000001",

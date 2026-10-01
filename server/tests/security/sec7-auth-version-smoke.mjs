@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-import { login, logout, signup } from "./controllers/authController.js";
-import { protectRoute } from "./middleware/authMiddleware.js";
-import User from "./models/User.js";
-import { authenticateSocket } from "./socket/socket.js";
+import { login, logout, signup } from "../../controllers/authController.js";
+import { protectRoute } from "../../middleware/authMiddleware.js";
+import User from "../../models/User.js";
+import { authenticateSocket } from "../../socket/socket.js";
 
 const secret = "sec7-smoke-secret";
 const userId = "507f1f77bcf86cd799439011";

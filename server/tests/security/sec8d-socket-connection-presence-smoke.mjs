@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 import jwt from "jsonwebtoken";
 
-import { updatePersonalProfile } from "./controllers/userController.js";
-import User from "./models/User.js";
-import { authenticateSocket } from "./socket/socket.js";
-import registerPresenceHandlers from "./socket/presenceHandlers.js";
+import { updatePersonalProfile } from "../../controllers/userController.js";
+import User from "../../models/User.js";
+import { authenticateSocket } from "../../socket/socket.js";
+import registerPresenceHandlers from "../../socket/presenceHandlers.js";
 import {
   createSocketConnectionLimiter,
   MAX_SOCKETS_PER_USER,
-} from "./socket/socketConnectionLimiter.js";
+} from "../../socket/socketConnectionLimiter.js";
 
 const secret = "sec8d-socket-connection-presence-smoke-secret";
 const ids = {

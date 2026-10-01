@@ -1,16 +1,16 @@
 import assert from "node:assert/strict";
 
-import { getAllChats } from "./controllers/chatController.js";
-import { getContacts } from "./controllers/contactController.js";
-import { getContactProfileMedia } from "./controllers/contactProfileController.js";
-import { getIncomingContactRequests, getOutgoingContactRequests } from "./controllers/contactRequestController.js";
-import { getAllMessages } from "./controllers/messageController.js";
-import { getAllUsers } from "./controllers/userController.js";
-import Chat from "./models/Chat.js";
-import Contact from "./models/Contact.js";
-import ContactRequest from "./models/ContactRequest.js";
-import Message from "./models/Message.js";
-import User from "./models/User.js";
+import { getAllChats } from "../../controllers/chatController.js";
+import { getContacts } from "../../controllers/contactController.js";
+import { getContactProfileMedia } from "../../controllers/contactProfileController.js";
+import { getIncomingContactRequests, getOutgoingContactRequests } from "../../controllers/contactRequestController.js";
+import { getAllMessages } from "../../controllers/messageController.js";
+import { getAllUsers } from "../../controllers/userController.js";
+import Chat from "../../models/Chat.js";
+import Contact from "../../models/Contact.js";
+import ContactRequest from "../../models/ContactRequest.js";
+import Message from "../../models/Message.js";
+import User from "../../models/User.js";
 import {
   DEFAULT_LIST_PAGE_SIZE,
   MAX_CHATS_PER_USER,
@@ -20,7 +20,7 @@ import {
   MAX_MESSAGES_PER_CHAT_HISTORY,
   MAX_OUTGOING_CONTACT_REQUESTS,
   MAX_USERS_PER_LIST,
-} from "./utils/queryLimits.js";
+} from "../../utils/queryLimits.js";
 
 const ids = {
   user: "000000000000000000000001",

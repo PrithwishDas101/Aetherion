@@ -7,7 +7,7 @@ import {
   signupUpload,
   validateMessageUpload,
   validateProfileImageUpload,
-} from "./middleware/uploadMiddleware.js";
+} from "../../middleware/uploadMiddleware.js";
 import {
   jpegFixture,
   pdfFixture,

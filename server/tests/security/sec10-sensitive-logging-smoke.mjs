@@ -2,17 +2,17 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import express from "express";
 
-import { login } from "./controllers/authController.js";
-import { sendMessage } from "./controllers/messageController.js";
-import Chat from "./models/Chat.js";
-import Message from "./models/Message.js";
-import User from "./models/User.js";
-import { messageUpload } from "./middleware/uploadMiddleware.js";
-import { registerSocketHandlers } from "./socket/socketHandlers.js";
+import { login } from "../../controllers/authController.js";
+import { sendMessage } from "../../controllers/messageController.js";
+import Chat from "../../models/Chat.js";
+import Message from "../../models/Message.js";
+import User from "../../models/User.js";
+import { messageUpload } from "../../middleware/uploadMiddleware.js";
+import { registerSocketHandlers } from "../../socket/socketHandlers.js";
 import {
   logSafeClientDiagnostic,
   logSafeClientError,
-} from "../client/src/utils/safeLogging.js";
+} from "../../../client/src/utils/safeLogging.js";
 import { pdfFixture } from "./sec12-upload-fixtures.mjs";
 
 const ids = {
