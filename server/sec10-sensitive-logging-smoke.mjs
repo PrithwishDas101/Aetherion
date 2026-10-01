@@ -13,6 +13,7 @@ import {
   logSafeClientDiagnostic,
   logSafeClientError,
 } from "../client/src/utils/safeLogging.js";
+import { pdfFixture } from "./sec12-upload-fixtures.mjs";
 
 const ids = {
   chat: "00000000000000000000000a",
@@ -223,7 +224,7 @@ try {
   const form = new FormData();
   form.append(
     "media",
-    new Blob(["private upload"], { type: "application/pdf" }),
+    new Blob([pdfFixture], { type: "application/pdf" }),
     sentinels[2],
   );
   const uploadResponse = await fetch(

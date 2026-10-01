@@ -1,21 +1,20 @@
-import { createServer } from "node:http";
-import { messageUpload } from "./middleware/uploadMiddleware.js";
+import express from "express";
+import {
+  messageUpload,
+  singleUpload,
+  validateMessageUpload,
+} from "./middleware/uploadMiddleware.js";
+import { mp4VideoFixture } from "./sec12-upload-fixtures.mjs";
 
-const server = createServer((request, response) => {
-  messageUpload.single("media")(request, response, (error) => {
-    response.writeHead(error ? 400 : 200, {
-      "content-type": "application/json",
-    });
-    response.end(JSON.stringify({
-      code: error?.code || null,
-      message: error?.message || null,
-      mime: request.file?.mimetype || null,
-      filename: request.file?.originalname || null,
-    }));
-  });
-});
-
-await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+const app = express();
+app.post(
+  "/upload",
+  singleUpload(messageUpload, "media"),
+  validateMessageUpload,
+  (_req, res) => res.status(200).json({ accepted: true }),
+);
+const server = app.listen(0, "127.0.0.1");
+await new Promise((resolve) => server.once("listening", resolve));
 
 try {
   const form = new FormData();
@@ -23,23 +22,19 @@ try {
   form.append("type", "video");
   form.append("text", "doodle");
   form.append("replyTo", "");
-  const exportedBlob = new Blob(["video"], {
-    type: "video/webm;codecs=vp8,opus",
-  });
-  const uploadBlob = new Blob([exportedBlob], {
-    type: exportedBlob.type.split(";")[0],
-  });
-  form.append(
-    "media",
-    uploadBlob,
-    "processed.webm",
-  );
+  form.append("media", new Blob([mp4VideoFixture], { type: "video/mp4" }), "processed.mp4");
 
-  const response = await fetch(`http://127.0.0.1:${server.address().port}`, {
+  const response = await fetch(`http://127.0.0.1:${server.address().port}/upload`, {
     method: "POST",
     body: form,
   });
-  console.log("Video upload filter smoke status:", response.status);
+  if (response.status !== 200) {
+    throw new Error(
+      `Valid video signature was not accepted: ${response.status} ${await response.text()}`,
+    );
+  }
+
+  console.log("Video upload signature smoke status:", response.status);
 } finally {
   await new Promise((resolve, reject) => {
     server.close((error) => (error ? reject(error) : resolve()));

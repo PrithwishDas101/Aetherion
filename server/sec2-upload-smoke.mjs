@@ -1,33 +1,54 @@
-import { createServer } from "node:http";
+import express from "express";
 import {
   messageUpload,
   profileBannerUpload,
   profilePictureUpload,
+  singleUpload,
   signupUpload,
+  validateMessageUpload,
+  validateProfileImageUpload,
 } from "./middleware/uploadMiddleware.js";
+import {
+  jpegFixture,
+  pdfFixture,
+  pngFixture,
+  webpFixture,
+} from "./sec12-upload-fixtures.mjs";
 
-const uploadMiddleware = new Map([
-  ["/signup", signupUpload.single("profilePic")],
-  ["/profile-picture", profilePictureUpload.single("profilePic")],
-  ["/profile-banner", profileBannerUpload.single("profileBanner")],
-  ["/send-message", messageUpload.single("media")],
-]);
+const app = express();
+const accepted = (_req, res) => res.status(200).send("accepted");
+const rejected = (_error, _req, res, _next) =>
+  res.status(400).json({ success: false, message: "Upload rejected." });
 
-const server = createServer((request, response) => {
-  const middleware = uploadMiddleware.get(request.url);
+app.post(
+  "/signup",
+  singleUpload(signupUpload, "profilePic"),
+  validateProfileImageUpload,
+  accepted,
+);
+app.post(
+  "/profile-picture",
+  singleUpload(profilePictureUpload, "profilePic"),
+  validateProfileImageUpload,
+  accepted,
+);
+app.post(
+  "/profile-banner",
+  singleUpload(profileBannerUpload, "profileBanner"),
+  validateProfileImageUpload,
+  accepted,
+);
+app.post(
+  "/send-message",
+  singleUpload(messageUpload, "media"),
+  validateMessageUpload,
+  accepted,
+);
+app.use(rejected);
 
-  if (!middleware) {
-    response.writeHead(404).end();
-    return;
-  }
+const server = app.listen(0, "127.0.0.1");
+await new Promise((resolve) => server.once("listening", resolve));
 
-  middleware(request, response, (error) => {
-    response.writeHead(error ? 400 : 200);
-    response.end(error?.code || error?.message || "accepted");
-  });
-});
-
-await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 const url = `http://127.0.0.1:${server.address().port}`;
 
 const check = async (path, form, expectedStatus) => {
@@ -46,15 +67,15 @@ try {
   signup.append("lastName", "User");
   signup.append("email", "aether@example.test");
   signup.append("password", "password123");
-  signup.append("profilePic", new Blob(["x"], { type: "image/webp" }), "profile.webp");
+  signup.append("profilePic", new Blob([webpFixture], { type: "image/webp" }), "profile.webp");
   await check("/signup", signup, 200);
 
   const profilePicture = new FormData();
-  profilePicture.append("profilePic", new Blob(["x"], { type: "image/png" }), "profile.png");
+  profilePicture.append("profilePic", new Blob([pngFixture], { type: "image/png" }), "profile.png");
   await check("/profile-picture", profilePicture, 200);
 
   const profileBanner = new FormData();
-  profileBanner.append("profileBanner", new Blob(["x"], { type: "image/jpeg" }), "banner.jpg");
+  profileBanner.append("profileBanner", new Blob([jpegFixture], { type: "image/jpeg" }), "banner.jpg");
   await check("/profile-banner", profileBanner, 200);
 
   const message = new FormData();
@@ -62,15 +83,15 @@ try {
   message.append("type", "document");
   message.append("text", "attachment");
   message.append("replyTo", "");
-  message.append("media", new Blob(["x"], { type: "application/pdf" }), "file.pdf");
+  message.append("media", new Blob([pdfFixture], { type: "application/pdf" }), "file.pdf");
   await check("/send-message", message, 200);
 
   const mismatchedMime = new FormData();
-  mismatchedMime.append("profilePic", new Blob(["x"], { type: "image/jpeg" }), "profile.png");
+  mismatchedMime.append("profilePic", new Blob([jpegFixture], { type: "image/jpeg" }), "profile.png");
   await check("/profile-picture", mismatchedMime, 400);
 
   const extraProfileField = new FormData();
-  extraProfileField.append("profilePic", new Blob(["x"], { type: "image/png" }), "profile.png");
+  extraProfileField.append("profilePic", new Blob([pngFixture], { type: "image/png" }), "profile.png");
   extraProfileField.append("unexpected", "extra");
   await check("/profile-picture", extraProfileField, 400);
 } finally {

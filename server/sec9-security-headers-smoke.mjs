@@ -6,6 +6,7 @@ import app from "./app.js";
 import { profilePictureUpload } from "./middleware/uploadMiddleware.js";
 import initializeSocket from "./socket/socket.js";
 import User from "./models/User.js";
+import { pngFixture } from "./sec12-upload-fixtures.mjs";
 
 const secret = "sec9-security-headers-smoke-secret";
 const userId = "000000000000000000000009";
@@ -81,7 +82,7 @@ try {
   const upload = new FormData();
   upload.append(
     "profilePic",
-    new Blob(["valid image payload"], { type: "image/png" }),
+    new Blob([pngFixture], { type: "image/png" }),
     "profile.png",
   );
   const uploadResponse = await fetch(`${baseUrl}/__sec9/upload`, {

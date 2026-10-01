@@ -8,6 +8,7 @@ import User from "./models/User.js";
 import contactRequestRoutes from "./routes/contactRequestRoute.js";
 import messageRoutes from "./routes/MessageRoute.js";
 import pollRoutes from "./routes/pollRoute.js";
+import { pdfFixture } from "./sec12-upload-fixtures.mjs";
 import {
   authLimiter,
   profilePictureLimiter,
@@ -243,7 +244,7 @@ try {
   upload.append("type", "document");
   upload.append("text", "attachment");
   upload.append("replyTo", "");
-  upload.append("media", new Blob(["pdf"], { type: "application/pdf" }), "file.pdf");
+  upload.append("media", new Blob([pdfFixture], { type: "application/pdf" }), "file.pdf");
   const uploadedMessage = await request("/api/v1/message/send-message", {
     user: userId(701),
     body: upload,

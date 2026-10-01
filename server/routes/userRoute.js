@@ -2,6 +2,8 @@ import express from "express";
 import {
   profileBannerUpload,
   profilePictureUpload,
+  singleUpload,
+  validateProfileImageUpload,
 } from "../middleware/uploadMiddleware.js";
 
 import {
@@ -28,7 +30,8 @@ router.post(
   "/profile-picture",
   profilePictureLimiter,
   protectRoute,
-  profilePictureUpload.single("profilePic"),
+  singleUpload(profilePictureUpload, "profilePic"),
+  validateProfileImageUpload,
   updateProfilePicture,
 );
 router.delete(
@@ -41,7 +44,8 @@ router.post(
   "/profile-banner",
   profilePictureLimiter,
   protectRoute,
-  profileBannerUpload.single("profileBanner"),
+  singleUpload(profileBannerUpload, "profileBanner"),
+  validateProfileImageUpload,
   updateProfileBanner,
 );
 router.put("/connections", protectRoute, updateConnections);

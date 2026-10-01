@@ -5,7 +5,11 @@ import {
   sendMessage,
   getAllMessages,
 } from "../controllers/messageController.js";
-import { messageUpload } from "../middleware/uploadMiddleware.js";
+import {
+  messageUpload,
+  singleUpload,
+  validateMessageUpload,
+} from "../middleware/uploadMiddleware.js";
 import {
   messageIpLimiter,
   messageUserLimiter,
@@ -18,7 +22,8 @@ router.post(
   protectRoute,
   messageIpLimiter,
   messageUserLimiter,
-  messageUpload.single("media"),
+  singleUpload(messageUpload, "media"),
+  validateMessageUpload,
   sendMessage,
 );
 router.get("/:chatId", protectRoute, getAllMessages);
