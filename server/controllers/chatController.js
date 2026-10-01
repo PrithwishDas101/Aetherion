@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
+import { socketEventLimiter } from "../socket/socketEventLimiter.js";
 
 // CREATE ONE-TO-ONE CHAT
 export const createChat = async (req, res) => {
@@ -214,7 +215,10 @@ export const clearUnreadMessages = async (req, res) => {
       (member) => String(member._id) !== String(userId),
     );
 
-    if (otherMember) {
+    if (
+      otherMember &&
+      socketEventLimiter.allow(userId, "messages-read")
+    ) {
       io.to(String(otherMember._id)).emit("messages-read", {
         chatId: String(chatId),
         userId: String(userId),

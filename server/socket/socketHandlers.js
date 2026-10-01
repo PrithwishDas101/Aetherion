@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import Poll from "../models/Poll.js";
+import { socketEventLimiter } from "./socketEventLimiter.js";
 
 const getChatForUser = async (chatId, userId) => {
   if (!chatId || !userId) {
@@ -14,7 +15,7 @@ const getChatForUser = async (chatId, userId) => {
   }).lean();
 };
 
-const registerSocketHandlers = (io) => {
+const registerSocketHandlers = (io, eventLimiter = socketEventLimiter) => {
   io.on("connection", (socket) => {
     const userId = socket.data.userId;
 
@@ -28,6 +29,10 @@ const registerSocketHandlers = (io) => {
         const chatId = chat?._id || message?.chatId;
 
         if (!message?._id || !chatId) {
+          return;
+        }
+
+        if (!eventLimiter.allow(userId, "send-message")) {
           return;
         }
 
@@ -89,6 +94,10 @@ const registerSocketHandlers = (io) => {
           return;
         }
 
+        if (!eventLimiter.allow(userId, "typing")) {
+          return;
+        }
+
         const authorizedChat = await getChatForUser(chatId, userId);
 
         if (!authorizedChat) {
@@ -119,6 +128,10 @@ const registerSocketHandlers = (io) => {
           return;
         }
 
+        if (!eventLimiter.allow(userId, "stop-typing")) {
+          return;
+        }
+
         const authorizedChat = await getChatForUser(chatId, userId);
 
         if (!authorizedChat) {
@@ -141,6 +154,10 @@ const registerSocketHandlers = (io) => {
     socket.on("poll-updated", async ({ poll, chatId } = {}) => {
       try {
         if (!poll?._id || !chatId) {
+          return;
+        }
+
+        if (!eventLimiter.allow(userId, "poll-updated")) {
           return;
         }
 

@@ -4,8 +4,9 @@ import {
   getOnlineUsers,
 } from "./presenceStore.js";
 import User from "../models/User.js";
+import { socketEventLimiter } from "./socketEventLimiter.js";
 
-const registerPresenceHandlers = (io) => {
+const registerPresenceHandlers = (io, eventLimiter = socketEventLimiter) => {
   io.on("connection", (socket) => {
     const userId = socket.data.userId;
 
@@ -25,6 +26,10 @@ const registerPresenceHandlers = (io) => {
     }
 
     socket.on("get-presence", () => {
+      if (!eventLimiter.allow(userId, "get-presence")) {
+        return;
+      }
+
       socket.emit("presence-state", {
         userIds: getOnlineUsers(),
       });

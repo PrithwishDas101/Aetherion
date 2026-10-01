@@ -6,12 +6,18 @@ import {
   getAllMessages,
 } from "../controllers/messageController.js";
 import { messageUpload } from "../middleware/uploadMiddleware.js";
+import {
+  messageIpLimiter,
+  messageUserLimiter,
+} from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
 router.post(
   "/send-message",
   protectRoute,
+  messageIpLimiter,
+  messageUserLimiter,
   messageUpload.single("media"),
   sendMessage,
 );

@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import User from "../models/User.js";
 import { registerSocketHandlers } from "./socketHandlers.js";
 import registerPresenceHandlers from "./presenceHandlers.js";
+import { socketEventLimiter } from "./socketEventLimiter.js";
 
 export const authenticateSocket = async (socket, next) => {
   try {
@@ -76,8 +77,8 @@ const initializeSocket = (server) => {
 
   io.use(authenticateSocket);
 
-  registerSocketHandlers(io);
-  registerPresenceHandlers(io);
+  registerSocketHandlers(io, socketEventLimiter);
+  registerPresenceHandlers(io, socketEventLimiter);
 
   return io;
 };
