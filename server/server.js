@@ -43,20 +43,14 @@ app.set("io", io);
 const shutdown = (signal) => {
   console.log(`Received ${signal}; shutting down gracefully`);
 
-  server.close(async (error) => {
-    if (error) {
-      logSafeError("Server shutdown", error);
-      process.exit(1);
-    }
-
-    try {
-      await mongoose.connection.close();
-      await io.close();
-      process.exit(0);
-    } catch (shutdownError) {
-      logSafeError("Server shutdown", shutdownError);
-      process.exit(1);
-    }
+  io.close(() => {
+    mongoose.connection
+      .close()
+      .then(() => process.exit(0))
+      .catch((error) => {
+        logSafeError("Server shutdown", error);
+        process.exit(1);
+      });
   });
 };
 
