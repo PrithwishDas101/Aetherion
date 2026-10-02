@@ -7,7 +7,7 @@ import userRoutes from "./routes/userRoute.js";
 import chatRoutes from "./routes/chatRoute.js";
 import contactRoutes from "./routes/contactRoute.js";
 import contactRequestRoutes from "./routes/contactRequestRoute.js";
-import messageRoutes from "./routes/messageRoute.js";
+import messageRoutes from "./routes/MessageRoute.js";
 import pollRoutes from "./routes/pollRoute.js";
 import contactProfileRoutes from "./routes/contactProfileRoute.js";
 import { logSafeError } from "./utils/safeLogging.js";
