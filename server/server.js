@@ -1,7 +1,3 @@
-import dns from "dns";
-
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
-
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
