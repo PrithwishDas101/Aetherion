@@ -14,6 +14,11 @@ import { logSafeError } from "./utils/safeLogging.js";
 
 const app = express();
 const isProduction = process.env.NODE_ENV === "production";
+const trustProxy = process.env.TRUST_PROXY?.trim();
+
+if (trustProxy) {
+  app.set("trust proxy", trustProxy);
+}
 
 app.use(
   helmet({
