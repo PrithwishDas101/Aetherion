@@ -18,7 +18,6 @@ const requiredEnvVars = [
   "CLOUDINARY_CLOUD_NAME",
   "CLOUDINARY_API_KEY",
   "CLOUDINARY_API_SECRET",
-  "CLIENT_URL",
 ];
 
 const missingEnvVars = requiredEnvVars.filter((name) => !process.env[name]?.trim());
