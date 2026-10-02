@@ -13,13 +13,14 @@ import contactProfileRoutes from "./routes/contactProfileRoute.js";
 import { logSafeError } from "./utils/safeLogging.js";
 
 const app = express();
+const isProduction = process.env.NODE_ENV === "production";
 
 app.use(
   helmet({
     contentSecurityPolicy: false,
     frameguard: { action: "deny" },
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-    strictTransportSecurity: false,
+    strictTransportSecurity: isProduction,
   }),
 );
 
