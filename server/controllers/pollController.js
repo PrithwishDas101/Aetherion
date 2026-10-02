@@ -34,22 +34,40 @@ export const createPoll = async (req, res) => {
       });
     }
 
-    // VALIDATE OPTIONS
-    if (!Array.isArray(options) || options.length < 2) {
+    // VALIDATE QUESTION
+    const cleanedQuestion = question.trim();
+
+    if (cleanedQuestion.length > 500) {
       return res.status(400).json({
         success: false,
-        message: "A poll requires at least two options.",
+        message: "Poll question is too long.",
+      });
+    }
+
+    // VALIDATE OPTIONS
+    if (!Array.isArray(options) || options.length < 2 || options.length > 10) {
+      return res.status(400).json({
+        success: false,
+        message: "A poll must have between 2 and 10 options.",
       });
     }
 
     const cleanedOptions = options
-      .map((option) => option?.trim())
+      .filter((option) => typeof option === "string")
+      .map((option) => option.trim())
       .filter(Boolean);
 
     if (cleanedOptions.length < 2) {
       return res.status(400).json({
         success: false,
         message: "A poll requires at least two valid options.",
+      });
+    }
+
+    if (cleanedOptions.some((option) => option.length > 200)) {
+      return res.status(400).json({
+        success: false,
+        message: "Poll options are too long.",
       });
     }
 
@@ -101,7 +119,7 @@ export const createPoll = async (req, res) => {
       chatId,
       sender: senderId,
       type: "poll",
-      text: question.trim(),
+      text: cleanedQuestion,
       replyTo: replyTo || null,
       read: false,
     });
@@ -111,7 +129,7 @@ export const createPoll = async (req, res) => {
       messageId: savedMessage._id,
       chatId,
       creator: senderId,
-      question: question.trim(),
+      question: cleanedQuestion,
       options: cleanedOptions.map((option) => ({
         text: option,
         votes: [],
