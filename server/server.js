@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import http from "http";
+import mongoose from "mongoose";
 import { Server } from "socket.io";
 
 import app from "./app.js";
@@ -37,6 +38,24 @@ const server = http.createServer(app);
 const io = initializeSocket(server);
 
 app.set("io", io);
+
+
+const shutdown = (signal) => {
+  console.log(`Received ${signal}; shutting down gracefully`);
+
+  io.close(() => {
+    mongoose.connection
+      .close()
+      .then(() => process.exit(0))
+      .catch((error) => {
+        logSafeError("Server shutdown", error);
+        process.exit(1);
+      });
+  });
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
 
 connectDB()
   .then(() => {
