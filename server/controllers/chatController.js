@@ -2,9 +2,20 @@ import mongoose from "mongoose";
 
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
+import User from "../models/User.js";
 import { socketEventLimiter } from "../socket/socketEventLimiter.js";
 import { logSafeError } from "../utils/safeLogging.js";
 import { MAX_CHATS_PER_USER } from "../utils/queryLimits.js";
+
+const findPopulatedChat = (filter) =>
+  Chat.findOne(filter).populate("members").populate("lastMessage");
+
+const respondWithExistingChat = (res, chat) =>
+  res.status(200).json({
+    success: true,
+    message: "Chat already exists.",
+    data: chat,
+  });
 
 // CREATE ONE-TO-ONE CHAT
 export const createChat = async (req, res) => {
@@ -18,71 +29,90 @@ export const createChat = async (req, res) => {
       });
     }
 
-    const authenticatedUserId = String(req.user.userId);
-
-    if (!members.some((member) => String(member) === authenticatedUserId)) {
-      return res.status(403).json({
-        success: false,
-        message: "You can only create a chat that includes yourself.",
-      });
-    }
-
-    // Make sure both member IDs are valid MongoDB ObjectIds.
-    if (!members.every((member) => mongoose.Types.ObjectId.isValid(member))) {
+    if (
+      !members.every(
+        (member) =>
+          typeof member === "string" &&
+          mongoose.Types.ObjectId.isValid(member),
+      )
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid chat member.",
       });
     }
 
-    // A user cannot start a chat with themselves.
-    if (String(members[0]) === String(members[1])) {
+    const memberIds = members.map((member) =>
+      new mongoose.Types.ObjectId(member).toHexString(),
+    );
+    const authenticatedUserId = new mongoose.Types.ObjectId(
+      String(req.user.userId),
+    ).toHexString();
+
+    if (!memberIds.includes(authenticatedUserId)) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only create a chat that includes yourself.",
+      });
+    }
+
+    if (new Set(memberIds).size !== 2) {
       return res.status(400).json({
         success: false,
         message: "You cannot create a chat with yourself.",
       });
     }
 
-    const existingChat = await Chat.findOne({
-      members: {
-        $all: members,
-      },
+    const memberObjectIds = memberIds.map(
+      (memberId) => new mongoose.Types.ObjectId(memberId),
+    );
+    const existingUserCount = await User.countDocuments({
+      _id: { $in: memberObjectIds },
+    });
 
-      $expr: {
-        $eq: [
-          {
-            $size: "$members",
-          },
-
-          2,
-        ],
-      },
-    })
-      .populate("members")
-      .populate("lastMessage");
-
-    // Even if the chat already exists, make sure the contact relationship exists.
-    if (existingChat) {
-      return res.status(200).json({
-        success: true,
-
-        message: "Chat already exists.",
-
-        data: existingChat,
+    if (existingUserCount !== 2) {
+      return res.status(404).json({
+        success: false,
+        message: "Unable to create chat.",
       });
     }
 
-    const unreadMessageCount = new Map([
-      [String(members[0]), 0],
+    const pairKey = [...memberIds].sort().join(":");
+    const existingChat =
+      (await findPopulatedChat({ pairKey })) ||
+      (await findPopulatedChat({
+        members: { $all: memberObjectIds },
+        $expr: {
+          $eq: [{ $size: "$members" }, 2],
+        },
+      }));
 
-      [String(members[1]), 0],
-    ]);
+    if (existingChat) {
+      return respondWithExistingChat(res, existingChat);
+    }
 
-    const chat = await Chat.create({
-      members,
+    const unreadMessageCount = new Map(memberIds.map((memberId) => [memberId, 0]));
+    let chat;
 
-      unreadMessageCount,
-    });
+    try {
+      chat = await Chat.create({
+        members: memberObjectIds,
+        pairKey,
+        unreadMessageCount,
+      });
+    } catch (error) {
+      if (error?.code !== 11000) {
+        throw error;
+      }
+
+      const racedChat = await findPopulatedChat({ pairKey });
+
+      if (!racedChat) {
+        throw error;
+      }
+
+      return respondWithExistingChat(res, racedChat);
+    }
 
     await chat.populate("members");
 

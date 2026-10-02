@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const chatSchema = new mongoose.Schema(
   {
+    pairKey: {
+      type: String,
+      select: false,
+    },
+
     members: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,6 +39,15 @@ const chatSchema = new mongoose.Schema(
 );
 
 chatSchema.index({ members: 1, updatedAt: -1, _id: -1 });
+chatSchema.index(
+  { pairKey: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      pairKey: { $type: "string" },
+    },
+  },
+);
 
 const Chat = mongoose.model("Chat", chatSchema);
 

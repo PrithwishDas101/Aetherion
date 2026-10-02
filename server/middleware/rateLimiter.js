@@ -78,6 +78,11 @@ export const contactRequestUserLimiter = createAuthenticatedUserLimiter({
   max: 10,
 });
 
+export const chatCreationUserLimiter = createAuthenticatedUserLimiter({
+  windowMs: 5 * 60 * 1000,
+  max: 20,
+});
+
 export const pollCreationUserLimiter = createAuthenticatedUserLimiter({
   windowMs: 10 * 60 * 1000,
   max: 10,

@@ -13,6 +13,7 @@ import {
   logSafeError,
 } from "../utils/safeLogging.js";
 import { MAX_MESSAGES_PER_CHAT_HISTORY } from "../utils/queryLimits.js";
+import { isAllowedGiphyMediaUrl } from "../utils/giphyUrl.js";
 
 // SEND MESSAGES
 export const sendMessage = async (req, res) => {
@@ -112,6 +113,17 @@ export const sendMessage = async (req, res) => {
       });
     }
 
+    if (
+      type === "gif" &&
+      !uploadedFile &&
+      !isAllowedGiphyMediaUrl(incomingMediaUrl)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Only HTTPS GIPHY media URLs are supported.",
+      });
+    }
+
     if (replyTo) {
       if (!mongoose.Types.ObjectId.isValid(replyTo)) {
         return res.status(400).json({
@@ -195,13 +207,8 @@ export const sendMessage = async (req, res) => {
         finalMediaUrl = uploadResult.secure_url;
 
         logSafeDiagnostic("Message media upload completed", { chatId, type });
-      } else if (incomingMediaUrl) {
-        finalMediaUrl = incomingMediaUrl;
       } else {
-        return res.status(400).json({
-          success: false,
-          message: "GIF file or GIF URL is required.",
-        });
+        finalMediaUrl = incomingMediaUrl;
       }
     }
 
