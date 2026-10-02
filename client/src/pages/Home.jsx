@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 import Header from "../components/Header.jsx";
-import Sidebar from "../components/SideBar.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 import Chat from "../components/Chat.jsx";
 import {
   setTyping,
