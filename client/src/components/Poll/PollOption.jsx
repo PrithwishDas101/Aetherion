@@ -87,7 +87,7 @@ const PollOption = ({
                 <div
                     className={`absolute inset-y-0 left-0 rounded-md transition-all duration-500 ${isSelected
                         ? "bg-[#eaff8f]"
-                        : "bg-[#d8f45a]/16"
+                        : "bg-[#b8d85a]/45"
                         }`}
                     style={{
                         width: `${safePercentage}%`,
