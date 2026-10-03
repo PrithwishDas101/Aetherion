@@ -13,6 +13,7 @@ const PUBLIC_PROFILE_PROJECTION = [
   "_id",
   "firstName",
   "lastName",
+  "email",
   "pronouns",
   "bio",
   "profilePic",
