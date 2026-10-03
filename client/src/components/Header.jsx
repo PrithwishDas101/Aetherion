@@ -166,6 +166,10 @@ function Header() {
     setShowLogoutConfirm(false);
     setShowProfileMenu(false);
 
+    // End the realtime session before removing the current user's token.
+    socket.auth = { token: null };
+    socket.disconnect();
+
     await logoutUser();
 
     navigate("/login", { replace: true });
