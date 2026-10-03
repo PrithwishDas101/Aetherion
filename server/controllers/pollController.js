@@ -210,6 +210,7 @@ export const voteOnPoll = async (req, res) => {
         message: "Invalid poll options.",
       });
     }
+
     // FIND POLL
     const poll = await Poll.findById(pollId);
 
@@ -262,26 +263,84 @@ export const voteOnPoll = async (req, res) => {
       });
     }
 
-    // REMOVE USER FROM ALL PREVIOUS VOTES
-    poll.options.forEach((option) => {
-      option.votes = option.votes.filter(
-        (voteUserId) => String(voteUserId) !== userId,
-      );
-    });
+    const userObjectId = new mongoose.Types.ObjectId(userId);
 
-    // ADD USER TO NEWLY SELECTED OPTIONS
-    poll.options.forEach((option) => {
-      if (uniqueOptionIds.includes(String(option._id))) {
-        option.votes.push(userId);
-      }
-    });
+    // UPDATE ALL OPTION VOTES ATOMICALLY.
+    //
+    // The previous read-modify-save flow could lose another user's vote when
+    // two votes were submitted concurrently from stale poll documents. A
+    // single MongoDB update keeps each vote transition atomic.
+    const updatedPoll = await Poll.findOneAndUpdate(
+      { _id: pollId },
+      [
+        {
+          $set: {
+            options: {
+              $map: {
+                input: "$options",
+                as: "option",
+                in: {
+                  $mergeObjects: [
+                    "$$option",
+                    {
+                      votes: {
+                        $cond: [
+                          {
+                            $in: [
+                              { $toString: "$$option._id" },
+                              uniqueOptionIds,
+                            ],
+                          },
+                          {
+                            $setUnion: [
+                              {
+                                $filter: {
+                                  input: "$$option.votes",
+                                  as: "voteUserId",
+                                  cond: {
+                                    $ne: ["$$voteUserId", userObjectId],
+                                  },
+                                },
+                              },
+                              [userObjectId],
+                            ],
+                          },
+                          {
+                            $filter: {
+                              input: "$$option.votes",
+                              as: "voteUserId",
+                              cond: {
+                                $ne: ["$$voteUserId", userObjectId],
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      ],
+      {
+        returnDocument: "after",
+        runValidators: true,
+      },
+    );
 
-    await poll.save();
+    if (!updatedPoll) {
+      return res.status(404).json({
+        success: false,
+        message: "Poll not found.",
+      });
+    }
 
     return res.status(200).json({
       success: true,
       message: "Poll vote updated successfully!",
-      data: poll,
+      data: updatedPoll,
     });
   } catch (error) {
     logSafeError("Vote on poll", error, {
