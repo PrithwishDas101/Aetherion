@@ -189,7 +189,7 @@ export const createPoll = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: "Internal server error.",
     });
   }
 };
@@ -290,7 +290,7 @@ export const voteOnPoll = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: "Internal server error.",
     });
   }
 };
@@ -335,7 +335,7 @@ export const getPoll = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: "Internal server error.",
     });
   }
 };
