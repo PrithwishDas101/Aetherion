@@ -129,7 +129,7 @@ export const createChat = async (req, res) => {
     return res.status(500).json({
       success: false,
 
-      message: error.message,
+      message: "Internal server error.",
     });
   }
 };
@@ -163,7 +163,7 @@ export const getAllChats = async (req, res) => {
     return res.status(500).json({
       success: false,
 
-      message: error.message,
+      message: "Internal server error.",
     });
   }
 };
@@ -275,7 +275,7 @@ export const clearUnreadMessages = async (req, res) => {
     return res.status(500).json({
       success: false,
 
-      message: error.message,
+      message: "Internal server error.",
     });
   }
 };
