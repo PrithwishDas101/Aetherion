@@ -329,6 +329,7 @@ export const voteOnPoll = async (req, res) => {
       ],
       {
         returnDocument: "after",
+        updatePipeline: true,
       },
     );
 
