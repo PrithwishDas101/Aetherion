@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
@@ -16,94 +16,106 @@ import {
 function ProtectedRoute({ children }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const token = localStorage.getItem("token");
-
-  const getLoggedInUser = async () => {
-    try {
-      dispatch(showLoader());
-
-      const response = await getLoggedUser();
-
-      if (response.success) {
-        dispatch(setUser(response.data));
-      } else {
-        localStorage.removeItem("token");
-
-        toast.error(response.message);
-
-        navigate("/login");
-      }
-    } catch (error) {
-      localStorage.removeItem("token");
-
-      navigate("/login");
-    } finally {
-      dispatch(hideLoader());
-    }
-  };
-
-  const getAllUser = async () => {
-    try {
-      dispatch(showLoader());
-
-      const response = await getAllUsers();
-
-      if (response.success) {
-        dispatch(setAllUser(response.users));
-
-        dispatch(setInitialPresence(response.users));
-      } else {
-        localStorage.removeItem("token");
-
-        toast.error(response.message);
-
-        navigate("/login");
-      }
-    } catch (error) {
-      localStorage.removeItem("token");
-
-      navigate("/login");
-    } finally {
-      dispatch(hideLoader());
-    }
-  };
-
-  const getAllUserChats = async () => {
-    try {
-      dispatch(showLoader());
-
-      const response = await getAllChats();
-
-      if (response.success) {
-        dispatch(setAllChats(response.data));
-      } else {
-        localStorage.removeItem("token");
-
-        toast.error(response.message);
-
-        navigate("/login");
-      }
-    } catch (error) {
-      localStorage.removeItem("token");
-
-      navigate("/login");
-    } finally {
-      dispatch(hideLoader());
-    }
-  };
+  const [authStatus, setAuthStatus] = useState("checking");
 
   useEffect(() => {
-    if (token) {
-      getLoggedInUser();
+    let cancelled = false;
 
-      getAllUser();
+    const bootstrap = async () => {
+      const token = localStorage.getItem("token");
 
-      getAllUserChats();
-    } else {
-      navigate("/login");
-    }
-  }, []);
+      if (!token) {
+        if (!cancelled) {
+          setAuthStatus("unauthenticated");
+          navigate("/login", { replace: true });
+        }
+        return;
+      }
+
+      dispatch(showLoader());
+
+      try {
+        const response = await getLoggedUser();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!response?.success) {
+          if (response?.status === 401 || response?.status === 403) {
+            localStorage.removeItem("token");
+            setAuthStatus("unauthenticated");
+            toast.error(response.message || "Your session has expired.");
+            navigate("/login", { replace: true });
+          } else {
+            setAuthStatus("unavailable");
+            toast.error(
+              response?.message || "Unable to verify your session right now.",
+            );
+          }
+          return;
+        }
+
+        dispatch(setUser(response.data));
+
+        const [usersResponse, chatsResponse] = await Promise.all([
+          getAllUsers(),
+          getAllChats(),
+        ]);
+
+        if (cancelled) {
+          return;
+        }
+
+        if (
+          usersResponse?.status === 401 ||
+          usersResponse?.status === 403 ||
+          chatsResponse?.status === 401 ||
+          chatsResponse?.status === 403
+        ) {
+          localStorage.removeItem("token");
+          setAuthStatus("unauthenticated");
+          toast.error("Your session has expired.");
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        if (usersResponse?.success) {
+          dispatch(setAllUser(usersResponse.users));
+          dispatch(setInitialPresence(usersResponse.users));
+        } else {
+          toast.error(usersResponse?.message || "Unable to load users.");
+        }
+
+        if (chatsResponse?.success) {
+          dispatch(setAllChats(chatsResponse.data));
+        } else {
+          toast.error(chatsResponse?.message || "Unable to load your chats.");
+        }
+
+        setAuthStatus("authenticated");
+      } catch (error) {
+        if (!cancelled) {
+          setAuthStatus("unavailable");
+          toast.error("Unable to verify your session right now.");
+        }
+      } finally {
+        if (!cancelled) {
+          dispatch(hideLoader());
+        }
+      }
+    };
+
+    bootstrap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch, navigate]);
+
+  if (authStatus !== "authenticated") {
+    return null;
+  }
 
   return children;
 }

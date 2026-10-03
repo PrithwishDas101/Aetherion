@@ -1,4 +1,4 @@
-import { axiosInstance } from "./index.js";
+import { axiosInstance, getApiErrorResponse } from "./index.js";
 
 // GET LOGGED-IN USER
 export const getLoggedUser = async () => {
@@ -7,7 +7,7 @@ export const getLoggedUser = async () => {
 
     return response.data;
   } catch (error) {
-    return error.response?.data;
+    return getApiErrorResponse(error, "Unable to load your account.");
   }
 };
 
@@ -18,7 +18,7 @@ export const getAllUsers = async () => {
 
     return response.data;
   } catch (error) {
-    return error.response?.data;
+    return getApiErrorResponse(error, "Unable to load users.");
   }
 };
 
