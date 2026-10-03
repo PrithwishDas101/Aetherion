@@ -268,8 +268,11 @@ export const voteOnPoll = async (req, res) => {
     // UPDATE ALL OPTION VOTES ATOMICALLY.
     //
     // The previous read-modify-save flow could lose another user's vote when
-    // two votes were submitted concurrently from stale poll documents. A
-    // single MongoDB update keeps each vote transition atomic.
+    // two votes were submitted concurrently from stale poll documents.
+    //
+    // Mongoose 9 requires updatePipeline: true for aggregation-pipeline
+    // updates. Without it, the request throws before MongoDB executes the
+    // atomic update and the client receives a 500 response.
     const updatedPoll = await Poll.findOneAndUpdate(
       { _id: pollId },
       [
@@ -326,7 +329,6 @@ export const voteOnPoll = async (req, res) => {
       ],
       {
         returnDocument: "after",
-        runValidators: true,
       },
     );
 
