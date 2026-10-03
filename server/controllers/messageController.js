@@ -364,7 +364,7 @@ export const sendMessage = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: "Internal server error.",
     });
   }
 };
@@ -416,7 +416,7 @@ export const getAllMessages = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: "Internal server error.",
     });
   }
 };
