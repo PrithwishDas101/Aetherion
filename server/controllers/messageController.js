@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import Message from "../models/Message.js";
 import Chat from "../models/Chat.js";
+import User from "../models/User.js";
 import {
   uploadImage,
   uploadGif,
@@ -145,6 +146,8 @@ export const sendMessage = async (req, res) => {
       }
     }
 
+    let sharedContact = null;
+
     if (type === "contact") {
       const contactUserId = String(contact.userId);
 
@@ -160,6 +163,26 @@ export const sendMessage = async (req, res) => {
           message: "You can only share contacts you already have a chat with.",
         });
       }
+
+      const contactUser = await User.findById(contactUserId).select(
+        "_id firstName lastName email profilePic avatarDecoration",
+      );
+
+      if (!contactUser) {
+        return res.status(404).json({
+          success: false,
+          message: "Contact user not found.",
+        });
+      }
+
+      sharedContact = {
+        userId: contactUser._id,
+        firstName: contactUser.firstName,
+        lastName: contactUser.lastName,
+        email: contactUser.email,
+        profilePic: contactUser.profilePic,
+        avatarDecoration: contactUser.avatarDecoration,
+      };
     }
 
     const receiver = chat.members.find((member) => String(member) !== senderId);
@@ -287,30 +310,7 @@ export const sendMessage = async (req, res) => {
             }
           : undefined,
 
-      contact:
-        type === "contact"
-          ? {
-              userId: contact.userId,
-              firstName:
-                typeof contact.firstName === "string"
-                  ? contact.firstName.trim()
-                  : null,
-              lastName:
-                typeof contact.lastName === "string"
-                  ? contact.lastName.trim()
-                  : null,
-              email:
-                typeof contact.email === "string" ? contact.email.trim() : null,
-              profilePic:
-                typeof contact.profilePic === "string"
-                  ? contact.profilePic.trim()
-                  : null,
-              avatarDecoration:
-                typeof contact.avatarDecoration === "string"
-                  ? contact.avatarDecoration.trim()
-                  : "none",
-            }
-          : undefined,
+      contact: type === "contact" ? sharedContact : undefined,
 
       replyTo: replyTo || null,
       read: false,
