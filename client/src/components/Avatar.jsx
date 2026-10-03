@@ -6,7 +6,7 @@ const Avatar = ({
     alt = "Profile",
     decoration = "none",
     size = "md",
-    avatarClassName = "",
+    avatarClassName = "bg-[#151a16] font-serif font-bold text-[#D2F25E]",
     className = "",
     children,
 }) => {
