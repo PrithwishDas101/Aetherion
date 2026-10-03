@@ -622,7 +622,7 @@ const ContactProfile = () => {
                                     alt={fullName}
                                     decoration={profile.avatarDecoration}
                                     size="lg"
-                                    avatarClassName="border-4 border-[#0b100c] bg-[#151a16] font-bold text-[#d8f45a]"
+                                    avatarClassName="border-4 border-[#0b100c] bg-[#151a16] font-serif font-bold text-[#D2F25E]"
                                 >
                                     <div className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full border-[2px] border-[#111317] bg-[#131613] shadow-md">
                                         <PresenceIcon
