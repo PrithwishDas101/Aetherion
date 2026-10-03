@@ -41,62 +41,59 @@ function ProtectedRoute({ children }) {
           return;
         }
 
-        if (response?.success) {
-          dispatch(setUser(response.data));
-          setAuthStatus("authenticated");
-
-          const [usersResponse, chatsResponse] = await Promise.all([
-            getAllUsers(),
-            getAllChats(),
-          ]);
-
-          if (cancelled) {
-            return;
-          }
-
-          if (usersResponse?.success) {
-            dispatch(setAllUser(usersResponse.users));
-            dispatch(setInitialPresence(usersResponse.users));
-          } else if (
-            usersResponse?.status === 401 ||
-            usersResponse?.status === 403
-          ) {
+        if (!response?.success) {
+          if (response?.status === 401 || response?.status === 403) {
             localStorage.removeItem("token");
             setAuthStatus("unauthenticated");
+            toast.error(response.message || "Your session has expired.");
             navigate("/login", { replace: true });
-            return;
           } else {
-            toast.error(usersResponse?.message || "Unable to load users.");
+            setAuthStatus("unavailable");
+            toast.error(
+              response?.message || "Unable to verify your session right now.",
+            );
           }
+          return;
+        }
 
-          if (chatsResponse?.success) {
-            dispatch(setAllChats(chatsResponse.data));
-          } else if (
-            chatsResponse?.status === 401 ||
-            chatsResponse?.status === 403
-          ) {
-            localStorage.removeItem("token");
-            setAuthStatus("unauthenticated");
-            navigate("/login", { replace: true });
-            return;
-          } else {
-            toast.error(chatsResponse?.message || "Unable to load your chats.");
-          }
-        } else if (
-          response?.status === 401 ||
-          response?.status === 403
+        dispatch(setUser(response.data));
+
+        const [usersResponse, chatsResponse] = await Promise.all([
+          getAllUsers(),
+          getAllChats(),
+        ]);
+
+        if (cancelled) {
+          return;
+        }
+
+        if (
+          usersResponse?.status === 401 ||
+          usersResponse?.status === 403 ||
+          chatsResponse?.status === 401 ||
+          chatsResponse?.status === 403
         ) {
           localStorage.removeItem("token");
           setAuthStatus("unauthenticated");
-          toast.error(response.message || "Your session has expired.");
+          toast.error("Your session has expired.");
           navigate("/login", { replace: true });
           return;
-        } else {
-          setAuthStatus("unavailable");
-          toast.error(
-            response?.message || "Unable to verify your session right now.",
-          );
         }
+
+        if (usersResponse?.success) {
+          dispatch(setAllUser(usersResponse.users));
+          dispatch(setInitialPresence(usersResponse.users));
+        } else {
+          toast.error(usersResponse?.message || "Unable to load users.");
+        }
+
+        if (chatsResponse?.success) {
+          dispatch(setAllChats(chatsResponse.data));
+        } else {
+          toast.error(chatsResponse?.message || "Unable to load your chats.");
+        }
+
+        setAuthStatus("authenticated");
       } catch (error) {
         if (!cancelled) {
           setAuthStatus("unavailable");
@@ -116,10 +113,7 @@ function ProtectedRoute({ children }) {
     };
   }, [dispatch, navigate]);
 
-  if (
-    authStatus === "checking" ||
-    authStatus === "unauthenticated"
-  ) {
+  if (authStatus !== "authenticated") {
     return null;
   }
 
