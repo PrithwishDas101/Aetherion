@@ -1,4 +1,4 @@
-import { axiosInstance } from "./index.js";
+import { axiosInstance, getApiErrorResponse } from "./index.js";
 
 // CREATE CHAT
 export const createChat = async (members) => {
@@ -20,7 +20,7 @@ export const getAllChats = async () => {
 
     return response.data;
   } catch (error) {
-    return error.response?.data;
+    return getApiErrorResponse(error, "Unable to load your chats.");
   }
 };
 
