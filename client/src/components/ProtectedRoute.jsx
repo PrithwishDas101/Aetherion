@@ -12,6 +12,7 @@ import {
   setAllChats,
   setInitialPresence,
 } from "../redux/userSlice.js";
+import socket from "../sockets/socket.js";
 
 function ProtectedRoute({ children }) {
   const dispatch = useDispatch();
@@ -21,13 +22,20 @@ function ProtectedRoute({ children }) {
   useEffect(() => {
     let cancelled = false;
 
+    const invalidateSession = () => {
+      localStorage.removeItem("token");
+      socket.auth = { token: null };
+      socket.disconnect();
+      setAuthStatus("unauthenticated");
+      navigate("/login", { replace: true });
+    };
+
     const bootstrap = async () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
         if (!cancelled) {
-          setAuthStatus("unauthenticated");
-          navigate("/login", { replace: true });
+          invalidateSession();
         }
         return;
       }
@@ -43,10 +51,8 @@ function ProtectedRoute({ children }) {
 
         if (!response?.success) {
           if (response?.status === 401 || response?.status === 403) {
-            localStorage.removeItem("token");
-            setAuthStatus("unauthenticated");
+            invalidateSession();
             toast.error(response.message || "Your session has expired.");
-            navigate("/login", { replace: true });
           } else {
             setAuthStatus("unavailable");
             toast.error(
@@ -73,10 +79,8 @@ function ProtectedRoute({ children }) {
           chatsResponse?.status === 401 ||
           chatsResponse?.status === 403
         ) {
-          localStorage.removeItem("token");
-          setAuthStatus("unauthenticated");
+          invalidateSession();
           toast.error("Your session has expired.");
-          navigate("/login", { replace: true });
           return;
         }
 
