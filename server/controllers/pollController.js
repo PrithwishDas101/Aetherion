@@ -71,6 +71,17 @@ export const createPoll = async (req, res) => {
       });
     }
 
+    const normalizedOptions = cleanedOptions.map((option) =>
+      option.toLocaleLowerCase(),
+    );
+
+    if (new Set(normalizedOptions).size !== normalizedOptions.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Poll options must be unique.",
+      });
+    }
+
     // VERIFY CHAT MEMBERSHIP
     const chat = await Chat.findOne({
       _id: chatId,
