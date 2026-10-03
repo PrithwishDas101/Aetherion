@@ -30,6 +30,25 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
     const [error, setError] = useState("");
     const [isSending, setIsSending] = useState(false);
 
+    const normalizedOptionCounts = options.reduce((counts, option) => {
+        const normalized = option.text.trim().toLocaleLowerCase();
+
+        if (normalized) {
+            counts[normalized] = (counts[normalized] || 0) + 1;
+        }
+
+        return counts;
+    }, {});
+
+    const hasDuplicateOptions = options.some((option) => {
+        const normalized = option.text.trim().toLocaleLowerCase();
+
+        return (
+            normalized &&
+            normalizedOptionCounts[normalized] > 1
+        );
+    });
+
     const resetPoll = () => {
         setQuestion("");
         setOptions([createOption(), createOption()]);
@@ -89,6 +108,11 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
 
         if (cleanedOptions.some((option) => !option.text)) {
             setError("Every option needs text.");
+            return;
+        }
+
+        if (hasDuplicateOptions) {
+            setError("This is already an option.");
             return;
         }
 
@@ -213,7 +237,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
                                         disabled={isSending}
                                         maxLength={200}
                                         placeholder={`Option ${index + 1}`}
-                                        className="h-10 min-w-0 flex-1 rounded-lg border border-[#d8f45a]/10 bg-[#080d09] px-3 text-xs text-[#edefe5] outline-none transition placeholder:text-[#697267] focus:border-[#d8f45a]/45 disabled:cursor-not-allowed disabled:opacity-60"
+                                        className={`h-10 min-w-0 flex-1 rounded-lg border bg-[#080d09] px-3 text-xs text-[#edefe5] outline-none transition placeholder:text-[#697267] disabled:cursor-not-allowed disabled:opacity-60 ${option.text.trim() && normalizedOptionCounts[option.text.trim().toLocaleLowerCase()] > 1 ? "border-red-500/70 focus:border-red-400" : "border-[#d8f45a]/10 focus:border-[#d8f45a]/45"}`}
                                     />
 
                                     {options.length > 2 && (
@@ -232,6 +256,12 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
                                 </div>
                             ))}
                         </div>
+
+                        {hasDuplicateOptions && (
+                            <p className="mt-2 text-xs font-medium text-red-400">
+                                This is already an option.
+                            </p>
+                        )}
 
                         {options.length < MAX_OPTIONS && (
                             <button
