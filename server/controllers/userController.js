@@ -250,23 +250,20 @@ export const removeProfilePicture = async (req, res) => {
 
     const oldPublicId = user.profilePicPublicId;
 
-    // Delete image from Cloudinary first
-    try {
-      await deleteImage(oldPublicId);
-    } catch (deleteError) {
-      logSafeError("Profile picture deletion", deleteError);
-
-      return res.status(500).json({
-        success: false,
-        message: "Unable to remove profile picture.",
-      });
-    }
-
-    // Clear database references
+    // Clear the database reference first. If MongoDB fails, the Cloudinary
+    // asset remains available and the existing profile picture keeps working.
     user.profilePic = "";
     user.profilePicPublicId = "";
 
     await user.save();
+
+    // MongoDB succeeded. It is now safe to remove the old Cloudinary asset.
+    // A failed Cloudinary deletion leaves an orphaned asset, not a broken DB URL.
+    try {
+      await deleteImage(oldPublicId);
+    } catch (deleteError) {
+      logSafeError("Profile picture deletion", deleteError);
+    }
 
     const updatedUser = user.toObject();
 
