@@ -1231,25 +1231,80 @@ const Chat = ({ socket }) => {
   const sendMessage = async () => {
     const messageText = message.trim();
 
-    if (!messageText || !selectedChat?._id || isSending) {
+    if (!messageText || !selectedChat?._id) {
       return;
     }
 
+    const chatId = selectedChat._id;
+    const replyToId = replyingTo?._id || null;
+    const temporaryMessageId = `temp-text-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    const temporaryMessage = {
+      _id: temporaryMessageId,
+      chatId,
+      sender: user._id,
+      type: "text",
+      text: messageText,
+      replyTo: replyingTo || null,
+      read: false,
+      createdAt: new Date().toISOString(),
+      isSending: true,
+    };
+
     isNearBottomRef.current = true;
 
-    try {
-      setIsSending(true);
+    // Show the message immediately and free the composer for the next message.
+    setAllMessages((previousMessages) => [
+      ...previousMessages,
+      temporaryMessage,
+    ]);
 
+    setMessage("");
+    setReplyingTo(null);
+
+    clearTimeout(typingTimeout.current);
+
+    sendStopTyping(socket, {
+      sender: user._id,
+      chatId,
+      members: selectedChat.members.map((member) => String(member._id)),
+    });
+
+    if (messageInputRef.current) {
+      messageInputRef.current.style.height = "48px";
+      messageInputRef.current.focus();
+    }
+
+    setNewMessagesState(0, null);
+
+    try {
       const response = await createMessage({
-        chatId: selectedChat._id,
+        chatId,
         text: messageText,
-        replyTo: replyingTo?._id || null,
+        replyTo: replyToId,
       });
 
-      if (!response?.success) {
+      if (!response?.success || !response?.data) {
+        setAllMessages((previousMessages) =>
+          previousMessages.filter(
+            (currentMessage) =>
+              String(currentMessage._id) !== String(temporaryMessageId),
+          ),
+        );
+
         toast.error(response?.message || "Unable to send message.");
+
         return;
       }
+
+      // Replace only this optimistic message when the server confirms it.
+      setAllMessages((previousMessages) =>
+        previousMessages.map((currentMessage) =>
+          String(currentMessage._id) === String(temporaryMessageId)
+            ? response.data
+            : currentMessage,
+        ),
+      );
 
       emitSendMessage(socket, {
         message: response.data,
@@ -1257,39 +1312,22 @@ const Chat = ({ socket }) => {
         members: selectedChat.members.map((member) => String(member._id)),
       });
 
-      setAllMessages((previousMessages) => [
-        ...previousMessages,
-        response.data,
-      ]);
-
       if (response?.chat) {
         updateChatInRedux(response.chat);
       }
-
-      setMessage("");
-
-      clearTimeout(typingTimeout.current);
-
-      sendStopTyping(socket, {
-        sender: user._id,
-        chatId: selectedChat._id,
-        members: selectedChat.members.map((member) => String(member._id)),
-      });
-
-      setReplyingTo(null);
-
-      if (messageInputRef.current) {
-        messageInputRef.current.style.height = "48px";
-      }
-
-      // We are the sender and therefore already at the latest message.
-      setNewMessagesState(0, null);
     } catch (error) {
       logSafeClientError("Send message", error);
 
-      toast.error(error.response?.data?.message || "Unable to send message.");
-    } finally {
-      setIsSending(false);
+      setAllMessages((previousMessages) =>
+        previousMessages.filter(
+          (currentMessage) =>
+            String(currentMessage._id) !== String(temporaryMessageId),
+        ),
+      );
+
+      toast.error(
+        error?.response?.data?.message || "Unable to send message.",
+      );
     }
   };
 
