@@ -16,8 +16,7 @@ import {
   voteOnPoll,
 } from "../apiCalls/pollApi.js";
 import { clearUnreadMessage, createChat } from "../apiCalls/chatApi.js";
-import { showLoader, hideLoader } from "../redux/sliceLoader.js";
-import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
+import { setAllChats, setSelectedChat, setChatMessages } from "../redux/userSlice.js";
 import {
   logSafeClientDiagnostic,
   logSafeClientError,
@@ -100,12 +99,12 @@ const Chat = ({ socket }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { selectedChat, user, allUsers, allChats, typingChats, presence } = useSelector(
-    (state) => state.userReducer,
-  );
+  const { selectedChat, user, allUsers, allChats, typingChats, presence, messagesByChat } =
+    useSelector((state) => state.userReducer);
 
   const [message, setMessage] = useState("");
   const [allMessages, setAllMessages] = useState([]);
+  const [isMessagesLoading, setIsMessagesLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
@@ -273,36 +272,31 @@ const Chat = ({ socket }) => {
     }
   };
 
-  const leaveChat = async () => {
+  const leaveChat = () => {
     const chatId = selectedChat?._id;
 
-    if (!chatId) {
-      dispatch(setSelectedChat(null));
-      return;
-    }
+    dividerVisibleRef.current = false;
+    setDividerVisible(false);
+    newMessageCountRef.current = 0;
+    setNewMessageCount(0);
+    setFirstNewMessageId(null);
+    dispatch(setSelectedChat(null));
 
-    try {
-      const response = await clearUnreadMessage(chatId);
+    if (chatId) {
+      clearUnreadMessage(chatId)
+        .then((response) => {
+          logSafeClientDiagnostic("Leave chat unread clear completed", {
+            chatId,
+            success: response?.success,
+          });
 
-      logSafeClientDiagnostic("Leave chat unread clear completed", {
-        chatId,
-        success: response?.success,
-      });
-
-      if (response?.success && response?.data) {
-        updateChatWithoutReordering(response.data);
-      }
-    } catch (error) {
-      logSafeClientError("Leave chat unread clear", error);
-    } finally {
-      dividerVisibleRef.current = false;
-      setDividerVisible(false);
-
-      newMessageCountRef.current = 0;
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
-
-      dispatch(setSelectedChat(null));
+          if (response?.success && response?.data) {
+            updateChatWithoutReordering(response.data);
+          }
+        })
+        .catch((error) => {
+          logSafeClientError("Leave chat unread clear", error);
+        });
     }
   };
 
@@ -395,8 +389,6 @@ const Chat = ({ socket }) => {
     }
 
     try {
-      dispatch(showLoader());
-
       // CHECK FOR EXISTING CHAT
       const existingChat = (allChats || []).find((chat) => {
         const memberIds = (chat.members || [])
@@ -456,8 +448,6 @@ const Chat = ({ socket }) => {
         error?.response?.data?.message ||
         "Unable to open chat.",
       );
-    } finally {
-      dispatch(hideLoader());
     }
   };
 
@@ -1880,26 +1870,48 @@ const Chat = ({ socket }) => {
 
   // FETCH MESSAGES
   const getMessages = async () => {
-    if (!selectedChat?._id) {
+    const chatId = selectedChat?._id;
+
+    if (!chatId) {
       return;
     }
 
-    try {
-      dispatch(showLoader());
+    const cachedEntry = messagesByChat?.[String(chatId)];
 
-      const response = await getAllMessages(selectedChat._id);
+    if (cachedEntry) {
+      setAllMessages(cachedEntry.messages || []);
+      setIsMessagesLoading(false);
+    } else {
+      setAllMessages([]);
+      setIsMessagesLoading(true);
+    }
+
+    try {
+      const response = await getAllMessages(chatId);
 
       if (response?.success) {
-        setAllMessages(response.data || []);
+        const messages = response.data || [];
+
+        dispatch(
+          setChatMessages({
+            chatId,
+            messages,
+          }),
+        );
+
+        if (String(selectedChat?._id) === String(chatId)) {
+          setAllMessages(messages);
+        }
       } else {
         toast.error(response?.message || "Unable to fetch messages.");
       }
     } catch (error) {
       logSafeClientError("Get messages", error);
-
       toast.error("Unable to fetch messages.");
     } finally {
-      dispatch(hideLoader());
+      if (String(selectedChat?._id) === String(chatId)) {
+        setIsMessagesLoading(false);
+      }
     }
   };
 
@@ -1973,7 +1985,12 @@ const Chat = ({ socket }) => {
 
     initialUnreadCountRef.current = unreadMessageCount;
 
-    setAllMessages([]);
+    const cachedMessages = selectedChat?._id
+      ? messagesByChat?.[String(selectedChat._id)]?.messages
+      : null;
+
+    setAllMessages(Array.isArray(cachedMessages) ? cachedMessages : []);
+    setIsMessagesLoading(!Array.isArray(cachedMessages));
     setNewMessagesState(0, null);
     setReplyingTo(null);
   }, [selectedChat?._id]);
@@ -1986,6 +2003,20 @@ const Chat = ({ socket }) => {
 
     getMessages();
   }, [selectedChat?._id]);
+
+  // KEEP THE REDUX CACHE IN SYNC WITH THE ACTIVE CHAT
+  useEffect(() => {
+    if (!selectedChat?._id) {
+      return;
+    }
+
+    dispatch(
+      setChatMessages({
+        chatId: selectedChat._id,
+        messages: allMessages,
+      }),
+    );
+  }, [dispatch, selectedChat?._id, allMessages]);
 
   useEffect(() => {
     if (
@@ -2449,7 +2480,13 @@ const Chat = ({ socket }) => {
       >
         <div className="flex min-h-full min-w-0 flex-col gap-2">
           {/* EMPTY CHAT */}
-          {allMessages.length === 0 && (
+          {isMessagesLoading && allMessages.length === 0 && (
+            <div className="flex flex-1 items-center justify-center">
+              <p className="text-sm text-[#70786f]">Loading messages...</p>
+            </div>
+          )}
+
+          {!isMessagesLoading && allMessages.length === 0 && (
             <div className="flex flex-1 items-center justify-center">
               <p className="text-sm text-[#70786f]">No messages yet.</p>
             </div>
