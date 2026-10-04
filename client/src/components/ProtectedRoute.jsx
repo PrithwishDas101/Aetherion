@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
@@ -14,7 +14,7 @@ import {
 } from "../redux/userSlice.js";
 import socket from "../sockets/socket.js";
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [authStatus, setAuthStatus] = useState("checking");
@@ -121,7 +121,7 @@ function ProtectedRoute({ children }) {
     return null;
   }
 
-  return children;
+  return <Outlet />;
 }
 
 export default ProtectedRoute;
