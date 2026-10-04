@@ -4,6 +4,7 @@ import Message from "../models/Message.js";
 import Chat from "../models/Chat.js";
 import User from "../models/User.js";
 import {
+  deleteUploadedMedia,
   uploadImage,
   uploadGif,
   uploadVideo,
@@ -18,6 +19,9 @@ import { isAllowedGiphyMediaUrl } from "../utils/giphyUrl.js";
 
 // SEND MESSAGES
 export const sendMessage = async (req, res) => {
+  let uploadedMediaPublicId = null;
+  let uploadedMediaResourceType = "image";
+
   try {
     const {
       chatId,
@@ -213,6 +217,7 @@ export const sendMessage = async (req, res) => {
       );
 
       finalMediaUrl = uploadResult.secure_url;
+      uploadedMediaPublicId = uploadResult.public_id;
 
       logSafeDiagnostic("Message media upload completed", { chatId, type });
     }
@@ -228,6 +233,7 @@ export const sendMessage = async (req, res) => {
         );
 
         finalMediaUrl = uploadResult.secure_url;
+        uploadedMediaPublicId = uploadResult.public_id;
 
         logSafeDiagnostic("Message media upload completed", { chatId, type });
       } else {
@@ -252,6 +258,8 @@ export const sendMessage = async (req, res) => {
       );
 
       finalMediaUrl = uploadResult.secure_url;
+      uploadedMediaPublicId = uploadResult.public_id;
+      uploadedMediaResourceType = "video";
 
       logSafeDiagnostic("Message media upload completed", { chatId, type });
     }
@@ -273,6 +281,8 @@ export const sendMessage = async (req, res) => {
       );
 
       finalMediaUrl = uploadResult.secure_url;
+      uploadedMediaPublicId = uploadResult.public_id;
+      uploadedMediaResourceType = "raw";
 
       logSafeDiagnostic("Message media upload completed", { chatId, type });
     }
@@ -282,67 +292,101 @@ export const sendMessage = async (req, res) => {
       type,
     });
 
-    const savedMessage = await Message.create({
-      chatId,
-      sender: senderId,
-      type,
-      text: text?.trim() || "",
-      mediaUrl: finalMediaUrl,
+    const receiverId = String(receiver);
+    const unreadField = `unreadMessageCount.${receiverId}`;
 
-      document:
-        type === "document" && uploadedFile
-          ? {
-              name: uploadedFile.originalname,
-              mimeType: uploadedFile.mimetype,
-              size: uploadedFile.size,
-            }
-          : undefined,
+    const session = await mongoose.startSession();
+    let savedMessage;
+    let updatedChat;
 
-      location:
-        type === "location"
-          ? {
-              latitude: Number(location.latitude),
-              longitude: Number(location.longitude),
-              address:
-                typeof location.address === "string" && location.address.trim()
-                  ? location.address.trim()
-                  : null,
-            }
-          : undefined,
+    try {
+      await session.withTransaction(async () => {
+        savedMessage = new Message({
+          chatId,
+          sender: senderId,
+          type,
+          text: text?.trim() || "",
+          mediaUrl: finalMediaUrl,
 
-      contact: type === "contact" ? sharedContact : undefined,
+          document:
+            type === "document" && uploadedFile
+              ? {
+                  name: uploadedFile.originalname,
+                  mimeType: uploadedFile.mimetype,
+                  size: uploadedFile.size,
+                }
+              : undefined,
 
-      replyTo: replyTo || null,
-      read: false,
-    });
+          location:
+            type === "location"
+              ? {
+                  latitude: Number(location.latitude),
+                  longitude: Number(location.longitude),
+                  address:
+                    typeof location.address === "string" &&
+                    location.address.trim()
+                      ? location.address.trim()
+                      : null,
+                }
+              : undefined,
+
+          contact: type === "contact" ? sharedContact : undefined,
+
+          replyTo: replyTo || null,
+          read: false,
+        });
+
+        await savedMessage.save({ session });
+
+        updatedChat = await Chat.findByIdAndUpdate(
+          chatId,
+          {
+            $set: {
+              lastMessage: savedMessage._id,
+            },
+
+            $inc: {
+              [unreadField]: 1,
+            },
+          },
+          {
+            returnDocument: "after",
+            runValidators: true,
+            session,
+          },
+        );
+
+        if (!updatedChat) {
+          throw new Error("Chat update failed after message creation.");
+        }
+      });
+    } catch (transactionError) {
+      if (uploadedMediaPublicId) {
+        try {
+          await deleteUploadedMedia(
+            uploadedMediaPublicId,
+            uploadedMediaResourceType,
+          );
+        } catch (cleanupError) {
+          logSafeError("Message media cleanup", cleanupError, {
+            chatId,
+            type,
+          });
+        }
+      }
+
+      throw transactionError;
+    } finally {
+      await session.endSession();
+    }
 
     await savedMessage.populate({
       path: "replyTo",
       select: "text sender type mediaUrl document poll location contact",
     });
 
-    const receiverId = String(receiver);
-
-    const unreadField = `unreadMessageCount.${receiverId}`;
-
-    const updatedChat = await Chat.findByIdAndUpdate(
-      chatId,
-      {
-        $set: {
-          lastMessage: savedMessage._id,
-        },
-
-        $inc: {
-          [unreadField]: 1,
-        },
-      },
-      {
-        returnDocument: "after",
-        runValidators: true,
-      },
-    )
-      .populate("members")
-      .populate("lastMessage");
+    await updatedChat.populate("members");
+    await updatedChat.populate("lastMessage");
 
     logSafeDiagnostic("Message saved", {
       chatId,

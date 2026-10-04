@@ -1,5 +1,15 @@
 import cloudinary from "../config/cloudinary.js";
 
+export const deleteUploadedMedia = async (publicId, resourceType = "image") => {
+  if (!publicId) {
+    return null;
+  }
+
+  return cloudinary.uploader.destroy(publicId, {
+    resource_type: resourceType,
+  });
+};
+
 export const uploadImage = (buffer, folder = "aetherion/profile-pictures") => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
