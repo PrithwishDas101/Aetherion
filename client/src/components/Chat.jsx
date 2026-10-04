@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FiArrowLeft, FiSmile } from "react-icons/fi";
@@ -129,6 +129,7 @@ const Chat = ({ socket }) => {
 
   const typingTimeout = useRef(null);
   const highlightTimeoutRef = useRef(null);
+  const messageRequestIdRef = useRef(0);
 
   const messageRefs = useRef({});
   const temporaryMediaUrlsRef = useRef(new Set());
@@ -1869,13 +1870,7 @@ const Chat = ({ socket }) => {
   };
 
   // FETCH MESSAGES
-  const getMessages = async () => {
-    const chatId = selectedChat?._id;
-
-    if (!chatId) {
-      return;
-    }
-
+  const getMessages = async ({ chatId, requestId, signal }) => {
     const cachedEntry = messagesByChat?.[String(chatId)];
 
     if (cachedEntry) {
@@ -1887,11 +1882,18 @@ const Chat = ({ socket }) => {
     }
 
     try {
-      const response = await getAllMessages(chatId);
+      const response = await getAllMessages(chatId, { signal });
+
+      // A cancelled/aborted request may resolve without a response body.
+      if (!response) {
+        return;
+      }
 
       if (response?.success) {
         const messages = response.data || [];
 
+        // Background refreshes may still populate their own chat cache,
+        // but only the latest request may update the visible conversation.
         dispatch(
           setChatMessages({
             chatId,
@@ -1899,17 +1901,21 @@ const Chat = ({ socket }) => {
           }),
         );
 
-        if (String(selectedChat?._id) === String(chatId)) {
+        if (messageRequestIdRef.current === requestId) {
           setAllMessages(messages);
         }
-      } else {
+      } else if (messageRequestIdRef.current === requestId) {
         toast.error(response?.message || "Unable to fetch messages.");
       }
     } catch (error) {
+      if (messageRequestIdRef.current !== requestId) {
+        return;
+      }
+
       logSafeClientError("Get messages", error);
       toast.error("Unable to fetch messages.");
     } finally {
-      if (String(selectedChat?._id) === String(chatId)) {
+      if (messageRequestIdRef.current === requestId) {
         setIsMessagesLoading(false);
       }
     }
@@ -1974,7 +1980,7 @@ const Chat = ({ socket }) => {
   };
 
   // RESET WHEN CHAT CHANGES
-  useEffect(() => {
+  useLayoutEffect(() => {
     hasInitialScrolledRef.current = false;
     isNearBottomRef.current = true;
     previousMessageCountRef.current = 0;
@@ -1997,16 +2003,36 @@ const Chat = ({ socket }) => {
 
   // LOAD CHAT
   useEffect(() => {
-    if (!selectedChat?._id) {
-      return;
+    const requestId = ++messageRequestIdRef.current;
+    const controller = new AbortController();
+    const chatId = selectedChat?._id;
+
+    if (!chatId) {
+      return () => {
+        controller.abort();
+      };
     }
 
-    getMessages();
+    getMessages({
+      chatId,
+      requestId,
+      signal: controller.signal,
+    });
+
+    return () => {
+      controller.abort();
+    };
   }, [selectedChat?._id]);
 
   // KEEP THE REDUX CACHE IN SYNC WITH THE ACTIVE CHAT
   useEffect(() => {
     if (!selectedChat?._id) {
+      return;
+    }
+
+    // Do not turn the temporary empty state during an uncached chat switch
+    // into a real cache entry. The network response owns that cache entry.
+    if (isMessagesLoading && allMessages.length === 0) {
       return;
     }
 
@@ -2016,7 +2042,12 @@ const Chat = ({ socket }) => {
         messages: allMessages,
       }),
     );
-  }, [dispatch, selectedChat?._id, allMessages]);
+  }, [
+    dispatch,
+    selectedChat?._id,
+    allMessages,
+    isMessagesLoading,
+  ]);
 
   useEffect(() => {
     if (
