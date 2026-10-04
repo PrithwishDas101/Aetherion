@@ -32,8 +32,7 @@ export const createChat = async (req, res) => {
     if (
       !members.every(
         (member) =>
-          typeof member === "string" &&
-          mongoose.Types.ObjectId.isValid(member),
+          typeof member === "string" && mongoose.Types.ObjectId.isValid(member),
       )
     ) {
       return res.status(400).json({
@@ -91,7 +90,9 @@ export const createChat = async (req, res) => {
       return respondWithExistingChat(res, existingChat);
     }
 
-    const unreadMessageCount = new Map(memberIds.map((memberId) => [memberId, 0]));
+    const unreadMessageCount = new Map(
+      memberIds.map((memberId) => [memberId, 0]),
+    );
     let chat;
 
     try {
@@ -140,6 +141,9 @@ export const getAllChats = async (req, res) => {
     const chats = await Chat.find({
       members: {
         $in: [req.user.userId],
+      },
+      lastMessage: {
+        $ne: null,
       },
     })
       .populate("members")
@@ -249,10 +253,7 @@ export const clearUnreadMessages = async (req, res) => {
       (member) => String(member._id) !== String(userId),
     );
 
-    if (
-      otherMember &&
-      socketEventLimiter.allow(userId, "messages-read")
-    ) {
+    if (otherMember && socketEventLimiter.allow(userId, "messages-read")) {
       io.to(String(otherMember._id)).emit("messages-read", {
         chatId: String(chatId),
         userId: String(userId),
