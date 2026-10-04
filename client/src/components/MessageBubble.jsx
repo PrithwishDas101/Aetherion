@@ -1,4 +1,4 @@
-import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
+import { IoCheckmark, IoCheckmarkDone, IoTimeOutline } from "react-icons/io5";
 
 import {
   FiCornerUpLeft,
@@ -453,6 +453,11 @@ const MessageBubble = ({
                 <span className="text-[10px] text-[#7b8477]">
                   Sending...
                 </span>
+              ) : message.isSending ? (
+                <IoTimeOutline
+                  className="text-sm text-[#7b8477]"
+                  aria-label="Sending"
+                />
               ) : message.read ? (
                 <IoCheckmarkDone className="text-sm text-[#2196f3]" />
               ) : (
