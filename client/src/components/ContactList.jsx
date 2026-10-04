@@ -206,10 +206,6 @@ const ContactList = ({
                         No contacts yet
                     </p>
 
-                    <p className="mt-1.5 text-xs text-[#626960]">
-                        Start a chat to add someone
-                    </p>
-
                     {isOwnProfile && (
                         <button
                             type="button"
