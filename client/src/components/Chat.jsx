@@ -1227,6 +1227,23 @@ const Chat = ({ socket }) => {
     dispatch(setSelectedChat(updatedChat));
   };
 
+  const syncIncomingChat = (updatedChat) => {
+    if (!updatedChat) {
+      return;
+    }
+
+    const existingChats = allChats || [];
+
+    const updatedChats = [
+      updatedChat,
+      ...existingChats.filter(
+        (chat) => String(chat._id) !== String(updatedChat._id),
+      ),
+    ];
+
+    dispatch(setAllChats(updatedChats));
+  };
+
   // SEND TEXT MESSAGE
   const sendMessage = async () => {
     const messageText = message.trim();
@@ -2167,10 +2184,15 @@ const Chat = ({ socket }) => {
   // SOCKET: RECEIVE MESSAGE
   useEffect(() => {
     const handleReceiveMessage = (data) => {
-      if (
-        !data?.message ||
-        String(data.message.chatId) !== String(selectedChat?._id)
-      ) {
+      if (!data?.message) {
+        return;
+      }
+
+      const incomingChatId = String(data.message.chatId);
+      const activeChatId = String(selectedChat?._id || "");
+
+      if (incomingChatId !== activeChatId) {
+        syncIncomingChat(data.chat);
         return;
       }
 
