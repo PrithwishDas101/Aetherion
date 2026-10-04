@@ -19,7 +19,7 @@ The project was built from the ground up as a serious full-stack engineering pro
 
 ---
 
-## ✦ What is Aetherion?
+## What is Aetherion?
 
 Aetherion is built around the idea that messaging should feel immediate while still behaving like a reliable, persistent application.
 
@@ -40,7 +40,7 @@ Under the hood, the application combines a React frontend, an Express API, Mongo
 
 ---
 
-## ◈ Features
+## Features
 
 ### ◉ Real-time messaging
 
@@ -99,7 +99,7 @@ Polls are treated as a realtime part of the conversation rather than a separate 
 
 ---
 
-## ⚙ Engineering Highlights
+## Engineering Highlights
 
 Aetherion is more than a collection of frontend screens. Several parts of the application were deliberately hardened around real failure cases.
 
@@ -135,7 +135,7 @@ The project has been developed with real deployment constraints in mind, includi
 
 ---
 
-## 🧩 Tech Stack
+## Tech Stack
 
 | Layer | Technologies |
 | --- | --- |
@@ -151,7 +151,7 @@ The project has been developed with real deployment constraints in mind, includi
 
 ---
 
-## ⌘ Architecture
+## Architecture
 
 At a high level, Aetherion follows a client/API/realtime architecture:
 
@@ -188,7 +188,7 @@ The frontend uses the HTTP API for persistent operations and Socket.IO for realt
 
 ---
 
-## 🗂 Project Structure
+## Project Structure
 
 ```text
 Aetherion/
@@ -214,7 +214,7 @@ Aetherion/
 
 ---
 
-## ▶ Running Locally
+## Running Locally
 
 ### Prerequisites
 
@@ -277,7 +277,7 @@ The frontend and backend URLs are configured through environment variables.
 
 ---
 
-## 🚀 Production
+## Production
 
 Aetherion is deployed using:
 
@@ -290,7 +290,7 @@ The production architecture separates the frontend, API/realtime backend, persis
 
 ---
 
-## ◇ Project Status
+## Project Status
 
 Aetherion is an actively evolving project.
 
@@ -308,7 +308,7 @@ The goal is not simply to make the application work, but to keep improving how i
 
 ---
 
-## → Roadmap
+## Roadmap
 
 Potential future improvements include:
 
@@ -321,7 +321,7 @@ Potential future improvements include:
 
 ---
 
-## ✦ Author
+## Author
 
 **Prithwish Das**
 
@@ -331,6 +331,6 @@ The project represents an extended hands-on exploration of modern web applicatio
 
 ---
 
-## ◻ License
+## License
 
 No license has currently been declared for this repository.
