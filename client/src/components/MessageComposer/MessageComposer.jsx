@@ -60,7 +60,7 @@ const MessageComposer = ({
 
     event.preventDefault();
 
-    if (!message.trim() || isSending) {
+    if (!message.trim()) {
       return;
     }
 
@@ -77,8 +77,7 @@ const MessageComposer = ({
           onKeyDown={handleKeyDown}
           placeholder="Message"
           rows="1"
-          disabled={isSending}
-          className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto bg-transparent px-2 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] disabled:cursor-not-allowed disabled:opacity-60 sm:px-3"
+          className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto bg-transparent px-2 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] sm:px-3"
         />
 
         {/* ATTACHMENT BUTTON + PANEL */}
