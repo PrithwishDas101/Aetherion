@@ -2705,7 +2705,7 @@ const Chat = ({ socket }) => {
             <button
               type="button"
               onClick={sendMessage}
-              disabled={isSending || !message.trim()}
+              disabled={!message.trim()}
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="Send message"
             >
