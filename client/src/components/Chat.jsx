@@ -264,7 +264,8 @@ const Chat = ({ socket }) => {
       }
 
       if (response?.data) {
-        updateChatWithoutReordering(response.data);
+        // Clearing unread state must never change which chat is selected.
+        updateChatListOnly(response.data);
       }
     } catch (error) {
       logSafeClientError("Clear unread messages", error);
@@ -292,7 +293,9 @@ const Chat = ({ socket }) => {
           });
 
           if (response?.success && response?.data) {
-            updateChatWithoutReordering(response.data);
+            // This request belongs to the chat we just left. Its completion
+            // must not resurrect that chat after the user selects another one.
+            updateChatListOnly(response.data);
           }
         })
         .catch((error) => {
@@ -1205,7 +1208,7 @@ const Chat = ({ socket }) => {
     dispatch(setSelectedChat(updatedChat));
   };
 
-  const updateChatWithoutReordering = (updatedChat) => {
+  const updateChatListOnly = (updatedChat) => {
     if (!updatedChat) {
       return;
     }
@@ -1215,7 +1218,20 @@ const Chat = ({ socket }) => {
     );
 
     dispatch(setAllChats(updatedChats));
-    dispatch(setSelectedChat(updatedChat));
+  };
+
+  const updateChatWithoutReordering = (updatedChat) => {
+    if (!updatedChat) {
+      return;
+    }
+
+    updateChatListOnly(updatedChat);
+
+    // This helper is only for updates that are intentionally tied to the
+    // currently selected chat. Background work must use updateChatListOnly.
+    if (String(selectedChat?._id) === String(updatedChat._id)) {
+      dispatch(setSelectedChat(updatedChat));
+    }
   };
 
   const syncIncomingChat = (updatedChat) => {
