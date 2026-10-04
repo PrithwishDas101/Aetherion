@@ -1,4 +1,8 @@
-# Aetherion
+<h1 align="center">Aetherion</h1>
+
+<p align="center">
+  <strong>Real-time communication, built as a full-stack product.</strong>
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
@@ -9,13 +13,16 @@
   <img src="https://img.shields.io/badge/Vercel-20232A?style=for-the-badge&logo=vercel&logoColor=ffffff" alt="Vercel" />
 </p>
 
-> **Real-time communication, built as a full-stack product.**
+<p align="center">
+  A full-stack real-time messaging platform focused on reliability,<br />
+  security, expressive communication, and a polished user experience.
+</p>
 
-Aetherion is a real-time messaging platform designed and developed by **Prithwish Das**. It combines persistent conversations, live Socket.IO updates, expressive profiles, media sharing, polls, contacts, and production-ready authentication into one cohesive application.
-
-The project was built from the ground up as a serious full-stack engineering project, with an emphasis on reliability, security, realtime behavior, and a polished user experience.
-
-**Live application:** https://aetherion-lime.vercel.app/
+<p align="center">
+  <a href="https://aetherion-lime.vercel.app/">
+    <strong>Live Application →</strong>
+  </a>
+</p>
 
 ---
 
