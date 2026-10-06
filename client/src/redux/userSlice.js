@@ -12,6 +12,7 @@ const userSlice = createSlice({
     typingChats: {},
     presence: {},
     messagesByChat: {},
+    contactProfiles: {},
   },
 
   reducers: {
@@ -40,6 +41,19 @@ const userSlice = createSlice({
 
     setBootstrapReady: (state, action) => {
       state.bootstrapReady = Boolean(action.payload);
+    },
+
+    setContactProfile: (state, action) => {
+      const { userId, profileData } = action.payload || {};
+
+      if (!userId || !profileData) {
+        return;
+      }
+
+      state.contactProfiles[String(userId)] = {
+        profileData,
+        fetchedAt: Date.now(),
+      };
     },
 
     setChatMessages: (state, action) => {
@@ -188,6 +202,7 @@ export const {
   setAllChats,
   setSelectedChat,
   setBootstrapReady,
+  setContactProfile,
   setChatMessages,
   setTyping,
   clearTyping,
