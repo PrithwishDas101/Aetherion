@@ -149,8 +149,13 @@ const ContactProfile = () => {
         (state) => state.userReducer,
     );
 
-    const [profileData, setProfileData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const cachedProfileEntry = contactProfiles?.[String(userId)];
+    const cachedProfileData = cachedProfileEntry?.profileData || null;
+
+    // Seed local state synchronously from Redux so a cached profile never
+    // renders the loading screen for even one paint during route navigation.
+    const [profileData, setProfileData] = useState(cachedProfileData);
+    const [loading, setLoading] = useState(!cachedProfileData);
 
     const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
     const [mediaViewerIndex, setMediaViewerIndex] = useState(0);
