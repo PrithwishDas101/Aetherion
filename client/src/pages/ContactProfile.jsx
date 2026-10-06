@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { logSafeClientError } from "../utils/safeLogging.js";
 import {
@@ -29,6 +29,7 @@ import { removeContact } from "../apiCalls/contactApi.js";
 import { sendContactRequest, } from "../apiCalls/contactRequestApi.js";
 import AetherionDayBadge from "../components/AetherionDayBadge.jsx";
 import { getEffectivePresenceStatus } from "../utils/presenceStatus.js";
+import { setContactProfile } from "../redux/userSlice.js";
 import { getAetherionDays, getAetherionDayMilestone, } from "../utils/aetherionDays.js";
 
 const getFullName = (user) => {
@@ -137,12 +138,15 @@ const getMediaDateGroup = (value) => {
     return "Older";
 };
 
+const CONTACT_PROFILE_CACHE_TTL_MS = 2 * 60 * 1000;
+
 const ContactProfile = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { userId } = useParams();
 
-    const presence = useSelector(
-        (state) => state.userReducer?.presence || {},
+    const { presence, contactProfiles } = useSelector(
+        (state) => state.userReducer,
     );
 
     const [profileData, setProfileData] = useState(null);
@@ -162,28 +166,76 @@ const ContactProfile = () => {
 
     useEffect(() => {
         let cancelled = false;
+        const cacheEntry = contactProfiles?.[String(userId)];
+        const cachedProfileData = cacheEntry?.profileData;
+        const cachedAt = Number(cacheEntry?.fetchedAt || 0);
+        const cacheIsFresh =
+            cachedProfileData &&
+            Date.now() - cachedAt < CONTACT_PROFILE_CACHE_TTL_MS;
+
+        if (cachedProfileData) {
+            // Render cached profile data immediately. Navigation should never
+            // block on a profile request once we already know this profile.
+            setProfileData(cachedProfileData);
+            setLoading(false);
+        } else {
+            setProfileData(null);
+            setLoading(true);
+        }
+
+        if (cacheIsFresh) {
+            return () => {
+                cancelled = true;
+            };
+        }
 
         const loadProfile = async () => {
-            setLoading(true);
+            try {
+                const response = await getContactProfile(userId);
 
-            const response = await getContactProfile(userId);
+                if (cancelled) {
+                    return;
+                }
 
-            if (cancelled) {
-                return;
-            }
+                if (!response?.success) {
+                    // Keep cached data visible if a background refresh fails.
+                    if (cachedProfileData) {
+                        logSafeClientError("Refresh contact profile", response);
+                        return;
+                    }
 
-            if (!response?.success) {
-                toast.error(
-                    response?.message ||
-                    "Unable to load this profile.",
+                    toast.error(
+                        response?.message ||
+                        "Unable to load this profile.",
+                    );
+
+                    navigate(-1);
+                    return;
+                }
+
+                dispatch(
+                    setContactProfile({
+                        userId,
+                        profileData: response.data,
+                    }),
                 );
 
-                navigate(-1);
-                return;
-            }
+                setProfileData(response.data);
+                setLoading(false);
+            } catch (error) {
+                if (cancelled) {
+                    return;
+                }
 
-            setProfileData(response.data);
-            setLoading(false);
+                logSafeClientError("Load contact profile", error);
+
+                if (cachedProfileData) {
+                    return;
+                }
+
+                toast.error("Unable to load this profile.");
+                navigate(-1);
+            }
         };
 
         loadProfile();
@@ -191,7 +243,7 @@ const ContactProfile = () => {
         return () => {
             cancelled = true;
         };
-    }, [userId, navigate]);
+    }, [contactProfiles, dispatch, navigate, userId]);
 
     const profile = profileData?.profile;
 
