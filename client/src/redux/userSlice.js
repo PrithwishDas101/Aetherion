@@ -8,8 +8,10 @@ const userSlice = createSlice({
     allUsers: null,
     allChats: null,
     selectedChat: null,
+    bootstrapReady: false,
     typingChats: {},
     presence: {},
+    messagesByChat: {},
   },
 
   reducers: {
@@ -34,6 +36,23 @@ const userSlice = createSlice({
 
     setSelectedChat: (state, action) => {
       state.selectedChat = action.payload;
+    },
+
+    setBootstrapReady: (state, action) => {
+      state.bootstrapReady = Boolean(action.payload);
+    },
+
+    setChatMessages: (state, action) => {
+      const { chatId, messages } = action.payload || {};
+
+      if (!chatId || !Array.isArray(messages)) {
+        return;
+      }
+
+      state.messagesByChat[String(chatId)] = {
+        messages,
+        fetchedAt: Date.now(),
+      };
     },
 
     setTyping: (state, action) => {
@@ -168,6 +187,8 @@ export const {
   setAllUser,
   setAllChats,
   setSelectedChat,
+  setBootstrapReady,
+  setChatMessages,
   setTyping,
   clearTyping,
   setUserOnline,

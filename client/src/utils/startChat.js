@@ -1,7 +1,6 @@
 import toast from "react-hot-toast";
 
 import { createChat } from "../apiCalls/chatApi.js";
-import { hideLoader, showLoader } from "../redux/sliceLoader.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
 import { logSafeClientError } from "./safeLogging.js";
 
@@ -22,8 +21,6 @@ export const startChatWithUser = async ({
   }
 
   try {
-    dispatch(showLoader());
-
     const response = await createChat([currentUserId, targetUserId]);
 
     if (!response?.success) {
@@ -73,7 +70,5 @@ export const startChatWithUser = async ({
     toast.error("Unable to open chat.");
 
     return false;
-  } finally {
-    dispatch(hideLoader());
   }
 };

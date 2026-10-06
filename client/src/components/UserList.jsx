@@ -16,7 +16,6 @@ import {
 } from "react-icons/io5";
 
 import { createChat } from "../apiCalls/chatApi.js";
-import { hideLoader, showLoader } from "../redux/sliceLoader.js";
 import { startChatWithUser } from "../utils/startChat.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
 import store from "../redux/store.js";

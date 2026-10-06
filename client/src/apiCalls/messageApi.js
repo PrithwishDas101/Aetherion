@@ -29,9 +29,12 @@ export const createMediaMessage = async (formData) => {
 };
 
 // GET ALL MESSAGES
-export const getAllMessages = async (chatId) => {
+export const getAllMessages = async (chatId, config = {}) => {
   try {
-    const response = await axiosInstance.get(`/api/v1/message/${chatId}`);
+    const response = await axiosInstance.get(
+      `/api/v1/message/${chatId}`,
+      config,
+    );
 
     return response.data;
   } catch (error) {

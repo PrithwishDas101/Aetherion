@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
 import { getLoggedUser, getAllUsers } from "../apiCalls/userApi.js";
@@ -11,18 +11,23 @@ import {
   setAllUser,
   setAllChats,
   setInitialPresence,
+  setBootstrapReady,
 } from "../redux/userSlice.js";
 import socket from "../sockets/socket.js";
 
 function ProtectedRoute() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const bootstrapReady = useSelector(
+    (state) => state.userReducer.bootstrapReady,
+  );
   const [authStatus, setAuthStatus] = useState("checking");
 
   useEffect(() => {
     let cancelled = false;
 
     const invalidateSession = () => {
+      dispatch(setBootstrapReady(false));
       localStorage.removeItem("token");
       socket.auth = { token: null };
       socket.disconnect();
@@ -32,6 +37,11 @@ function ProtectedRoute() {
 
     const bootstrap = async () => {
       const token = localStorage.getItem("token");
+
+      if (bootstrapReady) {
+        setAuthStatus("authenticated");
+        return;
+      }
 
       if (!token) {
         if (!cancelled) {
@@ -97,6 +107,7 @@ function ProtectedRoute() {
           toast.error(chatsResponse?.message || "Unable to load your chats.");
         }
 
+        dispatch(setBootstrapReady(true));
         setAuthStatus("authenticated");
       } catch (error) {
         if (!cancelled) {
@@ -115,7 +126,7 @@ function ProtectedRoute() {
     return () => {
       cancelled = true;
     };
-  }, [dispatch, navigate]);
+  }, [bootstrapReady, dispatch, navigate]);
 
   if (authStatus !== "authenticated") {
     return null;

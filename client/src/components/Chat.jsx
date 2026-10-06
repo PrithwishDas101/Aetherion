@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FiArrowLeft, FiSmile } from "react-icons/fi";
@@ -16,8 +16,7 @@ import {
   voteOnPoll,
 } from "../apiCalls/pollApi.js";
 import { clearUnreadMessage, createChat } from "../apiCalls/chatApi.js";
-import { showLoader, hideLoader } from "../redux/sliceLoader.js";
-import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
+import { setAllChats, setSelectedChat, setChatMessages } from "../redux/userSlice.js";
 import {
   logSafeClientDiagnostic,
   logSafeClientError,
@@ -100,12 +99,12 @@ const Chat = ({ socket }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { selectedChat, user, allUsers, allChats, typingChats, presence } = useSelector(
-    (state) => state.userReducer,
-  );
+  const { selectedChat, user, allUsers, allChats, typingChats, presence, messagesByChat } =
+    useSelector((state) => state.userReducer);
 
   const [message, setMessage] = useState("");
   const [allMessages, setAllMessages] = useState([]);
+  const [isMessagesLoading, setIsMessagesLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
@@ -130,6 +129,7 @@ const Chat = ({ socket }) => {
 
   const typingTimeout = useRef(null);
   const highlightTimeoutRef = useRef(null);
+  const messageRequestIdRef = useRef(0);
 
   const messageRefs = useRef({});
   const temporaryMediaUrlsRef = useRef(new Set());
@@ -264,7 +264,8 @@ const Chat = ({ socket }) => {
       }
 
       if (response?.data) {
-        updateChatWithoutReordering(response.data);
+        // Clearing unread state must never change which chat is selected.
+        updateChatListOnly(response.data);
       }
     } catch (error) {
       logSafeClientError("Clear unread messages", error);
@@ -273,36 +274,33 @@ const Chat = ({ socket }) => {
     }
   };
 
-  const leaveChat = async () => {
+  const leaveChat = () => {
     const chatId = selectedChat?._id;
 
-    if (!chatId) {
-      dispatch(setSelectedChat(null));
-      return;
-    }
+    dividerVisibleRef.current = false;
+    setDividerVisible(false);
+    newMessageCountRef.current = 0;
+    setNewMessageCount(0);
+    setFirstNewMessageId(null);
+    dispatch(setSelectedChat(null));
 
-    try {
-      const response = await clearUnreadMessage(chatId);
+    if (chatId) {
+      clearUnreadMessage(chatId)
+        .then((response) => {
+          logSafeClientDiagnostic("Leave chat unread clear completed", {
+            chatId,
+            success: response?.success,
+          });
 
-      logSafeClientDiagnostic("Leave chat unread clear completed", {
-        chatId,
-        success: response?.success,
-      });
-
-      if (response?.success && response?.data) {
-        updateChatWithoutReordering(response.data);
-      }
-    } catch (error) {
-      logSafeClientError("Leave chat unread clear", error);
-    } finally {
-      dividerVisibleRef.current = false;
-      setDividerVisible(false);
-
-      newMessageCountRef.current = 0;
-      setNewMessageCount(0);
-      setFirstNewMessageId(null);
-
-      dispatch(setSelectedChat(null));
+          if (response?.success && response?.data) {
+            // This request belongs to the chat we just left. Its completion
+            // must not resurrect that chat after the user selects another one.
+            updateChatListOnly(response.data);
+          }
+        })
+        .catch((error) => {
+          logSafeClientError("Leave chat unread clear", error);
+        });
     }
   };
 
@@ -395,8 +393,6 @@ const Chat = ({ socket }) => {
     }
 
     try {
-      dispatch(showLoader());
-
       // CHECK FOR EXISTING CHAT
       const existingChat = (allChats || []).find((chat) => {
         const memberIds = (chat.members || [])
@@ -456,8 +452,6 @@ const Chat = ({ socket }) => {
         error?.response?.data?.message ||
         "Unable to open chat.",
       );
-    } finally {
-      dispatch(hideLoader());
     }
   };
 
@@ -1214,7 +1208,7 @@ const Chat = ({ socket }) => {
     dispatch(setSelectedChat(updatedChat));
   };
 
-  const updateChatWithoutReordering = (updatedChat) => {
+  const updateChatListOnly = (updatedChat) => {
     if (!updatedChat) {
       return;
     }
@@ -1224,7 +1218,20 @@ const Chat = ({ socket }) => {
     );
 
     dispatch(setAllChats(updatedChats));
-    dispatch(setSelectedChat(updatedChat));
+  };
+
+  const updateChatWithoutReordering = (updatedChat) => {
+    if (!updatedChat) {
+      return;
+    }
+
+    updateChatListOnly(updatedChat);
+
+    // This helper is only for updates that are intentionally tied to the
+    // currently selected chat. Background work must use updateChatListOnly.
+    if (String(selectedChat?._id) === String(updatedChat._id)) {
+      dispatch(setSelectedChat(updatedChat));
+    }
   };
 
   const syncIncomingChat = (updatedChat) => {
@@ -1879,27 +1886,54 @@ const Chat = ({ socket }) => {
   };
 
   // FETCH MESSAGES
-  const getMessages = async () => {
-    if (!selectedChat?._id) {
-      return;
+  const getMessages = async ({ chatId, requestId, signal }) => {
+    const cachedEntry = messagesByChat?.[String(chatId)];
+
+    if (cachedEntry) {
+      setAllMessages(cachedEntry.messages || []);
+      setIsMessagesLoading(false);
+    } else {
+      setAllMessages([]);
+      setIsMessagesLoading(true);
     }
 
     try {
-      dispatch(showLoader());
+      const response = await getAllMessages(chatId, { signal });
 
-      const response = await getAllMessages(selectedChat._id);
+      // A cancelled/aborted request may resolve without a response body.
+      if (!response) {
+        return;
+      }
 
       if (response?.success) {
-        setAllMessages(response.data || []);
-      } else {
+        const messages = response.data || [];
+
+        // Background refreshes may still populate their own chat cache,
+        // but only the latest request may update the visible conversation.
+        dispatch(
+          setChatMessages({
+            chatId,
+            messages,
+          }),
+        );
+
+        if (messageRequestIdRef.current === requestId) {
+          setAllMessages(messages);
+        }
+      } else if (messageRequestIdRef.current === requestId) {
         toast.error(response?.message || "Unable to fetch messages.");
       }
     } catch (error) {
-      logSafeClientError("Get messages", error);
+      if (messageRequestIdRef.current !== requestId) {
+        return;
+      }
 
+      logSafeClientError("Get messages", error);
       toast.error("Unable to fetch messages.");
     } finally {
-      dispatch(hideLoader());
+      if (messageRequestIdRef.current === requestId) {
+        setIsMessagesLoading(false);
+      }
     }
   };
 
@@ -1962,7 +1996,7 @@ const Chat = ({ socket }) => {
   };
 
   // RESET WHEN CHAT CHANGES
-  useEffect(() => {
+  useLayoutEffect(() => {
     hasInitialScrolledRef.current = false;
     isNearBottomRef.current = true;
     previousMessageCountRef.current = 0;
@@ -1973,19 +2007,63 @@ const Chat = ({ socket }) => {
 
     initialUnreadCountRef.current = unreadMessageCount;
 
-    setAllMessages([]);
+    const cachedMessages = selectedChat?._id
+      ? messagesByChat?.[String(selectedChat._id)]?.messages
+      : null;
+
+    setAllMessages(Array.isArray(cachedMessages) ? cachedMessages : []);
+    setIsMessagesLoading(!Array.isArray(cachedMessages));
     setNewMessagesState(0, null);
     setReplyingTo(null);
   }, [selectedChat?._id]);
 
   // LOAD CHAT
   useEffect(() => {
+    const requestId = ++messageRequestIdRef.current;
+    const controller = new AbortController();
+    const chatId = selectedChat?._id;
+
+    if (!chatId) {
+      return () => {
+        controller.abort();
+      };
+    }
+
+    getMessages({
+      chatId,
+      requestId,
+      signal: controller.signal,
+    });
+
+    return () => {
+      controller.abort();
+    };
+  }, [selectedChat?._id]);
+
+  // KEEP THE REDUX CACHE IN SYNC WITH THE ACTIVE CHAT
+  useEffect(() => {
     if (!selectedChat?._id) {
       return;
     }
 
-    getMessages();
-  }, [selectedChat?._id]);
+    // Do not turn the temporary empty state during an uncached chat switch
+    // into a real cache entry. The network response owns that cache entry.
+    if (isMessagesLoading && allMessages.length === 0) {
+      return;
+    }
+
+    dispatch(
+      setChatMessages({
+        chatId: selectedChat._id,
+        messages: allMessages,
+      }),
+    );
+  }, [
+    dispatch,
+    selectedChat?._id,
+    allMessages,
+    isMessagesLoading,
+  ]);
 
   useEffect(() => {
     if (
@@ -2449,7 +2527,13 @@ const Chat = ({ socket }) => {
       >
         <div className="flex min-h-full min-w-0 flex-col gap-2">
           {/* EMPTY CHAT */}
-          {allMessages.length === 0 && (
+          {isMessagesLoading && allMessages.length === 0 && (
+            <div className="flex flex-1 items-center justify-center">
+              <p className="text-sm text-[#70786f]">Loading messages...</p>
+            </div>
+          )}
+
+          {!isMessagesLoading && allMessages.length === 0 && (
             <div className="flex flex-1 items-center justify-center">
               <p className="text-sm text-[#70786f]">No messages yet.</p>
             </div>
