@@ -374,6 +374,6 @@ Use the same Supabase project for client and server. Never expose a Supabase ser
    - `http://localhost:5173/auth/callback`
    - `https://aetherion-lime.vercel.app/auth/callback`
    - Any other exact Aetherion origin you use, followed by `/auth/callback`.
-4. Set the Supabase Site URL to the deployed Aetherion URL you use most often. Redirect URLs must be allow-listed.
+4. If this is the same Supabase project already used by NoteNest, keep the existing Site URL unchanged and only add the Aetherion callback URLs above. Changing the Site URL can affect NoteNest redirects. If Aetherion has its own Supabase project, set its Site URL to the deployed Aetherion URL.
 
 OAuth users are created in Aetherion's existing MongoDB user collection and receive Aetherion JWTs. Provider accounts must expose a verified email address. If that verified email already belongs to an Aetherion account, social sign-in uses the existing account and leaves its password login intact.
