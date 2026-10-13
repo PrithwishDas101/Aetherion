@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { randomBytes } from "node:crypto";
 
 import User from "../models/User.js";
 import { uploadImage, deleteImage } from "../services/cloudinaryService.js";
@@ -295,5 +296,80 @@ export const logout = async (req, res) => {
       success: false,
       message: "Internal server error",
     });
+  }
+};
+
+
+// Social sign-in verifies the Supabase access token, then issues an Aetherion JWT.
+export const oauthLogin = async (req, res) => {
+  try {
+    const { accessToken } = req.body || {};
+    if (typeof accessToken !== "string" || !accessToken.trim()) {
+      return res.status(400).json({ success: false, message: "A valid social sign-in session is required." });
+    }
+    const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/+$/, "");
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return res.status(503).json({ success: false, message: "Social sign-in is not configured on the server yet." });
+    }
+    const verified = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: supabaseAnonKey, Authorization: `Bearer ${accessToken}` },
+    });
+    if (!verified.ok) {
+      return res.status(401).json({ success: false, message: "Your social sign-in session is invalid or expired. Please try again." });
+    }
+    const authUser = await verified.json();
+    const providers = [
+      authUser?.app_metadata?.provider,
+      ...(Array.isArray(authUser?.identities) ? authUser.identities.map((identity) => identity?.provider) : []),
+    ].filter(Boolean);
+    if (!providers.some((provider) => ["google", "github"].includes(provider))) {
+      return res.status(403).json({ success: false, message: "Please sign in with Google or GitHub." });
+    }
+    const email = typeof authUser.email === "string" ? authUser.email.trim().toLowerCase() : "";
+    if (!email || !authUser.email_confirmed_at) {
+      return res.status(403).json({ success: false, message: "This provider account must supply a verified email address." });
+    }
+    const metadata = authUser.user_metadata || {};
+    const displayName = String(metadata.full_name || metadata.name || metadata.user_name || metadata.preferred_username || "").trim();
+    const parts = displayName.split(/\s+/).filter(Boolean);
+    const first = (parts.shift() || String(metadata.given_name || "Aetherion")).slice(0, 50);
+    const last = (parts.join(" ") || String(metadata.family_name || "Member")).slice(0, 50);
+    const avatar = typeof metadata.avatar_url === "string" ? metadata.avatar_url : typeof metadata.picture === "string" ? metadata.picture : "";
+    let user = await User.findOne({ email }).select("+authVersion");
+    if (!user) {
+      const unusablePassword = await bcrypt.hash(randomBytes(32).toString("hex"), 10);
+      try {
+        user = await User.create({
+          firstName: first.length >= 2 ? first : "Aetherion",
+          lastName: last.length >= 2 ? last : "Member",
+          email,
+          password: unusablePassword,
+          profilePic: avatar,
+        });
+      } catch (error) {
+        if (error.code !== 11000) throw error;
+        user = await User.findOne({ email }).select("+authVersion");
+        if (!user) throw error;
+      }
+    }
+    if (!user) return res.status(500).json({ success: false, message: "Unable to create your account. Please try again." });
+    const token = jwt.sign({ userId: user._id, authVersion: getAuthVersion(user) }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    return res.status(200).json({
+      success: true,
+      message: "Social login successful",
+      token,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        profilePic: user.profilePic,
+        avatarDecoration: user.avatarDecoration,
+      },
+    });
+  } catch (error) {
+    logSafeError("Social login", error);
+    return res.status(500).json({ success: false, message: "Social sign-in failed. Please try again." });
   }
 };

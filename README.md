@@ -341,3 +341,39 @@ The project represents an extended hands-on exploration of modern web applicatio
 ## License
 
 No license has currently been declared for this repository.
+
+
+## Social sign-in (Google and GitHub)
+
+Aetherion keeps its existing MongoDB-backed email/password accounts and application JWTs. Google and GitHub use Supabase OAuth to verify the provider session; Aetherion then issues its own JWT so the existing protected pages, chats, and sockets continue to use the same authentication system.
+
+### Environment variables
+
+Add to `client/.env` (or `client/.env.local`):
+
+```env
+VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
+VITE_API_URL=https://YOUR_AETHERION_API
+```
+
+Add to the server environment:
+
+```env
+SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
+```
+
+Use the same Supabase project for client and server. Never expose a Supabase service-role key in the browser.
+
+### Supabase setup
+
+1. In Supabase, open **Authentication → Sign In / Providers** and enable **Google** and **GitHub**.
+2. Configure provider credentials. For GitHub, create an OAuth App in GitHub Developer Settings and use the exact callback URL shown in Supabase as the GitHub Authorization callback URL.
+3. In **Authentication → URL Configuration**, add:
+   - `http://localhost:5173/auth/callback`
+   - `https://aetherion-lime.vercel.app/auth/callback`
+   - Any other exact Aetherion origin you use, followed by `/auth/callback`.
+4. Set the Supabase Site URL to the deployed Aetherion URL you use most often. Redirect URLs must be allow-listed.
+
+OAuth users are created in Aetherion's existing MongoDB user collection and receive Aetherion JWTs. Provider accounts must expose a verified email address. If that verified email already belongs to an Aetherion account, social sign-in uses the existing account and leaves its password login intact.

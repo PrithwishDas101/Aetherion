@@ -7,6 +7,7 @@ import { signupUser } from "../apiCalls/authApi.js";
 import { hideLoader, showLoader } from "../redux/sliceLoader.js";
 import compressImage from "../utils/compressImage.js";
 import { logSafeClientError } from "../utils/safeLogging.js";
+import OAuthButtons from "../components/OAuthButtons.jsx";
 
 function Signup() {
   const dispatch = useDispatch();
@@ -302,6 +303,8 @@ function Signup() {
                 Create Account
               </button>
             </form>
+
+            <OAuthButtons />
 
             {/* Login */}
             <div className="mt-3 text-center text-sm text-[#858d84]">
