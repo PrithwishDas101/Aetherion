@@ -19,20 +19,20 @@ const palettes = {
     glow: "#D5E1D0",
   },
   night: {
-    page: "#0B1020",
-    surface: "#151D2F",
-    input: "#10182A",
-    border: "#2B3650",
-    text: "#F2F5FC",
-    muted: "#A4AEC3",
-    accent: "#9DAFFF",
-    primary: "#EAF0FF",
-    primaryText: "#10182A",
-    panel: "#111A2B",
-    panelText: "#F2F5FC",
-    panelMuted: "#A4AEC3",
-    line: "#6278B9",
-    glow: "#263B69",
+    page: "#090B0A",
+    surface: "#131715",
+    input: "#0E1210",
+    border: "#2A312C",
+    text: "#F1F5F1",
+    muted: "#9BA69E",
+    accent: "#B6E2C5",
+    primary: "#EAF4ED",
+    primaryText: "#111612",
+    panel: "#0C100E",
+    panelText: "#F1F5F1",
+    panelMuted: "#9BA69E",
+    line: "#638D73",
+    glow: "#254B35",
   },
 };
 
@@ -98,7 +98,7 @@ export default function AuthLayout({ children, page = "login" }) {
         <p className="pt-2 text-center text-xs text-[var(--auth-muted)] lg:text-left">Thoughtfully made for your next chapter.</p>
       </section>
 
-      <aside className="relative m-3 hidden min-h-[calc(100vh-1.5rem)] overflow-hidden rounded-[28px] bg-[var(--auth-panel)] p-10 text-[var(--auth-panel-text)] transition-colors duration-300 lg:flex lg:flex-col xl:p-14">
+      <aside style={{ backgroundColor: palette.panel, backgroundImage: theme === "night" ? "radial-gradient(ellipse at 92% 3%, rgba(190, 255, 211, 0.20) 0%, rgba(91, 166, 119, 0.10) 20%, transparent 46%)" : undefined }} className="relative m-3 hidden min-h-[calc(100vh-1.5rem)] overflow-hidden rounded-[28px] bg-[var(--auth-panel)] p-10 text-[var(--auth-panel-text)] transition-colors duration-300 lg:flex lg:flex-col xl:p-14">
         <div className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full opacity-70 blur-3xl" style={{ background: palette.glow }} />
         <div className="pointer-events-none absolute -bottom-32 -left-24 h-[360px] w-[360px] rounded-full opacity-60 blur-3xl" style={{ background: palette.glow }} />
         <div className="relative z-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--auth-panel-muted)]">
