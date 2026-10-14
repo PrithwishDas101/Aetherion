@@ -4,11 +4,67 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../apiCalls/authApi.js";
 import { hideLoader, showLoader } from "../redux/sliceLoader.js";
+import AuthLayout from "../components/AuthLayout.jsx";
 import OAuthButtons from "../components/OAuthButtons.jsx";
+
 function Login() {
- const dispatch=useDispatch(), navigate=useNavigate(), location=useLocation();
- const [user,setUser]=React.useState({email:location.state?.email||"",password:""});
- async function onFormSubmit(event){event.preventDefault();dispatch(showLoader());try{const response=await loginUser(user);if(response.success){localStorage.setItem("token",response.token);toast(`Welcome ${response.user.firstName}`,{icon:null});navigate("/");}else toast.error(response.message);}catch{toast.error("Something went wrong. Please try again later.");}finally{dispatch(hideLoader());}}
- return <div className="relative min-h-screen w-full overflow-hidden font-sans"><div className="fixed inset-0 -z-20 bg-[#0A0D1A]" style={{backgroundImage:"radial-gradient(ellipse at 50% 0%, rgba(191,181,255,0.13), transparent 48%), radial-gradient(ellipse at 100% 100%, rgba(85,103,175,0.12), transparent 42%)"}}/><div className="relative z-10 flex min-h-screen w-full items-center justify-center px-4 py-4"><div className="h-auto min-h-[540px] w-full max-w-[450px] rounded-[28px] border border-[#BFB5FF]/20 bg-[#141930]/95 shadow-[0_25px_80px_rgba(0,0,0,0.65)] backdrop-blur-md"><div className="px-5 pb-6 pt-6 sm:px-10"><div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#BFB5FF]/35 bg-[#1E2545]"><img src="/images/logo.png" alt="Aetherion logo" className="h-full w-full object-contain"/></div><div className="mt-3 text-center text-lg tracking-[0.45em] text-[#F7F7FC]"><span className="mr-3 text-[#BFB5FF]">✦</span>AETHERION<span className="ml-3 text-[#BFB5FF]">✦</span></div><div className="mt-6 text-center"><h1 className="text-3xl font-semibold tracking-[0.25rem] text-[#F7F7FC]">Welcome</h1><p className="mt-2 text-sm text-[#A0A7C2] sm:text-base">Log in to continue.</p></div><OAuthButtons/><div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#858DAA]"><span className="h-px flex-1 bg-[#BFB5FF]/15" /><span>or</span><span className="h-px flex-1 bg-[#BFB5FF]/15" /></div><form onSubmit={onFormSubmit} className="mx-auto mt-0 max-w-[560px]"><div><label htmlFor="email" className="mb-3 block text-sm text-[#D8D9E8]">Email Address</label><input id="email" type="email" placeholder="you@example.com" value={user.email} onChange={e=>setUser({...user,email:e.target.value})} className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 py-2 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"/></div><div className="mt-4"><label htmlFor="password" className="mb-1 block text-sm text-[#D8D9E8]">Password</label><input id="password" type="password" placeholder="Enter your password" value={user.password} onChange={e=>setUser({...user,password:e.target.value})} className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 py-2 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"/></div><button type="submit" className="mt-6 h-10 w-full rounded-full border border-white bg-white text-base font-semibold text-[#0A0D1A] transition-all hover:bg-[#D8D2FF]">Log In</button></form><div className="mt-5 text-center text-sm text-[#A0A7C2]">Don't have an account yet?<Link to="/signup" className="ml-1 text-[#BFB5FF] hover:text-[#D8D2FF]">Sign Up</Link></div></div></div></div></div>;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [user, setUser] = React.useState({
+    email: location.state?.email || "",
+    password: "",
+  });
+
+  async function onFormSubmit(event) {
+    event.preventDefault();
+    dispatch(showLoader());
+    try {
+      const response = await loginUser(user);
+      if (response.success) {
+        localStorage.setItem("token", response.token);
+        toast(`Welcome ${response.user.firstName}`, { icon: null });
+        navigate("/");
+      } else {
+        toast.error(response.message);
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again later.");
+    } finally {
+      dispatch(hideLoader());
+    }
+  }
+
+  return (
+    <AuthLayout page="login">
+      <div>
+        <p className="text-sm font-medium text-[var(--auth-accent)]">Good to see you again</p>
+        <h1 className="mt-3 text-[34px] font-semibold leading-[1.08] tracking-[-0.055em] text-[var(--auth-text)] sm:text-[38px]">Welcome back.</h1>
+        <p className="mt-3 text-sm leading-6 text-[var(--auth-muted)]">Sign in to continue to your Aetherion space.</p>
+      </div>
+
+      <form onSubmit={onFormSubmit} className="mt-8 space-y-4">
+        <div>
+          <label htmlFor="email" className="mb-2 block text-[13px] font-medium text-[var(--auth-text)]">Email address</label>
+          <input id="email" name="email" type="email" autoComplete="email" required placeholder="you@example.com" value={user.email} onChange={(event) => setUser({ ...user, email: event.target.value })} className="h-[50px] w-full rounded-xl border border-[var(--auth-border)] bg-[var(--auth-input)] px-4 text-sm text-[var(--auth-text)] outline-none transition placeholder:text-[var(--auth-muted)]/70 focus:border-[var(--auth-accent)] focus:ring-4 focus:ring-[var(--auth-accent)]/10" />
+        </div>
+        <div>
+          <label htmlFor="password" className="mb-2 block text-[13px] font-medium text-[var(--auth-text)]">Password</label>
+          <input id="password" name="password" type="password" autoComplete="current-password" required placeholder="Enter your password" value={user.password} onChange={(event) => setUser({ ...user, password: event.target.value })} className="h-[50px] w-full rounded-xl border border-[var(--auth-border)] bg-[var(--auth-input)] px-4 text-sm text-[var(--auth-text)] outline-none transition placeholder:text-[var(--auth-muted)]/70 focus:border-[var(--auth-accent)] focus:ring-4 focus:ring-[var(--auth-accent)]/10" />
+        </div>
+        <button type="submit" className="h-[50px] w-full rounded-xl bg-[var(--auth-primary)] px-4 text-sm font-semibold text-[var(--auth-primary-text)] transition duration-150 hover:opacity-90 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--auth-accent)]/25">Log in</button>
+      </form>
+
+      <div className="my-6 flex items-center gap-3 text-xs text-[var(--auth-muted)]">
+        <span className="h-px flex-1 bg-[var(--auth-border)]" />
+        <span>or continue with</span>
+        <span className="h-px flex-1 bg-[var(--auth-border)]" />
+      </div>
+      <OAuthButtons />
+
+      <p className="mt-7 text-center text-sm text-[var(--auth-muted)]">New to Aetherion? <Link to="/signup" className="font-semibold text-[var(--auth-accent)] underline-offset-4 transition hover:underline">Create an account</Link></p>
+    </AuthLayout>
+  );
 }
+
 export default Login;
