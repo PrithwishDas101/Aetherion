@@ -101,183 +101,44 @@ function Signup() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden font-sans">
-      {/* Background image */}
-      <div
-        className="fixed inset-0 -z-20 bg-[#0A0D1A]"
-        style={{
-          backgroundImage: "radial-gradient(ellipse at 50% 0%, rgba(191,181,255,0.13), transparent 48%), radial-gradient(ellipse at 100% 100%, rgba(85,103,175,0.12), transparent 42%)",
-        }}
-      />
-
-      {/* Page layout */}
-      <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-4 py-4">
-        {/* Card */}
-        <div className="w-full max-w-[520px] rounded-[28px] border border-[#BFB5FF]/20 bg-[#141930]/95 shadow-[0_25px_80px_rgba(0,0,0,0.65)] backdrop-blur-md">
-          {/* Card content */}
-          <div className="px-5 pb-5 pt-5 sm:px-10">
-            {/* Logo */}
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#BFB5FF]/35 bg-[#1E2545] text-2xl text-[#BFB5FF] shadow-[0_0_30px_rgba(216,244,90,0.12)]">
-              <img
-                src="/images/logo.png"
-                alt="Aetherion logo"
-                className="h-full w-full object-contain"
-              />
+    <main className="flex min-h-screen items-center justify-center bg-[#F5F5F7] px-4 py-8 font-sans text-[#171923]">
+      <section className="w-full max-w-[480px] rounded-[24px] border border-black/[0.05] bg-white px-6 py-7 shadow-[0_16px_48px_rgba(22,24,40,0.08)] sm:px-9 sm:py-8">
+        <header className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-[#F0EDFF]">
+            <img src="/images/logo.png" alt="Aetherion logo" className="h-full w-full object-contain" />
+          </div>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#7162C9]">Aetherion</p>
+          <h1 className="mt-4 text-[28px] font-semibold tracking-[-0.04em] text-[#171923] sm:text-[30px]">Create your account</h1>
+          <p className="mt-2 text-sm leading-6 text-[#737583]">A few details and you’re ready to get started.</p>
+        </header>
+        <div className="mt-6"><OAuthButtons /></div>
+        <div className="my-5 flex items-center gap-3 text-xs text-[#9294A0]">
+          <span className="h-px flex-1 bg-[#E8E8EE]" /><span>or sign up with email</span><span className="h-px flex-1 bg-[#E8E8EE]" />
+        </div>
+        <form onSubmit={onFormSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="firstName" className="mb-1.5 block text-[13px] font-medium text-[#383A46]">First name</label>
+              <input id="firstName" name="firstName" type="text" autoComplete="given-name" placeholder="John" value={user.firstName} onChange={(e) => setUser({ ...user, firstName: e.target.value })} className="h-12 w-full rounded-xl border border-[#E4E5EC] bg-[#F7F7FA] px-4 text-sm text-[#171923] outline-none transition placeholder:text-[#A1A2AD] focus:border-[#8B7CF6] focus:bg-white focus:ring-4 focus:ring-[#8B7CF6]/10" />
             </div>
-
-            {/* Aetherion */}
-            <div className="mt-3 text-center text-base tracking-[0.45em] text-[#F7F7FC]">
-              <span className="mr-3 text-[#BFB5FF]">✦</span>
-              AETHERION
-              <span className="ml-3 text-[#BFB5FF]">✦</span>
-            </div>
-
-            {/* Heading */}
-            <div className="mt-2 text-center">
-              <h1 className="text-2xl font-semibold text-[#F7F7FC] sm:text-3xl tracking-[0.25rem]">
-                Create Your Account
-              </h1>
-
-              <p className="mt-1 text-xs text-[#A0A7C2] xs:text-base">
-                Create your account and start connecting with people.
-              </p>
-            </div>
-
-            <OAuthButtons />
-            <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#858DAA]"><span className="h-px flex-1 bg-[#BFB5FF]/15" /><span>or</span><span className="h-px flex-1 bg-[#BFB5FF]/15" /></div>
-
-
-
-
-            {/* Form */}
-            <form onSubmit={onFormSubmit} className="mx-auto max-w-[560px]">
-              {/* First + Last Name */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-                {/* First Name */}
-                <div>
-                  <label
-                    htmlFor="firstName"
-                    className="mb-1 block text-sm text-[#D8D9E8]"
-                  >
-                    First Name
-                  </label>
-
-                  <input
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    placeholder="John"
-                    value={user.firstName}
-                    onChange={(e) =>
-                      setUser({
-                        ...user,
-                        firstName: e.target.value,
-                      })
-                    }
-                    className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"
-                  />
-                </div>
-
-                {/* Last Name */}
-                <div>
-                  <label
-                    htmlFor="lastName"
-                    className="mb-1 block text-sm text-[#D8D9E8]"
-                  >
-                    Last Name
-                  </label>
-
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    placeholder="Doe"
-                    value={user.lastName}
-                    onChange={(e) =>
-                      setUser({
-                        ...user,
-                        lastName: e.target.value,
-                      })
-                    }
-                    className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"
-                  />
-                </div>
-              </div>
-
-              {/* Email */}
-              <div className="mt-3">
-                <label
-                  htmlFor="email"
-                  className="mb-1 block text-sm text-[#D8D9E8]"
-                >
-                  Email Address
-                </label>
-
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={user.email}
-                  onChange={(e) =>
-                    setUser({
-                      ...user,
-                      email: e.target.value,
-                    })
-                  }
-                  className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"
-                />
-              </div>
-
-              {/* Password */}
-              <div className="mt-4">
-                <label
-                  htmlFor="password"
-                  className="mb-1 block text-sm text-[#D8D9E8]"
-                >
-                  Password
-                </label>
-
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Create a password"
-                  value={user.password}
-                  onChange={(e) =>
-                    setUser({
-                      ...user,
-                      password: e.target.value,
-                    })
-                  }
-                  className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"
-                />
-              </div>
-
-              {/* Button */}
-              <button
-                type="submit"
-                className="mt-6 h-10 w-full rounded-full border border-white bg-white text-base font-semibold text-[#0A0D1A] transition-all duration-200 hover:bg-[#EDEBFF] active:scale-[0.98]"
-              >
-                Create Account
-              </button>
-            </form>
-
-
-            {/* Login */}
-            <div className="mt-3 text-center text-sm text-[#A0A7C2]">
-              Already have an account?
-              <Link
-                to="/login"
-                className="ml-1 text-[#BFB5FF] hover:text-[#D8D2FF]"
-              >
-                Log in
-              </Link>
+            <div>
+              <label htmlFor="lastName" className="mb-1.5 block text-[13px] font-medium text-[#383A46]">Last name</label>
+              <input id="lastName" name="lastName" type="text" autoComplete="family-name" placeholder="Doe" value={user.lastName} onChange={(e) => setUser({ ...user, lastName: e.target.value })} className="h-12 w-full rounded-xl border border-[#E4E5EC] bg-[#F7F7FA] px-4 text-sm text-[#171923] outline-none transition placeholder:text-[#A1A2AD] focus:border-[#8B7CF6] focus:bg-white focus:ring-4 focus:ring-[#8B7CF6]/10" />
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+          <div>
+            <label htmlFor="email" className="mb-1.5 block text-[13px] font-medium text-[#383A46]">Email address</label>
+            <input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} className="h-12 w-full rounded-xl border border-[#E4E5EC] bg-[#F7F7FA] px-4 text-sm text-[#171923] outline-none transition placeholder:text-[#A1A2AD] focus:border-[#8B7CF6] focus:bg-white focus:ring-4 focus:ring-[#8B7CF6]/10" />
+          </div>
+          <div>
+            <label htmlFor="password" className="mb-1.5 block text-[13px] font-medium text-[#383A46]">Password</label>
+            <input id="password" name="password" type="password" autoComplete="new-password" placeholder="Create a password" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} className="h-12 w-full rounded-xl border border-[#E4E5EC] bg-[#F7F7FA] px-4 text-sm text-[#171923] outline-none transition placeholder:text-[#A1A2AD] focus:border-[#8B7CF6] focus:bg-white focus:ring-4 focus:ring-[#8B7CF6]/10" />
+          </div>
+          <button type="submit" className="h-12 w-full rounded-xl bg-[#171923] text-sm font-semibold text-white transition duration-150 hover:bg-[#2C2E3B] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#8B7CF6]/25">Create account</button>
+        </form>
+        <p className="mt-6 text-center text-sm text-[#737583]">Already have an account? <Link to="/login" className="font-semibold text-[#7162C9] transition hover:text-[#5545B5]">Log in</Link></p>
+      </section>
+    </main>
   );
 }
 
