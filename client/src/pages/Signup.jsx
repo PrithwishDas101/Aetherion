@@ -101,23 +101,23 @@ function Signup() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
+    <div className="relative min-h-screen w-full overflow-hidden font-sans">
       {/* Background image */}
       <div
-        className="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 -z-20 bg-[#0A0D1A]"
         style={{
-          backgroundImage: "url('/images/background-aetherion.png')",
+          backgroundImage: "radial-gradient(ellipse at 50% 0%, rgba(191,181,255,0.13), transparent 48%), radial-gradient(ellipse at 100% 100%, rgba(85,103,175,0.12), transparent 42%)",
         }}
       />
 
       {/* Page layout */}
       <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-4 py-4">
         {/* Card */}
-        <div className="w-full max-w-[520px] rounded-[28px] border border-[#d8f45a]/25 bg-[#111612]/90 shadow-[0_25px_80px_rgba(0,0,0,0.65)] backdrop-blur-md">
+        <div className="w-full max-w-[520px] rounded-[28px] border border-[#BFB5FF]/20 bg-[#141930]/95 shadow-[0_25px_80px_rgba(0,0,0,0.65)] backdrop-blur-md">
           {/* Card content */}
           <div className="px-5 pb-5 pt-5 sm:px-10">
             {/* Logo */}
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#d8f45a]/50 bg-[#050906] text-2xl text-[#d8f45a] shadow-[0_0_30px_rgba(216,244,90,0.12)]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#BFB5FF]/35 bg-[#1E2545] text-2xl text-[#BFB5FF] shadow-[0_0_30px_rgba(216,244,90,0.12)]">
               <img
                 src="/images/logo.png"
                 alt="Aetherion logo"
@@ -126,25 +126,25 @@ function Signup() {
             </div>
 
             {/* Aetherion */}
-            <div className="mt-3 text-center text-base tracking-[0.45em] text-[#f1eee8]">
-              <span className="mr-3 text-[#d8f45a]">✦</span>
+            <div className="mt-3 text-center text-base tracking-[0.45em] text-[#F7F7FC]">
+              <span className="mr-3 text-[#BFB5FF]">✦</span>
               AETHERION
-              <span className="ml-3 text-[#d8f45a]">✦</span>
+              <span className="ml-3 text-[#BFB5FF]">✦</span>
             </div>
 
             {/* Heading */}
             <div className="mt-2 text-center">
-              <h1 className="text-2xl font-semibold text-[#f1eee8] sm:text-3xl tracking-[0.25rem]">
+              <h1 className="text-2xl font-semibold text-[#F7F7FC] sm:text-3xl tracking-[0.25rem]">
                 Create Your Account
               </h1>
 
-              <p className="mt-1 text-xs text-[#9ca39a] xs:text-base">
+              <p className="mt-1 text-xs text-[#A0A7C2] xs:text-base">
                 Create your account and start connecting with people.
               </p>
             </div>
 
             <OAuthButtons />
-            <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#70786f]"><span className="h-px flex-1 bg-[#d8f45a]/15" /><span>or</span><span className="h-px flex-1 bg-[#d8f45a]/15" /></div>
+            <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#858DAA]"><span className="h-px flex-1 bg-[#BFB5FF]/15" /><span>or</span><span className="h-px flex-1 bg-[#BFB5FF]/15" /></div>
 
 
 
@@ -157,7 +157,7 @@ function Signup() {
                 <div>
                   <label
                     htmlFor="firstName"
-                    className="mb-1 block text-sm text-[#d0d4cc]"
+                    className="mb-1 block text-sm text-[#D8D9E8]"
                   >
                     First Name
                   </label>
@@ -174,7 +174,7 @@ function Signup() {
                         firstName: e.target.value,
                       })
                     }
-                    className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                    className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"
                   />
                 </div>
 
@@ -182,7 +182,7 @@ function Signup() {
                 <div>
                   <label
                     htmlFor="lastName"
-                    className="mb-1 block text-sm text-[#d0d4cc]"
+                    className="mb-1 block text-sm text-[#D8D9E8]"
                   >
                     Last Name
                   </label>
@@ -199,7 +199,7 @@ function Signup() {
                         lastName: e.target.value,
                       })
                     }
-                    className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                    className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"
                   />
                 </div>
               </div>
@@ -208,7 +208,7 @@ function Signup() {
               <div className="mt-3">
                 <label
                   htmlFor="email"
-                  className="mb-1 block text-sm text-[#d0d4cc]"
+                  className="mb-1 block text-sm text-[#D8D9E8]"
                 >
                   Email Address
                 </label>
@@ -225,7 +225,7 @@ function Signup() {
                       email: e.target.value,
                     })
                   }
-                  className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                  className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"
                 />
               </div>
 
@@ -233,7 +233,7 @@ function Signup() {
               <div className="mt-4">
                 <label
                   htmlFor="password"
-                  className="mb-1 block text-sm text-[#d0d4cc]"
+                  className="mb-1 block text-sm text-[#D8D9E8]"
                 >
                   Password
                 </label>
@@ -250,14 +250,14 @@ function Signup() {
                       password: e.target.value,
                     })
                   }
-                  className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
+                  className="h-10 w-full rounded-xl border border-white/10 bg-[#1E2545] px-4 text-[#F7F7FC] outline-none placeholder:text-[#858DAA] focus:border-[#BFB5FF]/80 focus:ring-2 focus:ring-[#BFB5FF]/15"
                 />
               </div>
 
               {/* Button */}
               <button
                 type="submit"
-                className="mt-6 h-10 w-full rounded-full border-2 border-[#f0ff6a] bg-[#d8f45a] text-base font-semibold text-[#10120d] shadow-[0_0_12px_rgba(216,244,90,0.12)] transition-all hover:bg-[#e4ff6c] hover:border-[#f7ffb0] hover:shadow-[0_0_30px_rgba(216,244,90,0.28)]"
+                className="mt-6 h-10 w-full rounded-full border border-white bg-white text-base font-semibold text-[#0A0D1A] shadow-[0_0_12px_rgba(216,244,90,0.12)] transition-all hover:bg-[#D8D2FF] hover:border-[#E7E2FF] hover:shadow-[0_0_30px_rgba(216,244,90,0.28)]"
               >
                 Create Account
               </button>
@@ -265,11 +265,11 @@ function Signup() {
 
 
             {/* Login */}
-            <div className="mt-3 text-center text-sm text-[#858d84]">
+            <div className="mt-3 text-center text-sm text-[#A0A7C2]">
               Already have an account?
               <Link
                 to="/login"
-                className="ml-1 text-[#d8f45a] hover:text-[#efff9a]"
+                className="ml-1 text-[#BFB5FF] hover:text-[#D8D2FF]"
               >
                 Log in
               </Link>
