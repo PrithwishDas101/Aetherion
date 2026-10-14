@@ -147,7 +147,7 @@ function Signup() {
             <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#70786f]"><span className="h-px flex-1 bg-[#d8f45a]/15" /><span>or</span><span className="h-px flex-1 bg-[#d8f45a]/15" /></div>
 
 
-            <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#70786f]"><span className="h-px flex-1 bg-[#d8f45a]/15" /><span>or</span><span className="h-px flex-1 bg-[#d8f45a]/15" /></div>
+
 
             {/* Form */}
             <form onSubmit={onFormSubmit} className="mx-auto max-w-[560px]">
@@ -253,54 +253,6 @@ function Signup() {
                   className="h-10 w-full rounded-xl border border-[#d8f45a]/20 bg-[#0b100c]/80 px-4 text-[#f1eee8] outline-none placeholder:text-[#70786f] focus:border-[#d8f45a]/60"
                 />
               </div>
-
-            <div className="flex flex-col items-center py-2">
-              <div className="relative">
-                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[#252d25] text-2xl font-bold text-[#d8f45a] ring-2 ring-[#d8f45a]/20 sm:h-16 sm:w-16">
-                  {profilePreview ? (
-                    <img
-                      src={profilePreview}
-                      alt="Profile preview"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-[#858d84]">+</span>
-                  )}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#080d09] bg-[#d8f45a] text-xs font-bold text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 sm:h-7 sm:w-7 sm:text-sm"
-                  aria-label="Add profile picture"
-                >
-                  +
-                </button>
-              </div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleProfilePictureChange}
-                className="hidden"
-              />
-
-              <p className="mt-2 text-xs text-[#858d84]">
-                Profile picture{" "}
-                <span className="text-[#60685f]">(optional)</span>
-              </p>
-
-              {profileUploadError && (
-                <p
-                  role="alert"
-                  className="mt-2 max-w-xs text-center text-xs text-red-400"
-                >
-                  {profileUploadError}
-                </p>
-              )}
-            </div>
-
 
               {/* Button */}
               <button
