@@ -257,7 +257,7 @@ function Signup() {
               {/* Button */}
               <button
                 type="submit"
-                className="mt-6 h-10 w-full rounded-full border border-white bg-white text-base font-semibold text-[#0A0D1A] shadow-[0_0_12px_rgba(216,244,90,0.12)] transition-all hover:bg-[#D8D2FF] hover:border-[#E7E2FF] hover:shadow-[0_0_30px_rgba(216,244,90,0.28)]"
+                className="mt-6 h-10 w-full rounded-full border border-white bg-white text-base font-semibold text-[#0A0D1A] transition-all duration-200 hover:bg-[#EDEBFF] active:scale-[0.98]"
               >
                 Create Account
               </button>
