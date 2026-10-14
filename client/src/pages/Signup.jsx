@@ -190,6 +190,9 @@ function Signup() {
               )}
             </div>
 
+            <OAuthButtons />
+            <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#70786f]"><span className="h-px flex-1 bg-[#d8f45a]/15" /><span>or</span><span className="h-px flex-1 bg-[#d8f45a]/15" /></div>
+
             {/* Form */}
             <form onSubmit={onFormSubmit} className="mx-auto max-w-[560px]">
               {/* First + Last Name */}
@@ -304,7 +307,6 @@ function Signup() {
               </button>
             </form>
 
-            <OAuthButtons />
 
             {/* Login */}
             <div className="mt-3 text-center text-sm text-[#858d84]">
