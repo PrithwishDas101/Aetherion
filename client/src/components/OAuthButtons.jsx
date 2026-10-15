@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FaGithub, FaGoogle } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import { startSocialSignIn } from "../lib/oauth.js";
 
@@ -22,7 +23,7 @@ export default function OAuthButtons() {
   return (
     <div className="w-full space-y-3">
       <button type="button" onClick={() => start("google")} disabled={!!loading} className={buttonClass}>
-        <FaGoogle className="text-base" />
+        <FcGoogle className="text-lg" aria-hidden="true" />
         <span>{loading === "google" ? "Connecting to Google..." : "Continue with Google"}</span>
       </button>
       <button type="button" onClick={() => start("github")} disabled={!!loading} className={buttonClass}>
