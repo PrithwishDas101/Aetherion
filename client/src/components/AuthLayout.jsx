@@ -115,21 +115,23 @@ export default function AuthLayout({ children, page = "login" }) {
           </p>
 
           <div className="relative mt-14 h-[210px] max-w-[540px]">
-            <style>{`@keyframes authLabelGlow { 0%, 100% { border-color: var(--auth-border); color: var(--auth-muted); box-shadow: 0 1px 2px rgba(0,0,0,.04); } 12%, 28% { border-color: var(--auth-accent); color: var(--auth-panel-text); box-shadow: 0 0 22px color-mix(in srgb, var(--auth-accent) 18%, transparent); } } .auth-path-label { animation: authLabelGlow 8s ease-in-out infinite; } @media (prefers-reduced-motion: reduce) { .auth-path-label { animation: none !important; } }`}</style>
+            <style>{`@keyframes authPathDash { to { stroke-dashoffset: -48; } } .auth-path-flow { animation: authPathDash 7s linear infinite; } @media (prefers-reduced-motion: reduce) { .auth-path-flow { animation: none !important; } }`}</style>
             <svg viewBox="0 0 540 210" className="h-full w-full" fill="none" aria-hidden="true">
-              <path d="M-10 166 C 70 166, 73 55, 165 55 S 254 172, 338 128 S 431 18, 550 36" stroke="var(--auth-line)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 8" opacity=".8" />
-              <path d="M-10 190 C 75 190, 92 96, 170 96 S 252 195, 343 153 S 445 56, 550 75" stroke="var(--auth-line)" strokeWidth="1" strokeLinecap="round" opacity=".35" />
-              <circle cx="165" cy="55" r="7" fill="var(--auth-accent)" />
-              <circle cx="338" cy="128" r="6" fill="var(--auth-panel)" stroke="var(--auth-line)" strokeWidth="2" />
-              <circle cx="457" cy="39" r="9" fill="var(--auth-panel)" stroke="var(--auth-accent)" strokeWidth="2" />
-              <circle cx="165" cy="55" r="17" stroke="var(--auth-line)" strokeWidth="1" opacity=".5" />
-              <circle cx="457" cy="39" r="23" stroke="var(--auth-line)" strokeWidth="1" opacity=".35" />
-              <circle r="4.5" fill="var(--auth-accent)" opacity=".95"><animateMotion dur="8s" repeatCount="indefinite" path="M165 55 C 250 10, 390 0, 457 39 C 450 100, 390 150, 338 128" /></circle>
-              <circle r="10" fill="var(--auth-accent)" opacity=".18"><animateMotion dur="8s" repeatCount="indefinite" path="M165 55 C 250 10, 390 0, 457 39 C 450 100, 390 150, 338 128" /></circle>
+              <path d="M135 15 C 245 8, 420 25, 470 115 C 450 168, 365 195, 290 195 C 220 190, 165 115, 135 15" stroke="var(--auth-line)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 9" opacity=".75" />
+              <path className="auth-path-flow" d="M135 15 C 245 8, 420 25, 470 115 C 450 168, 365 195, 290 195 C 220 190, 165 115, 135 15" stroke="var(--auth-accent)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="12 36" opacity=".8" />
+              <path d="M135 15 C 245 8, 420 25, 470 115 C 450 168, 365 195, 290 195 C 220 190, 165 115, 135 15" transform="translate(0 12)" stroke="var(--auth-line)" strokeWidth="1" strokeLinecap="round" opacity=".22" />
+              <circle cx="135" cy="15" r="5" fill="var(--auth-accent)" />
+              <circle cx="470" cy="115" r="5" fill="var(--auth-panel)" stroke="var(--auth-line)" strokeWidth="2" />
+              <circle cx="290" cy="195" r="5" fill="var(--auth-panel)" stroke="var(--auth-line)" strokeWidth="2" />
+              <circle cx="135" cy="15" r="13" stroke="var(--auth-accent)" strokeWidth="1" opacity=".45" />
+              <circle cx="470" cy="115" r="13" stroke="var(--auth-line)" strokeWidth="1" opacity=".35" />
+              <circle cx="290" cy="195" r="13" stroke="var(--auth-line)" strokeWidth="1" opacity=".35" />
+              <circle r="4" fill="var(--auth-accent)" opacity=".95"><animateMotion dur="9s" repeatCount="indefinite" path="M135 15 C 245 8, 420 25, 470 115 C 450 168, 365 195, 290 195 C 220 190, 165 115, 135 15" /></circle>
+              <circle r="10" fill="var(--auth-accent)" opacity=".18"><animateMotion dur="9s" repeatCount="indefinite" path="M135 15 C 245 8, 420 25, 470 115 C 450 168, 365 195, 290 195 C 220 190, 165 115, 135 15" /></circle>
             </svg>
-            <div className="auth-path-label absolute left-[22%] top-0 rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)]/80 px-3 py-1.5 text-[11px] text-[var(--auth-muted)] shadow-sm" style={{ animationDelay: "0s" }}>Ideas</div>
-            <div className="auth-path-label absolute right-[10%] top-1/2 rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)]/80 px-3 py-1.5 text-[11px] text-[var(--auth-muted)] shadow-sm" style={{ animationDelay: "2.65s" }}>People</div>
-            <div className="auth-path-label absolute bottom-0 left-[53%] rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)]/80 px-3 py-1.5 text-[11px] text-[var(--auth-muted)] shadow-sm" style={{ animationDelay: "5.3s" }}>Possibilities</div>
+            <div className="absolute left-[22%] top-0 rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)]/80 px-3 py-1.5 text-[11px] text-[var(--auth-muted)] shadow-sm">Ideas</div>
+            <div className="auth-path-label absolute right-[10%] top-1/2 rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)]/80 px-3 py-1.5 text-[11px] text-[var(--auth-muted)] shadow-sm">People</div>
+            <div className="auth-path-label absolute bottom-0 left-[53%] rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)]/80 px-3 py-1.5 text-[11px] text-[var(--auth-muted)] shadow-sm">Possibilities</div>
           </div>
         </div>
 
