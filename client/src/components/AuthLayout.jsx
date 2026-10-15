@@ -124,8 +124,8 @@ export default function AuthLayout({ children, page = "login" }) {
               <circle cx="457" cy="39" r="9" fill="var(--auth-panel)" stroke="var(--auth-accent)" strokeWidth="2" />
               <circle cx="165" cy="55" r="17" stroke="var(--auth-line)" strokeWidth="1" opacity=".5" />
               <circle cx="457" cy="39" r="23" stroke="var(--auth-line)" strokeWidth="1" opacity=".35" />
-              <circle r="4.5" fill="var(--auth-accent)" opacity=".95"><animateMotion dur="8s" repeatCount="indefinite" path="M165 55 C 250 10, 390 0, 457 39 C 450 100, 390 150, 338 128" /></circle>
-              <circle r="10" fill="var(--auth-accent)" opacity=".18"><animateMotion dur="8s" repeatCount="indefinite" path="M165 55 C 250 10, 390 0, 457 39 C 450 100, 390 150, 338 128" /></circle>
+              <circle r="4.5" fill="var(--auth-accent)" opacity=".95"><animateMotion dur="8s" calcMode="paced" repeatCount="indefinite" path="M-10 166 C 70 166, 73 55, 165 55 S 254 172, 338 128 S 431 18, 550 36" /></circle>
+              <circle r="10" fill="var(--auth-accent)" opacity=".18"><animateMotion dur="8s" calcMode="paced" repeatCount="indefinite" path="M-10 166 C 70 166, 73 55, 165 55 S 254 172, 338 128 S 431 18, 550 36" /></circle>
             </svg>
             <div className="auth-path-label absolute left-[22%] top-0 rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)]/80 px-3 py-1.5 text-[11px] text-[var(--auth-muted)] shadow-sm" style={{ animationDelay: "0s" }}>Ideas</div>
             <div className="auth-path-label absolute right-[10%] top-1/2 rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)]/80 px-3 py-1.5 text-[11px] text-[var(--auth-muted)] shadow-sm" style={{ animationDelay: "2.65s" }}>People</div>
