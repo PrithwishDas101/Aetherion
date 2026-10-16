@@ -1,11 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { Toaster } from "react-hot-toast";
 import { Provider } from "react-redux";
-import eruda from "eruda";
-
-if (import.meta.env.DEV) {
-  eruda.init();
-}
 
 import App from "./app.jsx";
 import "./index.css";
