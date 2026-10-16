@@ -27,14 +27,14 @@ const palettes = {
     border: "#252B27",
     text: "#F1F5F1",
     muted: "#9BA69E",
-    accent: "#17432F",
-    primary: "#082519",
+    accent: "#17201B",
+    primary: "#080B09",
     primaryText: "#FFFFFF",
     panel: "#090D0B",
     panelText: "#F1F5F1",
     panelMuted: "#9BA69E",
-    line: "#0D3021",
-    glow: "#0B2B1D",
+    line: "#171F1A",
+    glow: "#0A100C",
   },
 };
 
@@ -100,7 +100,7 @@ export default function AuthLayout({ children, page = "login" }) {
         <p className="pt-2 text-center text-xs text-[var(--auth-muted)] lg:text-left">Thoughtfully made for your next chapter.</p>
       </section>
 
-      <aside style={{ backgroundColor: palette.panel, backgroundImage: theme === "night" ? "radial-gradient(ellipse at 92% 3%, rgba(11, 43, 29, 0.16) 0%, rgba(11, 43, 29, 0.07) 20%, transparent 46%)" : undefined }} className="relative m-3 hidden min-h-[calc(100vh-1.5rem)] overflow-hidden rounded-[28px] bg-[var(--auth-panel)] p-10 text-[var(--auth-panel-text)] transition-colors duration-300 lg:flex lg:flex-col xl:p-14">
+      <aside style={{ backgroundColor: palette.panel, backgroundImage: theme === "night" ? "radial-gradient(ellipse at 92% 3%, rgba(10, 16, 12, 0.12) 0%, rgba(10, 16, 12, 0.05) 20%, transparent 46%)" : undefined }} className="relative m-3 hidden min-h-[calc(100vh-1.5rem)] overflow-hidden rounded-[28px] bg-[var(--auth-panel)] p-10 text-[var(--auth-panel-text)] transition-colors duration-300 lg:flex lg:flex-col xl:p-14">
         <div className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full opacity-20 blur-3xl" style={{ background: palette.glow }} />
         <div className="pointer-events-none absolute -bottom-32 -left-24 h-[360px] w-[360px] rounded-full opacity-10 blur-3xl" style={{ background: palette.glow }} />
         <div className="relative z-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--auth-panel-muted)]">
