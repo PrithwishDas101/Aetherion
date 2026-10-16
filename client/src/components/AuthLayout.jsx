@@ -1,7 +1,7 @@
 import React from "react";
 import { FaMoon, FaSun } from "react-icons/fa";
 
-const deepForestGreen = "#103D2B";
+const deepForestGreen = "#202622";
 
 const palettes = {
   warm: {
@@ -27,13 +27,13 @@ const palettes = {
     border: "#252B27",
     text: "#F1F5F1",
     muted: "#9BA69E",
-    accent: "#17201B",
-    primary: "#080B09",
+    accent: "#B8C2BA",
+    primary: "#111512",
     primaryText: "#FFFFFF",
     panel: "#090D0B",
     panelText: "#F1F5F1",
     panelMuted: "#9BA69E",
-    line: "#171F1A",
+    line: "#202722",
     glow: "#0A100C",
   },
 };
