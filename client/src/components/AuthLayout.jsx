@@ -104,11 +104,10 @@ export default function AuthLayout({ children, page = "login" }) {
         <div className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full opacity-20 blur-3xl" style={{ background: palette.glow }} />
         <div className="pointer-events-none absolute -bottom-32 -left-24 h-[360px] w-[360px] rounded-full opacity-10 blur-3xl" style={{ background: palette.glow }} />
         <div className="relative z-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--auth-panel-muted)]">
-          <span className="h-px w-7 bg-[var(--auth-line)]" /> Aetherion / Your space
+          <span className="h-px w-7 bg-[var(--auth-line)]" /> Aetherion
         </div>
 
         <div className="relative z-10 my-auto max-w-[620px] py-16">
-          <p className="mb-5 text-sm font-medium text-[var(--auth-accent)]">{page === "signup" ? "A good place to begin" : "Welcome to your next chapter"}</p>
           <h2 className="max-w-[560px] text-5xl font-medium leading-[1.08] tracking-[-0.055em] xl:text-6xl">
             Make room for <span className="font-serif italic">{page === "signup" ? "what's next." : "what matters."}</span>
           </h2>
