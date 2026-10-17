@@ -80,7 +80,7 @@ export default function AuthLayout({ children, page = "login" }) {
       <section className="relative flex min-h-screen flex-col px-6 py-6 sm:px-10 lg:px-12 xl:px-[clamp(3rem,7vw,7rem)]">
         <div className="flex items-center justify-between gap-4">
           <a href="/" className="flex items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[var(--auth-accent)]" aria-label="Aetherion home">
-            <img src="/images/logo.png" alt="" className="h-9 w-9 rounded-xl object-contain" />
+            <img src="/favicon.png" alt="" className="h-9 w-9 object-contain" />
             <span className="text-[15px] font-semibold tracking-[-0.025em]">Aetherion</span>
           </a>
           <div className="flex items-center rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)] p-1" aria-label="Color theme">
