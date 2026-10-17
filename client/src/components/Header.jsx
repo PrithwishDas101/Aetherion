@@ -181,7 +181,7 @@ function Header() {
         {/* App logo */}
         <div className="flex items-center">
           <img
-            src="/images/logo.png"
+            src="/favicon.png"
             alt="Aetherion logo"
             className="mr-3 h-10 w-10 object-contain"
           />
