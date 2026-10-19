@@ -2523,7 +2523,7 @@ const Chat = ({ socket }) => {
       <div
         ref={messagesContainerRef}
         onScroll={handleMessagesScroll}
-        className="scrollbar-aetherion min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2"
+        className="scrollbar-aetherion-light min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1 py-3 sm:px-2"
       >
         <div className="flex min-h-full min-w-0 flex-col gap-2">
           {/* EMPTY CHAT */}
