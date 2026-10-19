@@ -214,7 +214,7 @@ function UserList({ searchKey, socket }) {
             String(selectedChat?._id) === String(userChat?._id);
 
           const userClass = isSelected
-            ? "border-l-[3px] border-l-[#171717] bg-[#182018] shadow-[inset_0_0_18px_rgba(0,0,0,0.035)]"
+            ? "border-l-[3px] border-l-[#171717] bg-[#FFFFFF] shadow-[inset_0_0_18px_rgba(0,0,0,0.035)]"
             : "border-l-[3px] border-l-transparent hover:bg-[#101710]";
 
           return (
