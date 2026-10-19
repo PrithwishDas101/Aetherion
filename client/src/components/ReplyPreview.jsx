@@ -69,17 +69,17 @@ const ReplyPreview = ({
                 : message.text?.trim() || "Message";
 
   return (
-    <div className="relative z-50 flex w-full items-center gap-3 overflow-hidden rounded-xl border border-[#d8f45a]/15 bg-[#111811] px-3 py-2 shadow-lg">
+    <div className="relative z-50 flex w-full items-center gap-3 overflow-hidden rounded-xl border border-[#E5E5E5] bg-[#F7F7F5] px-3 py-2 shadow-lg">
       {/* REPLY INDICATOR */}
-      <div className="h-10 w-1 shrink-0 rounded-full bg-[#d8f45a]" />
+      <div className="h-10 w-1 shrink-0 rounded-full bg-[#171717]" />
 
       {/* REPLY CONTENT */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-semibold text-[#d8f45a]">
+        <p className="truncate text-xs font-semibold text-[#171717]">
           {senderName}
         </p>
 
-        <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-[#aab3a8]">
+        <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-[#737373]">
           {isImage ? (
             <IoImageOutline className="shrink-0 text-sm" />
           ) : isVideo ? (
@@ -128,7 +128,7 @@ const ReplyPreview = ({
       <button
         type="button"
         onClick={onCancel}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#aab3a8] transition hover:bg-[#d8f45a]/10 hover:text-[#f1eee8]"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#737373] transition hover:bg-[#171717]/10 hover:text-[#171717]"
         aria-label="Cancel reply"
       >
         <IoClose className="text-xl" />
