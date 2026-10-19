@@ -459,7 +459,7 @@ const MessageBubble = ({
                   aria-label="Sending"
                 />
               ) : message.read ? (
-                <IoCheckmarkDone className="text-sm text-[#2196f3]" />
+                <IoCheckmarkDone className="text-sm text-[#737373]" />
               ) : (
                 <IoCheckmark className="text-sm text-[#737373]" />
               ))}
