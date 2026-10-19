@@ -250,7 +250,7 @@ function Header() {
                     {user?.firstName} {user?.lastName}
                   </p>
 
-                  <p className="mt-0.5 truncate text-xs text-[#8f998b]">
+                  <p className="mt-0.5 truncate text-xs text-[#737373]">
                     {user?.email}
                   </p>
                 </div>
@@ -260,7 +260,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleProfileClick}
-                className="mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#1c261c] hover:text-[#5af48b] active:scale-[0.98] active:text-[#5af48be3]"
+                className="mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#E5E5E5] hover:text-[#171717] active:scale-[0.98] active:text-[#171717e3]"
               >
                 <FiUser className="h-[18px] w-[18px]" />
 
@@ -274,7 +274,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleRequestsClick}
-                className="mt-2 flex w-full items-center justify-between rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#1c261c] hover:text-[#5a64f4] active:scale-[0.98] active:text-[#5a64f4e0]"
+                className="mt-2 flex w-full items-center justify-between rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#F5F5F5] hover:text-[#737373] active:scale-[0.98] active:text-[#737373e0]"
               >
                 <span className="flex items-center gap-3">
                   <FiUserPlus className="h-[18px] w-[18px]" />
@@ -298,7 +298,7 @@ function Header() {
               <button
                 type="button"
                 onClick={() => setShowLogoutConfirm(true)}
-                className="flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#1c261c] hover:text-red-400 active:scale-[0.98] active:text-red-500"
+                className="flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#F5F5F5] hover:text-red-400 active:scale-[0.98] active:text-red-500"
               >
                 <FiLogOut className="h-[18px] w-[18px]" />
 
@@ -334,7 +334,7 @@ function Header() {
                     Log out of Aetherion?
                   </h2>
 
-                  <p className="mt-1 text-[13px] leading-5 text-[#8f998b]">
+                  <p className="mt-1 text-[13px] leading-5 text-[#737373]">
                     You'll need to log in again to continue.
                   </p>
                 </div>
@@ -345,7 +345,7 @@ function Header() {
                 <button
                   type="button"
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 rounded-xl border border-white/10 bg-[#F5F5F5] px-4 py-2.5 text-sm font-medium text-[#c9cec5] transition hover:bg-[#1c261c] active:scale-[0.98]"
+                  className="flex-1 rounded-xl border border-white/10 bg-[#F5F5F5] px-4 py-2.5 text-sm font-medium text-[#737373] transition hover:bg-[#F5F5F5] active:scale-[0.98]"
                 >
                   Cancel
                 </button>
@@ -384,7 +384,7 @@ function Header() {
                   Your profile is here
                 </p>
 
-                <p className="mt-2 text-[13px] leading-5 text-[#aeb8a8]">
+                <p className="mt-2 text-[13px] leading-5 text-[#737373]">
                   Tap your profile picture anytime to view or edit your profile.
                 </p>
 
