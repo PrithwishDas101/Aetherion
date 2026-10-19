@@ -162,7 +162,7 @@ const MessageBubble = ({
           <button
             type="button"
             onClick={() => onReply(message)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#f4ffc3] group-hover:opacity-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#171717]/10 hover:text-[#f4ffc3] group-hover:opacity-100"
             aria-label="Reply to message"
           >
             <FiCornerUpRight className="text-lg" />
@@ -198,8 +198,8 @@ const MessageBubble = ({
             isContact
             ? ""
             : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMyMessage
-              ? "rounded-tr-sm bg-[#d8f164] text-[#10120d]"
-              : "rounded-bl-sm border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
+              ? "rounded-tr-sm bg-[#d8f164] text-[#FFFFFF]"
+              : "rounded-bl-sm border border-[#E5E5E5] bg-[#18221a] text-[#171717]"
             }`
             }`}
         >
@@ -229,8 +229,8 @@ const MessageBubble = ({
                 ? "cursor-default"
                 : "cursor-pointer"
                 } ${isMyMessage
-                  ? "bg-[#d8f164] text-[#10120d]"
-                  : "border border-[#d8f45a]/10 bg-[#18221a] text-[#f1eee8]"
+                  ? "bg-[#d8f164] text-[#FFFFFF]"
+                  : "border border-[#E5E5E5] bg-[#18221a] text-[#171717]"
                 }`}
             >
               <FiFileText className="shrink-0 text-base" />
@@ -243,8 +243,8 @@ const MessageBubble = ({
                 {message.document?.size ? (
                   <p
                     className={`mt-0.5 text-[10px] leading-3 ${isMyMessage
-                      ? "text-[#10120d]/55"
-                      : "text-[#aab3a8]"
+                      ? "text-[#FFFFFF]/55"
+                      : "text-[#737373]"
                       }`}
                   >
                     {formatFileSize(
@@ -407,8 +407,8 @@ const MessageBubble = ({
                 message.text?.trim() && (
                   <div
                     className={`px-3 pb-2.5 pt-2.5 text-sm leading-relaxed ${isMyMessage
-                      ? "bg-[#d8f164] text-[#10120d]"
-                      : "bg-[#18221a] text-[#f1eee8]"
+                      ? "bg-[#d8f164] text-[#FFFFFF]"
+                      : "bg-[#18221a] text-[#171717]"
                       }`}
                   >
                     <p className="whitespace-pre-wrap break-words">
@@ -437,10 +437,10 @@ const MessageBubble = ({
                 isPoll ||
                 isLocation ||
                 isContact
-                ? "px-1 pt-1 text-[#aab3a8]"
+                ? "px-1 pt-1 text-[#737373]"
                 : `mt-1 ${isMyMessage
-                  ? "text-[#10120d]/60"
-                  : "text-[#aab3a8]"
+                  ? "text-[#FFFFFF]/60"
+                  : "text-[#737373]"
                 }`
               }`}
           >
@@ -473,7 +473,7 @@ const MessageBubble = ({
           <button
             type="button"
             onClick={() => onReply(message)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#d8f45a]/10 hover:text-[#d8f45a] group-hover:opacity-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#8d9689] opacity-0 transition hover:bg-[#171717]/10 hover:text-[#171717] group-hover:opacity-100"
             aria-label="Reply to message"
           >
             <FiCornerUpLeft className="text-lg" />
