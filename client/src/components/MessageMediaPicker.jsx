@@ -142,11 +142,11 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
   }
 
   return (
-    <div className=" z-50 w-full overflow-hidden border border-[#d8f45a]/15 bg-[#101610] shadow-2xl md:absolute md:bottom-16 md:left-0 md:w-[min(360px,calc(100vw-32px))] md:rounded-2xl">
+    <div className=" z-50 w-full overflow-hidden border border-[#E5E5E5] bg-[#FFFFFF] shadow-2xl md:absolute md:bottom-16 md:left-0 md:w-[min(360px,calc(100vw-32px))] md:rounded-2xl">
       {/* SEARCH */}
 
-      <div className="border-b border-[#d8f45a]/10 p-2 sm:p-3">
-        <div className="flex items-center gap-2 rounded-xl border border-[#d8f45a]/10 bg-[#080d09] px-3 py-2 transition focus-within:border-[#d8f45a]/25">
+      <div className="border-b border-[#E5E5E5] p-2 sm:p-3">
+        <div className="flex items-center gap-2 rounded-xl border border-[#E5E5E5] bg-[#F7F7F5] px-3 py-2 transition focus-within:border-[#171717]/25">
           <FiSearch className="shrink-0 text-[#8f9b86]" />
 
           <input
@@ -154,18 +154,18 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder={searchPlaceholder}
-            className="min-w-0 flex-1 bg-transparent text-sm text-[#c6d5f3] outline-none placeholder:text-[#70786f]"
+            className="min-w-0 flex-1 bg-transparent text-sm text-[#c6d5f3] outline-none placeholder:text-[#737373]"
           />
         </div>
       </div>
 
       {/* TABS */}
 
-      <div className="flex border-b border-[#d8f45a]/10">
+      <div className="flex border-b border-[#E5E5E5]">
         <button
           type="button"
           onClick={() => handleTabChange("emoji")}
-          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "emoji" ? "border-b-2 border-[#d8f45a] text-[#d8f45a]" : "text-[#858d84] hover:text-[#f1eee8]"}`}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "emoji" ? "border-b-2 border-[#171717] text-[#171717]" : "text-[#737373] hover:text-[#171717]"}`}
         >
           <FiSmile />
           <span>Emoji</span>
@@ -174,7 +174,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
         <button
           type="button"
           onClick={() => handleTabChange("gif")}
-          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "gif" ? "border-b-2 border-[#a78bfa] text-[#a78bfa]" : "text-[#858d84] hover:text-[#f1eee8]"}`}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "gif" ? "border-b-2 border-[#a78bfa] text-[#a78bfa]" : "text-[#737373] hover:text-[#171717]"}`}
         >
           GIF
         </button>
@@ -182,7 +182,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
         <button
           type="button"
           onClick={() => handleTabChange("stickers")}
-          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "stickers" ? "border-b-2 border-[#f5c96a] text-[#f5c96a]" : "text-[#858d84] hover:text-[#f1eee8]"}`}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "stickers" ? "border-b-2 border-[#f5c96a] text-[#f5c96a]" : "text-[#737373] hover:text-[#171717]"}`}
         >
           Stickers
         </button>
@@ -210,7 +210,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
                           isCustom: false,
                         })
                       }
-                      className="flex h-9 w-9 items-center justify-center rounded-lg text-2xl transition hover:bg-[#d8f45a]/10"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg text-2xl transition hover:bg-[#171717]/10"
                       title={emoji.names?.[0]}
                     >
                       {emoji.emoji}
@@ -218,7 +218,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
                   ))}
                 </div>
               ) : (
-                <div className="flex h-full items-center justify-center text-sm text-[#70786f]">
+                <div className="flex h-full items-center justify-center text-sm text-[#737373]">
                   No emojis found.
                 </div>
               )
@@ -233,7 +233,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
                 lazyLoadEmojis={true}
                 theme="dark"
                 style={{
-                  background: "#101610",
+                  background: "#FFFFFF",
                   border: "none",
                   borderRadius: 0,
                 }}
@@ -247,15 +247,15 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
         {activeTab === "gif" && (
           <div className="h-full w-full">
             {isGifLoading ? (
-              <div className="flex h-full items-center justify-center text-sm text-[#70786f]">
+              <div className="flex h-full items-center justify-center text-sm text-[#737373]">
                 Loading GIFs...
               </div>
             ) : gifError ? (
-              <div className="flex h-full items-center justify-center text-sm text-[#70786f]">
+              <div className="flex h-full items-center justify-center text-sm text-[#737373]">
                 {gifError}
               </div>
             ) : gifResults.length === 0 ? (
-              <div className="flex h-full items-center justify-center text-sm text-[#70786f]">
+              <div className="flex h-full items-center justify-center text-sm text-[#737373]">
                 No GIFs found.
               </div>
             ) : (
@@ -294,7 +294,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
         {/* STICKERS */}
 
         {activeTab === "stickers" && (
-          <div className="flex h-full items-center justify-center text-sm text-[#70786f]">
+          <div className="flex h-full items-center justify-center text-sm text-[#737373]">
             {normalizedSearch
               ? `Sticker search for "${search}" coming later.`
               : "Stickers coming later."}
