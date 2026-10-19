@@ -147,14 +147,14 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
 
       <div className="border-b border-[#E5E5E5] p-2 sm:p-3">
         <div className="flex items-center gap-2 rounded-xl border border-[#E5E5E5] bg-[#F7F7F5] px-3 py-2 transition focus-within:border-[#171717]/25">
-          <FiSearch className="shrink-0 text-[#8f9b86]" />
+          <FiSearch className="shrink-0 text-[#737373]" />
 
           <input
             type="text"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder={searchPlaceholder}
-            className="min-w-0 flex-1 bg-transparent text-sm text-[#c6d5f3] outline-none placeholder:text-[#737373]"
+            className="min-w-0 flex-1 bg-transparent text-sm text-[#171717] outline-none placeholder:text-[#737373]"
           />
         </div>
       </div>
@@ -174,7 +174,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
         <button
           type="button"
           onClick={() => handleTabChange("gif")}
-          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "gif" ? "border-b-2 border-[#a78bfa] text-[#a78bfa]" : "text-[#737373] hover:text-[#171717]"}`}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "gif" ? "border-b-2 border-[#737373] text-[#737373]" : "text-[#737373] hover:text-[#171717]"}`}
         >
           GIF
         </button>
@@ -182,7 +182,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
         <button
           type="button"
           onClick={() => handleTabChange("stickers")}
-          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "stickers" ? "border-b-2 border-[#f5c96a] text-[#f5c96a]" : "text-[#737373] hover:text-[#171717]"}`}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${activeTab === "stickers" ? "border-b-2 border-[#737373] text-[#737373]" : "text-[#737373] hover:text-[#171717]"}`}
         >
           Stickers
         </button>
