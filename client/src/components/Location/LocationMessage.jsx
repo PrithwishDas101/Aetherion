@@ -13,7 +13,7 @@ const LocationMessage = ({ message, isOwn }) => {
         return (
             <div
                 className={`max-w-[320px] rounded-lg border px-2.5 py-2 ${isOwn
-                        ? "border-[#d8f45a]/10 bg-[#1c2418]"
+                        ? "border-[#E5E5E5] bg-[#1c2418]"
                         : "border-white/[0.06] bg-[#171c18]"
                     }`}
             >
@@ -46,7 +46,7 @@ const LocationMessage = ({ message, isOwn }) => {
     return (
         <div
             className={`w-full max-w-[320px] overflow-hidden rounded-lg border sm:max-w-[340px] ${isOwn
-                    ? "border-[#d8f45a]/10 bg-[#182018]"
+                    ? "border-[#E5E5E5] bg-[#182018]"
                     : "border-white/[0.06] bg-[#171c18]"
                 }`}
         >
@@ -67,23 +67,23 @@ const LocationMessage = ({ message, isOwn }) => {
 
                 {/* Pin */}
                 <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#d8f45a] text-[#11150f] shadow-lg">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#171717] text-[#11150f] shadow-lg">
                         <FiMapPin className="text-sm" />
                     </div>
 
-                    <div className="mx-auto h-1.5 w-1.5 rounded-full bg-[#d8f45a]" />
+                    <div className="mx-auto h-1.5 w-1.5 rounded-full bg-[#171717]" />
                 </div>
             </div>
 
             {/* Details */}
             <div className="px-2.5 py-2.5">
                 <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#d8f45a]/10 text-[#e2e5d3]">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#171717]/10 text-[#e2e5d3]">
                         <FiMapPin className="text-xs" />
                     </div>
 
                     <div className="min-w-0 flex-1">
-                        <p className="text-[12px] font-semibold text-[#f1eee8]">
+                        <p className="text-[12px] font-semibold text-[#171717]">
                             Location
                         </p>
 
