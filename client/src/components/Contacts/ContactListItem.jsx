@@ -45,14 +45,14 @@ const ContactListItem = ({
             aria-pressed={selected}
         >
             {/* DP */}
-            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-[#1a211a]">
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-[#F5F5F5]">
                 <Avatar
                     profilePic={profilePic}
                     initials={initials || "?"}
                     alt={fullName}
                     decoration={contact?.avatarDecoration}
                     size="sm"
-                    avatarClassName="bg-[#1a211a] text-[#aeb7aa] font-semibold"
+                    avatarClassName="bg-[#F5F5F5] text-[#aeb7aa] font-semibold"
                 />
             </div>
 
