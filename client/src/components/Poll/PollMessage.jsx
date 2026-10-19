@@ -124,7 +124,7 @@ const PollMessage = ({
                     onClick={() =>
                         setShowChart((previous) => !previous)
                     }
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#8c9688] outline-none transition hover:bg-white/[0.05] hover:text-[#d8f45a] focus:outline-none focus:ring-0"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#8c9688] outline-none transition hover:bg-white/[0.05] hover:text-[#171717] focus:outline-none focus:ring-0"
                     aria-label={
                         showChart
                             ? "Show poll"
