@@ -62,7 +62,7 @@ const ContactMessage = ({
                         {fullName}
                     </p>
 
-                    <p className="mt-0.5 truncate text-xs text-[#8d9689]">
+                    <p className="mt-0.5 truncate text-xs text-[#737373]">
                         {contact?.email || "No email"}
                     </p>
                 </div>
