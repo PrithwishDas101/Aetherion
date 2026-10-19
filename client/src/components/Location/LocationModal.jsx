@@ -111,7 +111,7 @@ const LocationModal = ({
             }}
         >
             <div
-                className="w-[calc(100vw-24px)] max-w-[360px] overflow-hidden rounded-xl border border-[#d8f45a]/10 bg-[#111711] shadow-2xl"
+                className="w-[calc(100vw-24px)] max-w-[360px] overflow-hidden rounded-xl border border-[#E5E5E5] bg-[#F7F7F5] shadow-2xl"
                 onMouseDown={(event) => event.stopPropagation()}
             >
                 {/* Header */}
@@ -127,13 +127,13 @@ const LocationModal = ({
                         </button>
 
                         <div>
-                            <p className="text-xs font-semibold text-[#f1eee8]">
+                            <p className="text-xs font-semibold text-[#171717]">
                                 Share location
                             </p>
                         </div>
                     </div>
 
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#d8f45a]/10 text-[#d4d8c2]">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#171717]/10 text-[#d4d8c2]">
                         <FiMapPin className="text-sm" />
                     </div>
                 </div>
@@ -143,7 +143,7 @@ const LocationModal = ({
 
                     {status === "loading" && (
                         <div className="flex min-h-[210px] flex-col items-center justify-center rounded-lg border border-white/[0.05] bg-[#0d120e] px-5 text-center">
-                            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#d8f45a]/10 text-[#d8f45a]">
+                            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#171717]/10 text-[#171717]">
                                 <FiMapPin className="text-lg animate-pulse" />
                             </div>
 
@@ -202,12 +202,12 @@ const LocationModal = ({
                             {/* Location details */}
                             <div className="px-3 py-2.5">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#d8f45a]/10 text-[#d8f45a]">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#171717]/10 text-[#171717]">
                                         <FiMapPin className="text-sm" />
                                     </div>
 
                                     <div className="min-w-0">
-                                        <p className="text-[12px] font-semibold text-[#f1eee8]">
+                                        <p className="text-[12px] font-semibold text-[#171717]">
                                             Current location
                                         </p>
 
@@ -227,7 +227,7 @@ const LocationModal = ({
                                 <FiAlertCircle className="text-lg" />
                             </div>
 
-                            <p className="text-xs font-medium text-[#f1eee8]">
+                            <p className="text-xs font-medium text-[#171717]">
                                 Location unavailable
                             </p>
 
@@ -239,7 +239,7 @@ const LocationModal = ({
                                 type="button"
                                 onClick={requestLocation}
                                 disabled={isSending}
-                                className="mt-4 flex items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 py-2 text-[9px] font-semibold text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#d8f45a]"
+                                className="mt-4 flex items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 py-2 text-[9px] font-semibold text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#171717]"
                             >
                                 <FiRefreshCw className="text-xs" />
                                 Try again
@@ -264,7 +264,7 @@ const LocationModal = ({
                             type="button"
                             onClick={handleSend}
                             disabled={isSending}
-                            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#d8f45a] px-3 py-2 text-[10px] font-bold text-[#11150f] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#171717] px-3 py-2 text-[10px] font-bold text-[#11150f] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {isSending ? (
                                 <>
