@@ -215,7 +215,7 @@ function UserList({ searchKey, socket }) {
 
           const userClass = isSelected
             ? "border-l-[3px] border-l-[#171717] bg-[#FFFFFF] shadow-[inset_0_0_18px_rgba(0,0,0,0.035)]"
-            : "border-l-[3px] border-l-transparent hover:bg-[#101710]";
+            : "border-l-[3px] border-l-transparent hover:bg-[#F5F5F5]";
 
           return (
             <div
@@ -284,7 +284,7 @@ function UserList({ searchKey, socket }) {
                       <span
                         className={`shrink-0 text-[10px] font-medium ${unreadCount > 0 && !isSelected
                           ? "text-[#737373]"
-                          : "text-[#7f8a7c]"
+                          : "text-[#737373]"
                           }`}
                       >
                         {lastMessageTime}
@@ -301,7 +301,7 @@ function UserList({ searchKey, socket }) {
                         lastMessage?._id &&
                         isLastMessageMine &&
                         (lastMessage?.read ? (
-                          <IoCheckmarkDone className="shrink-0 text-sm text-[#2196f3]" />
+                          <IoCheckmarkDone className="shrink-0 text-sm text-[#737373]" />
                         ) : (
                           <IoCheckmark className="shrink-0 text-sm text-[#737373]" />
                         ))}
