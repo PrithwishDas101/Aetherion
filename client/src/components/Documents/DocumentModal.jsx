@@ -205,20 +205,20 @@ const DocumentModal = ({
                     <div className="w-full max-w-[340px] rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF] px-5 py-5 shadow-[0_18px_50px_rgba(0,0,0,0.45)]">
 
                         {/* DOCUMENT ICON */}
-                        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#181f1a]">
+                        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F5F5]">
                             <FileText
                                 size={20}
                                 strokeWidth={2}
-                                className="text-[#506fb9]"
+                                className="text-[#737373]"
                             />
                         </div>
 
                         {/* TEXT */}
-                        <h2 className="text-[17px] font-semibold text-[#edefe5]">
+                        <h2 className="text-[17px] font-semibold text-[#171717]">
                             Access your files?
                         </h2>
 
-                        <p className="mt-2 text-sm leading-5 text-[#8a9385]">
+                        <p className="mt-2 text-sm leading-5 text-[#737373]">
                             Choose documents to send
                             in this chat.
                         </p>
@@ -234,7 +234,7 @@ const DocumentModal = ({
                                 disabled={
                                     isSending
                                 }
-                                className="flex-1 rounded-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-[#edefe5] transition hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex-1 rounded-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-[#171717] transition hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 Cancel
                             </button>
@@ -247,7 +247,7 @@ const DocumentModal = ({
                                 disabled={
                                     isSending
                                 }
-                                className="flex-1 rounded-xl bg-[#333333] px-4 py-2.5 text-sm font-semibold text-[#FFFFFF] transition hover:bg-[#e1fe5d] disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex-1 rounded-xl bg-[#333333] px-4 py-2.5 text-sm font-semibold text-[#FFFFFF] transition hover:bg-[#171717] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 Continue
                             </button>
