@@ -87,12 +87,12 @@ const ContactsModal = ({
     };
 
     return (
-        <div className=" fixed inset-0 z-[100] flex items-center justify-center bg-[#0d120e] md:bg-black/60 md:px-3 md:py-4"
+        <div className=" fixed inset-0 z-[100] flex items-center justify-center bg-[#F7F7F5] md:bg-black/60 md:px-3 md:py-4"
             onMouseDown={handleBackdropMouseDown}
         >
             <div
                 ref={modalRef}
-                className="relative flex h-auto w-full max-h-[100dvh] flex-col overflow-hidden bg-[#0d120e] md:max-h-[calc(100dvh-80px)] md:w-[390px] md:rounded-2xl md:border md:border-[#E5E5E5] md:shadow-2xl"
+                className="relative flex h-auto w-full max-h-[100dvh] flex-col overflow-hidden bg-[#F7F7F5] md:max-h-[calc(100dvh-80px)] md:w-[390px] md:rounded-2xl md:border md:border-[#E5E5E5] md:shadow-2xl"
                 onMouseDown={(event) => {
                     event.stopPropagation();
                 }}
