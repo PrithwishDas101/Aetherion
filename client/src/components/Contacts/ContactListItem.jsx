@@ -52,7 +52,7 @@ const ContactListItem = ({
                     alt={fullName}
                     decoration={contact?.avatarDecoration}
                     size="sm"
-                    avatarClassName="bg-[#F5F5F5] text-[#aeb7aa] font-semibold"
+                    avatarClassName="bg-[#F5F5F5] text-[#737373] font-semibold"
                 />
             </div>
 
