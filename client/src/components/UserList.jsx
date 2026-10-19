@@ -155,15 +155,15 @@ function UserList({ searchKey, socket }) {
     <div>
       {hasSearchQuery && !hasSearchResults ? (
         <div className="flex flex-col items-center px-6 py-12 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d8f45a]/15 bg-[#111711] text-[#d8f45a]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#E5E5E5] bg-[#F7F7F5] text-[#171717]">
             <IoSearch className="text-xl" />
           </div>
 
-          <h3 className="mt-4 text-sm font-semibold text-[#f1eee8]">
+          <h3 className="mt-4 text-sm font-semibold text-[#171717]">
             No users found
           </h3>
 
-          <p className="mt-2 max-w-[240px] text-xs leading-5 text-[#70786f]">
+          <p className="mt-2 max-w-[240px] text-xs leading-5 text-[#737373]">
             We couldn't find anyone matching{" "}
             <span className="font-medium text-[#9da59a]">
               "{searchKey.trim()}"
@@ -214,14 +214,14 @@ function UserList({ searchKey, socket }) {
             String(selectedChat?._id) === String(userChat?._id);
 
           const userClass = isSelected
-            ? "border-l-[3px] border-l-[#d8f45a] bg-[#182018] shadow-[inset_0_0_18px_rgba(216,244,90,0.035)]"
+            ? "border-l-[3px] border-l-[#171717] bg-[#182018] shadow-[inset_0_0_18px_rgba(0,0,0,0.035)]"
             : "border-l-[3px] border-l-transparent hover:bg-[#101710]";
 
           return (
             <div
               key={user._id}
               onClick={() => openChat(user._id)}
-              className={`group relative cursor-pointer border-b border-[#d8f45a]/10 px-3 py-4 transition-all duration-200 ${userClass}`}
+              className={`group relative cursor-pointer border-b border-[#E5E5E5] px-3 py-4 transition-all duration-200 ${userClass}`}
             >
               <div className="flex items-center gap-3">
                 {/* PROFILE PICTURE */}
@@ -257,7 +257,7 @@ function UserList({ searchKey, socket }) {
                     alt={`${user.firstName} ${user.lastName}`}
                     decoration={user.avatarDecoration}
                     size="md"
-                    avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold transition duration-200 group-hover/avatar:scale-[1.04]"
+                    avatarClassName="bg-[#cacfb4] text-[#FFFFFF] font-bold transition duration-200 group-hover/avatar:scale-[1.04]"
                   >
                     <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center">
                       <PresenceIcon
@@ -274,7 +274,7 @@ function UserList({ searchKey, socket }) {
                     <div
                       className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${isSelected || unreadCount > 0
                         ? "text-[#f7f7d0]"
-                        : "text-[#f1eee8]"
+                        : "text-[#171717]"
                         }`}
                     >
                       {`${user.firstName} ${user.lastName}`}
@@ -303,18 +303,18 @@ function UserList({ searchKey, socket }) {
                         (lastMessage?.read ? (
                           <IoCheckmarkDone className="shrink-0 text-sm text-[#2196f3]" />
                         ) : (
-                          <IoCheckmark className="shrink-0 text-sm text-[#858d84]" />
+                          <IoCheckmark className="shrink-0 text-sm text-[#737373]" />
                         ))}
 
                       {/* MESSAGE PREVIEW */}
                       <div
                         className={`flex min-w-0 flex-1 items-center gap-1.5 text-xs ${isTyping
-                          ? "font-semibold italic text-[#d8f45a]"
+                          ? "font-semibold italic text-[#171717]"
                           : unreadCount > 0 && !isSelected
                             ? "font-semibold text-[#999999]"
                             : isSelected
                               ? "text-[#b4bcae]"
-                              : "text-[#858d84]"
+                              : "text-[#737373]"
                           }`}
                       >
                         {isTyping ? (
@@ -381,7 +381,7 @@ function UserList({ searchKey, socket }) {
 
                     {/* UNREAD COUNT */}
                     {unreadCount > 0 && !isSelected && (
-                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#f1ffb5] px-1.5 text-[10px] font-bold text-[#10120d]">
+                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#f1ffb5] px-1.5 text-[10px] font-bold text-[#FFFFFF]">
                         {unreadCount > 99 ? "99+" : unreadCount}
                       </span>
                     )}
@@ -392,7 +392,7 @@ function UserList({ searchKey, socket }) {
                 {!userChat && (
                   <button
                     type="button"
-                    className="shrink-0 rounded-lg bg-[#d8f45a] px-3 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e4ff6c]"
+                    className="shrink-0 rounded-lg bg-[#171717] px-3 py-2 text-xs font-semibold text-[#FFFFFF] transition hover:bg-[#e4ff6c]"
                     onClick={(event) => {
                       event.stopPropagation();
                       startNewChat(user._id);
