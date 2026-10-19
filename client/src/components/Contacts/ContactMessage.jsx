@@ -35,7 +35,7 @@ const ContactMessage = ({
     };
 
     return (
-        <div className="w-[280px] max-w-full rounded-2xl border border-[#E5E5E5] bg-[#18221a] p-3.5">
+        <div className="w-[280px] max-w-full rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF] p-3.5">
             {/* CONTACT INFO */}
             <div className="flex items-center gap-3">
                 {/* DP */}
@@ -52,7 +52,7 @@ const ContactMessage = ({
                         alt={fullName}
                         decoration={contact?.avatarDecoration}
                         size="md"
-                        avatarClassName="bg-[#0d120e] text-[#171717] font-semibold transition duration-200 group-hover/avatar:scale-[1.04]"
+                        avatarClassName="bg-[#F7F7F5] text-[#171717] font-semibold transition duration-200 group-hover/avatar:scale-[1.04]"
                     />
                 </button>
 
