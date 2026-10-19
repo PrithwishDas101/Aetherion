@@ -125,7 +125,7 @@ const ContactsModal = ({
                 </div>
 
                 {/* CONTACT LIST */}
-                <div className="scrollbar-aetherion min-h-0 max-h-[calc(100dvh-130px)] overflow-y-auto overscroll-contain px-2 py-2 pb-2 md:max-h-[370px]">
+                <div className="scrollbar-aetherion-light min-h-0 max-h-[calc(100dvh-130px)] overflow-y-auto overscroll-contain px-2 py-2 pb-2 md:max-h-[370px]">
                     {normalizedContacts.length === 0 ? (
                         <div className="flex h-full items-center justify-center px-6 text-center">
                             <div>
