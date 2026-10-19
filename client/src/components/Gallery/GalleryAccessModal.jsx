@@ -44,7 +44,7 @@ const GalleryAccessModal = ({
                             type="button"
                             onClick={onDeny}
                             disabled={isRequesting}
-                            className="flex h-12 flex-1 items-center justify-center rounded-xl border border-[#ffffff]/10 bg-[#171d17] text-sm font-semibold text-[#d7ddd1] transition hover:bg-[#202820] disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-12 flex-1 items-center justify-center rounded-xl border border-[#ffffff]/10 bg-[#F5F5F5] text-sm font-semibold text-[#d7ddd1] transition hover:bg-[#202820] disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             Not now
                         </button>
