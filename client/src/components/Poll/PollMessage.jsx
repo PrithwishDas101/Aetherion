@@ -110,8 +110,8 @@ const PollMessage = ({
     return (
         <div
             className={`min-w-[250px] max-w-[420px] overflow-hidden rounded-2xl border px-3.5 py-3 ${isMyMessage
-                ? "border-[#2b3027] bg-[#1a2018] text-[#edefe5]"
-                : "border-[#202720] bg-[#141a16] text-[#edefe5]"
+                ? "border-[#2b3027] bg-[#1a2018] text-[#171717]"
+                : "border-[#202720] bg-[#141a16] text-[#171717]"
                 }`}
         >
             <div className="mb-3 flex items-start justify-between gap-2">
@@ -124,7 +124,7 @@ const PollMessage = ({
                     onClick={() =>
                         setShowChart((previous) => !previous)
                     }
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#8c9688] outline-none transition hover:bg-white/[0.05] hover:text-[#171717] focus:outline-none focus:ring-0"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#737373] outline-none transition hover:bg-white/[0.05] hover:text-[#171717] focus:outline-none focus:ring-0"
                     aria-label={
                         showChart
                             ? "Show poll"
