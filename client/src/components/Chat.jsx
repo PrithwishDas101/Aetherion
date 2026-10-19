@@ -2660,7 +2660,7 @@ const Chat = ({ socket }) => {
           {/* TYPING INDICATOR */}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="max-w-fit rounded-2xl bg-[#171d17] px-3 py-2 shadow-sm transition-all duration-200">
+              <div className="max-w-fit rounded-2xl bg-[#F5F5F5] px-3 py-2 shadow-sm transition-all duration-200">
                 <div className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#171717]" />
 
