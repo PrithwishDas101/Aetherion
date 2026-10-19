@@ -267,7 +267,7 @@ const VideoPreview = ({
       {/* SEND BAR */}
 
       {!isTextEditing && !isDoodling ? (
-        <div className="absolute inset-x-0 bottom-0 z-40 flex min-h-[72px] items-center justify-between gap-3 border-t border-white/10 bg-[#080d09] px-5 pb-[max(8px,env(safe-area-inset-bottom))] pt-2">
+        <div className="absolute inset-x-0 bottom-0 z-40 flex min-h-[72px] items-center justify-between gap-3 border-t border-white/10 bg-[#F7F7F5] px-5 pb-[max(8px,env(safe-area-inset-bottom))] pt-2">
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-white">
               {recipientName}
@@ -280,7 +280,7 @@ const VideoPreview = ({
             type="button"
             onClick={handleSend}
             disabled={isProcessing}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] shadow-lg transition hover:bg-[#e4ff6f] active:scale-95"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#171717] text-[#FFFFFF] shadow-lg transition hover:bg-[#333333] active:scale-95"
             aria-label="Send video"
           >
             <span className="text-sm font-bold">
