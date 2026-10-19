@@ -77,7 +77,7 @@ const MessageComposer = ({
           onKeyDown={handleKeyDown}
           placeholder="Message"
           rows="1"
-          className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto bg-transparent px-2 py-3 text-sm leading-5 text-[#171717] outline-none placeholder:text-[#737373] sm:px-3"
+          className="scrollbar-aetherion-light min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto bg-transparent px-2 py-3 text-sm leading-5 text-[#171717] outline-none placeholder:text-[#737373] sm:px-3"
         />
 
         {/* ATTACHMENT BUTTON + PANEL */}
