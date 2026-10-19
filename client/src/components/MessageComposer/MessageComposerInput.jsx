@@ -47,7 +47,7 @@ const MessageComposerInput = ({
         placeholder="Message"
         rows="1"
         disabled={isSending}
-        className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#E5E5E5] bg-[#F7F7F5] px-4 py-3 text-sm leading-5 text-[#171717] outline-none placeholder:text-[#737373] transition focus:border-[#171717]/50 disabled:cursor-not-allowed disabled:opacity-60 sm:px-5"
+        className="scrollbar-aetherion-light min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto rounded-2xl border border-[#E5E5E5] bg-[#F7F7F5] px-4 py-3 text-sm leading-5 text-[#171717] outline-none placeholder:text-[#737373] transition focus:border-[#171717]/50 disabled:cursor-not-allowed disabled:opacity-60 sm:px-5"
       />
     </div>
   );
