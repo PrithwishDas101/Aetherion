@@ -133,7 +133,7 @@ const LocationModal = ({
                         </div>
                     </div>
 
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#171717]/10 text-[#d4d8c2]">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#171717]/10 text-[#737373]">
                         <FiMapPin className="text-sm" />
                     </div>
                 </div>
@@ -142,7 +142,7 @@ const LocationModal = ({
                 <div className="px-3 py-3">
 
                     {status === "loading" && (
-                        <div className="flex min-h-[210px] flex-col items-center justify-center rounded-lg border border-white/[0.05] bg-[#0d120e] px-5 text-center">
+                        <div className="flex min-h-[210px] flex-col items-center justify-center rounded-lg border border-white/[0.05] bg-[#F7F7F5] px-5 text-center">
                             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#171717]/10 text-[#171717]">
                                 <FiMapPin className="text-lg animate-pulse" />
                             </div>
@@ -158,7 +158,7 @@ const LocationModal = ({
                     )}
 
                     {status === "ready" && coordinates && (
-                        <div className="overflow-hidden rounded-lg border border-white/[0.05] bg-[#0d120e]">
+                        <div className="overflow-hidden rounded-lg border border-white/[0.05] bg-[#F7F7F5]">
 
                             {/* Compact map preview */}
                             <div className="relative h-[155px] w-full overflow-hidden sm:h-[170px]">
