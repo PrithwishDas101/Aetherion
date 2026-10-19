@@ -165,13 +165,13 @@ function UserList({ searchKey, socket }) {
 
           <p className="mt-2 max-w-[240px] text-xs leading-5 text-[#737373]">
             We couldn't find anyone matching{" "}
-            <span className="font-medium text-[#9da59a]">
+            <span className="font-medium text-[#737373]">
               "{searchKey.trim()}"
             </span>
             .
           </p>
 
-          <p className="mt-1 text-xs text-[#555d54]">
+          <p className="mt-1 text-xs text-[#737373]">
             Try checking the spelling or search for another name.
           </p>
         </div>
@@ -257,7 +257,7 @@ function UserList({ searchKey, socket }) {
                     alt={`${user.firstName} ${user.lastName}`}
                     decoration={user.avatarDecoration}
                     size="md"
-                    avatarClassName="bg-[#cacfb4] text-[#FFFFFF] font-bold transition duration-200 group-hover/avatar:scale-[1.04]"
+                    avatarClassName="bg-[#E5E5E5] text-[#FFFFFF] font-bold transition duration-200 group-hover/avatar:scale-[1.04]"
                   >
                     <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center">
                       <PresenceIcon
@@ -273,7 +273,7 @@ function UserList({ searchKey, socket }) {
                   <div className="flex items-center gap-3">
                     <div
                       className={`min-w-0 flex-1 truncate text-sm font-semibold transition-colors ${isSelected || unreadCount > 0
-                        ? "text-[#f7f7d0]"
+                        ? "text-[#737373]"
                         : "text-[#171717]"
                         }`}
                     >
@@ -283,7 +283,7 @@ function UserList({ searchKey, socket }) {
                     {lastMessageTime && (
                       <span
                         className={`shrink-0 text-[10px] font-medium ${unreadCount > 0 && !isSelected
-                          ? "text-[#e9fb95]"
+                          ? "text-[#737373]"
                           : "text-[#7f8a7c]"
                           }`}
                       >
@@ -313,7 +313,7 @@ function UserList({ searchKey, socket }) {
                           : unreadCount > 0 && !isSelected
                             ? "font-semibold text-[#999999]"
                             : isSelected
-                              ? "text-[#b4bcae]"
+                              ? "text-[#737373]"
                               : "text-[#737373]"
                           }`}
                       >
@@ -381,7 +381,7 @@ function UserList({ searchKey, socket }) {
 
                     {/* UNREAD COUNT */}
                     {unreadCount > 0 && !isSelected && (
-                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#f1ffb5] px-1.5 text-[10px] font-bold text-[#FFFFFF]">
+                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#171717] px-1.5 text-[10px] font-bold text-[#FFFFFF]">
                         {unreadCount > 99 ? "99+" : unreadCount}
                       </span>
                     )}
@@ -392,7 +392,7 @@ function UserList({ searchKey, socket }) {
                 {!userChat && (
                   <button
                     type="button"
-                    className="shrink-0 rounded-lg bg-[#171717] px-3 py-2 text-xs font-semibold text-[#FFFFFF] transition hover:bg-[#e4ff6c]"
+                    className="shrink-0 rounded-lg bg-[#171717] px-3 py-2 text-xs font-semibold text-[#FFFFFF] transition hover:bg-[#333333]"
                     onClick={(event) => {
                       event.stopPropagation();
                       startNewChat(user._id);
