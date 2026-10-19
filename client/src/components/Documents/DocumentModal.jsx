@@ -202,7 +202,7 @@ const DocumentModal = ({
 
             {!hasDocumentAccess ? (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="w-full max-w-[340px] rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-5 py-5 shadow-[0_18px_50px_rgba(0,0,0,0.45)]">
+                    <div className="w-full max-w-[340px] rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF] px-5 py-5 shadow-[0_18px_50px_rgba(0,0,0,0.45)]">
 
                         {/* DOCUMENT ICON */}
                         <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#181f1a]">
@@ -247,7 +247,7 @@ const DocumentModal = ({
                                 disabled={
                                     isSending
                                 }
-                                className="flex-1 rounded-xl bg-[#e4ff6f] px-4 py-2.5 text-sm font-semibold text-[#10120d] transition hover:bg-[#e1fe5d] disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex-1 rounded-xl bg-[#333333] px-4 py-2.5 text-sm font-semibold text-[#FFFFFF] transition hover:bg-[#e1fe5d] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 Continue
                             </button>
