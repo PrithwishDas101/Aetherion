@@ -177,7 +177,7 @@ function Header() {
 
   return (
     <>
-      <header className="relative z-10 flex w-full flex-wrap items-center justify-between border-b border-[#d8f45a]/20 px-5 py-3 sm:px-8">
+      <header className="relative z-10 flex w-full flex-wrap items-center justify-between border-b border-[#E5E5E5] px-5 py-3 sm:px-8">
         {/* App logo */}
         <div className="flex items-center">
           <img
@@ -186,7 +186,7 @@ function Header() {
             className="mr-3 h-10 w-10 object-contain"
           />
 
-          <span className="text-xl font-bold text-[#f1eee8] sm:text-2xl">
+          <span className="text-xl font-bold text-[#171717] sm:text-2xl">
             Aetherion
           </span>
         </div>
@@ -197,7 +197,7 @@ function Header() {
           className="relative flex items-center gap-[5px]"
         >
           {/* User name — desktop only */}
-          <div className="mr-4 hidden font-bold text-[#d0d4cc] sm:block">
+          <div className="mr-4 hidden font-bold text-[#404040] sm:block">
             {user?.firstName} {user?.lastName}
           </div>
 
@@ -209,7 +209,7 @@ function Header() {
               setShowProfileMenu((prev) => !prev);
             }}
             className={`relative cursor-pointer transition active:scale-95 ${showProfileHint
-              ? "z-[60] ring-4 ring-[#d8f45a]/40 shadow-[0_0_25px_rgba(216,244,90,0.6)]"
+              ? "z-[60] ring-4 ring-[#171717]/40 shadow-[0_0_25px_rgba(0,0,0,0.6)]"
               : ""
               }`}
             aria-label="Open profile menu"
@@ -222,7 +222,7 @@ function Header() {
               alt={`${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Profile"}
               decoration={user?.avatarDecoration}
               size="xs"
-              avatarClassName="bg-[#d8f45a] text-[#10120d] font-bold sm:h-10 sm:w-10 sm:text-base"
+              avatarClassName="bg-[#171717] text-[#FFFFFF] font-bold sm:h-10 sm:w-10 sm:text-base"
             />
           </button>
 
@@ -233,20 +233,20 @@ function Header() {
               : "pointer-events-none -translate-y-2 opacity-0"
               }`}
           >
-            <div className="w-[250px] rounded-2xl border border-white/10 bg-[#101610]/95 p-2 shadow-2xl backdrop-blur-md sm:w-[270px]">
+            <div className="w-[250px] rounded-2xl border border-white/10 bg-[#FFFFFF]/95 p-2 shadow-2xl backdrop-blur-md sm:w-[270px]">
               {/* User info */}
-              <div className="flex items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3">
+              <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3">
                 <Avatar
                   profilePic={user?.profilePic}
                   initials={`${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`}
                   alt="Profile"
                   decoration={user?.avatarDecoration}
                   size="xs"
-                  avatarClassName="bg-[#d8f45a] text-[#10120d] font-bold"
+                  avatarClassName="bg-[#171717] text-[#FFFFFF] font-bold"
                 />
 
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-[#f1eee8]">
+                  <p className="truncate text-sm font-semibold text-[#171717]">
                     {user?.firstName} {user?.lastName}
                   </p>
 
@@ -260,7 +260,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleProfileClick}
-                className="mt-2 flex w-full items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-[#5af48b] active:scale-[0.98] active:text-[#5af48be3]"
+                className="mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#1c261c] hover:text-[#5af48b] active:scale-[0.98] active:text-[#5af48be3]"
               >
                 <FiUser className="h-[18px] w-[18px]" />
 
@@ -274,7 +274,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleRequestsClick}
-                className="mt-2 flex w-full items-center justify-between rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-[#5a64f4] active:scale-[0.98] active:text-[#5a64f4e0]"
+                className="mt-2 flex w-full items-center justify-between rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#1c261c] hover:text-[#5a64f4] active:scale-[0.98] active:text-[#5a64f4e0]"
               >
                 <span className="flex items-center gap-3">
                   <FiUserPlus className="h-[18px] w-[18px]" />
@@ -283,7 +283,7 @@ function Header() {
                 </span>
 
                 {contactRequestCount > 0 && (
-                  <span className="flex min-w-[22px] items-center justify-center rounded-full bg-[#d8f45a] px-1.5 py-0.5 text-[10px] font-bold text-[#10120d]">
+                  <span className="flex min-w-[22px] items-center justify-center rounded-full bg-[#171717] px-1.5 py-0.5 text-[10px] font-bold text-[#FFFFFF]">
                     {contactRequestCount > 99
                       ? "99+"
                       : contactRequestCount}
@@ -298,7 +298,7 @@ function Header() {
               <button
                 type="button"
                 onClick={() => setShowLogoutConfirm(true)}
-                className="flex w-full items-center gap-3 rounded-xl bg-[#151c15] px-3 py-3 text-left text-sm font-medium text-[#d0d4cc] transition hover:bg-[#1c261c] hover:text-red-400 active:scale-[0.98] active:text-red-500"
+                className="flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#1c261c] hover:text-red-400 active:scale-[0.98] active:text-red-500"
               >
                 <FiLogOut className="h-[18px] w-[18px]" />
 
@@ -316,7 +316,7 @@ function Header() {
           onClick={() => setShowLogoutConfirm(false)}
         >
           <div
-            className="w-full max-w-[350px] overflow-hidden rounded-2xl border border-white/10 bg-[#111711] shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
+            className="w-full max-w-[350px] overflow-hidden rounded-2xl border border-white/10 bg-[#F7F7F5] shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
             onClick={(event) => event.stopPropagation()}
           >
             {/* Red accent */}
@@ -330,7 +330,7 @@ function Header() {
                 </div>
 
                 <div className="min-w-0">
-                  <h2 className="text-[16px] font-semibold text-[#f1eee8]">
+                  <h2 className="text-[16px] font-semibold text-[#171717]">
                     Log out of Aetherion?
                   </h2>
 
@@ -345,7 +345,7 @@ function Header() {
                 <button
                   type="button"
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 rounded-xl border border-white/10 bg-[#151c15] px-4 py-2.5 text-sm font-medium text-[#c9cec5] transition hover:bg-[#1c261c] active:scale-[0.98]"
+                  className="flex-1 rounded-xl border border-white/10 bg-[#F5F5F5] px-4 py-2.5 text-sm font-medium text-[#c9cec5] transition hover:bg-[#1c261c] active:scale-[0.98]"
                 >
                   Cancel
                 </button>
@@ -375,12 +375,12 @@ function Header() {
           {/* Coach mark */}
           <div className="fixed right-5 top-[4.7rem] z-[70] w-[270px] sm:right-8 sm:w-[300px]">
             {/* Tooltip */}
-            <div className="relative rounded-[14px] border border-[#d8f45a]/15 bg-[#111711]/95 p-4 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
+            <div className="relative rounded-[14px] border border-[#E5E5E5] bg-[#F7F7F5]/95 p-4 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
               {/* Pointer */}
-              <div className="absolute -top-2 right-5 h-4 w-4 rotate-45 border-l border-t border-[#d8f45a]/15 bg-[#111711]" />
+              <div className="absolute -top-2 right-5 h-4 w-4 rotate-45 border-l border-t border-[#E5E5E5] bg-[#F7F7F5]" />
 
               <div className="relative">
-                <p className="text-sm font-semibold tracking-wide text-[#d8f45a]">
+                <p className="text-sm font-semibold tracking-wide text-[#171717]">
                   Your profile is here
                 </p>
 
@@ -392,7 +392,7 @@ function Header() {
                   <button
                     type="button"
                     onClick={dismissProfileHint}
-                    className="rounded-lg bg-[#d8f45a] px-4 py-2 text-xs font-bold text-[#10120d] shadow-sm transition hover:bg-[#e4ff6f] active:scale-95"
+                    className="rounded-lg bg-[#171717] px-4 py-2 text-xs font-bold text-[#FFFFFF] shadow-sm transition hover:bg-[#333333] active:scale-95"
                   >
                     Got it
                   </button>
