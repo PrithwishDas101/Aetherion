@@ -54,7 +54,7 @@ const PollOption = ({
             <div className="flex items-center gap-2 px-0.5 py-1">
                 <div
                     className={`flex h-4 w-4 shrink-0 items-center justify-center border transition ${isSelected
-                        ? "border-[#171717] bg-[#171717] text-[#1e2119]"
+                        ? "border-[#171717] bg-[#171717] text-[#171717]"
                         : "border-[#687165] bg-transparent text-transparent"
                         } ${allowMultipleAnswers
                             ? "rounded-md"
