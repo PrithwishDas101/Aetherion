@@ -65,7 +65,7 @@ const AttachmentPanel = ({
         }
       `}
     >
-      <div className="w-[250px] rounded-2xl border border-white/10 bg-[#101610]/95 p-2 shadow-2xl backdrop-blur-md">
+      <div className="w-[250px] rounded-2xl border border-white/10 bg-[#FFFFFF]/95 p-2 shadow-2xl backdrop-blur-md">
         <div className="grid grid-cols-3 gap-1.5 lg:grid-cols-1">
           {options.map(({ label, icon: Icon, color, onClick }, index) => (
             <button
@@ -76,7 +76,7 @@ const AttachmentPanel = ({
                 "--icon-color": color,
                 transitionDelay: isOpen ? `${index * 75}ms` : "0ms",
               }}
-              className={`group flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-xl bg-[#151c15] px-1.5 py-2 text-[11px] font-medium text-[#aeb7aa] transition-all duration-300 ease-out
+              className={`group flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-xl bg-[#F5F5F5] px-1.5 py-2 text-[11px] font-medium text-[#aeb7aa] transition-all duration-300 ease-out
                   ${isOpen
                   ? "translate-y-0 opacity-100"
                   : "translate-y-8 opacity-0"
