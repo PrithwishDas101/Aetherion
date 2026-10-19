@@ -257,7 +257,7 @@ const VideoPreview = ({
                 onChange={onCaptionChange}
                 placeholder="Add a caption..."
                 rows={1}
-                className="scrollbar-aetherion block min-h-9 max-h-24 w-full resize-none overflow-y-auto bg-transparent py-1 text-[15px] leading-5 text-white outline-none placeholder:text-white/50"
+                className="scrollbar-aetherion-light block min-h-9 max-h-24 w-full resize-none overflow-y-auto bg-transparent py-1 text-[15px] leading-5 text-white outline-none placeholder:text-white/50"
               />
             </div>
           </div>
