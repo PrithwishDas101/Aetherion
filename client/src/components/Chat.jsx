@@ -2402,9 +2402,9 @@ const Chat = ({ socket }) => {
   }
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8f45a]/15 bg-[#0b100c] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
       {/* CHAT HEADER */}
-      <div className="mb-4 flex shrink-0 items-center border-b border-[#d8f45a]/15 px-2 py-3 sm:mb-5 sm:px-4">
+      <div className="mb-4 flex shrink-0 items-center border-b border-[#E5E5E5] px-2 py-3 sm:mb-5 sm:px-4">
         {/* BACK */}
         <button
           type="button"
@@ -2505,7 +2505,7 @@ const Chat = ({ socket }) => {
                 alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
                 decoration={selectedUser.avatarDecoration}
                 size="sm"
-                avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold transition duration-200 group-hover:scale-[1.04]"
+                avatarClassName="bg-[#cacfb4] text-[#FFFFFF] font-bold transition duration-200 group-hover:scale-[1.04]"
               />
 
               <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-4 w-4 items-center justify-center">
@@ -2529,13 +2529,13 @@ const Chat = ({ socket }) => {
           {/* EMPTY CHAT */}
           {isMessagesLoading && allMessages.length === 0 && (
             <div className="flex flex-1 items-center justify-center">
-              <p className="text-sm text-[#70786f]">Loading messages...</p>
+              <p className="text-sm text-[#737373]">Loading messages...</p>
             </div>
           )}
 
           {!isMessagesLoading && allMessages.length === 0 && (
             <div className="flex flex-1 items-center justify-center">
-              <p className="text-sm text-[#70786f]">No messages yet.</p>
+              <p className="text-sm text-[#737373]">No messages yet.</p>
             </div>
           )}
 
@@ -2637,7 +2637,7 @@ const Chat = ({ socket }) => {
 
                 {/* NUMBER IN THE OPENING OF THE CIRCLE */}
                 {newMessageCount > 0 && (
-                  <span className="pointer-events-none absolute left-[7px] top-1/4 z-10 flex -translate-y-1/2 items-center justify-center text-[13px] font-bold leading-none text-[#ffffff] drop-shadow-[0_1px_5px_rgba(216,244,90,0.55)]">
+                  <span className="pointer-events-none absolute left-[7px] top-1/4 z-10 flex -translate-y-1/2 items-center justify-center text-[13px] font-bold leading-none text-[#ffffff] drop-shadow-[0_1px_5px_rgba(0,0,0,0.55)]">
                     {newMessageCount > 99 ? "99+" : newMessageCount}
                   </span>
                 )}
@@ -2662,17 +2662,17 @@ const Chat = ({ socket }) => {
             <div className="flex justify-start">
               <div className="max-w-fit rounded-2xl bg-[#171d17] px-3 py-2 shadow-sm transition-all duration-200">
                 <div className="flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#d8f45a]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#171717]" />
 
                   <span
-                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#d8f45a]"
+                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#171717]"
                     style={{
                       animationDelay: "0.15s",
                     }}
                   />
 
                   <span
-                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#d8f45a]"
+                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#171717]"
                     style={{
                       animationDelay: "0.3s",
                     }}
@@ -2812,7 +2812,7 @@ const Chat = ({ socket }) => {
               type="button"
               onClick={sendMessage}
               disabled={!message.trim()}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] transition hover:bg-[#e4ff6f] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#171717] text-[#FFFFFF] transition hover:bg-[#333333] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="Send message"
             >
               <FaPaperPlane className="ml-0.5 text-xl" />
