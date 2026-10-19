@@ -199,7 +199,7 @@ const MessageBubble = ({
             ? ""
             : `rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMyMessage
               ? "rounded-tr-sm bg-[#d8f164] text-[#FFFFFF]"
-              : "rounded-bl-sm border border-[#E5E5E5] bg-[#18221a] text-[#171717]"
+              : "rounded-bl-sm border border-[#E5E5E5] bg-[#FFFFFF] text-[#171717]"
             }`
             }`}
         >
@@ -230,7 +230,7 @@ const MessageBubble = ({
                 : "cursor-pointer"
                 } ${isMyMessage
                   ? "bg-[#d8f164] text-[#FFFFFF]"
-                  : "border border-[#E5E5E5] bg-[#18221a] text-[#171717]"
+                  : "border border-[#E5E5E5] bg-[#FFFFFF] text-[#171717]"
                 }`}
             >
               <FiFileText className="shrink-0 text-base" />
@@ -295,7 +295,7 @@ const MessageBubble = ({
                 message.text?.trim()
                 ? isMyMessage
                   ? "border border-[#d8f164]"
-                  : "border border-[#18221a]"
+                  : "border border-[#FFFFFF]"
                 : ""
                 }`}
             >
@@ -408,7 +408,7 @@ const MessageBubble = ({
                   <div
                     className={`px-3 pb-2.5 pt-2.5 text-sm leading-relaxed ${isMyMessage
                       ? "bg-[#d8f164] text-[#FFFFFF]"
-                      : "bg-[#18221a] text-[#171717]"
+                      : "bg-[#FFFFFF] text-[#171717]"
                       }`}
                   >
                     <p className="whitespace-pre-wrap break-words">
