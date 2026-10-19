@@ -110,12 +110,12 @@ const PollMessage = ({
     return (
         <div
             className={`min-w-[250px] max-w-[420px] overflow-hidden rounded-2xl border px-3.5 py-3 ${isMyMessage
-                ? "border-[#2b3027] bg-[#1a2018] text-[#171717]"
-                : "border-[#202720] bg-[#141a16] text-[#171717]"
+                ? "border-[#F5F5F5] bg-[#F7F7F5] text-[#171717]"
+                : "border-[#E5E5E5] bg-[#F7F7F5] text-[#171717]"
                 }`}
         >
             <div className="mb-3 flex items-start justify-between gap-2">
-                <h3 className="min-w-0 flex-1 text-sm font-semibold leading-5 text-[#f1f3ed]">
+                <h3 className="min-w-0 flex-1 text-sm font-semibold leading-5 text-[#F5F5F5]">
                     {question}
                 </h3>
 
@@ -203,7 +203,7 @@ const PollMessage = ({
                 </div>
             )}
 
-            <div className="mt-2.5 flex items-center justify-between border-t border-white/[0.06] pt-2 text-[10px] font-medium text-[#7d8778]">
+            <div className="mt-2.5 flex items-center justify-between border-t border-white/[0.06] pt-2 text-[10px] font-medium text-[#737373]">
                 <span>
                     {totalVotes}{" "}
                     {totalVotes === 1
