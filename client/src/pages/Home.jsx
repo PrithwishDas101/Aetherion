@@ -191,15 +191,15 @@ const Home = () => {
   }, [dispatch]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#080d09]">
+    <div className="flex h-screen flex-col overflow-hidden bg-[#F7F7F5] text-[#171717]">
       <div className={selectedChat ? "hidden md:block" : "block"}>
         <Header />
       </div>
 
-      <div className="flex min-h-0 flex-1 gap-3 px-0 py-[10px] md:px-5">
+      <div className="flex min-h-0 flex-1 gap-3 px-0 py-3 md:px-5 md:py-4">
         {/* CHAT LIST */}
         <div
-          className={`min-h-0 w-full ${selectedChat ? "hidden" : "block"} md:block md:w-[30%] md:min-w-[320px]`}
+          className={`min-h-0 w-full overflow-hidden rounded-none border-0 bg-white ${selectedChat ? "hidden" : "block"} md:block md:w-[30%] md:min-w-[320px] md:rounded-2xl md:border md:border-[#E5E5E5]`}
         >
           <Sidebar
             socket={socket}
@@ -211,7 +211,7 @@ const Home = () => {
 
         {/* CHAT AREA */}
         <div
-          className={`min-h-0 flex-1 overflow-hidden ${selectedChat || hasNoChats ? "block" : "hidden"
+          className={`min-h-0 flex-1 overflow-hidden bg-white md:rounded-2xl md:border md:border-[#E5E5E5] ${selectedChat || hasNoChats ? "block" : "hidden"
             } md:block`}
         >
           {selectedChat ? (
