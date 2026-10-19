@@ -92,24 +92,24 @@ const ContactsModal = ({
         >
             <div
                 ref={modalRef}
-                className="relative flex h-auto w-full max-h-[100dvh] flex-col overflow-hidden bg-[#0d120e] md:max-h-[calc(100dvh-80px)] md:w-[390px] md:rounded-2xl md:border md:border-[#d8f45a]/10 md:shadow-2xl"
+                className="relative flex h-auto w-full max-h-[100dvh] flex-col overflow-hidden bg-[#0d120e] md:max-h-[calc(100dvh-80px)] md:w-[390px] md:rounded-2xl md:border md:border-[#E5E5E5] md:shadow-2xl"
                 onMouseDown={(event) => {
                     event.stopPropagation();
                 }}
             >
                 {/* HEADER */}
-                <div className="flex shrink-0 items-center gap-3 border-b border-[#d8f45a]/10 px-4 py-4">
+                <div className="flex shrink-0 items-center gap-3 border-b border-[#E5E5E5] px-4 py-4">
                     {/* BACCK BUTTON */}
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#f1eee8] md:hidden"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#171717] md:hidden"
                         aria-label="Back"
                     >
                         <FiArrowLeft className="text-lg" />
                     </button>
 
-                    <h2 className="min-w-0 flex-1 truncate text-base font-semibold text-[#f1eee8]">
+                    <h2 className="min-w-0 flex-1 truncate text-base font-semibold text-[#171717]">
                         Contacts
                     </h2>
 
@@ -117,7 +117,7 @@ const ContactsModal = ({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#f1eee8] md:flex"
+                        className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#171717] md:flex"
                         aria-label="Close contacts"
                     >
                         <FiX className="text-lg" />
@@ -129,11 +129,11 @@ const ContactsModal = ({
                     {normalizedContacts.length === 0 ? (
                         <div className="flex h-full items-center justify-center px-6 text-center">
                             <div>
-                                <h3 className="text-sm font-semibold text-[#f1eee8]">
+                                <h3 className="text-sm font-semibold text-[#171717]">
                                     No contacts
                                 </h3>
 
-                                <p className="mt-2 text-xs leading-5 text-[#70786f]">
+                                <p className="mt-2 text-xs leading-5 text-[#737373]">
                                     There are no other Aetherion users to
                                     share.
                                 </p>
@@ -165,8 +165,8 @@ const ContactsModal = ({
                 flex h-12 w-12
                 items-center justify-center
                 rounded-full
-                bg-[#d8f45a]
-                text-[#10120d]
+                bg-[#171717]
+                text-[#FFFFFF]
                 shadow-lg
                 transition
                 hover:bg-[#e4ff6c]
