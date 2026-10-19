@@ -67,8 +67,8 @@ const ReplyMessage = ({
     "Message";
 
   const secondaryTextClass = isMyMessage
-    ? "text-[#343b16]"
-    : "text-[#aab3a8]";
+    ? "text-[#F5F5F5]"
+    : "text-[#737373]";
 
   return (
     <button
@@ -76,7 +76,7 @@ const ReplyMessage = ({
       onClick={onClick}
       className={`mb-2 block w-full overflow-hidden rounded-lg border-l-4 text-left transition active:scale-[0.99] ${isMyMessage
           ? "border-[#E5E5E5] bg-[#171717]/35 hover:bg-[#171717]/45"
-          : "border-[#d8f45a]/50 bg-[#FFFFFF] hover:bg-[#F5F5F5]"
+          : "border-[#171717]/50 bg-[#FFFFFF] hover:bg-[#F5F5F5]"
         }`}
     >
       <div className="px-3 pb-1.5 pt-1.5">
@@ -84,7 +84,7 @@ const ReplyMessage = ({
         <p
           className={`mb-1 text-xs font-semibold ${isMyMessage
               ? "text-[#FFFFFF]"
-              : "text-[#d8f45a]"
+              : "text-[#171717]"
             }`}
         >
           {senderName}
