@@ -75,15 +75,15 @@ const ReplyMessage = ({
       type="button"
       onClick={onClick}
       className={`mb-2 block w-full overflow-hidden rounded-lg border-l-4 text-left transition active:scale-[0.99] ${isMyMessage
-          ? "border-[#68752d] bg-[#b8cd4f]/35 hover:bg-[#b8cd4f]/45"
-          : "border-[#d8f45a]/50 bg-[#10170f] hover:bg-[#162015]"
+          ? "border-[#E5E5E5] bg-[#171717]/35 hover:bg-[#171717]/45"
+          : "border-[#d8f45a]/50 bg-[#FFFFFF] hover:bg-[#F5F5F5]"
         }`}
     >
       <div className="px-3 pb-1.5 pt-1.5">
         {/* SENDER */}
         <p
           className={`mb-1 text-xs font-semibold ${isMyMessage
-              ? "text-[#39400f]"
+              ? "text-[#FFFFFF]"
               : "text-[#d8f45a]"
             }`}
         >
