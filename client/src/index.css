@@ -36,18 +36,44 @@ body {
 }
 
 .scrollbar-aetherion::-webkit-scrollbar-thumb {
-  background: #E5E5E5;
+  background: #475569;
   border: 2px solid transparent;
   background-clip: content-box;
   border-radius: 999px;
 }
 
 .scrollbar-aetherion::-webkit-scrollbar-thumb:hover {
-  background: #B8B8B8;
+  background: #64748b;
   background-clip: content-box;
 }
 
 .scrollbar-aetherion {
+  scrollbar-width: thin;
+  scrollbar-color: #708bb2 transparent;
+}
+
+/* Light monochrome scrollbar used only by the redesigned Home experience. */
+.scrollbar-aetherion-light::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-thumb {
+  background: #E5E5E5;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-thumb:hover {
+  background: #B8B8B8;
+  background-clip: content-box;
+}
+
+.scrollbar-aetherion-light {
   scrollbar-width: thin;
   scrollbar-color: #B8B8B8 transparent;
 }
