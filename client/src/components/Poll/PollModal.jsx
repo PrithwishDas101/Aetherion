@@ -181,7 +181,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
                     </button>
                 </div>
 
-                <div className="scrollbar-aetherion min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:py-3.5">
+                <div className="scrollbar-aetherion-light min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:py-3.5">
                     <div>
                         <label
                             htmlFor="poll-question"
@@ -201,7 +201,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
                             placeholder="What do you want to ask?"
                             maxLength={500}
                             rows={2}
-                            className="scrollbar-aetherion min-h-[64px] w-full resize-none rounded-xl border border-[#E5E5E5] bg-[#F7F7F5] px-3 py-2.5 text-sm leading-5 text-[#171717] outline-none transition placeholder:text-[#737373] focus:border-[#171717]/45 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="scrollbar-aetherion-light min-h-[64px] w-full resize-none rounded-xl border border-[#E5E5E5] bg-[#F7F7F5] px-3 py-2.5 text-sm leading-5 text-[#171717] outline-none transition placeholder:text-[#737373] focus:border-[#171717]/45 disabled:cursor-not-allowed disabled:opacity-60"
                         />
 
                         <div className="mt-1 text-right text-[10px] text-[#737373]">
