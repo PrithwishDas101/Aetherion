@@ -147,11 +147,11 @@ const LocationModal = ({
                                 <FiMapPin className="text-lg animate-pulse" />
                             </div>
 
-                            <p className="text-xs font-medium text-[#e7e9e3]">
+                            <p className="text-xs font-medium text-[#F5F5F5]">
                                 Finding your location
                             </p>
 
-                            <p className="mt-1 max-w-[220px] text-[9px] leading-4 text-[#687167]">
+                            <p className="mt-1 max-w-[220px] text-[9px] leading-4 text-[#737373]">
                                 Please allow location access when your browser asks.
                             </p>
                         </div>
@@ -191,11 +191,11 @@ const LocationModal = ({
 
                                 {/* Location pin */}
                                 <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e2e4d7] text-[#11150f] shadow-lg">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F5F5F5] text-[#F7F7F5] shadow-lg">
                                         <FiMapPin className="text-base" />
                                     </div>
 
-                                    <div className="mx-auto h-1.5 w-1.5 rounded-full bg-[#dbdcd5]" />
+                                    <div className="mx-auto h-1.5 w-1.5 rounded-full bg-[#E5E5E5]" />
                                 </div>
                             </div>
 
@@ -211,7 +211,7 @@ const LocationModal = ({
                                             Current location
                                         </p>
 
-                                        <p className="mt-0.5 truncate font-mono text-[13px] text-[#626b61]">
+                                        <p className="mt-0.5 truncate font-mono text-[13px] text-[#737373]">
                                             {coordinates.latitude.toFixed(6)},{" "}
                                             {coordinates.longitude.toFixed(6)}
                                         </p>
@@ -222,7 +222,7 @@ const LocationModal = ({
                     )}
 
                     {(status === "error" || status === "denied") && (
-                        <div className="flex min-h-[180px] flex-col items-center justify-center rounded-lg border border-[#ff6b6b]/10 bg-[#160f0f] px-5 text-center">
+                        <div className="flex min-h-[180px] flex-col items-center justify-center rounded-lg border border-[#ff6b6b]/10 bg-[#F7F7F5] px-5 text-center">
                             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#ff6b6b]/10 text-[#ff7b7b]">
                                 <FiAlertCircle className="text-lg" />
                             </div>
@@ -231,7 +231,7 @@ const LocationModal = ({
                                 Location unavailable
                             </p>
 
-                            <p className="mt-1 max-w-[250px] text-[9px] leading-4 text-[#817773]">
+                            <p className="mt-1 max-w-[250px] text-[9px] leading-4 text-[#737373]">
                                 {errorMessage}
                             </p>
 
@@ -239,7 +239,7 @@ const LocationModal = ({
                                 type="button"
                                 onClick={requestLocation}
                                 disabled={isSending}
-                                className="mt-4 flex items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 py-2 text-[9px] font-semibold text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#171717]"
+                                className="mt-4 flex items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 py-2 text-[9px] font-semibold text-[#737373] transition hover:bg-white/[0.05] hover:text-[#171717]"
                             >
                                 <FiRefreshCw className="text-xs" />
                                 Try again
@@ -255,7 +255,7 @@ const LocationModal = ({
                             type="button"
                             onClick={handleClose}
                             disabled={isSending}
-                            className="flex-1 rounded-lg border border-white/[0.06] px-3 py-2 text-[12px] font-semibold text-[#7f897d] transition hover:bg-white/[0.03] hover:text-[#b7beb4] disabled:opacity-40"
+                            className="flex-1 rounded-lg border border-white/[0.06] px-3 py-2 text-[12px] font-semibold text-[#737373] transition hover:bg-white/[0.03] hover:text-[#737373] disabled:opacity-40"
                         >
                             Cancel
                         </button>
@@ -264,7 +264,7 @@ const LocationModal = ({
                             type="button"
                             onClick={handleSend}
                             disabled={isSending}
-                            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#171717] px-3 py-2 text-[10px] font-bold text-[#11150f] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#171717] px-3 py-2 text-[10px] font-bold text-[#F7F7F5] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {isSending ? (
                                 <>
