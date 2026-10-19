@@ -152,7 +152,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
 
     return createPortal(
         <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0b100c] lg:bg-transparent lg:pl-[320px]"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-[#FFFFFF] lg:bg-transparent lg:pl-[320px]"
             onMouseDown={(event) => {
                 if (event.target === event.currentTarget) {
                     handleClose();
@@ -160,7 +160,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
             }}
         >
             <div
-                className="flex h-full w-full flex-col overflow-hidden bg-[#0b100c] lg:h-auto lg:max-h-[calc(100dvh-56px)] lg:max-w-[400px] lg:rounded-2xl lg:border lg:border-[#d8f45a]/15 lg:shadow-[0_18px_70px_rgba(0,0,0,0.55)]"
+                className="flex h-full w-full flex-col overflow-hidden bg-[#FFFFFF] lg:h-auto lg:max-h-[calc(100dvh-56px)] lg:max-w-[400px] lg:rounded-2xl lg:border lg:border-[#E5E5E5] lg:shadow-[0_18px_70px_rgba(0,0,0,0.55)]"
                 onMouseDown={(event) => event.stopPropagation()}
             >
                 <div className="flex shrink-0 items-center justify-between border-b border-white/[0.06] px-4 py-3">
@@ -201,7 +201,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
                             placeholder="What do you want to ask?"
                             maxLength={500}
                             rows={2}
-                            className="scrollbar-aetherion min-h-[64px] w-full resize-none rounded-xl border border-[#d8f45a]/10 bg-[#080d09] px-3 py-2.5 text-sm leading-5 text-[#edefe5] outline-none transition placeholder:text-[#697267] focus:border-[#d8f45a]/45 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="scrollbar-aetherion min-h-[64px] w-full resize-none rounded-xl border border-[#E5E5E5] bg-[#F7F7F5] px-3 py-2.5 text-sm leading-5 text-[#edefe5] outline-none transition placeholder:text-[#697267] focus:border-[#171717]/45 disabled:cursor-not-allowed disabled:opacity-60"
                         />
 
                         <div className="mt-1 text-right text-[10px] text-[#667060]">
@@ -237,7 +237,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
                                         disabled={isSending}
                                         maxLength={200}
                                         placeholder={`Option ${index + 1}`}
-                                        className={`h-10 min-w-0 flex-1 rounded-lg border bg-[#080d09] px-3 text-xs text-[#edefe5] outline-none transition placeholder:text-[#697267] disabled:cursor-not-allowed disabled:opacity-60 ${option.text.trim() && normalizedOptionCounts[option.text.trim().toLocaleLowerCase()] > 1 ? "border-red-500/70 focus:border-red-400" : "border-[#d8f45a]/10 focus:border-[#d8f45a]/45"}`}
+                                        className={`h-10 min-w-0 flex-1 rounded-lg border bg-[#F7F7F5] px-3 text-xs text-[#edefe5] outline-none transition placeholder:text-[#697267] disabled:cursor-not-allowed disabled:opacity-60 ${option.text.trim() && normalizedOptionCounts[option.text.trim().toLocaleLowerCase()] > 1 ? "border-red-500/70 focus:border-red-400" : "border-[#E5E5E5] focus:border-[#171717]/45"}`}
                                     />
 
                                     {options.length > 2 && (
@@ -276,7 +276,7 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
                         )}
                     </div>
 
-                    <div className="mt-3.5 flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-[#080d09] px-3 py-2.5">
+                    <div className="mt-3.5 flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-[#F7F7F5] px-3 py-2.5">
                         <div className="min-w-0">
                             <p className="text-xs font-semibold text-[#edefe5]">
                                 Allow multiple answers
@@ -309,11 +309,11 @@ const PollModal = ({ isOpen, onClose, onSend }) => {
                         type="button"
                         onClick={handleSend}
                         disabled={isSending}
-                        className="pointer-events-auto ml-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#d7f941] text-[#10120d] shadow-lg transition hover:bg-[#dcf95e] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
+                        className="pointer-events-auto ml-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#d7f941] text-[#FFFFFF] shadow-lg transition hover:bg-[#dcf95e] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
                         aria-label={isSending ? "Sending poll" : "Send poll"}
                     >
                         {isSending ? (
-                            <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#10120d]/30 border-t-[#10120d]" />
+                            <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#FFFFFF]/30 border-t-[#FFFFFF]" />
                         ) : (
                             <FiSend className="text-xl" />
                         )}
