@@ -36,20 +36,20 @@ body {
 }
 
 .scrollbar-aetherion::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #E5E5E5;
   border: 2px solid transparent;
   background-clip: content-box;
   border-radius: 999px;
 }
 
 .scrollbar-aetherion::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: #B8B8B8;
   background-clip: content-box;
 }
 
 .scrollbar-aetherion {
   scrollbar-width: thin;
-  scrollbar-color: #708bb2 transparent;
+  scrollbar-color: #B8B8B8 transparent;
 }
 
 @keyframes typingDot {
@@ -70,7 +70,7 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 9999px;
-  background: #d8f45a;
+  background: #171717;
   animation: typingDot 1.2s infinite ease-in-out;
 }
 
@@ -92,17 +92,17 @@ body {
 }
 
 .scrollbar-media-picker::-webkit-scrollbar-thumb {
-  background: #7c3aed;
+  background: #B8B8B8;
   border-radius: 999px;
 }
 
 .scrollbar-media-picker::-webkit-scrollbar-thumb:hover {
-  background: #9333ea;
+  background: #737373;
 }
 
 .scrollbar-media-picker {
   scrollbar-width: thin;
-  scrollbar-color: #7c3aed transparent;
+  scrollbar-color: #B8B8B8 transparent;
 }
 
 .message-row-highlight {
@@ -111,24 +111,24 @@ body {
 
 @keyframes message-row-highlight {
   0% {
-    background-color: rgba(216, 244, 90, 0);
+    background-color: rgba(0, 0, 0, 0);
   }
 
   15% {
-    background-color: rgba(216, 244, 90, 0.16);
+    background-color: rgba(0, 0, 0, 0.16);
   }
 
   55% {
-    background-color: rgba(216, 244, 90, 0.08);
+    background-color: rgba(0, 0, 0, 0.08);
   }
 
   100% {
-    background-color: rgba(216, 244, 90, 0);
+    background-color: rgba(0, 0, 0, 0);
   }
 }
 
 .aetherion-button {
-  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#858d84] transition-colors duration-300 hover:text-[#e8e8e5];
+  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#737373] transition-colors duration-300 hover:text-[#e8e8e5];
 }
 
 .aetherion-button > span {
