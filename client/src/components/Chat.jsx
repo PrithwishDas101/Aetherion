@@ -2431,7 +2431,7 @@ const Chat = ({ socket }) => {
         >
           {/* NAME + PRESENCE */}
           <div className="min-w-0 flex-1">
-            <p className="truncate font-bold text-[#edefe5] transition group-hover:text-[#f5f7ef]">
+            <p className="truncate font-bold text-[#171717] transition group-hover:text-[#171717]">
               {selectedUser
                 ? `${selectedUser.firstName} ${selectedUser.lastName}`
                 : "Chat"}
@@ -2440,7 +2440,7 @@ const Chat = ({ socket }) => {
             {selectedUser &&
               selectedUser.publicPresenceStatus !==
               PRESENCE_STATUS.AUTOMATIC ? (
-              <p className="flex items-center justify-end gap-1 text-xs text-[#8a9385]">
+              <p className="flex items-center justify-end gap-1 text-xs text-[#737373]">
                 <PresenceIcon
                   status={effectivePresenceStatus}
                   size="small"
@@ -2465,7 +2465,7 @@ const Chat = ({ socket }) => {
                 </span>
               </p>
             ) : (
-              <p className="flex items-center justify-end gap-1 text-xs text-[#8a9385]">
+              <p className="flex items-center justify-end gap-1 text-xs text-[#737373]">
                 {selectedUserPresence?.online && (
                   <PresenceIcon
                     status={PRESENCE_STATUS.ONLINE}
@@ -2480,7 +2480,7 @@ const Chat = ({ socket }) => {
             )}
 
             {isTyping && (
-              <p className="text-right text-xs text-[#eaf7b3]">
+              <p className="text-right text-xs text-[#737373]">
                 typing...
               </p>
             )}
@@ -2505,7 +2505,7 @@ const Chat = ({ socket }) => {
                 alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
                 decoration={selectedUser.avatarDecoration}
                 size="sm"
-                avatarClassName="bg-[#cacfb4] text-[#FFFFFF] font-bold transition duration-200 group-hover:scale-[1.04]"
+                avatarClassName="bg-[#E5E5E5] text-[#FFFFFF] font-bold transition duration-200 group-hover:scale-[1.04]"
               />
 
               <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-4 w-4 items-center justify-center">
@@ -2625,7 +2625,7 @@ const Chat = ({ socket }) => {
                     ? `Jump to latest messages, ${newMessageCount} new messages`
                     : "Jump to latest messages"
                 }
-                className="pointer-events-auto relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full backdrop-blur-md transition-all duration-200 hover:bg-[#202b21] active:scale-90"
+                className="pointer-events-auto relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full backdrop-blur-md transition-all duration-200 hover:bg-[#F5F5F5] active:scale-90"
               >
                 {/* SCROLL ICON */}
                 <img
@@ -2710,7 +2710,7 @@ const Chat = ({ socket }) => {
             <button
               type="button"
               onClick={toggleMediaPicker}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#cedecb] transition hover:text-[#ebf0e4] active:scale-95"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#737373] transition hover:text-[#171717] active:scale-95"
               aria-label={
                 showMediaPicker ? "Show keyboard" : "Open emojis and media"
               }
