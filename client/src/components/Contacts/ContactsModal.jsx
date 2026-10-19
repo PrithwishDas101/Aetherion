@@ -103,7 +103,7 @@ const ContactsModal = ({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#171717] md:hidden"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#737373] transition hover:bg-white/[0.05] hover:text-[#171717] md:hidden"
                         aria-label="Back"
                     >
                         <FiArrowLeft className="text-lg" />
@@ -117,7 +117,7 @@ const ContactsModal = ({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#aeb7aa] transition hover:bg-white/[0.05] hover:text-[#171717] md:flex"
+                        className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#737373] transition hover:bg-white/[0.05] hover:text-[#171717] md:flex"
                         aria-label="Close contacts"
                     >
                         <FiX className="text-lg" />
@@ -169,7 +169,7 @@ const ContactsModal = ({
                 text-[#FFFFFF]
                 shadow-lg
                 transition
-                hover:bg-[#e4ff6c]
+                hover:bg-[#333333]
                 active:scale-95
               "
                             aria-label={`Send ${selectedContactIds.length} contact${selectedContactIds.length === 1
