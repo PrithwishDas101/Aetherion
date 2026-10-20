@@ -191,7 +191,7 @@ const Home = () => {
   }, [dispatch]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#F7F7F5] text-[#171717]">
+    <div className="aetherion-home flex h-screen flex-col overflow-hidden bg-[#F0EEE9] text-[#252522]">
       <div className={selectedChat ? "hidden md:block" : "block"}>
         <Header />
       </div>
