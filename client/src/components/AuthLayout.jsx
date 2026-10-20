@@ -48,10 +48,15 @@ export default function AuthLayout({ children, page = "login" }) {
   });
   const palette = palettes[theme];
 
+  React.useEffect(() => {
+    document.documentElement.dataset.aetherionTheme = theme;
+  }, [theme]);
+
   function changeTheme(nextTheme) {
     setTheme(nextTheme);
     try {
       window.localStorage.setItem("aetherion-auth-theme", nextTheme);
+      document.documentElement.dataset.aetherionTheme = nextTheme;
     } catch {
       // The theme still works for the current visit when storage is unavailable.
     }
