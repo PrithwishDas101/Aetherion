@@ -208,3 +208,60 @@ body {
     filter: brightness(1);
   }
 }
+
+
+/* Aetherion shared appearance system: muted warm light + true dark mode. */
+.aetherion-home {
+  background-color: #F0EEE9 !important;
+  color: #252522 !important;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+.aetherion-home [class~="bg-white"],
+.aetherion-home [class~="bg-[#FFFFFF]"],
+.aetherion-home [class~="bg-[#F7F7F5]"],
+.aetherion-home [class~="bg-[#F5F5F5]"] {
+  background-color: #F8F7F3 !important;
+}
+.aetherion-home [class~="border-[#E5E5E5]"] {
+  border-color: #DCD8D0 !important;
+}
+.aetherion-home [class~="text-[#171717]"] { color: #252522 !important; }
+.aetherion-home [class~="text-[#404040]"] { color: #4B4A45 !important; }
+.aetherion-home [class~="text-[#737373]"] { color: #77756E !important; }
+.aetherion-home [class~="bg-[#171717]"] { background-color: #292A27 !important; }
+.aetherion-home [class~="hover:bg-[#E5E5E5]"]:hover { background-color: #E9E6DF !important; }
+.aetherion-home .scrollbar-aetherion-light { scrollbar-color: #BEBAB2 transparent; }
+.aetherion-home .scrollbar-aetherion-light::-webkit-scrollbar-thumb { background: #BEBAB2; }
+.aetherion-home .typing-dot { background: currentColor; }
+
+html[data-aetherion-theme="night"] body { background: #111210; color: #F0EFEA; }
+html[data-aetherion-theme="night"] .aetherion-home {
+  background-color: #111210 !important;
+  color: #F0EFEA !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-white"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#FFFFFF]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#F7F7F5]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#F5F5F5]"] {
+  background-color: #1B1C19 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#F0EEE9]"] { background-color: #111210 !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="border-[#E5E5E5]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="border-[#DCD8D0]"] { border-color: #34352F !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#171717]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#252522]"] { color: #F0EFEA !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#404040]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#4B4A45]"] { color: #D1D0C9 !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#737373]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#77756E]"] { color: #A7A69E !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#171717]"] { background-color: #E8E7E0 !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#FFFFFF]"] { color: #171815 !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="hover:bg-[#E5E5E5]"]:hover { background-color: #2A2B26 !important; }
+html[data-aetherion-theme="night"] .aetherion-home .scrollbar-aetherion-light { scrollbar-color: #55564E transparent; }
+html[data-aetherion-theme="night"] .aetherion-home .scrollbar-aetherion-light::-webkit-scrollbar-thumb { background: #55564E; }
+html[data-aetherion-theme="night"] .aetherion-home .typing-dot { background: #F0EFEA; }
+html[data-aetherion-theme="night"] .aetherion-theme-menu-item {
+  background-color: #252620 !important;
+  color: #E6E5DE !important;
+}
+html[data-aetherion-theme="night"] .aetherion-theme-menu-item:hover { background-color: #30312B !important; }
