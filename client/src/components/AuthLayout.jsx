@@ -89,11 +89,11 @@ export default function AuthLayout({ children, page = "login" }) {
             <span className="text-[15px] font-semibold tracking-[-0.025em]">Aetherion</span>
           </a>
           <div className="flex items-center rounded-full border border-[var(--auth-border)] bg-[var(--auth-surface)] p-1" aria-label="Color theme">
-            <button type="button" onClick={() => changeTheme("warm")} aria-label="Use warm theme" aria-pressed={theme === "warm"} className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--auth-accent)] ${theme === "warm" ? "bg-[var(--auth-primary)] text-[var(--auth-primary-text)]" : "text-[var(--auth-muted)] hover:text-[var(--auth-text)]"}`}>
-              <FaSun size={12} /> <span className="hidden sm:inline">Warm</span>
+            <button type="button" onClick={() => changeTheme("warm")} aria-label="Use light mode" aria-pressed={theme === "warm"} className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--auth-accent)] ${theme === "warm" ? "bg-[var(--auth-primary)] text-[var(--auth-primary-text)]" : "text-[var(--auth-muted)] hover:text-[var(--auth-text)]"}`}>
+              <FaSun size={12} /> <span className="hidden sm:inline">Light</span>
             </button>
-            <button type="button" onClick={() => changeTheme("night")} aria-label="Use night theme" aria-pressed={theme === "night"} className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--auth-accent)] ${theme === "night" ? "bg-[var(--auth-primary)] text-[var(--auth-primary-text)]" : "text-[var(--auth-muted)] hover:text-[var(--auth-text)]"}`}>
-              <FaMoon size={12} /> <span className="hidden sm:inline">Night</span>
+            <button type="button" onClick={() => changeTheme("night")} aria-label="Use dark mode" aria-pressed={theme === "night"} className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--auth-accent)] ${theme === "night" ? "bg-[var(--auth-primary)] text-[var(--auth-primary-text)]" : "text-[var(--auth-muted)] hover:text-[var(--auth-text)]"}`}>
+              <FaMoon size={12} /> <span className="hidden sm:inline">Dark</span>
             </button>
           </div>
         </div>
