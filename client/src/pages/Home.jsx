@@ -211,7 +211,7 @@ const Home = () => {
 
         {/* CHAT AREA */}
         <div
-          className={`aetherion-chat-surface min-h-0 flex-1 overflow-hidden bg-white md:rounded-2xl md:border ${selectedChat || hasNoChats ? "block" : "hidden"
+          className={`aetherion-chat-surface min-h-0 flex-1 overflow-hidden bg-white md:rounded-2xl ${selectedChat || hasNoChats ? "block" : "hidden"
             } md:block`}
         >
           {selectedChat ? (
