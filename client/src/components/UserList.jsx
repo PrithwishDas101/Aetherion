@@ -214,14 +214,14 @@ function UserList({ searchKey, socket }) {
             String(selectedChat?._id) === String(userChat?._id);
 
           const userClass = isSelected
-            ? "border-l-[3px] border-l-[#171717] bg-[#FFFFFF] shadow-[inset_0_0_18px_rgba(0,0,0,0.035)]"
-            : "border-l-[3px] border-l-transparent hover:bg-[#F5F5F5]";
+            ? "aetherion-user-row-selected border-l-[3px] border-l-[#73736C]"
+            : "aetherion-user-row-idle border-l-[3px] border-l-transparent";
 
           return (
             <div
               key={user._id}
               onClick={() => openChat(user._id)}
-              className={`group relative cursor-pointer border-b border-[#E5E5E5] px-3 py-4 transition-all duration-200 ${userClass}`}
+              className={`aetherion-user-row group relative cursor-pointer border-b border-[#E5E5E5] px-3 py-4 transition-colors duration-150 ${userClass}`}
             >
               <div className="flex items-center gap-3">
                 {/* PROFILE PICTURE */}
