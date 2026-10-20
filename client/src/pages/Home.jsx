@@ -199,7 +199,7 @@ const Home = () => {
       <div className="flex min-h-0 flex-1 gap-3 px-0 py-3 md:px-5 md:py-4">
         {/* CHAT LIST */}
         <div
-          className={`min-h-0 w-full overflow-hidden rounded-none border-0 bg-white ${selectedChat ? "hidden" : "block"} md:block md:w-[30%] md:min-w-[320px] md:rounded-2xl md:border md:border-[#E5E5E5]`}
+          className={`aetherion-chat-list min-h-0 w-full overflow-hidden rounded-none border-0 bg-white ${selectedChat ? "hidden" : "block"} md:block md:w-[30%] md:min-w-[320px] md:rounded-2xl`}
         >
           <Sidebar
             socket={socket}
@@ -211,7 +211,7 @@ const Home = () => {
 
         {/* CHAT AREA */}
         <div
-          className={`min-h-0 flex-1 overflow-hidden bg-white md:rounded-2xl md:border md:border-[#E5E5E5] ${selectedChat || hasNoChats ? "block" : "hidden"
+          className={`aetherion-chat-surface min-h-0 flex-1 overflow-hidden bg-white md:rounded-2xl md:border ${selectedChat || hasNoChats ? "block" : "hidden"
             } md:block`}
         >
           {selectedChat ? (
