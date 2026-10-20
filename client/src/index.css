@@ -255,7 +255,7 @@ html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#4B4A45]"] { c
 html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#737373]"],
 html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#77756E]"] { color: #A7A69E !important; }
 html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#171717]"] { background-color: #E8E7E0 !important; }
-html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#FFFFFF]"] { color: #171815 !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#171717]"][class~="text-[#FFFFFF]"] { color: #171815 !important; }
 html[data-aetherion-theme="night"] .aetherion-home [class~="hover:bg-[#E5E5E5]"]:hover { background-color: #2A2B26 !important; }
 html[data-aetherion-theme="night"] .aetherion-home .scrollbar-aetherion-light { scrollbar-color: #55564E transparent; }
 html[data-aetherion-theme="night"] .aetherion-home .scrollbar-aetherion-light::-webkit-scrollbar-thumb { background: #55564E; }
