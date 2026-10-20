@@ -2402,9 +2402,9 @@ const Chat = ({ socket }) => {
   }
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+    <div className="aetherion-chat-panel flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border bg-[#FFFFFF] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
       {/* CHAT HEADER */}
-      <div className="mb-4 flex shrink-0 items-center border-b border-[#E5E5E5] px-2 py-3 sm:mb-5 sm:px-4">
+      <div className="aetherion-chat-header mb-4 flex shrink-0 items-center border-b border-[#E5E5E5] px-2 py-3 sm:mb-5 sm:px-4">
         {/* BACK */}
         <button
           type="button"
