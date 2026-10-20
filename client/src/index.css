@@ -210,6 +210,73 @@ body {
 }
 
 
+/* Shared app theme tokens for neutral surfaces on every route. */
+.aetherion-app {
+  min-height: 100vh;
+  background: #F0EEE9;
+  color: #252522;
+}
+.aetherion-app [class~="bg-white"],
+.aetherion-app [class~="bg-gray-50"],
+.aetherion-app [class~="bg-gray-100"],
+.aetherion-app [class~="bg-[#FFFFFF]"],
+.aetherion-app [class~="bg-[#F7F7F5]"],
+.aetherion-app [class~="bg-[#F5F5F5]"] {
+  background-color: #F8F7F3 !important;
+}
+.aetherion-app [class~="border-gray-100"],
+.aetherion-app [class~="border-gray-200"],
+.aetherion-app [class~="border-[#E5E5E5]"] {
+  border-color: #DCD8D0 !important;
+}
+.aetherion-app [class~="text-gray-900"],
+.aetherion-app [class~="text-gray-800"],
+.aetherion-app [class~="text-[#171717]"] {
+  color: #252522 !important;
+}
+.aetherion-app [class~="text-gray-700"],
+.aetherion-app [class~="text-gray-600"],
+.aetherion-app [class~="text-[#404040]"] {
+  color: #4B4A45 !important;
+}
+.aetherion-app [class~="text-gray-500"],
+.aetherion-app [class~="text-gray-400"],
+.aetherion-app [class~="text-[#737373]"] {
+  color: #77756E !important;
+}
+html[data-aetherion-theme="night"] .aetherion-app {
+  background: #111210;
+  color: #F0EFEA;
+}
+html[data-aetherion-theme="night"] .aetherion-app [class~="bg-white"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="bg-gray-50"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="bg-gray-100"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="bg-[#FFFFFF]"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="bg-[#F7F7F5]"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="bg-[#F5F5F5]"] {
+  background-color: #1B1C19 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-app [class~="border-gray-100"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="border-gray-200"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="border-[#E5E5E5]"] {
+  border-color: #34352F !important;
+}
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-gray-900"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-gray-800"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-[#171717]"] {
+  color: #F0EFEA !important;
+}
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-gray-700"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-gray-600"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-[#404040]"] {
+  color: #D1D0C9 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-gray-500"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-gray-400"],
+html[data-aetherion-theme="night"] .aetherion-app [class~="text-[#737373]"] {
+  color: #A7A69E !important;
+}
+
 /* Aetherion shared appearance system: muted warm light + true dark mode. */
 .aetherion-home {
   background-color: #F0EEE9 !important;
