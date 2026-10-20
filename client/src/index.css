@@ -332,3 +332,125 @@ html[data-aetherion-theme="night"] .aetherion-theme-menu-item {
   color: #E6E5DE !important;
 }
 html[data-aetherion-theme="night"] .aetherion-theme-menu-item:hover { background-color: #30312B !important; }
+
+
+/* Home polish pass: use layered surfaces, not bright hover inversions. */
+.aetherion-home {
+  --home-canvas: #F1F0EC;
+  --home-surface: #F7F6F2;
+  --home-surface-hover: #E8E6E0;
+  --home-surface-selected: #E5E3DC;
+  --home-border: #DAD8D1;
+  --home-divider: #E5E3DD;
+  --home-foreground: #262723;
+  --home-muted: #74746D;
+  background: var(--home-canvas) !important;
+  color: var(--home-foreground) !important;
+}
+.aetherion-home .aetherion-chat-list {
+  background: var(--home-canvas) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.aetherion-home .aetherion-chat-surface,
+.aetherion-home .aetherion-chat-panel {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: none !important;
+}
+.aetherion-home .aetherion-chat-header {
+  border-color: var(--home-divider) !important;
+}
+.aetherion-home .aetherion-user-row {
+  border-bottom-color: var(--home-divider) !important;
+}
+.aetherion-home .aetherion-user-row-idle {
+  background-color: transparent !important;
+}
+.aetherion-home .aetherion-user-row-idle:hover {
+  background-color: var(--home-surface-hover) !important;
+}
+.aetherion-home .aetherion-user-row-selected {
+  background-color: var(--home-surface-selected) !important;
+  box-shadow: inset 2px 0 0 #77776F !important;
+}
+.aetherion-home .aetherion-user-row-selected:hover {
+  background-color: var(--home-surface-selected) !important;
+}
+.aetherion-home .aetherion-chat-list [class~="hover:bg-[#F5F5F5]"]:hover,
+.aetherion-home .aetherion-chat-panel [class~="hover:bg-[#F5F5F5]"]:hover,
+.aetherion-home .aetherion-chat-list [class~="hover:bg-white"]:hover,
+.aetherion-home .aetherion-chat-panel [class~="hover:bg-white"]:hover {
+  background-color: var(--home-surface-hover) !important;
+}
+.aetherion-home .aetherion-chat-list [class~="hover:bg-[#333333]"]:hover,
+.aetherion-home .aetherion-chat-panel [class~="hover:bg-[#333333]"]:hover {
+  background-color: #41423D !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home {
+  --home-canvas: #171817;
+  --home-surface: #1E201F;
+  --home-surface-hover: #292B29;
+  --home-surface-selected: #2B2D2A;
+  --home-border: #303330;
+  --home-divider: #2A2C29;
+  --home-foreground: #E8E8E2;
+  --home-muted: #A1A29A;
+  background: var(--home-canvas) !important;
+  color: var(--home-foreground) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-list {
+  background: var(--home-canvas) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-surface,
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: none !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-header {
+  border-color: var(--home-divider) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row {
+  border-bottom-color: var(--home-divider) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-idle {
+  background-color: transparent !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-idle:hover {
+  background-color: var(--home-surface-hover) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-selected {
+  background-color: var(--home-surface-selected) !important;
+  box-shadow: inset 2px 0 0 #A7A89F !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-selected:hover {
+  background-color: var(--home-surface-selected) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-list [class~="hover:bg-[#F5F5F5]"]:hover,
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel [class~="hover:bg-[#F5F5F5]"]:hover,
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-list [class~="hover:bg-white"]:hover,
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel [class~="hover:bg-white"]:hover {
+  background-color: var(--home-surface-hover) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-list [class~="hover:bg-[#333333]"]:hover,
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel [class~="hover:bg-[#333333]"]:hover {
+  background-color: #383A37 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel [class~="bg-[#171717]"],
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-list [class~="bg-[#171717]"] {
+  background-color: #D7D8D1 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel [class~="bg-[#171717]"][class~="text-[#FFFFFF]"],
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-list [class~="bg-[#171717]"][class~="text-[#FFFFFF]"] {
+  color: #20211E !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel [class~="hover:bg-[#F5F5F5]"]:hover {
+  background-color: #292B29 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home .aetherion-user-row { transition: none !important; }
+}
