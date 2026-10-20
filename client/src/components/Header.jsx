@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   FiLogOut,
+  FiMoon,
+  FiSun,
   FiUser,
   FiUserPlus,
 } from "react-icons/fi";
@@ -25,8 +27,26 @@ function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [contactRequestCount, setContactRequestCount] = useState(0);
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem("aetherion-auth-theme") === "night" ? "night" : "warm";
+    } catch {
+      return "warm";
+    }
+  });
 
   const profileMenuRef = useRef(null);
+
+  useEffect(() => {
+    document.documentElement.dataset.aetherionTheme = theme;
+    try {
+      localStorage.setItem("aetherion-auth-theme", theme);
+    } catch {
+      // Keep the in-memory theme working if storage is unavailable.
+    }
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((current) => current === "night" ? "warm" : "night");
 
   useEffect(() => {
     if (!user?._id) {
@@ -255,6 +275,18 @@ function Header() {
                   </p>
                 </div>
               </div>
+
+              {/* Theme preference */}
+              <button
+                type="button"
+                role="menuitem"
+                onClick={toggleTheme}
+                className="aetherion-theme-menu-item mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#E5E5E5] hover:text-[#171717]"
+                aria-label={theme === "night" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {theme === "night" ? <FiSun className="h-[18px] w-[18px]" /> : <FiMoon className="h-[18px] w-[18px]" />}
+                <span>{theme === "night" ? "Light appearance" : "Dark appearance"}</span>
+              </button>
 
               {/* Profile */}
               <button
