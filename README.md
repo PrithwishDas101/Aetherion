@@ -1,379 +1,107 @@
-<h1 align="center">Aetherion</h1>
+# Aetherion
 
-<p align="center">
-  <strong>Real-time communication, built as a full-stack product.</strong>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-  <img src="https://img.shields.io/badge/Node.js-20232A?style=for-the-badge&logo=nodedotjs&logoColor=339933" alt="Node.js" />
-  <img src="https://img.shields.io/badge/Express-20232A?style=for-the-badge&logo=express&logoColor=ffffff" alt="Express" />
-  <img src="https://img.shields.io/badge/Socket.IO-20232A?style=for-the-badge&logo=socketdotio&logoColor=ffffff" alt="Socket.IO" />
-  <img src="https://img.shields.io/badge/MongoDB-20232A?style=for-the-badge&logo=mongodb&logoColor=47A248" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/Vercel-20232A?style=for-the-badge&logo=vercel&logoColor=ffffff" alt="Vercel" />
-</p>
-
-<p align="center">
-  A full-stack real-time messaging platform focused on reliability,<br />
-  security, expressive communication, and a polished user experience.
-</p>
-
-<p align="center">
-  <a href="https://aetherion-lime.vercel.app/">
-    <strong>Live Application →</strong>
-  </a>
-</p>
-
----
-
-## What is Aetherion?
-
-Aetherion is built around the idea that messaging should feel immediate while still behaving like a reliable, persistent application.
-
-Users can:
-
-- Create and maintain conversations
-- Send messages in real time
-- Share images, GIFs, videos, and documents
-- Reply to specific messages
-- Share locations and contact cards
-- Create and vote on polls
-- See typing and presence updates
-- Manage contacts and connections
-- Customize profiles with pictures and avatar details
-- View other users' public profile information
-
-Under the hood, the application combines a React frontend, an Express API, MongoDB persistence, Socket.IO realtime communication, JWT authentication, and Cloudinary media storage.
-
----
+Aetherion is a full-stack, real-time messaging application focused on fast conversations, reliable message persistence, and a polished chat experience.
 
 ## Features
 
-### ◉ Real-time messaging
+- Real-time messaging powered by Socket.IO
+- User accounts and authenticated sessions
+- Conversation and chat-list workflows
+- Share images, GIFs, videos, and documents
+- Reply to individual messages
+- Emoji picker and expressive messaging UI
+- Responsive React interface with client-side routing
+- Conversation and application state managed through Redux Toolkit / React state stores
+- MongoDB-backed persistence through Mongoose
+- Cloudinary integration for media handling
+- Server-side security controls, including Helmet, request rate limiting, file-type checks, and password hashing
 
-- Live one-to-one conversations with Socket.IO
-- Persistent message history
-- Realtime message delivery
-- Typing indicators
-- Online/offline presence
-- Read/unread message state
-- Reply-to-message support
-- Chat previews and unread counts
+Feature availability can depend on the current environment configuration and external services.
 
-### ◇ Rich messages
+## Tech stack
 
-Aetherion supports more than plain text:
+**Client**
+- React 19 + Vite
+- React Router
+- Tailwind CSS 3
+- Redux Toolkit and React Redux
+- Socket.IO Client
+- Axios
+- Lucide React and React Icons
+- Recharts for supported visualizations
 
-- Images
-- GIFs
-- Videos
-- Documents
-- Locations
-- Contact cards
-- Polls
-- Message replies
+**Server**
+- Node.js and Express 5
+- Socket.IO
+- MongoDB and Mongoose
+- JWT authentication and bcryptjs
+- Cloudinary and Multer
+- Helmet, CORS, cookie-parser, and express-rate-limit
 
-Media is uploaded and managed through Cloudinary while message metadata and conversation state are persisted in MongoDB.
-
-### ◌ Polls
-
-Polls are treated as a realtime part of the conversation rather than a separate feature.
-
-- Create polls directly inside chats
-- Prevent duplicate options
-- Vote on options
-- Update vote counts in realtime
-- Persist poll state in MongoDB
-- Handle concurrent voting with atomic database updates
-
-### ◎ Profiles and contacts
-
-- Profile pictures
-- Custom avatar presentation
-- Profile customization
-- Contact management
-- Public contact profiles
-- Server-authoritative shared contact information
-
-### ⌁ Authentication and session handling
-
-- JWT-based authentication
-- Protected application routes
-- Authentication bootstrap before rendering protected content
-- Proper handling of invalid or expired sessions
-- Realtime socket lifecycle tied to authenticated sessions
-- Safe logout and session teardown
-
----
-
-## Engineering Highlights
-
-Aetherion is more than a collection of frontend screens. Several parts of the application were deliberately hardened around real failure cases.
-
-### ◈ Data integrity
-
-Message creation and chat metadata updates are designed to succeed or fail together through MongoDB transactions. This keeps message persistence, chat previews, and unread counts from drifting apart when a database operation fails.
-
-Poll voting uses atomic MongoDB updates so simultaneous votes do not overwrite one another through a stale read-modify-write cycle.
-
-### ◉ Realtime lifecycle
-
-Socket.IO connections are treated as part of the authenticated session rather than as a permanently shared connection. Explicit logout and passive authentication expiry both tear down stale socket sessions.
-
-### ◎ Server-authoritative data
-
-Sensitive shared data is not blindly trusted from the client. For example, contact-card information is constructed from the authoritative user record on the server.
-
-### ⛓ Failure handling
-
-The backend avoids returning raw internal error details to clients. Media operations also account for failures across the Cloudinary and MongoDB boundary so failed database operations do not unnecessarily leave newly uploaded media behind.
-
-### ▲ Production reliability
-
-The project has been developed with real deployment constraints in mind, including:
-
-- Vercel SPA routing
-- Render backend deployment
-- Production CORS configuration
-- Environment-based configuration
-- Linux case-sensitive filesystem compatibility
-- Secure handling of environment secrets
-- Database persistence through MongoDB Atlas
-
----
-
-## Tech Stack
-
-| Layer | Technologies |
-| --- | --- |
-| 🎨 Frontend | <img src="https://cdn.simpleicons.org/react/61DAFB" width="18" alt="React" /> React · <img src="https://cdn.simpleicons.org/vite/646CFF" width="18" alt="Vite" /> Vite · <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" width="18" alt="Tailwind CSS" /> Tailwind CSS |
-| ⚡ API | <img src="https://cdn.simpleicons.org/nodedotjs/339933" width="18" alt="Node.js" /> Node.js · <img src="https://cdn.simpleicons.org/express/ffffff" width="18" alt="Express" /> Express |
-| ⇄ Realtime | <img src="https://cdn.simpleicons.org/socketdotio/ffffff" width="18" alt="Socket.IO" /> Socket.IO |
-| ◫ Database | <img src="https://cdn.simpleicons.org/mongodb/47A248" width="18" alt="MongoDB" /> MongoDB · Mongoose |
-| ◈ Authentication | JWT |
-| ↔ HTTP Client | <img src="https://cdn.simpleicons.org/axios/5A29E4" width="18" alt="Axios" /> Axios |
-| ◇ Media Storage | <img src="https://cdn.simpleicons.org/cloudinary/3448C5" width="18" alt="Cloudinary" /> Cloudinary |
-| ▲ Frontend Hosting | <img src="https://cdn.simpleicons.org/vercel/ffffff" width="18" alt="Vercel" /> Vercel |
-| ▣ Backend Hosting | Render |
-
----
-
-## Architecture
-
-At a high level, Aetherion follows a client/API/realtime architecture:
-
-```text
-                    ┌──────────────────────┐
-                    │      Aetherion       │
-                    │    React + Vite      │
-                    └──────────┬───────────┘
-                               │
-                 ┌─────────────┴─────────────┐
-                 │                           │
-             REST API                    Socket.IO
-                 │                           │
-                 ▼                           ▼
-        ┌────────────────┐          ┌────────────────┐
-        │ Express Server │          │ Realtime Layer │
-        └───────┬────────┘          └───────┬────────┘
-                │                           │
-                └─────────────┬─────────────┘
-                              │
-                    ┌─────────▼─────────┐
-                    │ MongoDB / Mongoose│
-                    └────────────────────┘
-
-                    Media uploads
-                         │
-                         ▼
-                    ┌───────────┐
-                    │ Cloudinary│
-                    └───────────┘
-```
-
-The frontend uses the HTTP API for persistent operations and Socket.IO for realtime events. MongoDB remains the source of truth for users, chats, messages, and polls, while Cloudinary handles uploaded media.
-
----
-
-## Project Structure
+## Repository layout
 
 ```text
 Aetherion/
-├── client/
-│   └── src/
-│       ├── apiCalls/       # API communication
-│       ├── components/     # Reusable UI and chat components
-│       ├── pages/          # Application pages
-│       ├── sockets/        # Socket.IO client setup
-│       └── ...
-│
-├── server/
-│   ├── config/             # Database and service configuration
-│   ├── controllers/        # Request and business logic
-│   ├── middleware/         # Authentication and request middleware
-│   ├── models/             # Mongoose models
-│   ├── routes/             # Express routes
-│   ├── services/           # External service integrations
-│   └── ...
-│
-└── README.md
+├── client/    # React + Vite frontend
+└── server/    # Express API and Socket.IO server
 ```
 
----
+## Getting started
 
-## Running Locally
+Requirements: Node.js, npm, a MongoDB database, and the credentials for any external services enabled in your setup.
 
-### Prerequisites
-
-- Node.js
-- npm
-- MongoDB / MongoDB Atlas database
-- Cloudinary account for media functionality
-- Any other third-party credentials required by the configured environment
-
-### 1. Clone the repository
+Install dependencies in both applications:
 
 ```bash
 git clone https://github.com/PrithwishDas101/Aetherion.git
 cd Aetherion
-```
 
-### 2. Install backend dependencies
-
-```bash
 cd server
 npm install
-```
 
-### 3. Install frontend dependencies
-
-```bash
 cd ../client
 npm install
 ```
 
-### 4. Configure environment variables
+Configure the server environment using the variable names expected by the server's configuration. Set the database connection, authentication secret, client/CORS origin, and any Cloudinary credentials required for media features. Keep secrets in a local environment file and never commit them.
 
-Create the environment files from the provided examples and add your own development credentials.
-
-Never commit:
-
-- Database credentials
-- JWT secrets
-- API keys
-- Cloudinary credentials
-- Other private tokens
-
-### 5. Start the backend
+Start the server in one terminal:
 
 ```bash
 cd server
 npm run dev
 ```
 
-### 6. Start the frontend
-
-In another terminal:
+Start the frontend in another terminal:
 
 ```bash
 cd client
 npm run dev
 ```
 
-The frontend and backend URLs are configured through environment variables.
+The client and server must be configured to point at one another's local URLs. Check the project's environment/configuration files for the exact ports and variable names before running the application.
+
+## Available scripts
+
+| Directory | Command | Purpose |
+| --- | --- | --- |
+| `server/` | `npm run dev` | Start the API with nodemon |
+| `server/` | `npm start` | Start the API |
+| `client/` | `npm run dev` | Start Vite |
+| `client/` | `npm run build` | Build the frontend |
+| `client/` | `npm run lint` | Run ESLint |
+| `client/` | `npm run preview` | Preview the production build |
+
+## Security and deployment notes
+
+- Use strong, private secrets for JWT signing and database access.
+- Restrict CORS to the intended frontend origins in production.
+- Configure the media provider before expecting upload features to work.
+- Keep the frontend API/socket URL and server origin settings aligned.
+- Do not commit `.env` files, service credentials, or uploaded user content.
+
+Aetherion is an actively evolving application; verify current environment keys and deployment settings in the source before deploying.
 
 ---
 
-## Production
-
-Aetherion is deployed using:
-
-- **Frontend:** Vercel
-- **Backend:** Render
-- **Database:** MongoDB Atlas
-- **Media:** Cloudinary
-
-The production architecture separates the frontend, API/realtime backend, persistent database, and media storage so each service can handle the responsibility it is best suited for.
-
----
-
-## Project Status
-
-Aetherion is an actively evolving project.
-
-Development focuses on:
-
-- Realtime reliability
-- Authentication and session security
-- Data integrity
-- Media handling
-- Production stability
-- UI/UX refinement
-- New communication features
-
-The goal is not simply to make the application work, but to keep improving how it behaves when real users, real networks, and real failures interact with it.
-
----
-
-## Roadmap
-
-Potential future improvements include:
-
-- Group conversations
-- More granular notification controls
-- Expanded profile customization
-- Additional realtime interaction features
-- More comprehensive automated testing
-- Further performance and observability improvements
-
----
-
-## Author
-
-**Prithwish Das**
-
-Aetherion is a personal full-stack project designed, developed, and maintained by Prithwish Das.
-
-The project represents an extended hands-on exploration of modern web application development across frontend engineering, backend APIs, databases, realtime systems, authentication, media infrastructure, deployment, and application security.
-
----
-
-## License
-
-No license has currently been declared for this repository.
-
-
-## Social sign-in (Google and GitHub)
-
-Aetherion keeps its existing MongoDB-backed email/password accounts and application JWTs. Google and GitHub use Supabase OAuth to verify the provider session; Aetherion then issues its own JWT so the existing protected pages, chats, and sockets continue to use the same authentication system.
-
-### Environment variables
-
-Add to `client/.env` (or `client/.env.local`):
-
-```env
-VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
-VITE_API_URL=https://YOUR_AETHERION_API
-```
-
-Add to the server environment:
-
-```env
-SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
-```
-
-Use the same Supabase project for client and server. Never expose a Supabase service-role key in the browser.
-
-### Supabase setup
-
-1. In Supabase, open **Authentication → Sign In / Providers** and enable **Google** and **GitHub**.
-2. Configure provider credentials. For GitHub, create an OAuth App in GitHub Developer Settings and use the exact callback URL shown in Supabase as the GitHub Authorization callback URL.
-3. In **Authentication → URL Configuration**, add:
-   - `http://localhost:5173/auth/callback`
-   - `https://aetherion-lime.vercel.app/auth/callback`
-   - Any other exact Aetherion origin you use, followed by `/auth/callback`.
-4. If this is the same Supabase project already used by NoteNest, keep the existing Site URL unchanged and only add the Aetherion callback URLs above. Changing the Site URL can affect NoteNest redirects. If Aetherion has its own Supabase project, set its Site URL to the deployed Aetherion URL.
-
-OAuth users are created in Aetherion's existing MongoDB user collection and receive Aetherion JWTs. Provider accounts must expose a verified email address. If that verified email already belongs to an Aetherion account, social sign-in uses the existing account and leaves its password login intact.
+Built by [Prithwish Das](https://github.com/PrithwishDas101).
