@@ -39,7 +39,7 @@ const Sidebar = ({
 
       {/* USER LIST */}
       <div
-        className={`scrollbar-aetherion min-h-0 flex-1 overflow-y-auto ${hasNoChats && !isSearching ? "hidden md:block" : "block"
+        className={`scrollbar-aetherion-light min-h-0 flex-1 overflow-y-auto ${hasNoChats && !isSearching ? "hidden md:block" : "block"
           }`}
       >
         <UserList searchKey={searchKey} socket={socket} />

@@ -52,6 +52,32 @@ body {
   scrollbar-color: #708bb2 transparent;
 }
 
+/* Light monochrome scrollbar used only by the redesigned Home experience. */
+.scrollbar-aetherion-light::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-thumb {
+  background: #E5E5E5;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-thumb:hover {
+  background: #B8B8B8;
+  background-clip: content-box;
+}
+
+.scrollbar-aetherion-light {
+  scrollbar-width: thin;
+  scrollbar-color: #B8B8B8 transparent;
+}
+
 @keyframes typingDot {
   0%,
   60%,
@@ -70,7 +96,7 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 9999px;
-  background: #d8f45a;
+  background: #171717;
   animation: typingDot 1.2s infinite ease-in-out;
 }
 
@@ -92,17 +118,17 @@ body {
 }
 
 .scrollbar-media-picker::-webkit-scrollbar-thumb {
-  background: #7c3aed;
+  background: #B8B8B8;
   border-radius: 999px;
 }
 
 .scrollbar-media-picker::-webkit-scrollbar-thumb:hover {
-  background: #9333ea;
+  background: #737373;
 }
 
 .scrollbar-media-picker {
   scrollbar-width: thin;
-  scrollbar-color: #7c3aed transparent;
+  scrollbar-color: #B8B8B8 transparent;
 }
 
 .message-row-highlight {
@@ -111,24 +137,24 @@ body {
 
 @keyframes message-row-highlight {
   0% {
-    background-color: rgba(216, 244, 90, 0);
+    background-color: rgba(0, 0, 0, 0);
   }
 
   15% {
-    background-color: rgba(216, 244, 90, 0.16);
+    background-color: rgba(0, 0, 0, 0.16);
   }
 
   55% {
-    background-color: rgba(216, 244, 90, 0.08);
+    background-color: rgba(0, 0, 0, 0.08);
   }
 
   100% {
-    background-color: rgba(216, 244, 90, 0);
+    background-color: rgba(0, 0, 0, 0);
   }
 }
 
 .aetherion-button {
-  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#858d84] transition-colors duration-300 hover:text-[#e8e8e5];
+  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#737373] transition-colors duration-300 hover:text-[#e8e8e5];
 }
 
 .aetherion-button > span {
@@ -181,4 +207,218 @@ body {
   100% {
     filter: brightness(1);
   }
+}
+
+
+
+/* Aetherion appearance system.
+   Surfaces are layered by role; hover states never invert to a contrasting color. */
+.aetherion-app {
+  --app-page: #F5F5F5;
+  --app-surface: #FFFFFF;
+  --app-raised: #FAFAFA;
+  --app-hover: #EEEEEE;
+  --app-selected: #E7E7E7;
+  --app-border: #E2E2E2;
+  --app-divider: #EBEBEB;
+  --app-text: #1D1D1F;
+  --app-muted: #6E6E73;
+  --app-control: #292A27;
+  --app-control-text: #F9F8F4;
+  min-height: 100vh;
+  background: var(--app-page);
+  color: var(--app-text);
+}
+html[data-aetherion-theme="night"] .aetherion-app {
+  --app-page: #171817;
+  --app-surface: #202220;
+  --app-raised: #242624;
+  --app-hover: #2C2E2C;
+  --app-selected: #30322F;
+  --app-border: #343733;
+  --app-divider: #2A2C29;
+  --app-text: #E9E9E3;
+  --app-muted: #A4A59D;
+  --app-control: #DADBD4;
+  --app-control-text: #20211F;
+  background: var(--app-page);
+  color: var(--app-text);
+}
+.aetherion-app [class~="bg-white"],
+.aetherion-app [class~="bg-gray-50"],
+.aetherion-app [class~="bg-gray-100"],
+.aetherion-app [class~="bg-[#FFFFFF]"],
+.aetherion-app [class~="bg-[#F7F7F5]"],
+.aetherion-app [class~="bg-[#F5F5F5]"] { background-color: var(--app-surface) !important; }
+.aetherion-app [class~="border-gray-100"],
+.aetherion-app [class~="border-gray-200"],
+.aetherion-app [class~="border-[#E5E5E5]"] { border-color: var(--app-border) !important; }
+.aetherion-app [class~="text-gray-900"],
+.aetherion-app [class~="text-gray-800"],
+.aetherion-app [class~="text-[#171717]"] { color: var(--app-text) !important; }
+.aetherion-app [class~="text-gray-700"],
+.aetherion-app [class~="text-gray-600"],
+.aetherion-app [class~="text-[#404040]"] { color: var(--app-text) !important; }
+.aetherion-app [class~="text-gray-500"],
+.aetherion-app [class~="text-gray-400"],
+.aetherion-app [class~="text-[#737373]"] { color: var(--app-muted) !important; }
+.aetherion-app [class~="bg-[#171717]"] { background-color: var(--app-control) !important; }
+.aetherion-app [class~="bg-[#171717]"][class~="text-[#FFFFFF]"],
+.aetherion-app [class~="bg-[#171717]"][class~="text-white"] { color: var(--app-control-text) !important; }
+.aetherion-app [class~="hover:bg-[#F5F5F5]"]:hover,
+.aetherion-app [class~="hover:bg-[#E5E5E5]"]:hover,
+.aetherion-app [class~="hover:bg-white"]:hover { background-color: var(--app-hover) !important; }
+.aetherion-app .scrollbar-aetherion-light { scrollbar-color: var(--app-border) transparent; }
+.aetherion-app .scrollbar-aetherion-light::-webkit-scrollbar-thumb { background: var(--app-border); }
+.aetherion-app .typing-dot { background: currentColor; }
+
+/* Home uses a restrained, system-font interface and three distinct surface levels. */
+.aetherion-home {
+  --home-canvas: #F6F5F1;
+  --home-surface: #FFFFFF;
+  --home-raised: #FBFAF7;
+  --home-hover: #F0F0E9;
+  --home-selected: #E8EEE7;
+  --home-border: #E2E3DB;
+  --home-divider: #ECECE5;
+  --home-text: #20241F;
+  --home-muted: #70776F;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.012em;
+  background: var(--home-canvas) !important;
+  color: var(--home-text) !important;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+.aetherion-home .aetherion-chat-list {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.aetherion-home .aetherion-chat-surface {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.aetherion-home .aetherion-chat-panel {
+  background: var(--home-surface) !important;
+  border: 1px solid var(--home-border) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 3%) !important;
+}
+.aetherion-home .aetherion-chat-header {
+  border-color: var(--home-divider) !important;
+}
+.aetherion-home .aetherion-user-row {
+  border-bottom-color: var(--home-divider) !important;
+  transition: background-color 140ms ease;
+}
+.aetherion-home .aetherion-user-row-idle { background: transparent !important; }
+.aetherion-home .aetherion-user-row-idle:hover { background: var(--home-hover) !important; }
+.aetherion-home .aetherion-user-row-selected {
+  background: var(--home-selected) !important;
+  box-shadow: inset 2px 0 0 #66836B !important;
+}
+.aetherion-home .aetherion-user-row-selected:hover { background: var(--home-selected) !important; }
+.aetherion-home .aetherion-user-row-selected .aetherion-user-row-accent { color: #58765D !important; }
+
+/* Replace legacy hard-coded neutral utility colors only inside Home. */
+.aetherion-home [class~="bg-white"],
+.aetherion-home [class~="bg-[#FFFFFF]"],
+.aetherion-home [class~="bg-[#F7F7F5]"],
+.aetherion-home [class~="bg-[#F5F5F5]"],
+.aetherion-home [class~="bg-gray-50"],
+.aetherion-home [class~="bg-gray-100"] { background-color: var(--home-raised) !important; }
+.aetherion-home [class~="border-[#E5E5E5]"] { border-color: var(--home-border) !important; }
+.aetherion-home [class~="text-[#171717]"] { color: var(--home-text) !important; }
+.aetherion-home [class~="text-[#404040]"] { color: var(--home-text) !important; }
+.aetherion-home [class~="text-[#737373]"] { color: var(--home-muted) !important; }
+.aetherion-home [class~="bg-[#171717]"] { background-color: #222222 !important; }
+.aetherion-home [class~="bg-[#171717]"][class~="text-[#FFFFFF]"],
+.aetherion-home [class~="bg-[#171717]"][class~="text-white"] { color: #FFFFFF !important; }
+.aetherion-home [class~="hover:bg-[#F5F5F5]"]:hover,
+.aetherion-home [class~="hover:bg-[#E5E5E5]"]:hover,
+.aetherion-home [class~="hover:bg-white"]:hover { background-color: var(--home-hover) !important; }
+.aetherion-home [class~="hover:bg-[#333333]"]:hover { background-color: #3A3A3A !important; }
+.aetherion-home .aetherion-theme-menu-item {
+  background: var(--home-raised) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-theme-menu-item:hover { background: var(--home-hover) !important; }
+.aetherion-home .scrollbar-aetherion-light { scrollbar-color: #BEBBB3 transparent; }
+.aetherion-home .scrollbar-aetherion-light::-webkit-scrollbar-thumb { background: #BEBBB3; }
+
+/* Header and profile popover follow the same Home palette. */
+.aetherion-home header { border-bottom-color: var(--home-divider) !important; }
+.aetherion-home header > div:first-child span { color: var(--home-text) !important; }
+.aetherion-home header .aetherion-profile-name { color: var(--home-text) !important; }
+.aetherion-home header [class~="bg-[#FFFFFF]/95"] {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: 0 18px 48px rgb(0 0 0 / 14%) !important;
+}
+.aetherion-home header [class~="bg-white/10"] { background: var(--home-divider) !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home {
+  --home-canvas: #171817;
+  --home-surface: #202220;
+  --home-raised: #242624;
+  --home-hover: #2C2E2C;
+  --home-selected: #30322F;
+  --home-border: #343733;
+  --home-divider: #2A2C29;
+  --home-text: #E9E9E3;
+  --home-muted: #A4A59D;
+  background: var(--home-canvas) !important;
+  color: var(--home-text) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-list { background: transparent !important; }
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-surface { background: transparent !important; }
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: none !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-idle { background: transparent !important; }
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-idle:hover { background: var(--home-hover) !important; }
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-selected {
+  background: var(--home-selected) !important;
+  box-shadow: inset 2px 0 0 #A7A89F !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-selected:hover { background: var(--home-selected) !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-white"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#FFFFFF]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#F7F7F5]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#F5F5F5]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-gray-50"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-gray-100"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#FFFFFF]/95"] { background-color: var(--home-raised) !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="border-[#E5E5E5]"] { border-color: var(--home-border) !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#171717]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#404040]"] { color: var(--home-text) !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#737373]"] { color: var(--home-muted) !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#171717]"] { background-color: #DADBD4 !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#171717]"][class~="text-[#FFFFFF]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#171717]"][class~="text-white"] { color: #20211F !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="hover:bg-[#F5F5F5]"]:hover,
+html[data-aetherion-theme="night"] .aetherion-home [class~="hover:bg-[#E5E5E5]"]:hover,
+html[data-aetherion-theme="night"] .aetherion-home [class~="hover:bg-white"]:hover { background-color: var(--home-hover) !important; }
+html[data-aetherion-theme="night"] .aetherion-home [class~="hover:bg-[#333333]"]:hover { background-color: #383A37 !important; }
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-theme-menu-item {
+  background: var(--home-raised) !important;
+  color: var(--home-text) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-theme-menu-item:hover { background: var(--home-hover) !important; }
+html[data-aetherion-theme="night"] .aetherion-home header [class~="bg-[#FFFFFF]/95"] {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home header [class~="bg-white/10"] { background: var(--home-divider) !important; }
+html[data-aetherion-theme="night"] body { background: #171817; color: #E9E9E3; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home,
+  .aetherion-home .aetherion-user-row { transition: none !important; }
+  .aetherion-home .aether-orbit-rotation { animation: none !important; }
 }

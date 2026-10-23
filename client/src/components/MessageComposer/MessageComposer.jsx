@@ -69,7 +69,7 @@ const MessageComposer = ({
 
   return (
     <div className="relative flex min-w-0 flex-1 items-end">
-      <div className="flex min-w-0 flex-1 items-end gap-1.5 rounded-2xl border border-[#d8f45a]/15 bg-[#080d09] px-2 transition focus-within:border-[#d8f45a]/50">
+      <div className="flex min-w-0 flex-1 items-end gap-1.5 rounded-2xl border border-[#E5E5E5] bg-[#F7F7F5] px-2 transition focus-within:border-[#171717]/50">
         <textarea
           ref={messageInputRef}
           value={message}
@@ -77,7 +77,7 @@ const MessageComposer = ({
           onKeyDown={handleKeyDown}
           placeholder="Message"
           rows="1"
-          className="scrollbar-aetherion min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto bg-transparent px-2 py-3 text-sm leading-5 text-[#f1eee8] outline-none placeholder:text-[#70786f] sm:px-3"
+          className="scrollbar-aetherion-light min-h-12 max-h-[120px] min-w-0 flex-1 resize-none overflow-x-hidden overflow-y-auto bg-transparent px-2 py-3 text-sm leading-5 text-[#171717] outline-none placeholder:text-[#737373] sm:px-3"
         />
 
         {/* ATTACHMENT BUTTON + PANEL */}
