@@ -274,15 +274,15 @@ html[data-aetherion-theme="night"] .aetherion-app {
 
 /* Home uses a restrained, system-font interface and three distinct surface levels. */
 .aetherion-home {
-  --home-canvas: #F5F5F5;
+  --home-canvas: #F6F5F1;
   --home-surface: #FFFFFF;
-  --home-raised: #FAFAFA;
-  --home-hover: #EEEEEE;
-  --home-selected: #E7E7E7;
-  --home-border: #E2E2E2;
-  --home-divider: #EBEBEB;
-  --home-text: #1D1D1F;
-  --home-muted: #6E6E73;
+  --home-raised: #FBFAF7;
+  --home-hover: #F0F0E9;
+  --home-selected: #E8EEE7;
+  --home-border: #E2E3DB;
+  --home-divider: #ECECE5;
+  --home-text: #20241F;
+  --home-muted: #70776F;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: -0.012em;
   background: var(--home-canvas) !important;
@@ -318,9 +318,10 @@ html[data-aetherion-theme="night"] .aetherion-app {
 .aetherion-home .aetherion-user-row-idle:hover { background: var(--home-hover) !important; }
 .aetherion-home .aetherion-user-row-selected {
   background: var(--home-selected) !important;
-  box-shadow: inset 2px 0 0 #77776F !important;
+  box-shadow: inset 2px 0 0 #66836B !important;
 }
 .aetherion-home .aetherion-user-row-selected:hover { background: var(--home-selected) !important; }
+.aetherion-home .aetherion-user-row-selected .aetherion-user-row-accent { color: #58765D !important; }
 
 /* Replace legacy hard-coded neutral utility colors only inside Home. */
 .aetherion-home [class~="bg-white"],
