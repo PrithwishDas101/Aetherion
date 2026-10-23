@@ -422,3 +422,44 @@ html[data-aetherion-theme="night"] body { background: #171817; color: #E9E9E3; }
   .aetherion-home .aetherion-user-row { transition: none !important; }
   .aetherion-home .aether-orbit-rotation { animation: none !important; }
 }
+
+
+/* Quiet interaction polish: preserve the approved palette, make focus states feel intentional. */
+.aetherion-home input:focus,
+.aetherion-home textarea:focus,
+.aetherion-home select:focus {
+  border-color: #879B82 !important;
+  box-shadow: 0 0 0 3px rgb(102 131 107 / 12%);
+}
+
+.aetherion-home button:focus-visible,
+.aetherion-home a:focus-visible,
+.aetherion-home input:focus-visible,
+.aetherion-home textarea:focus-visible,
+.aetherion-home select:focus-visible {
+  outline: 2px solid #879B82;
+  outline-offset: 2px;
+}
+
+.aetherion-home .aetherion-chat-panel {
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.aetherion-home .aetherion-user-row {
+  border-radius: 10px;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home input:focus,
+html[data-aetherion-theme="night"] .aetherion-home textarea:focus,
+html[data-aetherion-theme="night"] .aetherion-home select:focus {
+  border-color: #A0B29A !important;
+  box-shadow: 0 0 0 3px rgb(160 178 154 / 14%);
+}
+
+html[data-aetherion-theme="night"] .aetherion-home button:focus-visible,
+html[data-aetherion-theme="night"] .aetherion-home a:focus-visible,
+html[data-aetherion-theme="night"] .aetherion-home input:focus-visible,
+html[data-aetherion-theme="night"] .aetherion-home textarea:focus-visible,
+html[data-aetherion-theme="night"] .aetherion-home select:focus-visible {
+  outline-color: #A0B29A;
+}
