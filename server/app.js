@@ -29,11 +29,27 @@ app.use(
   }),
 );
 
-const allowedOrigins = [
+const configuredClientOrigins = [
+  process.env.CLIENT_URL,
+  ...(process.env.CLIENT_URLS || "").split(","),
+];
+
+const allowedOrigins = new Set([
   "http://localhost:5173",
   "http://127.0.0.1:5173",
-  process.env.CLIENT_URL,
-].filter(Boolean);
+  ...configuredClientOrigins
+    .map((value) => value?.trim())
+    .filter(Boolean)
+    .map((value) => {
+      try {
+        // Store origins only, so a trailing slash on an env value doesn't break CORS.
+        return new URL(value).origin;
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean),
+]);
 
 app.use(
   cors({
@@ -42,7 +58,7 @@ app.use(
         return callback(null, true);
       }
 
-      if (allowedOrigins.includes(origin)) {
+      if (allowedOrigins.has(origin)) {
         return callback(null, true);
       }
 
