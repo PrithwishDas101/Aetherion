@@ -2,10 +2,10 @@ import { Search, MessageCircle } from "lucide-react";
 
 const EmptyChatState = ({ onFindSomeone }) => {
   return (
-    <div className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden px-5 py-8 sm:px-6 sm:py-10">
+    <div className="aetherion-empty-state relative flex min-h-full flex-1 items-center justify-center overflow-hidden px-5 py-8 sm:px-6 sm:py-10">
       <div className="relative flex w-full max-w-md flex-col items-center text-center">
         {/* Icon */}
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#F7F7F5] shadow-[0_0_35px_rgba(0,0,0,0.06)] sm:h-20 sm:w-20 sm:rounded-[22px] sm:shadow-[0_0_45px_rgba(0,0,0,0.08)]">
+        <div className="aetherion-empty-icon relative flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#F7F7F5] shadow-[0_0_35px_rgba(0,0,0,0.06)] sm:h-20 sm:w-20 sm:rounded-[22px] sm:shadow-[0_0_45px_rgba(0,0,0,0.08)]">
           <MessageCircle
             className="h-7 w-7 text-[#171717] sm:h-9 sm:w-9"
             strokeWidth={1.5}
