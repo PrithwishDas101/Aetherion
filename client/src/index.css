@@ -463,3 +463,49 @@ html[data-aetherion-theme="night"] .aetherion-home textarea:focus-visible,
 html[data-aetherion-theme="night"] .aetherion-home select:focus-visible {
   outline-color: #A0B29A;
 }
+
+
+/* Finish the Home experience: cohesive empty states and message composition. */
+.aetherion-home .aetherion-empty-icon {
+  background: var(--home-selected) !important;
+  border: 1px solid var(--home-border);
+  box-shadow: 0 8px 24px rgb(32 36 31 / 5%) !important;
+}
+.aetherion-home .aetherion-empty-icon > svg { color: var(--home-text) !important; }
+.aetherion-home .aetherion-empty-icon > div {
+  background: #66836B !important;
+  box-shadow: 0 0 0 3px var(--home-canvas) !important;
+}
+.aetherion-home .aetherion-empty-state button {
+  background: #263329 !important;
+  box-shadow: 0 5px 14px rgb(38 51 41 / 13%) !important;
+}
+.aetherion-home .aetherion-empty-state button:hover { background: #344638 !important; }
+
+.aetherion-home .aetherion-composer-shell {
+  background: var(--home-raised) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 3%);
+}
+.aetherion-home .aetherion-composer-shell:focus-within {
+  border-color: #879B82 !important;
+  box-shadow: 0 0 0 3px rgb(102 131 107 / 10%);
+}
+.aetherion-home .aetherion-composer-shell textarea { color: var(--home-text) !important; }
+.aetherion-home .aetherion-composer-shell textarea::placeholder { color: var(--home-muted) !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-empty-icon {
+  box-shadow: 0 8px 24px rgb(0 0 0 / 16%) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-empty-state button {
+  background: #DADBD4 !important;
+  color: #20211F !important;
+  box-shadow: none !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-empty-state button:hover {
+  background: #C8CAC1 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-composer-shell:focus-within {
+  border-color: #A0B29A !important;
+  box-shadow: 0 0 0 3px rgb(160 178 154 / 12%);
+}
