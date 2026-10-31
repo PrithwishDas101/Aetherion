@@ -23,12 +23,12 @@ const GalleryItem = ({
             type="button"
             onClick={handleClick}
             disabled={disabled}
-            className={`group relative aspect-square w-full overflow-hidden rounded-xl bg-[#151c16] transition-all duration-200 ${disabled
+            className={`group relative aspect-square w-full overflow-hidden rounded-xl bg-[#F5F5F5] transition-all duration-200 ${disabled
                     ? "cursor-not-allowed opacity-40"
                     : "cursor-pointer active:scale-[0.97]"
                 } ${isSelected
-                    ? "ring-2 ring-[#d8f45a]"
-                    : "hover:ring-1 hover:ring-[#d8f45a]/40"
+                    ? "ring-2 ring-[#171717]"
+                    : "hover:ring-1 hover:ring-[#171717]/40"
                 }`}
             aria-label={`Select ${item.name}`}
             aria-pressed={isSelected}
@@ -67,13 +67,13 @@ const GalleryItem = ({
             {/* SELECTED OVERLAY */}
 
             {isSelected && (
-                <div className="pointer-events-none absolute inset-0 bg-[#d8f45a]/10" />
+                <div className="pointer-events-none absolute inset-0 bg-[#171717]/10" />
             )}
 
             {/* GREEN TICK */}
 
             {isSelected && (
-                <div className="pointer-events-none absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] shadow-lg">
+                <div className="pointer-events-none absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#171717] text-[#FFFFFF] shadow-lg">
                     <FiCheck className="text-base font-bold" />
                 </div>
             )}
