@@ -68,8 +68,8 @@ const MessageComposer = ({
   };
 
   return (
-    <div className="relative flex min-w-0 flex-1 items-end">
-      <div className="flex min-w-0 flex-1 items-end gap-1.5 rounded-2xl border border-[#E5E5E5] bg-[#F7F7F5] px-2 transition focus-within:border-[#171717]/50">
+    <div className="aetherion-message-composer relative flex min-w-0 flex-1 items-end">
+      <div className="aetherion-composer-shell flex min-w-0 flex-1 items-end gap-1.5 rounded-2xl border border-[#E5E5E5] bg-[#F7F7F5] px-2 transition focus-within:border-[#171717]/50">
         <textarea
           ref={messageInputRef}
           value={message}
