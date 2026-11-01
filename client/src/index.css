@@ -509,3 +509,144 @@ html[data-aetherion-theme="night"] .aetherion-home .aetherion-composer-shell:foc
   border-color: #A0B29A !important;
   box-shadow: 0 0 0 3px rgb(160 178 154 / 12%);
 }
+
+
+/* Home refinement pass: strengthen hierarchy and make chat controls feel cohesive. */
+.aetherion-home .aetherion-chat-header {
+  min-height: 68px;
+  padding-top: 0.75rem;
+  padding-bottom: 0.85rem;
+}
+.aetherion-home .aetherion-chat-header button:not(.aetherion-button) {
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.aetherion-home .aetherion-chat-header button:not(.aetherion-button):hover {
+  background: var(--home-hover);
+}
+.aetherion-home .aetherion-chat-panel > .scrollbar-aetherion-light {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.aetherion-home .aetherion-chat-panel .group.relative.flex.w-full {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit {
+  box-shadow: 0 1px 1px rgb(25 25 20 / 4%);
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+.aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#171717]"] {
+  background: #29372D !important;
+  border: 1px solid rgb(88 118 93 / 24%);
+  box-shadow: 0 2px 5px rgb(32 36 31 / 10%);
+}
+.aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#FFFFFF]"] {
+  background: var(--home-raised) !important;
+  border-color: var(--home-border) !important;
+}
+.aetherion-home .aetherion-chat-panel button[aria-label="Send message"] {
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgb(88 118 93 / 22%);
+  background: #29372D !important;
+  box-shadow: 0 3px 9px rgb(32 36 31 / 12%);
+  transition: transform 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+.aetherion-home .aetherion-chat-panel button[aria-label="Send message"]:hover:not(:disabled) {
+  background: #35483A !important;
+  box-shadow: 0 5px 13px rgb(32 36 31 / 16%);
+}
+.aetherion-home .aetherion-chat-panel button[aria-label="Send message"]:active:not(:disabled) {
+  transform: scale(.94);
+}
+.aetherion-home .aetherion-chat-panel button[aria-label="Send message"]:disabled {
+  box-shadow: none;
+  opacity: .42;
+}
+.aetherion-home .aetherion-chat-panel .aetherion-message-composer + button,
+.aetherion-home .aetherion-chat-panel button[aria-label="Open emojis and media"] {
+  transition: color 150ms ease, background-color 150ms ease, transform 150ms ease;
+}
+.aetherion-home .aetherion-chat-panel button[aria-label="Open emojis and media"]:hover {
+  color: var(--home-text) !important;
+  background: var(--home-hover);
+}
+.aetherion-home .aetherion-chat-panel .aetherion-composer-shell {
+  min-height: 50px;
+}
+.aetherion-home .aetherion-chat-panel .aetherion-composer-shell textarea {
+  line-height: 1.55;
+}
+.aetherion-home .aetherion-user-row {
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+.aetherion-home .aetherion-user-row .min-w-0.flex-1 > div:first-child > div {
+  letter-spacing: -0.015em;
+}
+.aetherion-home .aetherion-user-row [class*="bg-[#171717]"][class*="rounded-full"] {
+  background: #58765D !important;
+  box-shadow: 0 0 0 2px var(--home-canvas);
+}
+.aetherion-home .aetherion-user-row button:not([aria-label]) {
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.aetherion-home .aetherion-user-row button:not([aria-label]):active {
+  transform: scale(.97);
+}
+.aetherion-home input[placeholder="Search users..."] {
+  height: 42px;
+  padding-left: 1rem;
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 3%);
+}
+.aetherion-home input[placeholder="Search users..."] + svg {
+  color: var(--home-muted) !important;
+  transition: color 150ms ease, transform 150ms ease;
+}
+.aetherion-home input[placeholder="Search users..."]:focus + svg {
+  color: #66836B !important;
+  transform: translateY(-50%) scale(1.04);
+}
+
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#171717]"] {
+  background: #D7DDD3 !important;
+  border-color: rgb(215 221 211 / 18%);
+  color: #20241F !important;
+  box-shadow: none;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#FFFFFF]"] {
+  background: #292C28 !important;
+  border-color: #3A3D38 !important;
+  color: var(--home-text) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel button[aria-label="Send message"] {
+  background: #D7DDD3 !important;
+  color: #20241F !important;
+  border-color: transparent;
+  box-shadow: none;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel button[aria-label="Send message"]:hover:not(:disabled) {
+  background: #C5CEC0 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row [class*="bg-[#171717]"][class*="rounded-full"] {
+  box-shadow: 0 0 0 2px var(--home-canvas);
+}
+
+@media (max-width: 640px) {
+  .aetherion-home .aetherion-chat-panel {
+    border-radius: 16px !important;
+  }
+  .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 {
+    max-width: 86%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home .aetherion-chat-panel button,
+  .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit,
+  .aetherion-home input[placeholder="Search users..."] + svg {
+    transition: none !important;
+  }
+}
