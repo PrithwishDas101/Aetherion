@@ -650,3 +650,11 @@ html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row [class*="
     transition: none !important;
   }
 }
+
+/* Keep the composer focus treatment on its rounded shell, never the textarea rectangle. */
+.aetherion-home .aetherion-composer-shell textarea:focus,
+.aetherion-home .aetherion-composer-shell textarea:focus-visible {
+  outline: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
