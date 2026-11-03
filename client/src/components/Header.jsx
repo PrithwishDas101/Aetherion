@@ -253,7 +253,7 @@ function Header() {
               : "pointer-events-none -translate-y-2 opacity-0"
               }`}
           >
-            <div className="w-[250px] rounded-2xl border border-white/10 bg-[#FFFFFF]/95 p-2 shadow-2xl backdrop-blur-md sm:w-[270px]">
+            <div className="aetherion-profile-menu w-[250px] rounded-2xl border border-white/10 bg-[#FFFFFF]/95 p-2 shadow-2xl backdrop-blur-md sm:w-[270px]">
               {/* User info */}
               <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3">
                 <Avatar
@@ -281,7 +281,7 @@ function Header() {
                 type="button"
                 role="menuitem"
                 onClick={toggleTheme}
-                className="aetherion-theme-menu-item mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#E5E5E5] hover:text-[#171717]"
+                className="aetherion-profile-menu-item aetherion-theme-menu-item mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition"
                 aria-label={theme === "night" ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {theme === "night" ? <FiSun className="h-[18px] w-[18px]" /> : <FiMoon className="h-[18px] w-[18px]" />}
@@ -292,7 +292,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleProfileClick}
-                className="mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#E5E5E5] hover:text-[#171717] active:scale-[0.98] active:text-[#171717e3]"
+                className="aetherion-profile-menu-item mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition active:scale-[0.98]"
               >
                 <FiUser className="h-[18px] w-[18px]" />
 
@@ -306,7 +306,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleRequestsClick}
-                className="mt-2 flex w-full items-center justify-between rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#F5F5F5] hover:text-[#737373] active:scale-[0.98] active:text-[#737373e0]"
+                className="aetherion-profile-menu-item mt-2 flex w-full items-center justify-between rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition active:scale-[0.98]"
               >
                 <span className="flex items-center gap-3">
                   <FiUserPlus className="h-[18px] w-[18px]" />
@@ -330,7 +330,7 @@ function Header() {
               <button
                 type="button"
                 onClick={() => setShowLogoutConfirm(true)}
-                className="flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition hover:bg-[#F5F5F5] hover:text-red-400 active:scale-[0.98] active:text-red-500"
+                className="aetherion-profile-menu-logout flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium transition active:scale-[0.98]"
               >
                 <FiLogOut className="h-[18px] w-[18px]" />
 
