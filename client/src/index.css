@@ -658,3 +658,65 @@ html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row [class*="
   border-color: transparent !important;
   box-shadow: none !important;
 }
+
+
+/* Profile menu: quiet sage interactions with a restrained destructive action. */
+.aetherion-home header .aetherion-profile-menu {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: 0 18px 48px rgb(32 36 31 / 13%) !important;
+  padding: 8px;
+}
+.aetherion-home header .aetherion-profile-menu-item {
+  background: var(--home-raised) !important;
+  color: var(--home-text) !important;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.aetherion-home header .aetherion-profile-menu-item:hover,
+.aetherion-home header .aetherion-profile-menu-item:focus-visible {
+  background: var(--home-selected) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home header .aetherion-profile-menu-item > svg,
+.aetherion-home header .aetherion-profile-menu-item > span > svg {
+  color: #657B61;
+  flex-shrink: 0;
+}
+.aetherion-home header .aetherion-profile-menu > div:first-child {
+  background: var(--home-selected) !important;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout {
+  color: #A65F50 !important;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout > svg {
+  color: #A65F50 !important;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #F5EAE6 !important;
+  color: #985342 !important;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg {
+  color: #985342 !important;
+}
+.aetherion-home header .aetherion-profile-menu .my-2.h-px {
+  background: var(--home-divider) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu {
+  box-shadow: 0 18px 48px rgb(0 0 0 / 32%) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu-item > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu-item > span > svg {
+  color: #A0B29A;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #382A27 !important;
+  color: #E1A092 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg {
+  color: #E1A092 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home header .aetherion-profile-menu-item { transition: none !important; }
+}
