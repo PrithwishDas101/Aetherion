@@ -281,7 +281,7 @@ function Header() {
                 type="button"
                 role="menuitem"
                 onClick={toggleTheme}
-                className="aetherion-profile-menu-item aetherion-menu-appearance aetherion-theme-menu-item mt-2"
+                className="aetherion-profile-menu-item aetherion-menu-appearance aetherion-theme-menu-item mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium"
                 aria-label={theme === "night" ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {theme === "night" ? <FiSun className="h-[18px] w-[18px]" /> : <FiMoon className="h-[18px] w-[18px]" />}
