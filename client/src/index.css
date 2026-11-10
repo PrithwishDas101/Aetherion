@@ -776,3 +776,49 @@ html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-reques
   background: #F5EAE6 !important;
   color: #985342 !important;
 }
+
+/* Distinct hover accents for each profile action. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #E4EDE2 !important;
+  box-shadow: inset 3px 0 0 #789174;
+  transform: translateX(1px);
+}
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #F2E9DA !important;
+  box-shadow: inset 3px 0 0 #B28D59;
+  transform: translateX(1px);
+}
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #E4EBEF !important;
+  box-shadow: inset 3px 0 0 #7896A5;
+  transform: translateX(1px);
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #F4E5E0 !important;
+  box-shadow: inset 3px 0 0 #B87564;
+  transform: translateX(1px);
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #303C30 !important;
+  box-shadow: inset 3px 0 0 #91AA89;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #3B342A !important;
+  box-shadow: inset 3px 0 0 #C4A574;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #2D3940 !important;
+  box-shadow: inset 3px 0 0 #8EADBC;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #3B2C28 !important;
+  box-shadow: inset 3px 0 0 #C88776;
+}
