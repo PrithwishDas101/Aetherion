@@ -306,7 +306,7 @@ function Header() {
               <button
                 type="button"
                 onClick={handleRequestsClick}
-                className="aetherion-profile-menu-item aetherion-menu-requests mt-2 flex w-full items-center justify-between rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition active:scale-[0.98]"
+                className="aetherion-profile-menu-item aetherion-menu-requests mt-2 flex w-full items-center justify-between rounded-xl bg-[#000000] px-3 py-3 text-left text-sm font-medium text-[#404040] transition active:scale-[0.98]"
               >
                 <span className="flex items-center gap-3">
                   <FiUserPlus className="h-[18px] w-[18px]" />
