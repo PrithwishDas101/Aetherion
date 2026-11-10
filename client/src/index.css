@@ -822,3 +822,77 @@ html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-men
   background: #3B2C28 !important;
   box-shadow: inset 3px 0 0 #C88776;
 }
+
+
+/* Clear, recognizable color identities for profile-menu hover states. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #DCFCE7 !important;
+  color: #166534 !important;
+  box-shadow: inset 3px 0 0 #16A34A;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg { color: #15803D !important; }
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #FEF3C7 !important;
+  color: #92400E !important;
+  box-shadow: inset 3px 0 0 #EAB308;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg { color: #CA8A04 !important; }
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #DBEAFE !important;
+  color: #1E40AF !important;
+  box-shadow: inset 3px 0 0 #3B82F6;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg { color: #2563EB !important; }
+
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #FEE2E2 !important;
+  color: #991B1B !important;
+  box-shadow: inset 3px 0 0 #EF4444;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg { color: #DC2626 !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #1F3B2A !important;
+  color: #BBF7D0 !important;
+  box-shadow: inset 3px 0 0 #4ADE80;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible > svg { color: #86EFAC !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #49391B !important;
+  color: #FDE68A !important;
+  box-shadow: inset 3px 0 0 #FACC15;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible > svg { color: #FDE047 !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #1E3557 !important;
+  color: #BFDBFE !important;
+  box-shadow: inset 3px 0 0 #60A5FA;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover > span > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible > span > svg { color: #93C5FD !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #4A2428 !important;
+  color: #FECACA !important;
+  box-shadow: inset 3px 0 0 #F87171;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg { color: #FCA5A5 !important; }
