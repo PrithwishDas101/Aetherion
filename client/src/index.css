@@ -896,3 +896,88 @@ html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-men
 }
 html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
 html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg { color: #FCA5A5 !important; }
+
+
+/* Softer profile-menu feedback: keep the four color cues, reduce their intensity. */
+.aetherion-home header .aetherion-profile-menu-item {
+  transition: background-color 220ms ease, color 220ms ease, box-shadow 220ms ease !important;
+}
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #EAF2E9 !important;
+  color: #45634A !important;
+  box-shadow: inset 2px 0 0 #83A786;
+  transform: none !important;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg { color: #668C6A !important; }
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #F7F0DF !important;
+  color: #80683D !important;
+  box-shadow: inset 2px 0 0 #C5A85E;
+  transform: none !important;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg { color: #A98A46 !important; }
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #EAF1F7 !important;
+  color: #4D6682 !important;
+  box-shadow: inset 2px 0 0 #8AAAC8;
+  transform: none !important;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg { color: #6E91B4 !important; }
+
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #F8ECE9 !important;
+  color: #965F55 !important;
+  box-shadow: inset 2px 0 0 #C88C80;
+  transform: none !important;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg { color: #B8796D !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #29372C !important;
+  color: #C1D4C0 !important;
+  box-shadow: inset 2px 0 0 #789A7B;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible > svg { color: #9DB89D !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #393326 !important;
+  color: #E1D0A9 !important;
+  box-shadow: inset 2px 0 0 #AD955B;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible > svg { color: #C1A96F !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #293541 !important;
+  color: #C2D2E1 !important;
+  box-shadow: inset 2px 0 0 #7897B5;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover > span > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible > span > svg { color: #9BB4CD !important; }
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #3C2C2A !important;
+  color: #E4BCB4 !important;
+  box-shadow: inset 2px 0 0 #B47D73;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg { color: #D09A90 !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home header .aetherion-profile-menu-item { transition: none !important; }
+}
