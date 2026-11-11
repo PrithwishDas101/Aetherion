@@ -1600,3 +1600,93 @@ html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-men
 html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
   color: #d99b8e !important;
 }
+
+
+/* Harmonized profile-menu accents: richer color, still soft against the sage UI. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #dcefe0 !important;
+  color: #315b3b !important;
+  box-shadow: inset 2px 0 0 #68a875;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #438b53 !important;
+}
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #f6edcf !important;
+  color: #70551f !important;
+  box-shadow: inset 2px 0 0 #c9a34d;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #a98232 !important;
+}
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #dfebf7 !important;
+  color: #385b7d !important;
+  box-shadow: inset 2px 0 0 #76a2cb;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #5688b8 !important;
+}
+
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #f5e2de !important;
+  color: #88483f !important;
+  box-shadow: inset 2px 0 0 #c77d70;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
+  color: #b9685b !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #2b4031 !important;
+  color: #c9e3ce !important;
+  box-shadow: inset 2px 0 0 #78b786;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #98cda2 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #403925 !important;
+  color: #ecdbb1 !important;
+  box-shadow: inset 2px 0 0 #c8a75e;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #d7b96f !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #2a3b4d !important;
+  color: #ccdeef !important;
+  box-shadow: inset 2px 0 0 #83add4;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover > span > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #a2c4e5 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #442e2b !important;
+  color: #efc7bf !important;
+  box-shadow: inset 2px 0 0 #cc887a;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
+  color: #dfa094 !important;
+}
