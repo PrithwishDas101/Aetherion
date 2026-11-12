@@ -1690,3 +1690,75 @@ html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-men
 html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
   color: #dfa094 !important;
 }
+
+
+/* Tactile profile-menu feedback: hover previews, press confirms on touch and pointer. */
+.aetherion-home header .aetherion-profile-menu-item {
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  transition:
+    background-color 170ms ease,
+    color 170ms ease,
+    box-shadow 170ms ease,
+    transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  will-change: transform;
+}
+.aetherion-home header .aetherion-profile-menu-item > svg,
+.aetherion-home header .aetherion-profile-menu-item > span > svg {
+  transition: transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1), color 170ms ease;
+}
+
+/* A short, restrained press-in state works on touchscreens without hover. */
+.aetherion-home header .aetherion-profile-menu-item:active {
+  transform: scale(0.975) !important;
+  transition-duration: 80ms !important;
+}
+.aetherion-home header .aetherion-profile-menu-item:active > svg,
+.aetherion-home header .aetherion-profile-menu-item:active > span > svg {
+  transform: scale(0.9);
+}
+
+.aetherion-home header .aetherion-menu-appearance:active {
+  background: #cfe6d3 !important;
+  box-shadow: inset 3px 0 0 #579b65, inset 0 0 0 1px rgb(67 139 83 / 12%);
+}
+.aetherion-home header .aetherion-menu-profile:active {
+  background: #efe2bd !important;
+  box-shadow: inset 3px 0 0 #b9923e, inset 0 0 0 1px rgb(169 130 50 / 12%);
+}
+.aetherion-home header .aetherion-menu-requests:active {
+  background: #cfe0f1 !important;
+  box-shadow: inset 3px 0 0 #648fbd, inset 0 0 0 1px rgb(86 136 184 / 12%);
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:active {
+  background: #efd2cc !important;
+  box-shadow: inset 3px 0 0 #bd6d60, inset 0 0 0 1px rgb(185 104 91 / 12%);
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:active {
+  background: #34523b !important;
+  box-shadow: inset 3px 0 0 #83c18e, inset 0 0 0 1px rgb(145 201 154 / 14%);
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:active {
+  background: #51452d !important;
+  box-shadow: inset 3px 0 0 #d6b66a, inset 0 0 0 1px rgb(213 182 110 / 14%);
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:active {
+  background: #344b61 !important;
+  box-shadow: inset 3px 0 0 #91b8df, inset 0 0 0 1px rgb(155 189 224 / 14%);
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:active {
+  background: #563834 !important;
+  box-shadow: inset 3px 0 0 #d99587, inset 0 0 0 1px rgb(217 155 142 / 14%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home header .aetherion-profile-menu-item,
+  .aetherion-home header .aetherion-profile-menu-item > svg,
+  .aetherion-home header .aetherion-profile-menu-item > span > svg {
+    transition: none !important;
+  }
+  .aetherion-home header .aetherion-profile-menu-item:active {
+    transform: none !important;
+  }
+}
