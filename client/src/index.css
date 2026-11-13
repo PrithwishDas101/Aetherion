@@ -1762,3 +1762,54 @@ html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-men
     transform: none !important;
   }
 }
+
+
+/* Refined menu micro-interactions: lift on hover, tactile compression on press. */
+@media (hover: hover) and (pointer: fine) {
+  .aetherion-home header .aetherion-profile-menu-item:hover {
+    transform: translateY(-1px) !important;
+    box-shadow:
+      inset 2px 0 0 currentColor,
+      0 3px 9px rgb(32 36 31 / 7%);
+  }
+
+  .aetherion-home header .aetherion-profile-menu-item:hover > svg,
+  .aetherion-home header .aetherion-profile-menu-item:hover > span > svg {
+    transform: scale(1.06);
+  }
+}
+
+.aetherion-home header .aetherion-profile-menu-item:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.aetherion-home header .aetherion-profile-menu-item:active {
+  filter: saturate(1.08);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .aetherion-home header .aetherion-profile-menu-item {
+    min-height: 46px;
+  }
+
+  .aetherion-home header .aetherion-profile-menu-item:active {
+    transform: scale(0.97) !important;
+    transition:
+      transform 75ms ease-out,
+      background-color 75ms ease-out,
+      box-shadow 75ms ease-out !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home header .aetherion-profile-menu-item:hover,
+  .aetherion-home header .aetherion-profile-menu-item:active {
+    transform: none !important;
+  }
+
+  .aetherion-home header .aetherion-profile-menu-item:hover > svg,
+  .aetherion-home header .aetherion-profile-menu-item:hover > span > svg {
+    transform: none !important;
+  }
+}
