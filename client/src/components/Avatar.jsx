@@ -23,11 +23,15 @@ const Avatar = ({
         <div className={`relative shrink-0 ${className}`}>
             <AvatarDecoration decoration={decoration} />
 
-            <div className={`relative z-10 flex items-center justify-center overflow-hidden rounded-full ${avatarSize} ${avatarClassName}`}>        {profilePic ? (
+            <div
+                className={`relative z-10 flex items-center justify-center overflow-hidden rounded-full ${avatarSize} ${avatarClassName}`}
+                style={!profilePic ? { backgroundColor: "#DDE0D9", color: "#20211F" } : undefined}
+            >
+                {profilePic ? (
                 <img src={profilePic} alt={alt} className="h-full w-full object-cover" />
             ) : (
                 <span>{initials}</span>
-            )}
+                )}
             </div>
 
             {children}

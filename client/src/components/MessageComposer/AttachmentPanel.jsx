@@ -21,37 +21,37 @@ const AttachmentPanel = ({
     {
       label: "Camera",
       icon: FiCamera,
-      color: "#ff5c5c",
+      color: "#171717",
       onClick: onCamera,
     },
     {
       label: "Gallery",
       icon: FiImage,
-      color: "#4da6ff",
+      color: "#171717",
       onClick: onGallery,
     },
     {
       label: "Document",
       icon: FiFileText,
-      color: "#7f8cff",
+      color: "#171717",
       onClick: onDocument,
     },
     {
       label: "Poll",
       icon: FiBarChart2,
-      color: "#b36bff",
+      color: "#171717",
       onClick: onPoll,
     },
     {
       label: "Location",
       icon: FiMapPin,
-      color: "#ff6b6b",
+      color: "#171717",
       onClick: onLocation,
     },
     {
       label: "Contact",
       icon: FiUser,
-      color: "#3fd99b",
+      color: "#171717",
       onClick: onContact,
     },
   ];
@@ -65,7 +65,7 @@ const AttachmentPanel = ({
         }
       `}
     >
-      <div className="w-[250px] rounded-2xl border border-white/10 bg-[#101610]/95 p-2 shadow-2xl backdrop-blur-md">
+      <div className="w-[250px] rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF]/95 p-2 shadow-2xl backdrop-blur-md">
         <div className="grid grid-cols-3 gap-1.5 lg:grid-cols-1">
           {options.map(({ label, icon: Icon, color, onClick }, index) => (
             <button
@@ -76,14 +76,14 @@ const AttachmentPanel = ({
                 "--icon-color": color,
                 transitionDelay: isOpen ? `${index * 75}ms` : "0ms",
               }}
-              className={`group flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-xl bg-[#151c15] px-1.5 py-2 text-[11px] font-medium text-[#aeb7aa] transition-all duration-300 ease-out
+              className={`group flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-xl bg-[#F5F5F5] px-1.5 py-2 text-[11px] font-medium text-[#737373] transition-all duration-300 ease-out
                   ${isOpen
                   ? "translate-y-0 opacity-100"
                   : "translate-y-8 opacity-0"
                 }
-                  hover:bg-[#1b211b] active:scale-95 lg:min-h-[48px] lg:flex-row lg:justify-start lg:gap-3 lg:px-3 lg:py-1.5`}
+                  hover:bg-[#E5E5E5] active:scale-95 lg:min-h-[48px] lg:flex-row lg:justify-start lg:gap-3 lg:px-3 lg:py-1.5`}
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#202820] transition-all duration-200 lg:h-8 lg:w-8">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFFFFF] transition-all duration-200 lg:h-8 lg:w-8">
                 <Icon
                   className="text-lg transition-all duration-200 lg:text-base"
                   style={{
@@ -92,7 +92,7 @@ const AttachmentPanel = ({
                 />
               </span>
 
-              <span className="transition-colors duration-200 group-hover:text-[var(--icon-color)]">
+              <span className="transition-colors duration-200 group-hover:text-[#171717]">
                 {label}
               </span>
             </button>
