@@ -1939,12 +1939,6 @@ html[data-aetherion-theme="night"] .aetherion-profile-page {
   border-color: var(--profile-divider) !important;
   color: var(--profile-text) !important;
 }
-.aetherion-profile-page > header h1,
-.aetherion-profile-page > main h2,
-.aetherion-profile-page > main p,
-.aetherion-profile-page > main span {
-  color: inherit;
-}
 .aetherion-profile-page > main {
   background: var(--profile-canvas);
 }
