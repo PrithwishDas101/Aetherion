@@ -255,7 +255,7 @@ const Profile = () => {
 
   // UI
   return (
-    <div className="min-h-screen bg-[#080d09] text-[#f1eee8]">
+    <div className="aetherion-profile-page min-h-screen bg-[#080d09] text-[#f1eee8]">
       {/* ===================================================
           HEADER
       =================================================== */}
