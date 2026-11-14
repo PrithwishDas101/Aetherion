@@ -2085,8 +2085,9 @@ html[data-aetherion-theme="night"] .aetherion-profile-modal [class~="hover:bg-[#
   background-color: var(--profile-hover) !important;
 }
 .aetherion-profile-modal [class~="text-[#d8f45a]"],
-.aetherion-profile-modal [class~="text-[#c3e5d4]"],
-.aetherion-profile-modal [class~="bg-[#c3e5d4]"] {
+.aetherion-profile-modal [class~="text-[#c3e5d4]"] {
   color: var(--profile-muted) !important;
+}
+.aetherion-profile-modal [class~="bg-[#c3e5d4]"] {
   background-color: var(--profile-muted) !important;
 }
