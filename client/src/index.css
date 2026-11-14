@@ -2021,3 +2021,62 @@ html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fix
 html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#c3e5d4]"] {
   color: #b5b9ad !important;
 }
+
+
+/* Profile modal monochrome takeover. Applies only to dialogs opened from Profile. */
+.aetherion-profile-modal > div {
+  background-color: var(--profile-surface) !important;
+  border-color: var(--profile-border) !important;
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-modal [class*="border-white/"] {
+  border-color: var(--profile-divider) !important;
+}
+.aetherion-profile-modal [class~="bg-[#111611]"],
+.aetherion-profile-modal [class~="bg-[#0b100c]"],
+.aetherion-profile-modal [class~="bg-[#0d120e]"],
+.aetherion-profile-modal [class~="bg-[#080b09]"] {
+  background-color: var(--profile-raised) !important;
+}
+.aetherion-profile-modal [class*="bg-white/"] {
+  background-color: var(--profile-hover) !important;
+}
+.aetherion-profile-modal [class~="text-[#f1eee8]"],
+.aetherion-profile-modal [class~="text-[#c5c9c2]"] {
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-modal [class~="text-[#737b73]"],
+.aetherion-profile-modal [class~="text-[#626960]"],
+.aetherion-profile-modal [class~="text-[#4f564f]"],
+.aetherion-profile-modal [class~="text-[#858d84]"],
+.aetherion-profile-modal [class~="text-[#838371]"],
+.aetherion-profile-modal [class~="text-[#555d55]"],
+.aetherion-profile-modal [class~="text-[#666d65]"] {
+  color: var(--profile-muted) !important;
+}
+.aetherion-profile-modal [class~="bg-[#d8f45a]"],
+.aetherion-profile-modal [class~="hover:bg-[#e4ff6f]"]:hover {
+  background-color: #292d28 !important;
+  color: #ffffff !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-modal [class~="bg-[#d8f45a]"],
+html[data-aetherion-theme="night"] .aetherion-profile-modal [class~="hover:bg-[#e4ff6f]"]:hover {
+  background-color: #dadbd4 !important;
+  color: #20211f !important;
+}
+.aetherion-profile-modal [class*="border-[#d8f45a]"] {
+  border-color: #aab1a4 !important;
+}
+.aetherion-profile-modal [class*="bg-[#d8f45a]/"] {
+  background-color: rgb(125 135 121 / 12%) !important;
+}
+.aetherion-profile-modal [class*="focus:border-[#d8f45a]"]:focus {
+  border-color: #899286 !important;
+}
+.aetherion-profile-modal [class~="accent-[#d8f45a]"] {
+  accent-color: #7c8578 !important;
+}
+.aetherion-profile-modal textarea::placeholder,
+.aetherion-profile-modal input::placeholder {
+  color: var(--profile-muted) !important;
+}
