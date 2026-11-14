@@ -23,7 +23,7 @@ const Avatar = ({
         <div className={`relative shrink-0 ${className}`}>
             <AvatarDecoration decoration={decoration} />
 
-            <div className={`relative z-10 flex items-center justify-center overflow-hidden rounded-full ${avatarSize} ${avatarClassName} ${!profilePic ? "!bg-[#E8EAE4] !text-[#20211F] dark:!bg-[#F5F5F2] dark:!text-[#20211F]" : ""}`}
+            <div className={`relative z-10 flex items-center justify-center overflow-hidden rounded-full ${avatarSize} ${avatarClassName} ${!profilePic ? "!bg-[#D6D9D2] !text-[#20211F] dark:!bg-[#F5F5F2] dark:!text-[#20211F]" : ""}`}
             >
                 {profilePic ? (
                 <img src={profilePic} alt={alt} className="h-full w-full object-cover" />
