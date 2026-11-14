@@ -1906,3 +1906,124 @@ html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-men
 html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
   color: #c99a90 !important;
 }
+
+
+/* Profile page monochrome takeover.
+   Scoped to this route only; fixed overlays/modals are deliberately excluded. */
+.aetherion-profile-page {
+  --profile-canvas: #f6f5f1;
+  --profile-surface: #ffffff;
+  --profile-raised: #fbfaf7;
+  --profile-hover: #f0f0e9;
+  --profile-border: #e2e3db;
+  --profile-divider: #ecece5;
+  --profile-text: #20241f;
+  --profile-muted: #70776f;
+  background: var(--profile-canvas) !important;
+  color: var(--profile-text) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page {
+  --profile-canvas: #171817;
+  --profile-surface: #202220;
+  --profile-raised: #242624;
+  --profile-hover: #2c2e2c;
+  --profile-border: #343733;
+  --profile-divider: #2a2c29;
+  --profile-text: #e9e9e3;
+  --profile-muted: #a4a59d;
+  background: var(--profile-canvas) !important;
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-page > header {
+  background: color-mix(in srgb, var(--profile-surface) 92%, transparent) !important;
+  border-color: var(--profile-divider) !important;
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-page > header h1,
+.aetherion-profile-page > main h2,
+.aetherion-profile-page > main p,
+.aetherion-profile-page > main span {
+  color: inherit;
+}
+.aetherion-profile-page > main {
+  background: var(--profile-canvas);
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#080d09]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#151a16]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#111611]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#0b100c]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#0d120e]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#131613]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#1a1c1a]"] {
+  background-color: var(--profile-surface) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.018]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.025]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.035]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.045]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.05]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.06]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.065]"] {
+  background-color: var(--profile-raised) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.05]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.06]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.07]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.08]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.1]"] {
+  border-color: var(--profile-border) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-white"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#f1eee8]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#d9ddd5]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#d4d7d1]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#d0d2ce]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#c5c9c2]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#b5b8b3]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#aeb4ac]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-white/65"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-white/80"] {
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#8d918c]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#777b76]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#777d76]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#687166]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#626960]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#858d84]"] {
+  color: var(--profile-muted) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#d8f45a]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="hover:bg-[#e4ff6f]"]:hover {
+  background-color: #292d28 !important;
+  color: #ffffff !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#d8f45a]"],
+html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class~="hover:bg-[#e4ff6f]"]:hover {
+  background-color: #dadbd4 !important;
+  color: #20211f !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class*="bg-[radial-gradient"] {
+  background-image: radial-gradient(circle at 15% 40%, rgb(120 125 112 / 12%), transparent 28%), radial-gradient(circle at 85% 20%, rgb(120 125 112 / 10%), transparent 35%), linear-gradient(135deg, #e7e6df, #d9dbd2 45%, #eeede7) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class*="bg-[radial-gradient"] {
+  background-image: radial-gradient(circle at 15% 40%, rgb(210 213 202 / 8%), transparent 28%), radial-gradient(circle at 85% 20%, rgb(210 213 202 / 7%), transparent 35%), linear-gradient(135deg, #202220, #292c28 45%, #171817) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="accent-[#d8f45a]"] {
+  accent-color: #7c8578 !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-t-[#d8f45a]"] {
+  border-top-color: #899286 !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="hover:border-[#d8f45a]/30"]:hover {
+  border-color: #aab1a4 !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#080d09]"] {
+  background-color: var(--profile-surface) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#c3e5d4]"] {
+  color: #7d8779 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#c3e5d4]"] {
+  color: #b5b9ad !important;
+}
