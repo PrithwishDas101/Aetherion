@@ -437,10 +437,10 @@ const MessageBubble = ({
                 isPoll ||
                 isLocation ||
                 isContact
-                ? "px-1 pt-1 text-[#737373]"
+                ? "px-1 pt-1 text-[#404040]"
                 : `mt-1 ${isMyMessage
                   ? "text-[#FFFFFF]/60"
-                  : "text-[#737373]"
+                  : "text-[#404040]"
                 }`
               }`}
           >
@@ -450,18 +450,18 @@ const MessageBubble = ({
 
             {isMyMessage &&
               (message.isUploading ? (
-                <span className="text-[10px] text-[#737373]">
+                <span className="text-[10px] text-[#525252]">
                   Sending...
                 </span>
               ) : message.isSending ? (
                 <IoTimeOutline
-                  className="text-sm text-[#737373]"
+                  className="text-sm text-[#525252]"
                   aria-label="Sending"
                 />
               ) : message.read ? (
-                <IoCheckmarkDone className="text-sm text-[#737373]" />
+                <IoCheckmarkDone className="text-sm text-[#525252]" />
               ) : (
-                <IoCheckmark className="text-sm text-[#737373]" />
+                <IoCheckmark className="text-sm text-[#525252]" />
               ))}
           </div>
         </div>
