@@ -2091,3 +2091,12 @@ html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-mo
 .aetherion-profile-page .aetherion-profile-modal [class~="bg-[#c3e5d4]"] {
   background-color: var(--profile-muted) !important;
 }
+
+
+/* Give Profile modals clearer surface hierarchy in light mode only. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal {
+  --profile-raised: #f0f0e9;
+  --profile-hover: #e7e8df;
+  --profile-border: #d2d5ca;
+  --profile-divider: #e0e2d9;
+}
