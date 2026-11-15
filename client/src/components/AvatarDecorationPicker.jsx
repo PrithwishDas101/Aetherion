@@ -36,7 +36,7 @@ const AvatarDecorationPicker = ({
 
     return (
         <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/65 px-3 py-4 backdrop-blur-sm sm:px-5"
+            className="aetherion-edit-profile-modal fixed inset-0 z-[100] flex items-center justify-center bg-black/65 px-3 py-4 backdrop-blur-sm sm:px-5"
             onMouseDown={(event) => {
                 if (
                     event.target === event.currentTarget &&
