@@ -2120,3 +2120,9 @@ html:not([data-aetherion-theme="night"]) .aetherion-profile-page > header {
   border-color: #e0e3d9 !important;
 }
 
+/* Give Profile section dividers clearer contrast in light mode only. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-t"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-b"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="divide-y"] > * + * {
+  border-color: #cbd0c5 !important;
+}
