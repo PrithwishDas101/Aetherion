@@ -2755,3 +2755,8 @@ html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class*
   --profile-text: var(--contact-text);
   --profile-muted: var(--contact-muted);
 }
+
+/* Contact request hover uses a group state on the icon, not on the icon itself. */
+.aetherion-contact-profile-page .group:hover [class~="group-hover:text-[#5af48b]"] {
+  color: var(--contact-text) !important;
+}
