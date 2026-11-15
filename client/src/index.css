@@ -2322,8 +2322,16 @@ html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page [class*="b
 .aetherion-edit-profile-page [class~="text-[#666d65]"],
 .aetherion-edit-profile-page [class~="text-[#555d55]"],
 .aetherion-edit-profile-page [class~="text-[#747c73]"],
-.aetherion-edit-profile-page [class~="text-[#aeb4ac]"] {
+.aetherion-edit-profile-page [class~="text-[#aeb4ac]"],
+.aetherion-edit-profile-page [class~="text-[#aeb5aa]"],
+.aetherion-edit-profile-page [class~="text-[#838371]"] {
   color: var(--edit-muted) !important;
+}
+.aetherion-edit-profile-page [class~="text-[#d5d7c9]"] {
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page [class~="border-[#101218]"] {
+  border-color: var(--edit-border) !important;
 }
 
 /* Replace lime accents with restrained charcoal/sage contrast. */
@@ -2395,7 +2403,10 @@ html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-profi
   background: color-mix(in srgb, var(--edit-surface) 92%, transparent) !important;
   border-color: var(--edit-border) !important;
   color: var(--edit-text) !important;
-  box-shadow: 0 8px 26px rgb(0 0 0 / 8%), inset 0 1px 0 rgb(255 255 255 / 45%) !important;
+  box-shadow: 0 8px 26px rgb(0 0 0 / 18%), inset 0 1px 0 rgb(255 255 255 / 6%) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page .aetherion-edit-profile-status-trigger {
+  box-shadow: 0 8px 26px rgb(0 0 0 / 8%), inset 0 1px 0 rgb(255 255 255 / 70%) !important;
 }
 .aetherion-edit-profile-page .aetherion-edit-profile-status-trigger:hover {
   background: var(--edit-hover) !important;
@@ -2462,13 +2473,16 @@ html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-
 .aetherion-edit-profile-page .aetherion-edit-profile-modal input::placeholder {
   color: var(--edit-muted) !important;
 }
+/* Preserve the red duplicate state on the connection URL field. */
+.aetherion-edit-profile-page .aetherion-profile-modal input[class*="border-red-"] {
+  border-color: #f87171 !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal input[class*="focus:border-red-"]:focus {
+  border-color: #f87171 !important;
+}
 /* Destructive actions and duplicate/error feedback retain their existing semantic red classes. */
 
 /* Maintain a distinct selected state for decoration/platform choices. */
-.aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] span,
-.aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] svg {
-  color: var(--edit-text);
-}
 html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] {
   background-color: #dfe3d9 !important;
 }
