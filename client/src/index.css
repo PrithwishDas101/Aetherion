@@ -2093,10 +2093,30 @@ html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-mo
 }
 
 
-/* Give Profile modals clearer surface hierarchy in light mode only. */
-html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal {
-  --profile-raised: #f0f0e9;
-  --profile-hover: #e7e8df;
-  --profile-border: #d2d5ca;
-  --profile-divider: #e0e2d9;
+/* Light-mode color grading: add separation between the page, cards and inset surfaces. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page {
+  --profile-canvas: #f2f2ed;
+  --profile-surface: #ffffff;
+  --profile-raised: #f4f4ee;
+  --profile-hover: #e9ebe3;
+  --profile-border: #d6d9cf;
+  --profile-divider: #e3e5dd;
+  --profile-text: #222720;
+  --profile-muted: #646d63;
+  background: var(--profile-canvas) !important;
+  color: var(--profile-text) !important;
 }
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal {
+  --profile-surface: #ffffff;
+  --profile-raised: #f0f1ea;
+  --profile-hover: #e6e9e0;
+  --profile-border: #d1d5ca;
+  --profile-divider: #dfe2d8;
+  --profile-text: #222720;
+  --profile-muted: #626b61;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page > header {
+  background: #ffffff !important;
+  border-color: #e0e3d9 !important;
+}
+
