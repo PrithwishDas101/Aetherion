@@ -2191,3 +2191,315 @@ html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-ba
   background: #30332f !important;
   border-color: #5a6057 !important;
 }
+
+
+/* Edit Profile monochrome takeover.
+   All rules are scoped to this route so shared components keep their existing pages unchanged. */
+.aetherion-edit-profile-page {
+  --edit-canvas: #171817;
+  --edit-surface: #202220;
+  --edit-raised: #242624;
+  --edit-input: #1b1e1b;
+  --edit-hover: #2c2e2c;
+  --edit-border: #343733;
+  --edit-divider: #2a2c29;
+  --edit-text: #e9e9e3;
+  --edit-muted: #a4a59d;
+  --edit-subtle: #858a81;
+  --edit-primary: #dadbd4;
+  --edit-primary-text: #20211f;
+  --edit-selected: #30332e;
+  --edit-selected-border: #62695f;
+  background: var(--edit-canvas) !important;
+  color: var(--edit-text) !important;
+}
+
+html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page {
+  --edit-canvas: #f0f0ea;
+  --edit-surface: #ffffff;
+  --edit-raised: #eeefe8;
+  --edit-input: #f7f8f3;
+  --edit-hover: #e3e6dc;
+  --edit-border: #c8cdc2;
+  --edit-divider: #d2d6cc;
+  --edit-text: #1d211c;
+  --edit-muted: #555e54;
+  --edit-subtle: #70786d;
+  --edit-primary: #292d28;
+  --edit-primary-text: #ffffff;
+  --edit-selected: #dfe3d9;
+  --edit-selected-border: #b7c0b2;
+}
+
+.aetherion-edit-profile-page > header {
+  background: color-mix(in srgb, var(--edit-surface) 93%, transparent) !important;
+  border-color: var(--edit-divider) !important;
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page > main {
+  background: var(--edit-canvas);
+}
+.aetherion-edit-profile-page > header .aetherion-button {
+  color: var(--edit-text) !important;
+  background: var(--edit-raised) !important;
+  border: 1px solid var(--edit-border) !important;
+}
+.aetherion-edit-profile-page > header .aetherion-button:hover {
+  background: var(--edit-hover) !important;
+}
+
+/* Neutral page surfaces and inset fields. */
+.aetherion-edit-profile-page [class~="bg-[#111611]"],
+.aetherion-edit-profile-page [class~="bg-[#101510]"] {
+  background-color: var(--edit-surface) !important;
+}
+.aetherion-edit-profile-page [class~="bg-[#0b100c]"],
+.aetherion-edit-profile-page [class~="bg-[#0d120e]"],
+.aetherion-edit-profile-page [class~="bg-[#080b09]"] {
+  background-color: var(--edit-input) !important;
+}
+.aetherion-edit-profile-page [class~="bg-[#151a16]"],
+.aetherion-edit-profile-page [class~="bg-[#171d17]"],
+.aetherion-edit-profile-page [class~="bg-[#1a211a]"],
+.aetherion-edit-profile-page [class~="bg-[#1a1c1a]"] {
+  background-color: var(--edit-raised) !important;
+}
+.aetherion-edit-profile-page [class~="bg-white/[0.018]"],
+.aetherion-edit-profile-page [class~="bg-white/[0.025]"],
+.aetherion-edit-profile-page [class~="bg-white/[0.035]"] {
+  background-color: var(--edit-raised) !important;
+}
+.aetherion-edit-profile-page [class*="hover:bg-white/"]:hover {
+  background-color: var(--edit-hover) !important;
+}
+
+/* Inputs retain their existing dimensions, padding and interaction states. */
+.aetherion-edit-profile-page input:not([type="file"]):not([type="range"]),
+.aetherion-edit-profile-page textarea {
+  background-color: var(--edit-input);
+  border-color: var(--edit-border);
+  color: var(--edit-text);
+}
+.aetherion-edit-profile-page input:not([type="file"]):not([type="range"])::placeholder,
+.aetherion-edit-profile-page textarea::placeholder {
+  color: var(--edit-muted) !important;
+}
+.aetherion-edit-profile-page input:not([type="file"]):not([type="range"]):focus,
+.aetherion-edit-profile-page textarea:focus {
+  border-color: var(--edit-subtle) !important;
+  background-color: var(--edit-raised) !important;
+}
+.aetherion-edit-profile-page input[type="range"] {
+  accent-color: var(--edit-subtle) !important;
+}
+
+/* Borders, dividers and typography. */
+.aetherion-edit-profile-page [class*="border-white/"] {
+  border-color: var(--edit-border) !important;
+}
+.aetherion-edit-profile-page [class*="border-t"][class*="border-white/"],
+.aetherion-edit-profile-page [class*="border-b"][class*="border-white/"] {
+  border-color: var(--edit-divider) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page [class*="border-l"][class*="border-white/"] {
+  border-left-color: #c2c8bc !important;
+}
+.aetherion-edit-profile-page [class~="text-white"],
+.aetherion-edit-profile-page [class~="text-[#f1eee8]"],
+.aetherion-edit-profile-page [class~="text-[#d4d7d1]"],
+.aetherion-edit-profile-page [class~="text-[#d9ddd5]"],
+.aetherion-edit-profile-page [class~="text-[#c5c9c2]"],
+.aetherion-edit-profile-page [class~="text-[#b5b8b3]"] {
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page [class~="text-[#8d918c]"],
+.aetherion-edit-profile-page [class~="text-[#777b76]"],
+.aetherion-edit-profile-page [class~="text-[#777d76]"],
+.aetherion-edit-profile-page [class~="text-[#858d84]"],
+.aetherion-edit-profile-page [class~="text-[#737b73]"],
+.aetherion-edit-profile-page [class~="text-[#626960]"],
+.aetherion-edit-profile-page [class~="text-[#4f564f]"],
+.aetherion-edit-profile-page [class~="text-[#666d65]"],
+.aetherion-edit-profile-page [class~="text-[#555d55]"],
+.aetherion-edit-profile-page [class~="text-[#747c73]"],
+.aetherion-edit-profile-page [class~="text-[#aeb4ac]"] {
+  color: var(--edit-muted) !important;
+}
+
+/* Replace lime accents with restrained charcoal/sage contrast. */
+.aetherion-edit-profile-page [class~="bg-[#d8f45a]"] {
+  background-color: var(--edit-primary) !important;
+  color: var(--edit-primary-text) !important;
+}
+.aetherion-edit-profile-page [class*="hover:bg-[#e4ff6f]"]:hover {
+  background-color: var(--edit-hover) !important;
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page [class*="border-[#d8f45a]"] {
+  border-color: var(--edit-selected-border) !important;
+}
+.aetherion-edit-profile-page [class*="bg-[#d8f45a]/"] {
+  background-color: color-mix(in srgb, var(--edit-muted) 14%, transparent) !important;
+}
+.aetherion-edit-profile-page [class~="text-[#d8f45a]"],
+.aetherion-edit-profile-page [class~="text-[#D2F25E]"] {
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page [class~="accent-[#d8f45a]"] {
+  accent-color: var(--edit-subtle) !important;
+}
+.aetherion-edit-profile-page [class*="focus:border-[#d8f45a]"]:focus {
+  border-color: var(--edit-subtle) !important;
+}
+.aetherion-edit-profile-page [class*="hover:border-[#d8f45a]"]:hover {
+  border-color: var(--edit-selected-border) !important;
+}
+
+/* Banner: neutral monochrome artwork and theme-aware edit control. */
+.aetherion-edit-profile-page [class*="bg-[radial-gradient"] {
+  background-image:
+    radial-gradient(circle at 15% 40%, rgb(145 151 137 / 12%), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgb(145 151 137 / 9%), transparent 35%),
+    linear-gradient(135deg, #e8e9e2, #d8dbd1 45%, #f0f0ea) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page [class*="bg-[radial-gradient"] {
+  background-image:
+    radial-gradient(circle at 15% 40%, rgb(210 213 202 / 8%), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgb(210 213 202 / 6%), transparent 35%),
+    linear-gradient(135deg, #202220, #292c28 45%, #171817) !important;
+}
+.aetherion-edit-profile-page [class*="border-[#d8f45a]/"] {
+  border-color: color-mix(in srgb, var(--edit-muted) 30%, transparent) !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-banner-action {
+  background: #ffffff !important;
+  border-color: #d4d9ce !important;
+  color: #20241f !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-banner-action:hover {
+  background: #f0f1eb !important;
+  border-color: #bfc6b9 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-profile-banner-action {
+  background: #242624 !important;
+  border-color: #454943 !important;
+  color: #f1eee8 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-profile-banner-action:hover {
+  background: #30332f !important;
+  border-color: #5a6057 !important;
+}
+
+/* Status bubble and profile-picture edit control. */
+.aetherion-edit-profile-page .aetherion-edit-profile-status-trigger {
+  background: color-mix(in srgb, var(--edit-surface) 92%, transparent) !important;
+  border-color: var(--edit-border) !important;
+  color: var(--edit-text) !important;
+  box-shadow: 0 8px 26px rgb(0 0 0 / 8%), inset 0 1px 0 rgb(255 255 255 / 45%) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-status-trigger:hover {
+  background: var(--edit-hover) !important;
+  border-color: var(--edit-selected-border) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-avatar-action {
+  background: #ffffff !important;
+  border-color: #d4d9ce !important;
+  color: #20241f !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-avatar-action svg {
+  color: inherit !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-profile-avatar-action {
+  background: #242624 !important;
+  border-color: #454943 !important;
+  color: #f1eee8 !important;
+}
+.aetherion-edit-profile-page [class~="bg-[#1a1c1a]"] {
+  background-color: var(--edit-muted) !important;
+}
+
+/* All dialogs used from Edit Profile share the same neutral surfaces. */
+.aetherion-edit-profile-page .aetherion-edit-profile-modal > div,
+.aetherion-edit-profile-page .aetherion-profile-modal > div {
+  background-color: var(--edit-surface) !important;
+  border-color: var(--edit-border) !important;
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="border-white/"],
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="border-white/"] {
+  border-color: var(--edit-divider) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class~="bg-[#0b100c]"],
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class~="bg-[#0d120e]"],
+.aetherion-edit-profile-page .aetherion-profile-modal [class~="bg-[#0b100c]"],
+.aetherion-edit-profile-page .aetherion-profile-modal [class~="bg-[#0d120e]"] {
+  background-color: var(--edit-input) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] {
+  background-color: var(--edit-selected) !important;
+  border-color: var(--edit-selected-border) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edit-selected-border) 45%, transparent);
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="false"] {
+  background-color: var(--edit-raised) !important;
+  border-color: var(--edit-border) !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="hover:bg-white/"]:hover,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="hover:bg-white/"]:hover {
+  background-color: var(--edit-hover) !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal textarea,
+.aetherion-edit-profile-page .aetherion-profile-modal input,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal textarea,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal input {
+  background-color: var(--edit-input);
+  border-color: var(--edit-border);
+  color: var(--edit-text);
+}
+.aetherion-edit-profile-page .aetherion-profile-modal textarea::placeholder,
+.aetherion-edit-profile-page .aetherion-profile-modal input::placeholder,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal textarea::placeholder,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal input::placeholder {
+  color: var(--edit-muted) !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="text-red-"],
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="text-red-"] {
+  color: inherit;
+}
+/* Keep destructive actions and duplicate/error feedback semantic red. */
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="text-red-"],
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="bg-red-"],
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="border-red-"],
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="bg-red-"] {
+  color: revert;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="bg-red-"],
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="bg-red-"] {
+  background-color: revert;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="border-red-"],
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="border-red-"] {
+  border-color: revert;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="hover:text-red-"]:hover,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="hover:bg-red-"]:hover {
+  color: revert;
+  background-color: revert;
+}
+
+/* Maintain a distinct selected state for decoration/platform choices. */
+.aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] span,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] svg {
+  color: var(--edit-text);
+}
+html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] {
+  background-color: #dfe3d9 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] {
+  background-color: #30332e !important;
+}
+
+/* Preserve the social platforms' own icon colors; only the surrounding UI is themed. */
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="text-red-"] {
+  color: revert;
+}
