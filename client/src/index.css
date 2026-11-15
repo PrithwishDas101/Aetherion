@@ -2376,8 +2376,9 @@ html[data-aetherion-theme="night"] .aetherion-edit-profile-page [class*="bg-[rad
     radial-gradient(circle at 85% 20%, rgb(210 213 202 / 6%), transparent 35%),
     linear-gradient(135deg, #202220, #292c28 45%, #171817) !important;
 }
-.aetherion-edit-profile-page [class*="border-[#d8f45a]/"] {
-  border-color: color-mix(in srgb, var(--edit-muted) 30%, transparent) !important;
+.aetherion-edit-profile-page [class*="border-[#d8f45a]/[0.04]"],
+.aetherion-edit-profile-page [class*="border-[#d8f45a]/[0.06]"] {
+  border-color: color-mix(in srgb, var(--edit-muted) 14%, transparent) !important;
 }
 .aetherion-edit-profile-page .aetherion-profile-banner-action {
   background: #ffffff !important;
