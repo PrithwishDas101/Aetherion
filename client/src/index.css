@@ -2149,6 +2149,19 @@ html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-prof
   --profile-text: #1d211c;
   --profile-muted: #535c52;
 }
+
+/* Make the selected presence option visibly distinct from hover in light mode. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal button[class~="bg-white/[0.065]"] {
+  background-color: #dfe3d9 !important;
+  box-shadow: inset 0 0 0 1px #c9cec2;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal button[class~="bg-white/[0.065]"] p:first-child {
+  color: #20251f !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal button[class~="hover:bg-white/[0.035]"]:hover {
+  background-color: #f0f1ec !important;
+  box-shadow: inset 0 0 0 1px #e3e6de;
+}
 html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-t"][class*="border-white/"],
 html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-b"][class*="border-white/"],
 html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-l"][class*="border-white/"],
