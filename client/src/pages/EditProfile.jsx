@@ -746,7 +746,7 @@ const EditProfile = () => {
 
             {showStatusModal && (
                 <div
-                    className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
+                    className="aetherion-edit-profile-modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
                     onMouseDown={closeStatusModal}
                 >
                     <div
