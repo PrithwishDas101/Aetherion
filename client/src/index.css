@@ -2038,9 +2038,7 @@ html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fix
 .aetherion-profile-page .aetherion-profile-modal [class~="bg-[#080b09]"] {
   background-color: var(--profile-raised) !important;
 }
-.aetherion-profile-page .aetherion-profile-modal [class*="bg-white/"] {
-  background-color: var(--profile-hover) !important;
-}
+/* Preserve the status/presence option translucency and original surface texture. */
 .aetherion-profile-page .aetherion-profile-modal [class~="text-[#f1eee8]"],
 .aetherion-profile-page .aetherion-profile-modal [class~="text-[#c5c9c2]"] {
   color: var(--profile-text) !important;
