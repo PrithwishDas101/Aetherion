@@ -345,7 +345,7 @@ const EditProfile = () => {
                         <button
                             type="button"
                             onClick={() => navigate("/profile")}
-                            className="aetherion-button"
+                            className="aetherion-button aetherion-edit-profile-back-button"
                             aria-label="Back to profile"
                         >
                             <span>←</span>
