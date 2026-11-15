@@ -2126,3 +2126,8 @@ html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border
 html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="divide-y"] > * + * {
   border-color: #cbd0c5 !important;
 }
+
+/* Keep the vertical separator beside Connections visible in light mode. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-l"][class*="border-white/"] {
+  border-left-color: #cbd0c5 !important;
+}
