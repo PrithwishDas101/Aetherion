@@ -2462,30 +2462,7 @@ html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-
 .aetherion-edit-profile-page .aetherion-edit-profile-modal input::placeholder {
   color: var(--edit-muted) !important;
 }
-.aetherion-edit-profile-page .aetherion-profile-modal [class*="text-red-"],
-.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="text-red-"] {
-  color: inherit;
-}
-/* Keep destructive actions and duplicate/error feedback semantic red. */
-.aetherion-edit-profile-page .aetherion-profile-modal [class*="text-red-"],
-.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="bg-red-"],
-.aetherion-edit-profile-page .aetherion-profile-modal [class*="border-red-"],
-.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="bg-red-"] {
-  color: revert;
-}
-.aetherion-edit-profile-page .aetherion-profile-modal [class*="bg-red-"],
-.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="bg-red-"] {
-  background-color: revert;
-}
-.aetherion-edit-profile-page .aetherion-profile-modal [class*="border-red-"],
-.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="border-red-"] {
-  border-color: revert;
-}
-.aetherion-edit-profile-page .aetherion-profile-modal [class*="hover:text-red-"]:hover,
-.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="hover:bg-red-"]:hover {
-  color: revert;
-  background-color: revert;
-}
+/* Destructive actions and duplicate/error feedback retain their existing semantic red classes. */
 
 /* Maintain a distinct selected state for decoration/platform choices. */
 .aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] span,
@@ -2499,7 +2476,3 @@ html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-
   background-color: #30332e !important;
 }
 
-/* Preserve the social platforms' own icon colors; only the surrounding UI is themed. */
-.aetherion-edit-profile-page .aetherion-profile-modal [class*="text-red-"] {
-  color: revert;
-}
