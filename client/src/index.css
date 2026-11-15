@@ -2131,3 +2131,52 @@ html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="divide
 html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-l"][class*="border-white/"] {
   border-left-color: #cbd0c5 !important;
 }
+
+
+/* Stronger charcoal grading for Profile in light mode. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page {
+  --profile-canvas: #f0f0ea;
+  --profile-raised: #eeefe8;
+  --profile-hover: #e3e6dc;
+  --profile-border: #c8cdc2;
+  --profile-divider: #d2d6cc;
+  --profile-text: #1d211c;
+  --profile-muted: #555e54;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal {
+  --profile-raised: #ebede5;
+  --profile-hover: #e1e4da;
+  --profile-border: #c4cabe;
+  --profile-divider: #d0d5ca;
+  --profile-text: #1d211c;
+  --profile-muted: #535c52;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-t"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-b"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-l"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="divide-y"] > * + * {
+  border-color: #c2c8bc !important;
+}
+
+/* Banner action: porcelain in light mode, charcoal in dark mode. */
+.aetherion-profile-page .aetherion-profile-banner-action {
+  background: #ffffff !important;
+  border-color: #d4d9ce !important;
+  color: #20241f !important;
+}
+.aetherion-profile-page .aetherion-profile-banner-action:hover {
+  background: #f0f1eb !important;
+  border-color: #bfc6b9 !important;
+}
+.aetherion-profile-page .aetherion-profile-banner-action svg {
+  color: inherit !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-banner-action {
+  background: #242624 !important;
+  border-color: #454943 !important;
+  color: #f1eee8 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-banner-action:hover {
+  background: #30332f !important;
+  border-color: #5a6057 !important;
+}
