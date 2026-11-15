@@ -2491,3 +2491,11 @@ html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-
   background-color: #30332e !important;
 }
 
+
+
+/* Edit Profile back arrow: keep the existing control, remove its circular outline. */
+.aetherion-edit-profile-page .aetherion-edit-profile-back-button {
+  border: 0 !important;
+  outline: 0;
+  box-shadow: none !important;
+}
