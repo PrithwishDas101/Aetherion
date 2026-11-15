@@ -2499,3 +2499,259 @@ html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-
   outline: 0;
   box-shadow: none !important;
 }
+
+
+/* Contact Profile monochrome takeover.
+   Route-scoped so shared components keep their styling everywhere else. */
+.aetherion-contact-profile-page {
+  --contact-canvas: #171817;
+  --contact-surface: #202220;
+  --contact-raised: #242624;
+  --contact-input: #1b1e1b;
+  --contact-hover: #2c2e2c;
+  --contact-border: #343733;
+  --contact-divider: #2a2c29;
+  --contact-text: #e9e9e3;
+  --contact-muted: #a4a59d;
+  --contact-subtle: #858a81;
+  --contact-primary: #dadbd4;
+  --contact-primary-text: #20211f;
+  --contact-avatar: #30342e;
+  background: var(--contact-canvas) !important;
+  color: var(--contact-text) !important;
+}
+
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page {
+  --contact-canvas: #f0f0ea;
+  --contact-surface: #ffffff;
+  --contact-raised: #eeefe8;
+  --contact-input: #f7f8f3;
+  --contact-hover: #e3e6dc;
+  --contact-border: #c8cdc2;
+  --contact-divider: #d2d6cc;
+  --contact-text: #1d211c;
+  --contact-muted: #555e54;
+  --contact-subtle: #70786d;
+  --contact-primary: #292d28;
+  --contact-primary-text: #ffffff;
+  --contact-avatar: #d9ddd4;
+}
+
+.aetherion-contact-profile-page > main {
+  background: var(--contact-canvas);
+}
+
+/* Theme the existing page surfaces without changing their structure or spacing. */
+.aetherion-contact-profile-page [class~="bg-[#0b100c]"],
+.aetherion-contact-profile-page [class~="bg-[#080b09]"] {
+  background-color: var(--contact-input) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#111711]"],
+.aetherion-contact-profile-page [class~="bg-[#111611]"],
+.aetherion-contact-profile-page [class~="bg-[#151a16]"],
+.aetherion-contact-profile-page [class~="bg-[#131613]"],
+.aetherion-contact-profile-page [class~="bg-[#151c15]"] {
+  background-color: var(--contact-surface) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#1c261c]"],
+.aetherion-contact-profile-page [class~="bg-[#1a1c1a]"] {
+  background-color: var(--contact-hover) !important;
+}
+
+/* Neutralize the old lime/green theme accents. */
+.aetherion-contact-profile-page [class~="bg-[#d8f45a]"],
+.aetherion-contact-profile-page [class*="hover:bg-[#e4ff6f]"]:hover {
+  background-color: var(--contact-primary) !important;
+  color: var(--contact-primary-text) !important;
+}
+.aetherion-contact-profile-page [class*="border-[#d8f45a]"],
+.aetherion-contact-profile-page [class*="border-[#c1e344]"] {
+  border-color: var(--contact-border) !important;
+}
+.aetherion-contact-profile-page [class~="text-[#d8f45a]"],
+.aetherion-contact-profile-page [class~="text-[#D2F25E]"],
+.aetherion-contact-profile-page [class~="group-hover:text-[#5af48b]"]:hover {
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page [class*="border-[#d8f45a]/"],
+.aetherion-contact-profile-page [class*="border-[#c1e344]/"] {
+  border-color: var(--contact-divider) !important;
+}
+
+/* Text hierarchy. */
+.aetherion-contact-profile-page [class~="text-white"],
+.aetherion-contact-profile-page [class~="text-[#f1eee8]"],
+.aetherion-contact-profile-page [class~="text-[#d4d7d1]"],
+.aetherion-contact-profile-page [class~="text-[#d0d2ce]"],
+.aetherion-contact-profile-page [class~="text-[#d9ddd5]"],
+.aetherion-contact-profile-page [class~="text-[#c9cec5]"],
+.aetherion-contact-profile-page [class~="text-[#bebdbc]"] {
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page [class~="text-[#b5b8b3]"],
+.aetherion-contact-profile-page [class~="text-[#aeb5ac]"],
+.aetherion-contact-profile-page [class~="text-[#aeb4ac]"],
+.aetherion-contact-profile-page [class~="text-[#8d918c]"],
+.aetherion-contact-profile-page [class~="text-[#8f998b]"],
+.aetherion-contact-profile-page [class~="text-[#858d84]"],
+.aetherion-contact-profile-page [class~="text-[#777b76]"],
+.aetherion-contact-profile-page [class~="text-[#777f76]"],
+.aetherion-contact-profile-page [class~="text-[#777d76]"],
+.aetherion-contact-profile-page [class~="text-[#747c73]"],
+.aetherion-contact-profile-page [class~="text-[#737b73]"],
+.aetherion-contact-profile-page [class~="text-[#687166]"],
+.aetherion-contact-profile-page [class~="text-[#626960]"],
+.aetherion-contact-profile-page [class~="text-[#555d55]"],
+.aetherion-contact-profile-page [class~="text-[#4f564f]"],
+.aetherion-contact-profile-page [class~="text-[#666d65]"],
+.aetherion-contact-profile-page [class~="text-[#454c45]"] {
+  color: var(--contact-muted) !important;
+}
+
+/* Borders and dividers use the same contrast system as the Profile page. */
+.aetherion-contact-profile-page [class*="border-white/"] {
+  border-color: var(--contact-border) !important;
+}
+.aetherion-contact-profile-page [class*="border-t"][class*="border-white/"],
+.aetherion-contact-profile-page [class*="border-b"][class*="border-white/"],
+.aetherion-contact-profile-page [class*="divide-y"] > * + * {
+  border-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page [class*="border-l"][class*="border-white/"] {
+  border-left-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page [class*="border-[#0b100c]"],
+.aetherion-contact-profile-page [class*="border-[#111317]"] {
+  border-color: var(--contact-canvas) !important;
+}
+.aetherion-contact-profile-page [class*="ring-[#080d09]"] {
+  --tw-ring-color: var(--contact-canvas) !important;
+}
+
+/* Keep the read-only status bubble glassy instead of flattening its texture. */
+.aetherion-contact-profile-page .aetherion-contact-profile-status {
+  background: color-mix(in srgb, var(--contact-surface) 82%, transparent) !important;
+  border-color: color-mix(in srgb, var(--contact-border) 82%, transparent) !important;
+  color: var(--contact-text) !important;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 12%), inset 0 1px 0 rgb(255 255 255 / 7%) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page .aetherion-contact-profile-status {
+  background: rgb(255 255 255 / 84%) !important;
+  border-color: #d0d5ca !important;
+  box-shadow: 0 8px 28px rgb(28 34 25 / 8%), inset 0 1px 0 rgb(255 255 255 / 85%) !important;
+}
+
+/* Convert the default banner artwork to a quiet charcoal/sage treatment. */
+.aetherion-contact-profile-page [class*="bg-[radial-gradient"] {
+  background-image:
+    radial-gradient(circle at 15% 40%, rgb(170 176 160 / 10%), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgb(170 176 160 / 7%), transparent 35%),
+    linear-gradient(135deg, #202220, #292c28 45%, #171817) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class*="bg-[radial-gradient"] {
+  background-image:
+    radial-gradient(circle at 15% 40%, rgb(90 98 83 / 7%), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgb(90 98 83 / 5%), transparent 35%),
+    linear-gradient(135deg, #e6e8e0, #d9ddd3 45%, #f0f0ea) !important;
+}
+.aetherion-contact-profile-page [class*="border-[#d8f45a]/"] {
+  border-color: color-mix(in srgb, var(--contact-muted) 18%, transparent) !important;
+}
+
+/* Header actions, avatar fallback and details badge. */
+.aetherion-contact-profile-page button[aria-label="Go back"],
+.aetherion-contact-profile-page button[aria-label="Remove contact"],
+.aetherion-contact-profile-page button[aria-label="Send contact request"] {
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#cacfb4]"] {
+  background-color: var(--contact-avatar) !important;
+  color: var(--contact-primary-text) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#080d09]"] {
+  background-color: var(--contact-canvas) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#1a1c1a]"] {
+  background-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page [class~="text-[#9fcaef]"] {
+  color: var(--contact-muted) !important;
+}
+.aetherion-contact-profile-page [class~="hover:text-white"]:hover {
+  color: var(--contact-text) !important;
+}
+
+/* The contacts strip uses a neutral spinner and restrained hover states. */
+.aetherion-contact-profile-page [class*="border-[#d8f45a]/20"] {
+  border-color: color-mix(in srgb, var(--contact-muted) 22%, transparent) !important;
+}
+.aetherion-contact-profile-page [class*="border-t-[#d8f45a]"] {
+  border-top-color: var(--contact-subtle) !important;
+}
+.aetherion-contact-profile-page [class*="hover:border-[#d8f45a]"]:hover {
+  border-color: var(--contact-border) !important;
+}
+.aetherion-contact-profile-page [class*="hover:bg-[#d8f45a]"]:hover {
+  background-color: var(--contact-hover) !important;
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page [class*="hover:text-[#ededea]"]:hover {
+  color: var(--contact-text) !important;
+}
+
+/* All Media + Docs full-screen view. */
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal {
+  background: var(--contact-canvas) !important;
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal > div > div:first-child {
+  border-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal [class*="border-[#d8f45a]"] {
+  border-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal button[class*="border-[#c1e344]"],
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal button[class*="border-[#d8f45a]"] {
+  border-color: var(--contact-primary) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal button[class~="text-[#d8f45a]"] {
+  color: var(--contact-primary) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal button[class*="border-b-2"] {
+  border-bottom-color: var(--contact-primary) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal [class~="bg-[#151a16]"] {
+  background-color: var(--contact-raised) !important;
+}
+
+/* Remove-contact confirmation: neutral surfaces, with red retained for destructive meaning. */
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal {
+  background-color: rgb(8 10 8 / 62%);
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal > div {
+  background-color: var(--contact-surface) !important;
+  border-color: var(--contact-border) !important;
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal [class~="bg-[#151c15]"] {
+  background-color: var(--contact-raised) !important;
+  border-color: var(--contact-border) !important;
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal [class*="hover:bg-[#1c261c]"]:hover {
+  background-color: var(--contact-hover) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal [class~="text-[#c9cec5]"] {
+  color: var(--contact-text) !important;
+}
+
+/* Read-only Connections, ContactList and shared banner stay scoped to this route. */
+.aetherion-contact-profile-page .aetherion-profile-modal {
+  --profile-surface: var(--contact-surface);
+  --profile-raised: var(--contact-raised);
+  --profile-hover: var(--contact-hover);
+  --profile-border: var(--contact-border);
+  --profile-divider: var(--contact-divider);
+  --profile-text: var(--contact-text);
+  --profile-muted: var(--contact-muted);
+}
