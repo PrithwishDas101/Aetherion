@@ -3210,3 +3210,15 @@ html[data-aetherion-theme="night"] .aetherion-requests-page .aetherion-request-d
   background: var(--requests-hover) !important;
   color: var(--requests-text) !important;
 }
+
+.aetherion-requests-page .aetherion-requests-search {
+  background: var(--requests-input) !important;
+  border-color: var(--requests-border) !important;
+}
+.aetherion-requests-page .aetherion-requests-search:focus-within {
+  border-color: var(--requests-subtle) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--requests-subtle) 12%, transparent);
+}
+.aetherion-requests-page .aetherion-requests-search > svg {
+  color: var(--requests-subtle) !important;
+}
