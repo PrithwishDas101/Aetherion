@@ -601,7 +601,6 @@ const ContactProfile = () => {
                             bannerUrl={profile.profileBanner}
                             editMode={false}
                             showAction={false}
-                            defaultBannerVariant="editorial"
                         />
 
                         {/* BACK BUTTON */}
