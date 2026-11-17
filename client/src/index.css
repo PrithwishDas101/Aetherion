@@ -3258,3 +3258,48 @@ html[data-aetherion-theme="night"] .aetherion-camera-send-button:hover:not(:disa
 .aetherion-home .aetherion-message-media-picker > div > button:hover {
   color: var(--home-text) !important;
 }
+
+
+/* Final light-mode chat palette: incoming bubbles share the soft surface; outgoing stay charcoal. */
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#171717]"] {
+  background: #292d28 !important;
+  border: 1px solid #292d28 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 8%) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#FFFFFF]"] {
+  background: #f0f0ea !important;
+  border: 1px solid #e1e3da !important;
+  color: #20241f !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 5%) !important;
+}
+
+/* Keep the chat send control monochrome and steady on hover. */
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Send message"] {
+  background: #20241f !important;
+  color: #ffffff !important;
+  border-color: #20241f !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Send message"]:hover:not(:disabled) {
+  background: #20241f !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel button[aria-label="Send message"] {
+  background: #e9e9e3 !important;
+  color: #20211f !important;
+  border-color: #e9e9e3 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel button[aria-label="Send message"]:hover:not(:disabled) {
+  background: #e9e9e3 !important;
+}
+
+/* Attachment and camera controls remain visible, with no hover-only color shift. */
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Open attachments"],
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Open camera"] {
+  color: #555e54 !important;
+  transition: none !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Open attachments"]:hover,
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Open camera"]:hover {
+  color: #555e54 !important;
+  background: transparent !important;
+}
