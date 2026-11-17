@@ -2827,7 +2827,9 @@ html:not([data-aetherion-theme="night"]) .aetherion-contacts-page {
   border-color: var(--contacts-border) !important;
 }
 .aetherion-contacts-page [class*="border-b"][class*="border-white/"],
-.aetherion-contacts-page [class*="border-t"][class*="border-white/"] {
+.aetherion-contacts-page [class*="border-t"][class*="border-white/"],
+.aetherion-contacts-page [class*="border-b"][class*="border-[#ffffff]/"],
+.aetherion-contacts-page [class*="border-t"][class*="border-[#ffffff]/"] {
   border-color: var(--contacts-divider) !important;
 }
 
