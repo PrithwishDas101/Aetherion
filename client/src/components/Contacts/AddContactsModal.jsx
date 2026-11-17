@@ -377,10 +377,7 @@ function AddContactsModal({ onClose }) {
 
                                     <div className="flex flex-col gap-2.5">
                                         {results.map(
-                                            (
-                                                user,
-                                                index,
-                                            ) => {
+                                            (user) => {
                                                 const fullName =
                                                     getFullName(
                                                         user,
