@@ -284,7 +284,7 @@ function ContactRequests() {
 
                 {/* SEARCH */}
                 <div className="mt-8 w-full max-w-2xl">
-                    <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#ffffff]/[0.08] bg-[#111711] px-4 transition focus-within:border-[#777d72]">
+                    <div className="aetherion-requests-search flex h-12 items-center gap-3 rounded-2xl border border-[#ffffff]/[0.08] bg-[#111711] px-4 transition focus-within:border-[#777d72]">
                         <IoSearch className="shrink-0 text-lg text-[#697168]" />
 
                         <input
