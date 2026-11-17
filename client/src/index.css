@@ -52,6 +52,32 @@ body {
   scrollbar-color: #708bb2 transparent;
 }
 
+/* Light monochrome scrollbar used only by the redesigned Home experience. */
+.scrollbar-aetherion-light::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-thumb {
+  background: #e5e5e5;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+.scrollbar-aetherion-light::-webkit-scrollbar-thumb:hover {
+  background: #b8b8b8;
+  background-clip: content-box;
+}
+
+.scrollbar-aetherion-light {
+  scrollbar-width: thin;
+  scrollbar-color: #b8b8b8 transparent;
+}
+
 @keyframes typingDot {
   0%,
   60%,
@@ -70,7 +96,7 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 9999px;
-  background: #d8f45a;
+  background: #171717;
   animation: typingDot 1.2s infinite ease-in-out;
 }
 
@@ -92,17 +118,17 @@ body {
 }
 
 .scrollbar-media-picker::-webkit-scrollbar-thumb {
-  background: #7c3aed;
+  background: #b8b8b8;
   border-radius: 999px;
 }
 
 .scrollbar-media-picker::-webkit-scrollbar-thumb:hover {
-  background: #9333ea;
+  background: #737373;
 }
 
 .scrollbar-media-picker {
   scrollbar-width: thin;
-  scrollbar-color: #7c3aed transparent;
+  scrollbar-color: #b8b8b8 transparent;
 }
 
 .message-row-highlight {
@@ -111,24 +137,24 @@ body {
 
 @keyframes message-row-highlight {
   0% {
-    background-color: rgba(216, 244, 90, 0);
+    background-color: rgba(0, 0, 0, 0);
   }
 
   15% {
-    background-color: rgba(216, 244, 90, 0.16);
+    background-color: rgba(0, 0, 0, 0.16);
   }
 
   55% {
-    background-color: rgba(216, 244, 90, 0.08);
+    background-color: rgba(0, 0, 0, 0.08);
   }
 
   100% {
-    background-color: rgba(216, 244, 90, 0);
+    background-color: rgba(0, 0, 0, 0);
   }
 }
 
 .aetherion-button {
-  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#858d84] transition-colors duration-300 hover:text-[#e8e8e5];
+  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#737373] transition-colors duration-300 hover:text-[#e8e8e5];
 }
 
 .aetherion-button > span {
@@ -181,4 +207,3099 @@ body {
   100% {
     filter: brightness(1);
   }
+}
+
+/* Aetherion appearance system.
+   Surfaces are layered by role; hover states never invert to a contrasting color. */
+.aetherion-app {
+  --app-page: #f5f5f5;
+  --app-surface: #ffffff;
+  --app-raised: #fafafa;
+  --app-hover: #eeeeee;
+  --app-selected: #e7e7e7;
+  --app-border: #e2e2e2;
+  --app-divider: #ebebeb;
+  --app-text: #1d1d1f;
+  --app-muted: #6e6e73;
+  --app-control: #292a27;
+  --app-control-text: #f9f8f4;
+  min-height: 100vh;
+  background: var(--app-page);
+  color: var(--app-text);
+}
+html[data-aetherion-theme="night"] .aetherion-app {
+  --app-page: #171817;
+  --app-surface: #202220;
+  --app-raised: #242624;
+  --app-hover: #2c2e2c;
+  --app-selected: #30322f;
+  --app-border: #343733;
+  --app-divider: #2a2c29;
+  --app-text: #e9e9e3;
+  --app-muted: #a4a59d;
+  --app-control: #dadbd4;
+  --app-control-text: #20211f;
+  background: var(--app-page);
+  color: var(--app-text);
+}
+.aetherion-app [class~="bg-white"],
+.aetherion-app [class~="bg-gray-50"],
+.aetherion-app [class~="bg-gray-100"],
+.aetherion-app [class~="bg-[#FFFFFF]"],
+.aetherion-app [class~="bg-[#F7F7F5]"],
+.aetherion-app [class~="bg-[#F5F5F5]"] {
+  background-color: var(--app-surface) !important;
+}
+.aetherion-app [class~="border-gray-100"],
+.aetherion-app [class~="border-gray-200"],
+.aetherion-app [class~="border-[#E5E5E5]"] {
+  border-color: var(--app-border) !important;
+}
+.aetherion-app [class~="text-gray-900"],
+.aetherion-app [class~="text-gray-800"],
+.aetherion-app [class~="text-[#171717]"] {
+  color: var(--app-text) !important;
+}
+.aetherion-app [class~="text-gray-700"],
+.aetherion-app [class~="text-gray-600"],
+.aetherion-app [class~="text-[#404040]"] {
+  color: var(--app-text) !important;
+}
+.aetherion-app [class~="text-gray-500"],
+.aetherion-app [class~="text-gray-400"],
+.aetherion-app [class~="text-[#737373]"] {
+  color: var(--app-muted) !important;
+}
+.aetherion-app [class~="bg-[#171717]"] {
+  background-color: var(--app-control) !important;
+}
+.aetherion-app [class~="bg-[#171717]"][class~="text-[#FFFFFF]"],
+.aetherion-app [class~="bg-[#171717]"][class~="text-white"] {
+  color: var(--app-control-text) !important;
+}
+.aetherion-app [class~="hover:bg-[#F5F5F5]"]:hover,
+.aetherion-app [class~="hover:bg-[#E5E5E5]"]:hover,
+.aetherion-app [class~="hover:bg-white"]:hover {
+  background-color: var(--app-hover) !important;
+}
+.aetherion-app .scrollbar-aetherion-light {
+  scrollbar-color: var(--app-border) transparent;
+}
+.aetherion-app .scrollbar-aetherion-light::-webkit-scrollbar-thumb {
+  background: var(--app-border);
+}
+.aetherion-app .typing-dot {
+  background: currentColor;
+}
+
+/* Home uses a restrained, system-font interface and three distinct surface levels. */
+.aetherion-home {
+  --home-canvas: #f6f5f1;
+  --home-surface: #ffffff;
+  --home-raised: #fbfaf7;
+  --home-hover: #f0f0e9;
+  --home-selected: #e8eee7;
+  --home-border: #e2e3db;
+  --home-divider: #ecece5;
+  --home-text: #20241f;
+  --home-muted: #70776f;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.012em;
+  background: var(--home-canvas) !important;
+  color: var(--home-text) !important;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+.aetherion-home .aetherion-chat-list {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.aetherion-home .aetherion-chat-surface {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.aetherion-home .aetherion-chat-panel {
+  background: var(--home-surface) !important;
+  border: 1px solid var(--home-border) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 3%) !important;
+}
+.aetherion-home .aetherion-chat-header {
+  border-color: var(--home-divider) !important;
+}
+.aetherion-home .aetherion-user-row {
+  border-bottom-color: var(--home-divider) !important;
+  transition: background-color 140ms ease;
+}
+.aetherion-home .aetherion-user-row-idle {
+  background: transparent !important;
+}
+.aetherion-home .aetherion-user-row-idle:hover {
+  background: var(--home-hover) !important;
+}
+.aetherion-home .aetherion-user-row-selected {
+  background: var(--home-selected) !important;
+  box-shadow: inset 2px 0 0 #66836b !important;
+}
+.aetherion-home .aetherion-user-row-selected:hover {
+  background: var(--home-selected) !important;
+}
+.aetherion-home .aetherion-user-row-selected .aetherion-user-row-accent {
+  color: #58765d !important;
+}
+
+/* Replace legacy hard-coded neutral utility colors only inside Home. */
+.aetherion-home [class~="bg-white"],
+.aetherion-home [class~="bg-[#FFFFFF]"],
+.aetherion-home [class~="bg-[#F7F7F5]"],
+.aetherion-home [class~="bg-[#F5F5F5]"],
+.aetherion-home [class~="bg-gray-50"],
+.aetherion-home [class~="bg-gray-100"] {
+  background-color: var(--home-raised) !important;
+}
+.aetherion-home [class~="border-[#E5E5E5]"] {
+  border-color: var(--home-border) !important;
+}
+.aetherion-home [class~="text-[#171717]"] {
+  color: var(--home-text) !important;
+}
+.aetherion-home [class~="text-[#404040]"] {
+  color: var(--home-text) !important;
+}
+.aetherion-home [class~="text-[#737373]"] {
+  color: var(--home-muted) !important;
+}
+.aetherion-home [class~="bg-[#171717]"] {
+  background-color: #222222 !important;
+}
+.aetherion-home [class~="bg-[#171717]"][class~="text-[#FFFFFF]"],
+.aetherion-home [class~="bg-[#171717]"][class~="text-white"] {
+  color: #ffffff !important;
+}
+.aetherion-home [class~="hover:bg-[#F5F5F5]"]:hover,
+.aetherion-home [class~="hover:bg-[#E5E5E5]"]:hover,
+.aetherion-home [class~="hover:bg-white"]:hover {
+  background-color: var(--home-hover) !important;
+}
+.aetherion-home [class~="hover:bg-[#333333]"]:hover {
+  background-color: #3a3a3a !important;
+}
+.aetherion-home .aetherion-theme-menu-item {
+  background: var(--home-raised) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-theme-menu-item:hover {
+  background: var(--home-hover) !important;
+}
+.aetherion-home .scrollbar-aetherion-light {
+  scrollbar-color: #bebbb3 transparent;
+}
+.aetherion-home .scrollbar-aetherion-light::-webkit-scrollbar-thumb {
+  background: #bebbb3;
+}
+
+/* Header and profile popover follow the same Home palette. */
+.aetherion-home header {
+  border-bottom-color: var(--home-divider) !important;
+}
+.aetherion-home header > div:first-child span {
+  color: var(--home-text) !important;
+}
+.aetherion-home header .aetherion-profile-name {
+  color: var(--home-text) !important;
+}
+.aetherion-home header [class~="bg-[#FFFFFF]/95"] {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: 0 18px 48px rgb(0 0 0 / 14%) !important;
+}
+.aetherion-home header [class~="bg-white/10"] {
+  background: var(--home-divider) !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home {
+  --home-canvas: #171817;
+  --home-surface: #202220;
+  --home-raised: #242624;
+  --home-hover: #2c2e2c;
+  --home-selected: #30322f;
+  --home-border: #343733;
+  --home-divider: #2a2c29;
+  --home-text: #e9e9e3;
+  --home-muted: #a4a59d;
+  background: var(--home-canvas) !important;
+  color: var(--home-text) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-list {
+  background: transparent !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-surface {
+  background: transparent !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: none !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-user-row-idle {
+  background: transparent !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-user-row-idle:hover {
+  background: var(--home-hover) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-user-row-selected {
+  background: var(--home-selected) !important;
+  box-shadow: inset 2px 0 0 #a7a89f !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-user-row-selected:hover {
+  background: var(--home-selected) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-white"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#FFFFFF]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#F7F7F5]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#F5F5F5]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-gray-50"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-gray-100"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#FFFFFF]/95"] {
+  background-color: var(--home-raised) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home [class~="border-[#E5E5E5]"] {
+  border-color: var(--home-border) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#171717]"],
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#404040]"] {
+  color: var(--home-text) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#737373]"] {
+  color: var(--home-muted) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home [class~="text-[#FFFFFF]/60"] {
+  color: #404040 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home [class~="bg-[#171717]"] {
+  background-color: #dadbd4 !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  [class~="bg-[#171717]"][class~="text-[#FFFFFF]"],
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  [class~="bg-[#171717]"][class~="text-white"] {
+  color: #20211f !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  [class~="hover:bg-[#F5F5F5]"]:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  [class~="hover:bg-[#E5E5E5]"]:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  [class~="hover:bg-white"]:hover {
+  background-color: var(--home-hover) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  [class~="hover:bg-[#333333]"]:hover {
+  background-color: #383a37 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-theme-menu-item {
+  background: var(--home-raised) !important;
+  color: var(--home-text) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-theme-menu-item:hover {
+  background: var(--home-hover) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  [class~="bg-[#FFFFFF]/95"] {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  [class~="bg-white/10"] {
+  background: var(--home-divider) !important;
+}
+html[data-aetherion-theme="night"] body {
+  background: #171817;
+  color: #e9e9e3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home,
+  .aetherion-home .aetherion-user-row {
+    transition: none !important;
+  }
+  .aetherion-home .aether-orbit-rotation {
+    animation: none !important;
+  }
+}
+
+/* Quiet interaction polish: preserve the approved palette, make focus states feel intentional. */
+.aetherion-home input:focus,
+.aetherion-home textarea:focus,
+.aetherion-home select:focus {
+  border-color: #879b82 !important;
+  box-shadow: 0 0 0 3px rgb(102 131 107 / 12%);
+}
+
+.aetherion-home button:focus-visible,
+.aetherion-home a:focus-visible,
+.aetherion-home input:focus-visible,
+.aetherion-home textarea:focus-visible,
+.aetherion-home select:focus-visible {
+  outline: 2px solid #879b82;
+  outline-offset: 2px;
+}
+
+.aetherion-home .aetherion-chat-panel {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.aetherion-home .aetherion-user-row {
+  border-radius: 10px;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home input:focus,
+html[data-aetherion-theme="night"] .aetherion-home textarea:focus,
+html[data-aetherion-theme="night"] .aetherion-home select:focus {
+  border-color: #a0b29a !important;
+  box-shadow: 0 0 0 3px rgb(160 178 154 / 14%);
+}
+
+html[data-aetherion-theme="night"] .aetherion-home button:focus-visible,
+html[data-aetherion-theme="night"] .aetherion-home a:focus-visible,
+html[data-aetherion-theme="night"] .aetherion-home input:focus-visible,
+html[data-aetherion-theme="night"] .aetherion-home textarea:focus-visible,
+html[data-aetherion-theme="night"] .aetherion-home select:focus-visible {
+  outline-color: #a0b29a;
+}
+
+/* Finish the Home experience: cohesive empty states and message composition. */
+.aetherion-home .aetherion-empty-icon {
+  background: var(--home-selected) !important;
+  border: 1px solid var(--home-border);
+  box-shadow: 0 8px 24px rgb(32 36 31 / 5%) !important;
+}
+.aetherion-home .aetherion-empty-icon > svg {
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-empty-icon > div {
+  background: #66836b !important;
+  box-shadow: 0 0 0 3px var(--home-canvas) !important;
+}
+.aetherion-home .aetherion-empty-state button {
+  background: #263329 !important;
+  box-shadow: 0 5px 14px rgb(38 51 41 / 13%) !important;
+}
+.aetherion-home .aetherion-empty-state button:hover {
+  background: #344638 !important;
+}
+
+.aetherion-home .aetherion-composer-shell {
+  background: var(--home-raised) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 3%);
+}
+.aetherion-home .aetherion-composer-shell:focus-within {
+  border-color: #879b82 !important;
+  box-shadow: 0 0 0 3px rgb(102 131 107 / 10%);
+}
+.aetherion-home .aetherion-composer-shell textarea {
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-composer-shell textarea::placeholder {
+  color: var(--home-muted) !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-empty-icon {
+  box-shadow: 0 8px 24px rgb(0 0 0 / 16%) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-empty-state
+  button {
+  background: #dadbd4 !important;
+  color: #20211f !important;
+  box-shadow: none !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-empty-state
+  button:hover {
+  background: #c8cac1 !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-composer-shell:focus-within {
+  border-color: #a0b29a !important;
+  box-shadow: 0 0 0 3px rgb(160 178 154 / 12%);
+}
+
+/* Home refinement pass: strengthen hierarchy and make chat controls feel cohesive. */
+.aetherion-home .aetherion-chat-header {
+  min-height: 68px;
+  padding-top: 0.75rem;
+  padding-bottom: 0.85rem;
+}
+.aetherion-home .aetherion-chat-header button:not(.aetherion-button) {
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+.aetherion-home .aetherion-chat-header button:not(.aetherion-button):hover {
+  background: var(--home-hover);
+}
+.aetherion-home .aetherion-chat-panel > .scrollbar-aetherion-light {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.aetherion-home .aetherion-chat-panel .group.relative.flex.w-full {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.aetherion-home
+  .aetherion-chat-panel
+  .group.relative.flex.w-full
+  > div.order-1
+  > div.w-fit {
+  box-shadow: 0 1px 1px rgb(25 25 20 / 4%);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.aetherion-home
+  .aetherion-chat-panel
+  .group.relative.flex.w-full
+  > div.order-1
+  > div.w-fit[class*="bg-[#171717]"] {
+  background: #29372d !important;
+  border: 1px solid rgb(88 118 93 / 24%);
+  box-shadow: 0 2px 5px rgb(32 36 31 / 10%);
+}
+.aetherion-home
+  .aetherion-chat-panel
+  .group.relative.flex.w-full
+  > div.order-1
+  > div.w-fit[class*="bg-[#FFFFFF]"] {
+  background: var(--home-raised) !important;
+  border-color: var(--home-border) !important;
+}
+.aetherion-home .aetherion-chat-panel button[aria-label="Send message"] {
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgb(88 118 93 / 22%);
+  background: #29372d !important;
+  box-shadow: 0 3px 9px rgb(32 36 31 / 12%);
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.aetherion-home
+  .aetherion-chat-panel
+  button[aria-label="Send message"]:hover:not(:disabled) {
+  background: #35483a !important;
+  box-shadow: 0 5px 13px rgb(32 36 31 / 16%);
+}
+.aetherion-home
+  .aetherion-chat-panel
+  button[aria-label="Send message"]:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.aetherion-home
+  .aetherion-chat-panel
+  button[aria-label="Send message"]:disabled {
+  box-shadow: none;
+  opacity: 0.42;
+}
+.aetherion-home .aetherion-chat-panel .aetherion-message-composer + button,
+.aetherion-home
+  .aetherion-chat-panel
+  button[aria-label="Open emojis and media"] {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+.aetherion-home
+  .aetherion-chat-panel
+  button[aria-label="Open emojis and media"]:hover {
+  color: var(--home-text) !important;
+  background: var(--home-hover);
+}
+.aetherion-home .aetherion-chat-panel .aetherion-composer-shell {
+  min-height: 50px;
+}
+.aetherion-home .aetherion-chat-panel .aetherion-composer-shell textarea {
+  line-height: 1.55;
+}
+.aetherion-home .aetherion-user-row {
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+.aetherion-home .aetherion-user-row .min-w-0.flex-1 > div:first-child > div {
+  letter-spacing: -0.015em;
+}
+.aetherion-home
+  .aetherion-user-row
+  [class*="bg-[#171717]"][class*="rounded-full"] {
+  background: #58765d !important;
+  box-shadow: 0 0 0 2px var(--home-canvas);
+}
+.aetherion-home .aetherion-user-row button:not([aria-label]) {
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+.aetherion-home .aetherion-user-row button:not([aria-label]):active {
+  transform: scale(0.97);
+}
+.aetherion-home input[placeholder="Search users..."] {
+  height: 42px;
+  padding-left: 1rem;
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 3%);
+}
+.aetherion-home input[placeholder="Search users..."] + svg {
+  color: var(--home-muted) !important;
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
+}
+.aetherion-home input[placeholder="Search users..."]:focus + svg {
+  color: #66836b !important;
+  transform: translateY(-50%) scale(1.04);
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-chat-panel
+  .group.relative.flex.w-full
+  > div.order-1
+  > div.w-fit[class*="bg-[#171717]"] {
+  background: #d7ddd3 !important;
+  border-color: rgb(215 221 211 / 18%);
+  color: #20241f !important;
+  box-shadow: none;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-chat-panel
+  .group.relative.flex.w-full
+  > div.order-1
+  > div.w-fit[class*="bg-[#FFFFFF]"] {
+  background: #292c28 !important;
+  border-color: #3a3d38 !important;
+  color: var(--home-text) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-chat-panel
+  button[aria-label="Send message"] {
+  background: #d7ddd3 !important;
+  color: #20241f !important;
+  border-color: transparent;
+  box-shadow: none;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-chat-panel
+  button[aria-label="Send message"]:hover:not(:disabled) {
+  background: #c5cec0 !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  .aetherion-user-row
+  [class*="bg-[#171717]"][class*="rounded-full"] {
+  box-shadow: 0 0 0 2px var(--home-canvas);
+}
+
+@media (max-width: 640px) {
+  .aetherion-home .aetherion-chat-panel {
+    border-radius: 16px !important;
+  }
+  .aetherion-home
+    .aetherion-chat-panel
+    .group.relative.flex.w-full
+    > div.order-1 {
+    max-width: 86%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home .aetherion-chat-panel button,
+  .aetherion-home
+    .aetherion-chat-panel
+    .group.relative.flex.w-full
+    > div.order-1
+    > div.w-fit,
+  .aetherion-home input[placeholder="Search users..."] + svg {
+    transition: none !important;
+  }
+}
+
+/* Keep the composer focus treatment on its rounded shell, never the textarea rectangle. */
+.aetherion-home .aetherion-composer-shell textarea:focus,
+.aetherion-home .aetherion-composer-shell textarea:focus-visible {
+  outline: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Profile menu: quiet sage interactions with a restrained destructive action. */
+.aetherion-home header .aetherion-profile-menu {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  box-shadow: 0 18px 48px rgb(32 36 31 / 13%) !important;
+  padding: 8px;
+}
+.aetherion-home header .aetherion-profile-menu-item {
+  background: var(--home-raised) !important;
+  color: var(--home-text) !important;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+.aetherion-home header .aetherion-profile-menu-item:hover,
+.aetherion-home header .aetherion-profile-menu-item:focus-visible {
+  background: var(--home-selected) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home header .aetherion-profile-menu-item > svg,
+.aetherion-home header .aetherion-profile-menu-item > span > svg {
+  color: #657b61;
+  flex-shrink: 0;
+}
+.aetherion-home header .aetherion-profile-menu > div:first-child {
+  background: var(--home-selected) !important;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout {
+  color: #a65f50 !important;
+}
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout
+  > svg {
+  color: #a65f50 !important;
+}
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #f5eae6 !important;
+  color: #985342 !important;
+}
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover
+  > svg {
+  color: #985342 !important;
+}
+.aetherion-home header .aetherion-profile-menu .my-2.h-px {
+  background: var(--home-divider) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu {
+  box-shadow: 0 18px 48px rgb(0 0 0 / 32%) !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu-item
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu-item
+  > span
+  > svg {
+  color: #a0b29a;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #382a27 !important;
+  color: #e1a092 !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover
+  > svg {
+  color: #e1a092 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home header .aetherion-profile-menu-item {
+    transition: none !important;
+  }
+}
+
+/* Give each account action its own quiet, theme-aware hover identity. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #e8eee7 !important;
+  color: #405a43 !important;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #526b50 !important;
+}
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #f1eadf !important;
+  color: #725d43 !important;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #947650 !important;
+}
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #e8edf0 !important;
+  color: #4e6572 !important;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #637f8e !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:focus-visible {
+  background: #303b30 !important;
+  color: #c5d5bf !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:hover
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:focus-visible
+  > svg {
+  color: #b1c7a9 !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:focus-visible {
+  background: #3b342b !important;
+  color: #e0ccad !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:hover
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:focus-visible
+  > svg {
+  color: #c9aa7e !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:focus-visible {
+  background: #2d383d !important;
+  color: #c0d1d8 !important;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:hover
+  > span
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:focus-visible
+  > span
+  > svg {
+  color: #a5c0cc !important;
+}
+
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #f5eae6 !important;
+  color: #985342 !important;
+}
+
+/* Distinct hover accents for each profile action. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #e4ede2 !important;
+  box-shadow: inset 3px 0 0 #789174;
+  transform: translateX(1px);
+}
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #f2e9da !important;
+  box-shadow: inset 3px 0 0 #b28d59;
+  transform: translateX(1px);
+}
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #e4ebef !important;
+  box-shadow: inset 3px 0 0 #7896a5;
+  transform: translateX(1px);
+}
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #f4e5e0 !important;
+  box-shadow: inset 3px 0 0 #b87564;
+  transform: translateX(1px);
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:focus-visible {
+  background: #303c30 !important;
+  box-shadow: inset 3px 0 0 #91aa89;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:focus-visible {
+  background: #3b342a !important;
+  box-shadow: inset 3px 0 0 #c4a574;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:focus-visible {
+  background: #2d3940 !important;
+  box-shadow: inset 3px 0 0 #8eadbc;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #3b2c28 !important;
+  box-shadow: inset 3px 0 0 #c88776;
+}
+
+/* Clear, recognizable color identities for profile-menu hover states. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+  box-shadow: inset 3px 0 0 #16a34a;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #15803d !important;
+}
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  box-shadow: inset 3px 0 0 #eab308;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #ca8a04 !important;
+}
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #dbeafe !important;
+  color: #1e40af !important;
+  box-shadow: inset 3px 0 0 #3b82f6;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #2563eb !important;
+}
+
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  box-shadow: inset 3px 0 0 #ef4444;
+}
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover
+  > svg,
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible
+  > svg {
+  color: #dc2626 !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:focus-visible {
+  background: #1f3b2a !important;
+  color: #bbf7d0 !important;
+  box-shadow: inset 3px 0 0 #4ade80;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:hover
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:focus-visible
+  > svg {
+  color: #86efac !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:focus-visible {
+  background: #49391b !important;
+  color: #fde68a !important;
+  box-shadow: inset 3px 0 0 #facc15;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:hover
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:focus-visible
+  > svg {
+  color: #fde047 !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:focus-visible {
+  background: #1e3557 !important;
+  color: #bfdbfe !important;
+  box-shadow: inset 3px 0 0 #60a5fa;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:hover
+  > span
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:focus-visible
+  > span
+  > svg {
+  color: #93c5fd !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #4a2428 !important;
+  color: #fecaca !important;
+  box-shadow: inset 3px 0 0 #f87171;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible
+  > svg {
+  color: #fca5a5 !important;
+}
+
+/* Softer profile-menu feedback: keep the four color cues, reduce their intensity. */
+.aetherion-home header .aetherion-profile-menu-item {
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease !important;
+}
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #eaf2e9 !important;
+  color: #45634a !important;
+  box-shadow: inset 2px 0 0 #83a786;
+  transform: none !important;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #668c6a !important;
+}
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #f7f0df !important;
+  color: #80683d !important;
+  box-shadow: inset 2px 0 0 #c5a85e;
+  transform: none !important;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #a98a46 !important;
+}
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #eaf1f7 !important;
+  color: #4d6682 !important;
+  box-shadow: inset 2px 0 0 #8aaac8;
+  transform: none !important;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #6e91b4 !important;
+}
+
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #f8ece9 !important;
+  color: #965f55 !important;
+  box-shadow: inset 2px 0 0 #c88c80;
+  transform: none !important;
+}
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover
+  > svg,
+.aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible
+  > svg {
+  color: #b8796d !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:focus-visible {
+  background: #29372c !important;
+  color: #c1d4c0 !important;
+  box-shadow: inset 2px 0 0 #789a7b;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:hover
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-appearance:focus-visible
+  > svg {
+  color: #9db89d !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:focus-visible {
+  background: #393326 !important;
+  color: #e1d0a9 !important;
+  box-shadow: inset 2px 0 0 #ad955b;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:hover
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-profile:focus-visible
+  > svg {
+  color: #c1a96f !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:focus-visible {
+  background: #293541 !important;
+  color: #c2d2e1 !important;
+  box-shadow: inset 2px 0 0 #7897b5;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:hover
+  > span
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-menu-requests:focus-visible
+  > span
+  > svg {
+  color: #9bb4cd !important;
+}
+
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible {
+  background: #3c2c2a !important;
+  color: #e4bcb4 !important;
+  box-shadow: inset 2px 0 0 #b47d73;
+}
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:hover
+  > svg,
+html[data-aetherion-theme="night"]
+  .aetherion-home
+  header
+  .aetherion-profile-menu
+  .aetherion-profile-menu-logout:focus-visible
+  > svg {
+  color: #d09a90 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home header .aetherion-profile-menu-item {
+    transition: none !important;
+  }
+}
+
+
+/* Balanced, more vivid profile-menu accents. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #e1f0e2 !important;
+  color: #365b3d !important;
+  box-shadow: inset 2px 0 0 #70ad78;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #4f925b !important;
+}
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #f6edda !important;
+  color: #765d2e !important;
+  box-shadow: inset 2px 0 0 #d0ad62;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #ae873d !important;
+}
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #e1edf7 !important;
+  color: #405f7d !important;
+  box-shadow: inset 2px 0 0 #7fa9cf;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #5d8dbb !important;
+}
+
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #f5e3df !important;
+  color: #89534b !important;
+  box-shadow: inset 2px 0 0 #cb887b;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
+  color: #b96f62 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #2b4030 !important;
+  color: #c9e2ca !important;
+  box-shadow: inset 2px 0 0 #79b783;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #91c99a !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #423a29 !important;
+  color: #eddbb2 !important;
+  box-shadow: inset 2px 0 0 #c5a45e;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #d5b66e !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #2b3b4c !important;
+  color: #cbdced !important;
+  box-shadow: inset 2px 0 0 #80a9d0;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover > span > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #9bbde0 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #452f2c !important;
+  color: #edc6bf !important;
+  box-shadow: inset 2px 0 0 #c48679;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
+  color: #d99b8e !important;
+}
+
+
+/* Harmonized profile-menu accents: richer color, still soft against the sage UI. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #dcefe0 !important;
+  color: #315b3b !important;
+  box-shadow: inset 2px 0 0 #68a875;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #438b53 !important;
+}
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #f6edcf !important;
+  color: #70551f !important;
+  box-shadow: inset 2px 0 0 #c9a34d;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #a98232 !important;
+}
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #dfebf7 !important;
+  color: #385b7d !important;
+  box-shadow: inset 2px 0 0 #76a2cb;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #5688b8 !important;
+}
+
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #f5e2de !important;
+  color: #88483f !important;
+  box-shadow: inset 2px 0 0 #c77d70;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
+  color: #b9685b !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #2b4031 !important;
+  color: #c9e3ce !important;
+  box-shadow: inset 2px 0 0 #78b786;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #98cda2 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #403925 !important;
+  color: #ecdbb1 !important;
+  box-shadow: inset 2px 0 0 #c8a75e;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #d7b96f !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #2a3b4d !important;
+  color: #ccdeef !important;
+  box-shadow: inset 2px 0 0 #83add4;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover > span > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #a2c4e5 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #442e2b !important;
+  color: #efc7bf !important;
+  box-shadow: inset 2px 0 0 #cc887a;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
+  color: #dfa094 !important;
+}
+
+
+/* Tactile profile-menu feedback: hover previews, press confirms on touch and pointer. */
+.aetherion-home header .aetherion-profile-menu-item {
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  transition:
+    background-color 170ms ease,
+    color 170ms ease,
+    box-shadow 170ms ease,
+    transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  will-change: transform;
+}
+.aetherion-home header .aetherion-profile-menu-item > svg,
+.aetherion-home header .aetherion-profile-menu-item > span > svg {
+  transition: transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1), color 170ms ease;
+}
+
+/* A short, restrained press-in state works on touchscreens without hover. */
+.aetherion-home header .aetherion-profile-menu-item:active {
+  transform: scale(0.975) !important;
+  transition-duration: 80ms !important;
+}
+.aetherion-home header .aetherion-profile-menu-item:active > svg,
+.aetherion-home header .aetherion-profile-menu-item:active > span > svg {
+  transform: scale(0.9);
+}
+
+.aetherion-home header .aetherion-menu-appearance:active {
+  background: #cfe6d3 !important;
+  box-shadow: inset 3px 0 0 #579b65, inset 0 0 0 1px rgb(67 139 83 / 12%);
+}
+.aetherion-home header .aetherion-menu-profile:active {
+  background: #efe2bd !important;
+  box-shadow: inset 3px 0 0 #b9923e, inset 0 0 0 1px rgb(169 130 50 / 12%);
+}
+.aetherion-home header .aetherion-menu-requests:active {
+  background: #cfe0f1 !important;
+  box-shadow: inset 3px 0 0 #648fbd, inset 0 0 0 1px rgb(86 136 184 / 12%);
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:active {
+  background: #efd2cc !important;
+  box-shadow: inset 3px 0 0 #bd6d60, inset 0 0 0 1px rgb(185 104 91 / 12%);
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:active {
+  background: #34523b !important;
+  box-shadow: inset 3px 0 0 #83c18e, inset 0 0 0 1px rgb(145 201 154 / 14%);
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:active {
+  background: #51452d !important;
+  box-shadow: inset 3px 0 0 #d6b66a, inset 0 0 0 1px rgb(213 182 110 / 14%);
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:active {
+  background: #344b61 !important;
+  box-shadow: inset 3px 0 0 #91b8df, inset 0 0 0 1px rgb(155 189 224 / 14%);
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:active {
+  background: #563834 !important;
+  box-shadow: inset 3px 0 0 #d99587, inset 0 0 0 1px rgb(217 155 142 / 14%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home header .aetherion-profile-menu-item,
+  .aetherion-home header .aetherion-profile-menu-item > svg,
+  .aetherion-home header .aetherion-profile-menu-item > span > svg {
+    transition: none !important;
+  }
+  .aetherion-home header .aetherion-profile-menu-item:active {
+    transform: none !important;
+  }
+}
+
+
+/* Refined menu micro-interactions: lift on hover, tactile compression on press. */
+@media (hover: hover) and (pointer: fine) {
+  .aetherion-home header .aetherion-profile-menu-item:hover {
+    transform: translateY(-1px) !important;
+    box-shadow:
+      inset 2px 0 0 currentColor,
+      0 3px 9px rgb(32 36 31 / 7%);
+  }
+
+  .aetherion-home header .aetherion-profile-menu-item:hover > svg,
+  .aetherion-home header .aetherion-profile-menu-item:hover > span > svg {
+    transform: scale(1.06);
+  }
+}
+
+.aetherion-home header .aetherion-profile-menu-item:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.aetherion-home header .aetherion-profile-menu-item:active {
+  filter: saturate(1.08);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .aetherion-home header .aetherion-profile-menu-item {
+    min-height: 46px;
+  }
+
+  .aetherion-home header .aetherion-profile-menu-item:active {
+    transform: scale(0.97) !important;
+    transition:
+      transform 75ms ease-out,
+      background-color 75ms ease-out,
+      box-shadow 75ms ease-out !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-home header .aetherion-profile-menu-item:hover,
+  .aetherion-home header .aetherion-profile-menu-item:active {
+    transform: none !important;
+  }
+
+  .aetherion-home header .aetherion-profile-menu-item:hover > svg,
+  .aetherion-home header .aetherion-profile-menu-item:hover > span > svg {
+    transform: none !important;
+  }
+}
+
+
+/* Lighter pastel profile-menu hover palette: soft fills, clear but gentle accents. */
+.aetherion-home header .aetherion-menu-appearance:hover,
+.aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #edf5ed !important;
+  color: #527258 !important;
+  box-shadow: inset 2px 0 0 #9cbea0;
+}
+.aetherion-home header .aetherion-menu-appearance:hover > svg,
+.aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #729b78 !important;
+}
+
+.aetherion-home header .aetherion-menu-profile:hover,
+.aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #faf5e8 !important;
+  color: #88744c !important;
+  box-shadow: inset 2px 0 0 #d8c28d;
+}
+.aetherion-home header .aetherion-menu-profile:hover > svg,
+.aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #b49a60 !important;
+}
+
+.aetherion-home header .aetherion-menu-requests:hover,
+.aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #edf3f8 !important;
+  color: #5b7187 !important;
+  box-shadow: inset 2px 0 0 #a1bbd3;
+}
+.aetherion-home header .aetherion-menu-requests:hover > span > svg,
+.aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #7d9fbe !important;
+}
+
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #faf0ed !important;
+  color: #956b63 !important;
+  box-shadow: inset 2px 0 0 #d9aaa0;
+}
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+.aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
+  color: #bf8b80 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible {
+  background: #2b352c !important;
+  color: #c3d2c3 !important;
+  box-shadow: inset 2px 0 0 #78967c;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-appearance:focus-visible > svg {
+  color: #9fbea2 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible {
+  background: #393529 !important;
+  color: #d9cba9 !important;
+  box-shadow: inset 2px 0 0 #a99668;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-profile:focus-visible > svg {
+  color: #c0aa75 !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible {
+  background: #2b343d !important;
+  color: #c4d0dc !important;
+  box-shadow: inset 2px 0 0 #829bb3;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:hover > span > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-requests:focus-visible > span > svg {
+  color: #a0b8ce !important;
+}
+
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible {
+  background: #3a302e !important;
+  color: #dfc0b9 !important;
+  box-shadow: inset 2px 0 0 #ae8178;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-profile-menu .aetherion-profile-menu-logout:focus-visible > svg {
+  color: #c99a90 !important;
+}
+
+
+/* Profile page monochrome takeover.
+   Scoped to this route only; fixed overlays/modals are deliberately excluded. */
+.aetherion-profile-page {
+  --profile-canvas: #f6f5f1;
+  --profile-surface: #ffffff;
+  --profile-raised: #fbfaf7;
+  --profile-hover: #f0f0e9;
+  --profile-border: #e2e3db;
+  --profile-divider: #ecece5;
+  --profile-text: #20241f;
+  --profile-muted: #70776f;
+  background: var(--profile-canvas) !important;
+  color: var(--profile-text) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page {
+  --profile-canvas: #171817;
+  --profile-surface: #202220;
+  --profile-raised: #242624;
+  --profile-hover: #2c2e2c;
+  --profile-border: #343733;
+  --profile-divider: #2a2c29;
+  --profile-text: #e9e9e3;
+  --profile-muted: #a4a59d;
+  background: var(--profile-canvas) !important;
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-page > header {
+  background: color-mix(in srgb, var(--profile-surface) 92%, transparent) !important;
+  border-color: var(--profile-divider) !important;
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-page > main {
+  background: var(--profile-canvas);
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#080d09]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#151a16]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#111611]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#0b100c]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#0d120e]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#131613]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#1a1c1a]"] {
+  background-color: var(--profile-surface) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.018]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.025]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.035]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.045]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.05]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.06]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-white/[0.065]"] {
+  background-color: var(--profile-raised) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.05]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.06]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.07]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.08]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-white/[0.1]"] {
+  border-color: var(--profile-border) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-white"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#f1eee8]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#d9ddd5]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#d4d7d1]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#d0d2ce]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#c5c9c2]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#b5b8b3]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#aeb4ac]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-white/65"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-white/80"] {
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#8d918c]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#777b76]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#777d76]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#687166]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#626960]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#858d84]"] {
+  color: var(--profile-muted) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#d8f45a]"],
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="hover:bg-[#e4ff6f]"]:hover {
+  background-color: #292d28 !important;
+  color: #ffffff !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#d8f45a]"],
+html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class~="hover:bg-[#e4ff6f]"]:hover {
+  background-color: #dadbd4 !important;
+  color: #20211f !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class*="bg-[radial-gradient"] {
+  background-image: radial-gradient(circle at 15% 40%, rgb(120 125 112 / 12%), transparent 28%), radial-gradient(circle at 85% 20%, rgb(120 125 112 / 10%), transparent 35%), linear-gradient(135deg, #e7e6df, #d9dbd2 45%, #eeede7) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class*="bg-[radial-gradient"] {
+  background-image: radial-gradient(circle at 15% 40%, rgb(210 213 202 / 8%), transparent 28%), radial-gradient(circle at 85% 20%, rgb(210 213 202 / 7%), transparent 35%), linear-gradient(135deg, #202220, #292c28 45%, #171817) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="accent-[#d8f45a]"] {
+  accent-color: #7c8578 !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="border-t-[#d8f45a]"] {
+  border-top-color: #899286 !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="hover:border-[#d8f45a]/30"]:hover {
+  border-color: #aab1a4 !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="bg-[#080d09]"] {
+  background-color: var(--profile-surface) !important;
+}
+.aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#c3e5d4]"] {
+  color: #7d8779 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page :not(.fixed):not(.fixed *)[class~="text-[#c3e5d4]"] {
+  color: #b5b9ad !important;
+}
+
+
+/* Profile modal monochrome takeover. Applies only to dialogs opened from Profile. */
+.aetherion-profile-page .aetherion-profile-modal > div {
+  background-color: var(--profile-surface) !important;
+  border-color: var(--profile-border) !important;
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class*="border-white/"] {
+  border-color: var(--profile-divider) !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class~="bg-[#111611]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="bg-[#0b100c]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="bg-[#0d120e]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="bg-[#080b09]"] {
+  background-color: var(--profile-raised) !important;
+}
+/* Preserve the status/presence option translucency and original surface texture. */
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#f1eee8]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#c5c9c2]"] {
+  color: var(--profile-text) !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#737b73]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#626960]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#4f564f]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#858d84]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#838371]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#555d55]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#666d65]"] {
+  color: var(--profile-muted) !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class~="bg-[#d8f45a]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="hover:bg-[#e4ff6f]"]:hover {
+  background-color: #292d28 !important;
+  color: #ffffff !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-modal [class~="bg-[#d8f45a]"],
+html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-modal [class~="hover:bg-[#e4ff6f]"]:hover {
+  background-color: #dadbd4 !important;
+  color: #20211f !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class*="border-[#d8f45a]"] {
+  border-color: #aab1a4 !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class*="bg-[#d8f45a]/"] {
+  background-color: rgb(125 135 121 / 12%) !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class*="focus:border-[#d8f45a]"]:focus {
+  border-color: #899286 !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class~="accent-[#d8f45a]"] {
+  accent-color: #7c8578 !important;
+}
+.aetherion-profile-page .aetherion-profile-modal textarea::placeholder,
+.aetherion-profile-page .aetherion-profile-modal input::placeholder {
+  color: var(--profile-muted) !important;
+}
+
+.aetherion-profile-page .aetherion-profile-modal [class~="bg-[#1a211a]"] {
+  background-color: var(--profile-hover) !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#d8f45a]"],
+.aetherion-profile-page .aetherion-profile-modal [class~="text-[#c3e5d4]"] {
+  color: var(--profile-muted) !important;
+}
+.aetherion-profile-page .aetherion-profile-modal [class~="bg-[#c3e5d4]"] {
+  background-color: var(--profile-muted) !important;
+}
+
+
+/* Light-mode color grading: add separation between the page, cards and inset surfaces. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page {
+  --profile-canvas: #f2f2ed;
+  --profile-surface: #ffffff;
+  --profile-raised: #f4f4ee;
+  --profile-hover: #e9ebe3;
+  --profile-border: #d6d9cf;
+  --profile-divider: #e3e5dd;
+  --profile-text: #222720;
+  --profile-muted: #646d63;
+  background: var(--profile-canvas) !important;
+  color: var(--profile-text) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal {
+  --profile-surface: #ffffff;
+  --profile-raised: #f0f1ea;
+  --profile-hover: #e6e9e0;
+  --profile-border: #d1d5ca;
+  --profile-divider: #dfe2d8;
+  --profile-text: #222720;
+  --profile-muted: #626b61;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page > header {
+  background: #ffffff !important;
+  border-color: #e0e3d9 !important;
+}
+
+/* Give Profile section dividers clearer contrast in light mode only. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-t"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-b"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="divide-y"] > * + * {
+  border-color: #cbd0c5 !important;
+}
+
+/* Keep the vertical separator beside Connections visible in light mode. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-l"][class*="border-white/"] {
+  border-left-color: #cbd0c5 !important;
+}
+
+
+/* Stronger charcoal grading for Profile in light mode. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page {
+  --profile-canvas: #f0f0ea;
+  --profile-raised: #eeefe8;
+  --profile-hover: #e3e6dc;
+  --profile-border: #c8cdc2;
+  --profile-divider: #d2d6cc;
+  --profile-text: #1d211c;
+  --profile-muted: #555e54;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal {
+  --profile-raised: #ebede5;
+  --profile-hover: #e1e4da;
+  --profile-border: #c4cabe;
+  --profile-divider: #d0d5ca;
+  --profile-text: #1d211c;
+  --profile-muted: #535c52;
+}
+
+/* Make the selected presence option visibly distinct from hover in light mode. */
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal button[class~="bg-white/[0.065]"] {
+  background-color: #dfe3d9 !important;
+  box-shadow: inset 0 0 0 1px #c9cec2;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal button[class~="bg-white/[0.065]"] p:first-child {
+  color: #20251f !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page .aetherion-profile-modal button[class~="hover:bg-white/[0.035]"]:hover {
+  background-color: #f0f1ec !important;
+  box-shadow: inset 0 0 0 1px #e3e6de;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-t"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-b"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="border-l"][class*="border-white/"],
+html:not([data-aetherion-theme="night"]) .aetherion-profile-page [class*="divide-y"] > * + * {
+  border-color: #c2c8bc !important;
+}
+
+/* Banner action: porcelain in light mode, charcoal in dark mode. */
+.aetherion-profile-page .aetherion-profile-banner-action {
+  background: #ffffff !important;
+  border-color: #d4d9ce !important;
+  color: #20241f !important;
+}
+.aetherion-profile-page .aetherion-profile-banner-action:hover {
+  background: #f0f1eb !important;
+  border-color: #bfc6b9 !important;
+}
+.aetherion-profile-page .aetherion-profile-banner-action svg {
+  color: inherit !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-banner-action {
+  background: #242624 !important;
+  border-color: #454943 !important;
+  color: #f1eee8 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-profile-page .aetherion-profile-banner-action:hover {
+  background: #30332f !important;
+  border-color: #5a6057 !important;
+}
+
+
+/* Edit Profile monochrome takeover.
+   All rules are scoped to this route so shared components keep their existing pages unchanged. */
+.aetherion-edit-profile-page {
+  --edit-canvas: #171817;
+  --edit-surface: #202220;
+  --edit-raised: #242624;
+  --edit-input: #1b1e1b;
+  --edit-hover: #2c2e2c;
+  --edit-border: #343733;
+  --edit-divider: #2a2c29;
+  --edit-text: #e9e9e3;
+  --edit-muted: #a4a59d;
+  --edit-subtle: #858a81;
+  --edit-primary: #dadbd4;
+  --edit-primary-text: #20211f;
+  --edit-selected: #30332e;
+  --edit-selected-border: #62695f;
+  background: var(--edit-canvas) !important;
+  color: var(--edit-text) !important;
+}
+
+html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page {
+  --edit-canvas: #f0f0ea;
+  --edit-surface: #ffffff;
+  --edit-raised: #eeefe8;
+  --edit-input: #f7f8f3;
+  --edit-hover: #e3e6dc;
+  --edit-border: #c8cdc2;
+  --edit-divider: #d2d6cc;
+  --edit-text: #1d211c;
+  --edit-muted: #555e54;
+  --edit-subtle: #70786d;
+  --edit-primary: #292d28;
+  --edit-primary-text: #ffffff;
+  --edit-selected: #dfe3d9;
+  --edit-selected-border: #b7c0b2;
+}
+
+.aetherion-edit-profile-page > header {
+  background: color-mix(in srgb, var(--edit-surface) 93%, transparent) !important;
+  border-color: var(--edit-divider) !important;
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page > main {
+  background: var(--edit-canvas);
+}
+.aetherion-edit-profile-page > header .aetherion-button {
+  color: var(--edit-text) !important;
+  background: var(--edit-raised) !important;
+  border: 1px solid var(--edit-border) !important;
+}
+.aetherion-edit-profile-page > header .aetherion-button:hover {
+  background: var(--edit-hover) !important;
+}
+
+/* Neutral page surfaces and inset fields. */
+.aetherion-edit-profile-page [class~="bg-[#111611]"],
+.aetherion-edit-profile-page [class~="bg-[#101510]"] {
+  background-color: var(--edit-surface) !important;
+}
+.aetherion-edit-profile-page [class~="bg-[#0b100c]"],
+.aetherion-edit-profile-page [class~="bg-[#0d120e]"],
+.aetherion-edit-profile-page [class~="bg-[#080b09]"] {
+  background-color: var(--edit-input) !important;
+}
+.aetherion-edit-profile-page [class~="bg-[#151a16]"],
+.aetherion-edit-profile-page [class~="bg-[#171d17]"],
+.aetherion-edit-profile-page [class~="bg-[#1a211a]"],
+.aetherion-edit-profile-page [class~="bg-[#1a1c1a]"] {
+  background-color: var(--edit-raised) !important;
+}
+.aetherion-edit-profile-page [class~="bg-white/[0.018]"],
+.aetherion-edit-profile-page [class~="bg-white/[0.025]"],
+.aetherion-edit-profile-page [class~="bg-white/[0.035]"] {
+  background-color: var(--edit-raised) !important;
+}
+.aetherion-edit-profile-page [class*="hover:bg-white/"]:hover {
+  background-color: var(--edit-hover) !important;
+}
+
+/* Inputs retain their existing dimensions, padding and interaction states. */
+.aetherion-edit-profile-page input:not([type="file"]):not([type="range"]),
+.aetherion-edit-profile-page textarea {
+  background-color: var(--edit-input);
+  border-color: var(--edit-border);
+  color: var(--edit-text);
+}
+.aetherion-edit-profile-page input:not([type="file"]):not([type="range"])::placeholder,
+.aetherion-edit-profile-page textarea::placeholder {
+  color: var(--edit-muted) !important;
+}
+.aetherion-edit-profile-page input:not([type="file"]):not([type="range"]):focus,
+.aetherion-edit-profile-page textarea:focus {
+  border-color: var(--edit-subtle) !important;
+  background-color: var(--edit-raised) !important;
+}
+.aetherion-edit-profile-page input[type="range"] {
+  accent-color: var(--edit-subtle) !important;
+}
+
+/* Borders, dividers and typography. */
+.aetherion-edit-profile-page [class*="border-white/"] {
+  border-color: var(--edit-border) !important;
+}
+.aetherion-edit-profile-page [class*="border-t"][class*="border-white/"],
+.aetherion-edit-profile-page [class*="border-b"][class*="border-white/"] {
+  border-color: var(--edit-divider) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page [class*="border-l"][class*="border-white/"] {
+  border-left-color: #c2c8bc !important;
+}
+.aetherion-edit-profile-page [class~="text-white"],
+.aetherion-edit-profile-page [class~="text-[#f1eee8]"],
+.aetherion-edit-profile-page [class~="text-[#d4d7d1]"],
+.aetherion-edit-profile-page [class~="text-[#d9ddd5]"],
+.aetherion-edit-profile-page [class~="text-[#c5c9c2]"],
+.aetherion-edit-profile-page [class~="text-[#b5b8b3]"] {
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page [class~="text-[#8d918c]"],
+.aetherion-edit-profile-page [class~="text-[#777b76]"],
+.aetherion-edit-profile-page [class~="text-[#777d76]"],
+.aetherion-edit-profile-page [class~="text-[#858d84]"],
+.aetherion-edit-profile-page [class~="text-[#737b73]"],
+.aetherion-edit-profile-page [class~="text-[#626960]"],
+.aetherion-edit-profile-page [class~="text-[#4f564f]"],
+.aetherion-edit-profile-page [class~="text-[#666d65]"],
+.aetherion-edit-profile-page [class~="text-[#555d55]"],
+.aetherion-edit-profile-page [class~="text-[#747c73]"],
+.aetherion-edit-profile-page [class~="text-[#aeb4ac]"],
+.aetherion-edit-profile-page [class~="text-[#aeb5aa]"],
+.aetherion-edit-profile-page [class~="text-[#838371]"] {
+  color: var(--edit-muted) !important;
+}
+.aetherion-edit-profile-page [class~="text-[#d5d7c9]"] {
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page [class~="border-[#101218]"] {
+  border-color: var(--edit-border) !important;
+}
+
+/* Replace lime accents with restrained charcoal/sage contrast. */
+.aetherion-edit-profile-page [class~="bg-[#d8f45a]"] {
+  background-color: var(--edit-primary) !important;
+  color: var(--edit-primary-text) !important;
+}
+.aetherion-edit-profile-page [class*="hover:bg-[#e4ff6f]"]:hover {
+  background-color: var(--edit-hover) !important;
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page [class*="border-[#d8f45a]"] {
+  border-color: var(--edit-selected-border) !important;
+}
+.aetherion-edit-profile-page [class*="bg-[#d8f45a]/"] {
+  background-color: color-mix(in srgb, var(--edit-muted) 14%, transparent) !important;
+}
+.aetherion-edit-profile-page [class~="text-[#d8f45a]"],
+.aetherion-edit-profile-page [class~="text-[#D2F25E]"] {
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page [class~="accent-[#d8f45a]"] {
+  accent-color: var(--edit-subtle) !important;
+}
+.aetherion-edit-profile-page [class*="focus:border-[#d8f45a]"]:focus {
+  border-color: var(--edit-subtle) !important;
+}
+.aetherion-edit-profile-page [class*="hover:border-[#d8f45a]"]:hover {
+  border-color: var(--edit-selected-border) !important;
+}
+
+/* Banner: neutral monochrome artwork and theme-aware edit control. */
+.aetherion-edit-profile-page [class*="bg-[radial-gradient"] {
+  background-image:
+    radial-gradient(circle at 15% 40%, rgb(145 151 137 / 12%), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgb(145 151 137 / 9%), transparent 35%),
+    linear-gradient(135deg, #e8e9e2, #d8dbd1 45%, #f0f0ea) !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page [class*="bg-[radial-gradient"] {
+  background-image:
+    radial-gradient(circle at 15% 40%, rgb(210 213 202 / 8%), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgb(210 213 202 / 6%), transparent 35%),
+    linear-gradient(135deg, #202220, #292c28 45%, #171817) !important;
+}
+.aetherion-edit-profile-page [class*="border-[#d8f45a]/[0.04]"],
+.aetherion-edit-profile-page [class*="border-[#d8f45a]/[0.06]"] {
+  border-color: color-mix(in srgb, var(--edit-muted) 14%, transparent) !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-banner-action {
+  background: #ffffff !important;
+  border-color: #d4d9ce !important;
+  color: #20241f !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-banner-action:hover {
+  background: #f0f1eb !important;
+  border-color: #bfc6b9 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-profile-banner-action {
+  background: #242624 !important;
+  border-color: #454943 !important;
+  color: #f1eee8 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-profile-banner-action:hover {
+  background: #30332f !important;
+  border-color: #5a6057 !important;
+}
+
+/* Status bubble and profile-picture edit control. */
+.aetherion-edit-profile-page .aetherion-edit-profile-status-trigger {
+  background: color-mix(in srgb, var(--edit-surface) 92%, transparent) !important;
+  border-color: var(--edit-border) !important;
+  color: var(--edit-text) !important;
+  box-shadow: 0 8px 26px rgb(0 0 0 / 18%), inset 0 1px 0 rgb(255 255 255 / 6%) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page .aetherion-edit-profile-status-trigger {
+  box-shadow: 0 8px 26px rgb(0 0 0 / 8%), inset 0 1px 0 rgb(255 255 255 / 70%) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-status-trigger:hover {
+  background: var(--edit-hover) !important;
+  border-color: var(--edit-selected-border) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-avatar-action {
+  background: #ffffff !important;
+  border-color: #d4d9ce !important;
+  color: #20241f !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-avatar-action svg {
+  color: inherit !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-profile-avatar-action {
+  background: #242624 !important;
+  border-color: #454943 !important;
+  color: #f1eee8 !important;
+}
+.aetherion-edit-profile-page [class~="bg-[#1a1c1a]"] {
+  background-color: var(--edit-muted) !important;
+}
+
+/* All dialogs used from Edit Profile share the same neutral surfaces. */
+.aetherion-edit-profile-page .aetherion-edit-profile-modal > div,
+.aetherion-edit-profile-page .aetherion-profile-modal > div {
+  background-color: var(--edit-surface) !important;
+  border-color: var(--edit-border) !important;
+  color: var(--edit-text) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="border-white/"],
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="border-white/"] {
+  border-color: var(--edit-divider) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class~="bg-[#0b100c]"],
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class~="bg-[#0d120e]"],
+.aetherion-edit-profile-page .aetherion-profile-modal [class~="bg-[#0b100c]"],
+.aetherion-edit-profile-page .aetherion-profile-modal [class~="bg-[#0d120e]"] {
+  background-color: var(--edit-input) !important;
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] {
+  background-color: var(--edit-selected) !important;
+  border-color: var(--edit-selected-border) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edit-selected-border) 45%, transparent);
+}
+.aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="false"] {
+  background-color: var(--edit-raised) !important;
+  border-color: var(--edit-border) !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal [class*="hover:bg-white/"]:hover,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal [class*="hover:bg-white/"]:hover {
+  background-color: var(--edit-hover) !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal textarea,
+.aetherion-edit-profile-page .aetherion-profile-modal input,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal textarea,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal input {
+  background-color: var(--edit-input);
+  border-color: var(--edit-border);
+  color: var(--edit-text);
+}
+.aetherion-edit-profile-page .aetherion-profile-modal textarea::placeholder,
+.aetherion-edit-profile-page .aetherion-profile-modal input::placeholder,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal textarea::placeholder,
+.aetherion-edit-profile-page .aetherion-edit-profile-modal input::placeholder {
+  color: var(--edit-muted) !important;
+}
+/* Preserve the red duplicate state on the connection URL field. */
+.aetherion-edit-profile-page .aetherion-profile-modal input[class*="border-red-"] {
+  border-color: #f87171 !important;
+}
+.aetherion-edit-profile-page .aetherion-profile-modal input[class*="focus:border-red-"]:focus {
+  border-color: #f87171 !important;
+}
+/* Destructive actions and duplicate/error feedback retain their existing semantic red classes. */
+
+/* Maintain a distinct selected state for decoration/platform choices. */
+html:not([data-aetherion-theme="night"]) .aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] {
+  background-color: #dfe3d9 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-edit-profile-page .aetherion-edit-profile-modal button[aria-pressed="true"] {
+  background-color: #30332e !important;
+}
+
+
+
+/* Edit Profile back arrow: keep the existing control, remove its circular outline. */
+.aetherion-edit-profile-page .aetherion-edit-profile-back-button {
+  border: 0 !important;
+  outline: 0;
+  box-shadow: none !important;
+}
+
+
+/* Contact Profile monochrome takeover.
+   Route-scoped so shared components keep their styling everywhere else. */
+.aetherion-contact-profile-page {
+  --contact-canvas: #171817;
+  --contact-surface: #202220;
+  --contact-raised: #242624;
+  --contact-input: #1b1e1b;
+  --contact-hover: #2c2e2c;
+  --contact-border: #343733;
+  --contact-divider: #2a2c29;
+  --contact-text: #e9e9e3;
+  --contact-muted: #a4a59d;
+  --contact-subtle: #858a81;
+  --contact-primary: #dadbd4;
+  --contact-primary-text: #20211f;
+  --contact-avatar: #30342e;
+  background: var(--contact-canvas) !important;
+  color: var(--contact-text) !important;
+}
+
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page {
+  --contact-canvas: #f0f0ea;
+  --contact-surface: #ffffff;
+  --contact-raised: #eeefe8;
+  --contact-input: #f7f8f3;
+  --contact-hover: #e3e6dc;
+  --contact-border: #c8cdc2;
+  --contact-divider: #d2d6cc;
+  --contact-text: #1d211c;
+  --contact-muted: #555e54;
+  --contact-subtle: #70786d;
+  --contact-primary: #292d28;
+  --contact-primary-text: #ffffff;
+  --contact-avatar: #d9ddd4;
+}
+
+/* Light mode: restore readable contrast for the small metadata labels and values.
+   These utilities were authored for the dark page and were too pale on porcelain. */
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class~="text-white/35"] {
+  color: #687166 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class~="text-white/65"] {
+  color: #41483f !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class~="text-white/80"] {
+  color: #252a24 !important;
+}
+
+.aetherion-contact-profile-page > main {
+  background: var(--contact-canvas);
+}
+
+/* Theme the existing page surfaces without changing their structure or spacing. */
+.aetherion-contact-profile-page [class~="bg-[#0b100c]"],
+.aetherion-contact-profile-page [class~="bg-[#080b09]"] {
+  background-color: var(--contact-input) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#111711]"],
+.aetherion-contact-profile-page [class~="bg-[#111611]"],
+.aetherion-contact-profile-page [class~="bg-[#151a16]"],
+.aetherion-contact-profile-page [class~="bg-[#131613]"],
+.aetherion-contact-profile-page [class~="bg-[#151c15]"] {
+  background-color: var(--contact-surface) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#1c261c]"],
+.aetherion-contact-profile-page [class~="bg-[#1a1c1a]"] {
+  background-color: var(--contact-hover) !important;
+}
+
+/* Neutralize the old lime/green theme accents. */
+.aetherion-contact-profile-page [class~="bg-[#d8f45a]"],
+.aetherion-contact-profile-page [class*="hover:bg-[#e4ff6f]"]:hover {
+  background-color: var(--contact-primary) !important;
+  color: var(--contact-primary-text) !important;
+}
+.aetherion-contact-profile-page [class*="border-[#d8f45a]"],
+.aetherion-contact-profile-page [class*="border-[#c1e344]"] {
+  border-color: var(--contact-border) !important;
+}
+.aetherion-contact-profile-page [class~="text-[#d8f45a]"],
+.aetherion-contact-profile-page [class~="text-[#D2F25E]"],
+.aetherion-contact-profile-page [class~="group-hover:text-[#5af48b]"]:hover {
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page [class*="border-[#d8f45a]/"],
+.aetherion-contact-profile-page [class*="border-[#c1e344]/"] {
+  border-color: var(--contact-divider) !important;
+}
+
+/* Text hierarchy. */
+.aetherion-contact-profile-page [class~="text-white"],
+.aetherion-contact-profile-page [class~="text-[#f1eee8]"],
+.aetherion-contact-profile-page [class~="text-[#d4d7d1]"],
+.aetherion-contact-profile-page [class~="text-[#d0d2ce]"],
+.aetherion-contact-profile-page [class~="text-[#d9ddd5]"],
+.aetherion-contact-profile-page [class~="text-[#c9cec5]"],
+.aetherion-contact-profile-page [class~="text-[#bebdbc]"] {
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page [class~="text-[#b5b8b3]"],
+.aetherion-contact-profile-page [class~="text-[#aeb5ac]"],
+.aetherion-contact-profile-page [class~="text-[#aeb4ac]"],
+.aetherion-contact-profile-page [class~="text-[#8d918c]"],
+.aetherion-contact-profile-page [class~="text-[#8f998b]"],
+.aetherion-contact-profile-page [class~="text-[#858d84]"],
+.aetherion-contact-profile-page [class~="text-[#777b76]"],
+.aetherion-contact-profile-page [class~="text-[#777f76]"],
+.aetherion-contact-profile-page [class~="text-[#777d76]"],
+.aetherion-contact-profile-page [class~="text-[#747c73]"],
+.aetherion-contact-profile-page [class~="text-[#737b73]"],
+.aetherion-contact-profile-page [class~="text-[#687166]"],
+.aetherion-contact-profile-page [class~="text-[#626960]"],
+.aetherion-contact-profile-page [class~="text-[#555d55]"],
+.aetherion-contact-profile-page [class~="text-[#4f564f]"],
+.aetherion-contact-profile-page [class~="text-[#666d65]"],
+.aetherion-contact-profile-page [class~="text-[#454c45]"] {
+  color: var(--contact-muted) !important;
+}
+
+/* Borders and dividers use the same contrast system as the Profile page. */
+.aetherion-contact-profile-page [class*="border-white/"] {
+  border-color: var(--contact-border) !important;
+}
+.aetherion-contact-profile-page [class*="border-t"][class*="border-white/"],
+.aetherion-contact-profile-page [class*="border-b"][class*="border-white/"],
+.aetherion-contact-profile-page [class*="divide-y"] > * + * {
+  border-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page [class*="border-l"][class*="border-white/"] {
+  border-left-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page [class*="border-[#0b100c]"],
+.aetherion-contact-profile-page [class*="border-[#111317]"] {
+  border-color: var(--contact-canvas) !important;
+}
+.aetherion-contact-profile-page [class*="ring-[#080d09]"] {
+  --tw-ring-color: var(--contact-canvas) !important;
+}
+
+/* Keep the read-only status bubble glassy instead of flattening its texture. */
+.aetherion-contact-profile-page .aetherion-contact-profile-status {
+  background: color-mix(in srgb, var(--contact-surface) 82%, transparent) !important;
+  border-color: color-mix(in srgb, var(--contact-border) 82%, transparent) !important;
+  color: var(--contact-text) !important;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 12%), inset 0 1px 0 rgb(255 255 255 / 7%) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page .aetherion-contact-profile-status {
+  background: rgb(255 255 255 / 84%) !important;
+  border-color: #d0d5ca !important;
+  box-shadow: 0 8px 28px rgb(28 34 25 / 8%), inset 0 1px 0 rgb(255 255 255 / 85%) !important;
+}
+
+/* Convert the default banner artwork to a quiet charcoal/sage treatment. */
+.aetherion-contact-profile-page [class*="bg-[radial-gradient"] {
+  background-image:
+    radial-gradient(circle at 15% 40%, rgb(170 176 160 / 10%), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgb(170 176 160 / 7%), transparent 35%),
+    linear-gradient(135deg, #202220, #292c28 45%, #171817) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class*="bg-[radial-gradient"] {
+  background-image:
+    radial-gradient(circle at 15% 40%, rgb(90 98 83 / 7%), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgb(90 98 83 / 5%), transparent 35%),
+    linear-gradient(135deg, #e6e8e0, #d9ddd3 45%, #f0f0ea) !important;
+}
+.aetherion-contact-profile-page [class*="border-[#d8f45a]/"] {
+  border-color: color-mix(in srgb, var(--contact-muted) 18%, transparent) !important;
+}
+
+/* Header actions, avatar fallback and details badge. */
+.aetherion-contact-profile-page button[aria-label="Go back"],
+.aetherion-contact-profile-page button[aria-label="Remove contact"],
+.aetherion-contact-profile-page button[aria-label="Send contact request"] {
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#cacfb4]"] {
+  background-color: var(--contact-avatar) !important;
+  color: var(--contact-primary-text) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#080d09]"] {
+  background-color: var(--contact-canvas) !important;
+}
+.aetherion-contact-profile-page [class~="bg-[#1a1c1a]"] {
+  background-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page [class~="text-[#9fcaef]"] {
+  color: var(--contact-muted) !important;
+}
+.aetherion-contact-profile-page [class~="hover:text-white"]:hover {
+  color: var(--contact-text) !important;
+}
+
+/* The contacts strip uses a neutral spinner and restrained hover states. */
+.aetherion-contact-profile-page [class*="border-[#d8f45a]/20"] {
+  border-color: color-mix(in srgb, var(--contact-muted) 22%, transparent) !important;
+}
+.aetherion-contact-profile-page [class*="border-t-[#d8f45a]"] {
+  border-top-color: var(--contact-subtle) !important;
+}
+.aetherion-contact-profile-page [class*="hover:border-[#d8f45a]"]:hover {
+  border-color: var(--contact-border) !important;
+}
+.aetherion-contact-profile-page [class*="hover:bg-[#d8f45a]"]:hover {
+  background-color: var(--contact-hover) !important;
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page [class*="hover:text-[#ededea]"]:hover {
+  color: var(--contact-text) !important;
+}
+
+/* All Media + Docs full-screen view. */
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal {
+  background: var(--contact-canvas) !important;
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal > div > div:first-child {
+  border-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal [class*="border-[#d8f45a]"] {
+  border-color: var(--contact-divider) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal button[class*="border-[#c1e344]"],
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal button[class*="border-[#d8f45a]"] {
+  border-color: var(--contact-primary) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal button[class~="text-[#d8f45a]"] {
+  color: var(--contact-primary) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal button[class*="border-b-2"] {
+  border-bottom-color: var(--contact-primary) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-all-media-modal [class~="bg-[#151a16]"] {
+  background-color: var(--contact-raised) !important;
+}
+
+/* Remove-contact confirmation: neutral surfaces, with red retained for destructive meaning. */
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal {
+  background-color: rgb(8 10 8 / 62%);
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal > div {
+  background-color: var(--contact-surface) !important;
+  border-color: var(--contact-border) !important;
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal [class~="bg-[#151c15]"] {
+  background-color: var(--contact-raised) !important;
+  border-color: var(--contact-border) !important;
+  color: var(--contact-text) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal [class*="hover:bg-[#1c261c]"]:hover {
+  background-color: var(--contact-hover) !important;
+}
+.aetherion-contact-profile-page .aetherion-contact-profile-remove-modal [class~="text-[#c9cec5]"] {
+  color: var(--contact-text) !important;
+}
+
+/* Read-only Connections, ContactList and shared banner stay scoped to this route. */
+.aetherion-contact-profile-page .aetherion-profile-modal {
+  --profile-surface: var(--contact-surface);
+  --profile-raised: var(--contact-raised);
+  --profile-hover: var(--contact-hover);
+  --profile-border: var(--contact-border);
+  --profile-divider: var(--contact-divider);
+  --profile-text: var(--contact-text);
+  --profile-muted: var(--contact-muted);
+}
+
+/* Contact request hover uses a group state on the icon, not on the icon itself. */
+.aetherion-contact-profile-page .group:hover [class~="group-hover:text-[#5af48b]"] {
+  color: var(--contact-text) !important;
+}
+
+
+
+/* Contacts page — shared styling for personal and read-only contact lists. */
+.aetherion-contacts-page {
+  --contacts-canvas: #171817;
+  --contacts-surface: #202220;
+  --contacts-raised: #242624;
+  --contacts-input: #1b1e1b;
+  --contacts-hover: #2c2e2c;
+  --contacts-border: #343733;
+  --contacts-divider: #2a2c29;
+  --contacts-text: #e9e9e3;
+  --contacts-muted: #a4a59d;
+  --contacts-subtle: #858a81;
+  --contacts-primary: #dadbd4;
+  --contacts-primary-text: #20211f;
+  --contacts-avatar: #d9ddd4;
+  min-height: 100vh;
+  background: var(--contacts-canvas) !important;
+  color: var(--contacts-text) !important;
+}
+
+html:not([data-aetherion-theme="night"]) .aetherion-contacts-page {
+  --contacts-canvas: #f0f0ea;
+  --contacts-surface: #ffffff;
+  --contacts-raised: #eeefe8;
+  --contacts-input: #f7f8f3;
+  --contacts-hover: #e3e6dc;
+  --contacts-border: #c8cdc2;
+  --contacts-divider: #d2d6cc;
+  --contacts-text: #1d211c;
+  --contacts-muted: #555e54;
+  --contacts-subtle: #70786d;
+  --contacts-primary: #292d28;
+  --contacts-primary-text: #ffffff;
+  --contacts-avatar: #d9ddd4;
+}
+
+/* Page canvas, search field and filter control. */
+.aetherion-contacts-page [class~="bg-[#080b08]"] {
+  background-color: var(--contacts-canvas) !important;
+}
+.aetherion-contacts-page [class~="bg-[#0d120d]"] {
+  background-color: var(--contacts-input) !important;
+}
+.aetherion-contacts-page [class~="bg-[#171d17]"],
+.aetherion-contacts-page [class~="bg-[#111711]"] {
+  background-color: var(--contacts-raised) !important;
+}
+.aetherion-contacts-page [class*="border-white/"],
+.aetherion-contacts-page [class*="border-[#ffffff]/"] {
+  border-color: var(--contacts-border) !important;
+}
+.aetherion-contacts-page [class*="border-b"][class*="border-white/"],
+.aetherion-contacts-page [class*="border-t"][class*="border-white/"],
+.aetherion-contacts-page [class*="border-b"][class*="border-[#ffffff]/"],
+.aetherion-contacts-page [class*="border-t"][class*="border-[#ffffff]/"] {
+  border-color: var(--contacts-divider) !important;
+}
+
+/* Text hierarchy. */
+.aetherion-contacts-page [class~="text-[#f1eee8]"],
+.aetherion-contacts-page [class~="text-[#e8e5de]"] {
+  color: var(--contacts-text) !important;
+}
+.aetherion-contacts-page [class~="text-[#50584f]"],
+.aetherion-contacts-page [class~="text-[#596158]"],
+.aetherion-contacts-page [class~="text-[#626960]"],
+.aetherion-contacts-page [class~="text-[#687166]"],
+.aetherion-contacts-page [class~="text-[#697168]"],
+.aetherion-contacts-page [class~="text-[#70786f]"],
+.aetherion-contacts-page [class~="text-[#737b71]"],
+.aetherion-contacts-page [class~="text-[#8a9288]"],
+.aetherion-contacts-page [class~="text-[#a8b19f]"] {
+  color: var(--contacts-muted) !important;
+}
+.aetherion-contacts-page input {
+  color: var(--contacts-text);
+}
+.aetherion-contacts-page input::placeholder {
+  color: var(--contacts-subtle) !important;
+}
+
+/* Neutral monochrome interaction states; presence indicators remain semantic. */
+.aetherion-contacts-page [class*="hover:bg-[#101010bd]"]:hover,
+.aetherion-contacts-page [class*="hover:bg-[#151a15]"]:hover,
+.aetherion-contacts-page [class*="hover:bg-[#151a16]"]:hover {
+  background-color: var(--contacts-hover) !important;
+}
+.aetherion-contacts-page [class*="hover:text-[#d8f45a]"]:hover,
+.aetherion-contacts-page [class*="hover:text-[#f1eee8]"]:hover,
+.aetherion-contacts-page [class*="hover:text-[#ecf0dd]"]:hover,
+.aetherion-contacts-page [class*="hover:text-[#d3d3cf]"]:hover {
+  color: var(--contacts-text) !important;
+}
+.aetherion-contacts-page [class~="text-[#d8f45a]"] {
+  color: var(--contacts-text) !important;
+}
+.aetherion-contacts-page [class~="bg-[#d8f45a]"],
+.aetherion-contacts-page [class*="hover:bg-[#e5ff70]"]:hover {
+  background-color: var(--contacts-primary) !important;
+  color: var(--contacts-primary-text) !important;
+}
+.aetherion-contacts-page [class*="border-[#d8f45a]"] {
+  border-color: var(--contacts-border) !important;
+}
+.aetherion-contacts-page [class*="border-t-[#d8f45a]"] {
+  border-top-color: var(--contacts-subtle) !important;
+}
+.aetherion-contacts-page [class*="border-[#d8f45a]/"] {
+  border-color: color-mix(in srgb, var(--contacts-muted) 24%, transparent) !important;
+}
+
+/* Avatar fallbacks and chat actions. */
+.aetherion-contacts-page [class~="bg-[#cacfb4]"] {
+  background-color: var(--contacts-avatar) !important;
+  color: var(--contacts-primary-text) !important;
+}
+.aetherion-contacts-page [class~="text-[#10120d]"] {
+  color: var(--contacts-primary-text) !important;
+}
+.aetherion-contacts-page button[aria-label^="Open chat with"] {
+  color: var(--contacts-muted) !important;
+}
+.aetherion-contacts-page button[aria-label^="Open chat with"]:hover {
+  background-color: var(--contacts-hover) !important;
+  color: var(--contacts-text) !important;
+}
+.aetherion-contacts-page button[aria-label="Go back"] {
+  color: var(--contacts-text) !important;
+}
+
+/* Pagination controls. */
+.aetherion-contacts-page [class*="hover:bg-[#151a15]"]:hover {
+  background-color: var(--contacts-hover) !important;
+}
+
+/* Add Contacts modal has its own scope so shared UI elsewhere is unaffected. */
+.aetherion-add-contacts-modal {
+  --contacts-canvas: #171817;
+  --contacts-surface: #202220;
+  --contacts-raised: #242624;
+  --contacts-input: #1b1e1b;
+  --contacts-hover: #2c2e2c;
+  --contacts-border: #343733;
+  --contacts-divider: #2a2c29;
+  --contacts-text: #e9e9e3;
+  --contacts-muted: #a4a59d;
+  --contacts-subtle: #858a81;
+  --contacts-primary: #dadbd4;
+  --contacts-primary-text: #20211f;
+  --contacts-avatar: #d9ddd4;
+  color: var(--contacts-text) !important;
+  background: rgb(0 0 0 / 58%) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-add-contacts-modal {
+  --contacts-canvas: #f0f0ea;
+  --contacts-surface: #ffffff;
+  --contacts-raised: #eeefe8;
+  --contacts-input: #f7f8f3;
+  --contacts-hover: #e3e6dc;
+  --contacts-border: #c8cdc2;
+  --contacts-divider: #d2d6cc;
+  --contacts-text: #1d211c;
+  --contacts-muted: #555e54;
+  --contacts-subtle: #70786d;
+  --contacts-primary: #292d28;
+  --contacts-primary-text: #ffffff;
+  --contacts-avatar: #d9ddd4;
+}
+
+/* Modal surfaces and separators. */
+.aetherion-add-contacts-modal .aetherion-add-contacts-dialog {
+  background-color: var(--contacts-surface) !important;
+  border-color: var(--contacts-border) !important;
+  color: var(--contacts-text) !important;
+}
+.aetherion-add-contacts-modal [class*="border-white/"],
+.aetherion-add-contacts-modal [class*="border-[#ffffff]/"] {
+  border-color: var(--contacts-divider) !important;
+}
+.aetherion-add-contacts-modal [class~="bg-[#0d120d]"] {
+  background-color: var(--contacts-input) !important;
+}
+.aetherion-add-contacts-modal [class~="bg-[#111711]"] {
+  background-color: var(--contacts-raised) !important;
+}
+.aetherion-add-contacts-modal [class~="bg-[#cacfb4]"] {
+  background-color: var(--contacts-avatar) !important;
+  color: var(--contacts-primary-text) !important;
+}
+
+/* Modal typography and search field. */
+.aetherion-add-contacts-modal [class~="text-[#f1eee8]"],
+.aetherion-add-contacts-modal [class~="text-[#e8e5de]"] {
+  color: var(--contacts-text) !important;
+}
+.aetherion-add-contacts-modal [class~="text-[#596158]"],
+.aetherion-add-contacts-modal [class~="text-[#626960]"],
+.aetherion-add-contacts-modal [class~="text-[#687166]"],
+.aetherion-add-contacts-modal [class~="text-[#697168]"],
+.aetherion-add-contacts-modal [class~="text-[#70786f]"],
+.aetherion-add-contacts-modal [class~="text-[#8a9288]"] {
+  color: var(--contacts-muted) !important;
+}
+.aetherion-add-contacts-modal input {
+  color: var(--contacts-text);
+}
+.aetherion-add-contacts-modal input::placeholder {
+  color: var(--contacts-subtle) !important;
+}
+
+/* Search, row, request and chat hover states. */
+.aetherion-add-contacts-modal [class*="hover:bg-[#121812]"]:hover,
+.aetherion-add-contacts-modal [class*="hover:bg-[#151a15]"]:hover {
+  background-color: var(--contacts-hover) !important;
+}
+.aetherion-add-contacts-modal [class*="hover:text-[#d8f45a]"]:hover {
+  color: var(--contacts-text) !important;
+}
+.aetherion-add-contacts-modal [class~="text-[#d8f45a]"] {
+  color: var(--contacts-text) !important;
+}
+.aetherion-add-contacts-modal [class~="bg-[#d8f45a]"],
+.aetherion-add-contacts-modal [class*="hover:bg-[#e5ff70]"]:hover {
+  background-color: var(--contacts-primary) !important;
+  color: var(--contacts-primary-text) !important;
+}
+.aetherion-add-contacts-modal [class*="border-[#d8f45a]"] {
+  border-color: var(--contacts-border) !important;
+}
+.aetherion-add-contacts-modal [class*="border-t-[#d8f45a]"] {
+  border-top-color: var(--contacts-subtle) !important;
+}
+.aetherion-add-contacts-modal [class*="border-[#d8f45a]/"] {
+  border-color: color-mix(in srgb, var(--contacts-muted) 24%, transparent) !important;
+}
+.aetherion-add-contacts-modal [class*="focus-within:border-[#d8f45a]"]:focus-within {
+  border-color: var(--contacts-subtle) !important;
+}
+.aetherion-add-contacts-modal .scrollbar-aetherion {
+  scrollbar-color: var(--contacts-subtle) transparent;
+}
+.aetherion-add-contacts-modal .scrollbar-aetherion::-webkit-scrollbar-thumb {
+  background: var(--contacts-subtle);
+}
+.aetherion-add-contacts-modal .scrollbar-aetherion::-webkit-scrollbar-thumb:hover {
+  background: var(--contacts-muted);
+}
+
+
+/* Contacts menu item — muted violet hover identity, matching the other menu accents. */
+.aetherion-home header .aetherion-menu-contacts:hover,
+.aetherion-home header .aetherion-menu-contacts:focus-visible {
+  background: #f0ebf6 !important;
+  color: #6c5684 !important;
+  box-shadow: inset 2px 0 0 #b5a0cc;
+  transform: translateX(1px);
+}
+.aetherion-home header .aetherion-menu-contacts:hover > svg,
+.aetherion-home header .aetherion-menu-contacts:focus-visible > svg {
+  color: #9278b1 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-contacts:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-contacts:focus-visible {
+  background: #342d3c !important;
+  color: #d0c1e0 !important;
+  box-shadow: inset 2px 0 0 #8c76a8;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-contacts:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-contacts:focus-visible > svg {
+  color: #b8a2d3 !important;
+}
+
+
+/* Contact Requests: palette-only overrides. Keep the original page layout intact. */
+.aetherion-requests-page {
+  background-color: #171817 !important;
+  color: #e9e9e3 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page {
+  background-color: #f0f0ea !important;
+  color: #1d211c !important;
+}
+.aetherion-requests-page [class~="text-[#f1eee8]"],
+.aetherion-requests-page [class~="text-[#e8e5de]"] {
+  color: #e9e9e3 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#f1eee8]"],
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#e8e5de]"] {
+  color: #1d211c !important;
+}
+.aetherion-requests-page [class~="text-[#c9cec5]"],
+.aetherion-requests-page [class~="text-[#737b71]"],
+.aetherion-requests-page [class~="text-[#626960]"],
+.aetherion-requests-page [class~="text-[#697168]"],
+.aetherion-requests-page [class~="text-[#596158]"],
+.aetherion-requests-page [class~="text-[#687166]"],
+.aetherion-requests-page [class~="text-[#a8b19f]"] {
+  color: #a4a69d !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#c9cec5]"],
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#737b71]"],
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#626960]"],
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#697168]"],
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#596158]"],
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#687166]"],
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="text-[#a8b19f]"] {
+  color: #555e54 !important;
+}
+.aetherion-requests-page [class*="border-white/"] {
+  border-color: #363a34 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class*="border-white/"] {
+  border-color: #cbd0c5 !important;
+}
+.aetherion-requests-page [class~="bg-[#ffffff]/[0.08]"] {
+  background-color: #242624 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="bg-[#ffffff]/[0.08]"] {
+  background-color: #eeefe8 !important;
+}
+.aetherion-requests-page [class~="bg-[#111711]"] {
+  background-color: #202220 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class~="bg-[#111711]"] {
+  background-color: #ffffff !important;
+}
+.aetherion-requests-page input {
+  color: #e9e9e3 !important;
+}
+.aetherion-requests-page input::placeholder {
+  color: #858a81 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page input {
+  color: #1d211c !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page input::placeholder {
+  color: #70786d !important;
+}
+.aetherion-requests-page [class*="hover:bg-[#151a15]"]:hover {
+  background-color: #2b2e2a !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class*="hover:bg-[#151a15]"]:hover {
+  background-color: #e3e6dc !important;
+}
+.aetherion-requests-page [class*="hover:text-[#d8f45a]"]:hover {
+  color: #e9e9e3 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class*="hover:text-[#d8f45a]"]:hover {
+  color: #1d211c !important;
+}
+
+
+/* Contact Requests row hover: subtle contrast in both themes. */
+.aetherion-requests-page .group:hover {
+  background-color: #252725 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page .group:hover {
+  background-color: #e5e7e0 !important;
+}
+
+
+/* Home chat finishing touches — scoped to the active chat panel. */
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#171717]"] {
+  background: #f0f0ea !important;
+  border: 1px solid #e1e3da !important;
+  color: #20241f !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 5%) !important;
+}
+
+/* Emoji picker: every layer follows the app appearance, including the category rail and emoji grid. */
+.aetherion-home .aetherion-message-media-picker {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker > div {
+  border-color: var(--home-border) !important;
+}
+.aetherion-home .aetherion-message-media-picker .aetherion-emoji-picker,
+.aetherion-home .aetherion-message-media-picker .EmojiPickerReact {
+  --epr-bg-color: var(--home-surface);
+  --epr-category-label-bg-color: var(--home-raised);
+  --epr-category-label-text-color: var(--home-muted);
+  --epr-search-input-bg-color: var(--home-raised);
+  --epr-search-input-text-color: var(--home-text);
+  --epr-text-color: var(--home-text);
+  --epr-picker-border-color: var(--home-border);
+  --epr-hover-bg-color: var(--home-hover);
+  --epr-focus-bg-color: var(--home-hover);
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker .epr-header,
+.aetherion-home .aetherion-message-media-picker .epr-body,
+.aetherion-home .aetherion-message-media-picker .epr-category-nav,
+.aetherion-home .aetherion-message-media-picker .epr-emoji-category-content,
+.aetherion-home .aetherion-message-media-picker .epr-emoji-category-label {
+  background: var(--home-surface) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker .epr-emoji-category-label {
+  background: var(--home-raised) !important;
+  color: var(--home-muted) !important;
+}
+.aetherion-home .aetherion-message-media-picker .epr-search-container input {
+  background: var(--home-raised) !important;
+  border-color: var(--home-border) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker .epr-category-nav button:hover,
+.aetherion-home .aetherion-message-media-picker .epr-emoji button:hover {
+  background: var(--home-hover) !important;
+}
+.aetherion-home .aetherion-message-media-picker button {
+  color: var(--home-text);
+}
+
+/* Attachment choices keep their recognizable icon colors while their surfaces adapt. */
+.aetherion-home .aetherion-attachment-panel {
+  background: color-mix(in srgb, var(--home-surface) 96%, transparent) !important;
+  border-color: var(--home-border) !important;
+}
+.aetherion-home .aetherion-attachment-panel button {
+  background: var(--home-raised) !important;
+  color: var(--home-muted) !important;
+}
+.aetherion-home .aetherion-attachment-panel button:hover {
+  background: var(--home-hover) !important;
+}
+.aetherion-home .aetherion-attachment-panel button > span:first-child {
+  background: var(--home-surface) !important;
+}
+.aetherion-home .aetherion-attachment-panel button > span:last-child {
+  color: var(--home-text) !important;
+}
+
+/* Camera capture footer uses inverted monochrome send controls in each appearance. */
+.aetherion-camera-send-bar {
+  background: #ffffff !important;
+  border-color: #e2e3db !important;
+  color: #20241f !important;
+}
+.aetherion-camera-recipient {
+  color: #20241f !important;
+}
+.aetherion-camera-send-status {
+  color: #70776f !important;
+}
+.aetherion-camera-send-button {
+  background: #20241f !important;
+  color: #ffffff !important;
+  border: 1px solid #20241f !important;
+}
+.aetherion-camera-send-button:hover:not(:disabled) {
+  background: #343a34 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-send-bar {
+  background: #171817 !important;
+  border-color: #343733 !important;
+  color: #e9e9e3 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-recipient {
+  color: #e9e9e3 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-send-status {
+  color: #a4a59d !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-send-button {
+  background: #e9e9e3 !important;
+  color: #20211f !important;
+  border-color: #e9e9e3 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-send-button:hover:not(:disabled) {
+  background: #d3d5cc !important;
+}
+
+.aetherion-home .aetherion-message-media-picker > div > button[class*="border-[#171717]"] {
+  border-bottom-color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker > div > button:hover {
+  color: var(--home-text) !important;
+}
+
+
+/* Final light-mode chat palette: incoming bubbles share the soft surface; outgoing stay charcoal. */
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#171717]"] {
+  background: #292d28 !important;
+  border: 1px solid #292d28 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 8%) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#FFFFFF]"] {
+  background: #f0f0ea !important;
+  border: 1px solid #e1e3da !important;
+  color: #20241f !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 5%) !important;
+}
+
+/* Keep the chat send control monochrome and steady on hover. */
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Send message"] {
+  background: #20241f !important;
+  color: #ffffff !important;
+  border-color: #20241f !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Send message"]:hover:not(:disabled) {
+  background: #20241f !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel button[aria-label="Send message"] {
+  background: #e9e9e3 !important;
+  color: #20211f !important;
+  border-color: #e9e9e3 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home .aetherion-chat-panel button[aria-label="Send message"]:hover:not(:disabled) {
+  background: #e9e9e3 !important;
+}
+
+/* Attachment and camera controls remain visible, with no hover-only color shift. */
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Open attachments"],
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Open camera"] {
+  color: #555e54 !important;
+  transition: none !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Open attachments"]:hover,
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel button[aria-label="Open camera"]:hover {
+  color: #555e54 !important;
+  background: transparent !important;
 }

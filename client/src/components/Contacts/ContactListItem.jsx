@@ -39,31 +39,31 @@ const ContactListItem = ({
             type="button"
             onClick={handleClick}
             className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition ${selected
-                ? "bg-[#d8f45a]/[0.08]"
+                ? "bg-[#171717]/[0.08]"
                 : "hover:bg-white/[0.04]"
                 }`}
             aria-pressed={selected}
         >
             {/* DP */}
-            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-[#1a211a]">
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-[#F5F5F5]">
                 <Avatar
                     profilePic={profilePic}
                     initials={initials || "?"}
                     alt={fullName}
                     decoration={contact?.avatarDecoration}
                     size="sm"
-                    avatarClassName="bg-[#1a211a] text-[#aeb7aa] font-semibold"
+                    avatarClassName="bg-[#F5F5F5] text-[#737373] font-semibold"
                 />
             </div>
 
             {/* NAME + EMAIL */}
             <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-[#f1eee8]">
+                <p className="truncate text-sm font-medium text-[#171717]">
                     {fullName}
                 </p>
 
                 {email && (
-                    <p className="mt-0.5 truncate text-xs text-[#70786f]">
+                    <p className="mt-0.5 truncate text-xs text-[#737373]">
                         {email}
                     </p>
                 )}
@@ -72,8 +72,8 @@ const ContactListItem = ({
             {/* SELECTION */}
             <div
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition ${selected
-                    ? "border-[#d8f45a] bg-[#d8f45a] text-[#10120d]"
-                    : "border-[#70786f]/50 bg-transparent"
+                    ? "border-[#171717] bg-[#171717] text-[#FFFFFF]"
+                    : "border-[#737373]/50 bg-transparent"
                     }`}
             >
                 {selected && (

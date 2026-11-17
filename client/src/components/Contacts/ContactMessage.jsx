@@ -35,7 +35,7 @@ const ContactMessage = ({
     };
 
     return (
-        <div className="w-[280px] max-w-full rounded-2xl border border-[#d8f45a]/10 bg-[#18221a] p-3.5">
+        <div className="w-[280px] max-w-full rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF] p-3.5">
             {/* CONTACT INFO */}
             <div className="flex items-center gap-3">
                 {/* DP */}
@@ -52,17 +52,17 @@ const ContactMessage = ({
                         alt={fullName}
                         decoration={contact?.avatarDecoration}
                         size="md"
-                        avatarClassName="bg-[#0d120e] text-[#d8f45a] font-semibold transition duration-200 group-hover/avatar:scale-[1.04]"
+                        avatarClassName="bg-[#F7F7F5] text-[#171717] font-semibold transition duration-200 group-hover/avatar:scale-[1.04]"
                     />
                 </button>
 
                 {/* NAME + EMAIL */}
                 <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-[#f1eee8]">
+                    <p className="truncate text-sm font-semibold text-[#171717]">
                         {fullName}
                     </p>
 
-                    <p className="mt-0.5 truncate text-xs text-[#8d9689]">
+                    <p className="mt-0.5 truncate text-xs text-[#737373]">
                         {contact?.email || "No email"}
                     </p>
                 </div>
@@ -73,7 +73,7 @@ const ContactMessage = ({
                 <button
                     type="button"
                     onClick={handleChat}
-                    className="text-xs font-medium text-[#ebf6bb] transition-colors hover:text-[#f4f7e8] hover:underline"
+                    className="text-xs font-medium text-[#F5F5F5] transition-colors hover:text-[#F5F5F5] hover:underline"
                 >
                     Chat
                 </button>

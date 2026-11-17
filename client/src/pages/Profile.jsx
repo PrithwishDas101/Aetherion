@@ -255,7 +255,7 @@ const Profile = () => {
 
   // UI
   return (
-    <div className="min-h-screen bg-[#080d09] text-[#f1eee8]">
+    <div className="aetherion-profile-page min-h-screen bg-[#080d09] text-[#f1eee8]">
       {/* ===================================================
           HEADER
       =================================================== */}
@@ -513,7 +513,7 @@ const Profile = () => {
       {/* STATUS MODAL */}
       {showStatusModal && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0 aetherion-profile-modal"
           onMouseDown={closeStatusModal}
         >
           <div
@@ -638,7 +638,7 @@ const Profile = () => {
       {/* PRESENCE MODAL */}
       {showPresenceModal && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0 aetherion-profile-modal"
           onMouseDown={closePresenceModal}
         >
           <div

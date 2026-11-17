@@ -423,7 +423,7 @@ const PhotoPreview = ({
                 onChange={onCaptionChange}
                 placeholder="Add a caption..."
                 rows={1}
-                className="scrollbar-aetherion block min-h-9 max-h-24 w-full resize-none overflow-y-auto bg-transparent py-1 text-[15px] leading-5 text-white outline-none placeholder:text-white/50"
+                className="scrollbar-aetherion-light block min-h-9 max-h-24 w-full resize-none overflow-y-auto bg-transparent py-1 text-[15px] leading-5 text-white outline-none placeholder:text-white/50"
               />
             </div>
           </div>
@@ -433,13 +433,13 @@ const PhotoPreview = ({
       {/* SEND BAR */}
 
       {!isTextEditing && !isDoodling && !isDraggingCommittedText ? (
-        <div className="absolute inset-x-0 bottom-0 z-40 flex min-h-[72px] items-center justify-between gap-3 border-t border-white/10 bg-[#080d09] px-5 pb-[max(8px,env(safe-area-inset-bottom))] pt-2">
+        <div className="aetherion-camera-send-bar absolute inset-x-0 bottom-0 z-40 flex min-h-[72px] items-center justify-between gap-3 border-t border-white/10 bg-[#F7F7F5] px-5 pb-[max(8px,env(safe-area-inset-bottom))] pt-2">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-white">
+            <p className="aetherion-camera-recipient truncate text-sm font-semibold text-white">
               {recipientName}
             </p>
 
-            <p className="text-xs text-white/45">
+            <p className="aetherion-camera-send-status text-xs text-white/45">
               {isSending ? "Sending..." : "Send photo"}
             </p>
           </div>
@@ -448,10 +448,10 @@ const PhotoPreview = ({
             type="button"
             onClick={handleSendPhoto}
             disabled={isSending}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d8f45a] text-[#10120d] shadow-lg transition hover:bg-[#e4ff6f] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="aetherion-camera-send-button flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#171717] text-[#FFFFFF] shadow-lg transition hover:bg-[#333333] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             aria-label="Send photo"
           >
-            <span className="translate-x-[1px] text-xl">
+            <span className="aetherion-camera-send-icon translate-x-[1px] text-xl">
               {isSending ? "…" : "➤"}
             </span>
           </button>

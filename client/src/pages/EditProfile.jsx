@@ -334,7 +334,7 @@ const EditProfile = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#080d09] text-[#f1eee8]">
+        <div className="aetherion-edit-profile-page min-h-screen bg-[#080d09] text-[#f1eee8]">
             {/* ============================================================
                 HEADER
             ============================================================ */}
@@ -345,7 +345,7 @@ const EditProfile = () => {
                         <button
                             type="button"
                             onClick={() => navigate("/profile")}
-                            className="aetherion-button"
+                            className="aetherion-button aetherion-edit-profile-back-button"
                             aria-label="Back to profile"
                         >
                             <span>←</span>
@@ -405,7 +405,7 @@ const EditProfile = () => {
                                         onClick={() =>
                                             setShowAvatarModal(true)
                                         }
-                                        className="absolute right-1 top-1 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:scale-105 hover:bg-black/80 active:scale-95"
+                                        className="aetherion-edit-profile-avatar-action absolute right-1 top-1 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:scale-105 hover:bg-black/80 active:scale-95"
                                         aria-label="Edit profile picture"
                                         title="Edit profile picture"
                                     >
@@ -432,7 +432,7 @@ const EditProfile = () => {
                                         onClick={() =>
                                             setShowStatusModal(true)
                                         }
-                                        className="min-w-0 max-w-[calc(100vw-9rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl transition hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white sm:max-w-[calc(100vw-10rem)] lg:max-w-[28rem]"
+                                        className="aetherion-edit-profile-status-trigger min-w-0 max-w-[calc(100vw-9rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl transition hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white sm:max-w-[calc(100vw-10rem)] lg:max-w-[28rem]"
                                     >
                                         {customStatus.trim() ? (
                                             <span className="block max-h-[3.75rem] overflow-hidden break-all">
@@ -574,7 +574,7 @@ const EditProfile = () => {
 
             {showAvatarModal && (
                 <div
-                    className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
+                    className="aetherion-edit-profile-modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
                     onMouseDown={() =>
                         !isUploadingAvatar &&
                         setShowAvatarModal(false)
@@ -746,7 +746,7 @@ const EditProfile = () => {
 
             {showStatusModal && (
                 <div
-                    className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
+                    className="aetherion-edit-profile-modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
                     onMouseDown={closeStatusModal}
                 >
                     <div

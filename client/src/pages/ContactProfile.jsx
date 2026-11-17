@@ -572,7 +572,7 @@ const ContactProfile = () => {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-[#0b100c]">
+            <div className="aetherion-contact-profile-page flex min-h-screen items-center justify-center bg-[#0b100c]">
                 <div className="text-sm text-[#626960]">
                     Loading profile...
                 </div>
@@ -582,7 +582,7 @@ const ContactProfile = () => {
 
     if (!profile) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-[#0b100c]">
+            <div className="aetherion-contact-profile-page flex min-h-screen items-center justify-center bg-[#0b100c]">
                 <div className="text-sm text-[#626960]">
                     Profile unavailable.
                 </div>
@@ -591,7 +591,7 @@ const ContactProfile = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#0b100c] text-[#f1eee8]">
+        <div className="aetherion-contact-profile-page min-h-screen bg-[#0b100c] text-[#f1eee8]">
             <main className="w-full px-4 py-7 sm:px-7 sm:py-10 lg:px-10">
                 <div className="w-full">
 
@@ -700,7 +700,7 @@ const ContactProfile = () => {
                                         <div className="mr-1.5 mt-4 h-3 w-3 shrink-0 rounded-full bg-[#1a1c1a]" />
 
                                         {/* READ-ONLY STATUS BUBBLE */}
-                                        <div className="min-w-0 max-w-[calc(100vw-9rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:max-w-[calc(100vw-10rem)] lg:max-w-[28rem]">
+                                        <div className="aetherion-contact-profile-status min-w-0 max-w-[calc(100vw-9rem)] rounded-[1.35rem] rounded-bl-md border border-white/[0.1] bg-white/[0.035] px-4 py-2.5 text-left text-sm leading-5 text-[#d4d7d1] shadow-[0_8px_30px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:max-w-[calc(100vw-10rem)] lg:max-w-[28rem]">
                                             <span className="block max-h-[3.75rem] overflow-hidden break-all">
                                                 {profile.customStatus}
                                             </span>
@@ -1019,7 +1019,7 @@ const ContactProfile = () => {
 
             {/* ALL MEDIA MODAL */}
             {allMediaOpen && (
-                <div className="fixed inset-0 z-[80] bg-[#0b100c]">
+                <div className="aetherion-contact-profile-all-media-modal fixed inset-0 z-[80] bg-[#0b100c]">
                     <div className="flex h-full flex-col">
                         {/* HEADER */}
                         <div className="flex shrink-0 items-center gap-3 border-b border-white/[0.06] px-4 py-4 sm:px-6">
@@ -1214,7 +1214,7 @@ const ContactProfile = () => {
             {/* REMOVE CONTACT CONFIRMATION */}
             {showRemoveContactModal && (
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-5"
+                    className="aetherion-contact-profile-remove-modal fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-5"
                     onClick={() => {
                         if (!isRemovingContact) {
                             setShowRemoveContactModal(false);

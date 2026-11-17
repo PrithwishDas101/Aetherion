@@ -18,6 +18,7 @@ const ProfileBanner = ({
     onBannerChange,
     editMode = false,
     showAction = true,
+    defaultBannerVariant = "classic",
 }) => {
     const fileInputRef = useRef(null);
     const cropAreaRef = useRef(null);
@@ -490,12 +491,12 @@ const ProfileBanner = ({
                             type="button"
                             onClick={openFilePicker}
                             disabled={saving}
-                            className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:scale-105 hover:bg-black/80 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="aetherion-profile-banner-action absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border shadow-lg backdrop-blur-md transition hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                             aria-label="Change banner"
                             title="Change banner"
                         >
                             <Pencil
-                                className="h-4 w-4 text-white"
+                                className="h-4 w-4"
                                 strokeWidth={3.5}
                             />
                         </button>
@@ -504,7 +505,7 @@ const ProfileBanner = ({
                             type="button"
                             onClick={openFilePicker}
                             disabled={saving}
-                            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-black/45 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-black/65 disabled:cursor-not-allowed disabled:opacity-50 sm:right-4 sm:top-4 sm:w-auto sm:gap-2 sm:px-3"
+                            className="aetherion-profile-banner-action absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg border text-xs font-semibold backdrop-blur-md transition disabled:cursor-not-allowed disabled:opacity-50 sm:right-4 sm:top-4 sm:w-auto sm:gap-2 sm:px-3"
                             aria-label={bannerUrl ? "Change banner" : "Add banner"}
                             title={bannerUrl ? "Change banner" : "Add banner"}
                         >
@@ -532,7 +533,7 @@ const ProfileBanner = ({
 
             {showEditor && (
                 <div
-                    className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0"
+                    className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 pb-3 sm:items-center sm:px-5 sm:pb-0 aetherion-profile-modal"
                     onMouseDown={closeEditor}
                 >
                     <div

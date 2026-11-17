@@ -260,7 +260,7 @@ function Contacts() {
     const hasContacts = filteredContacts.length > 0;
 
     return (
-        <div className="min-h-screen w-full bg-[#080b08] text-[#f1eee8]">
+        <div className="aetherion-contacts-page min-h-screen w-full bg-[#080b08] text-[#f1eee8]">
             <div className="w-full px-5 py-5 sm:px-8 lg:px-10 xl:px-14">
                 {/* HEADER */}
 
