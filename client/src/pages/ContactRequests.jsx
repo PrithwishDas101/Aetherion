@@ -248,7 +248,7 @@ function ContactRequests() {
 
     return (
         <div className="aetherion-requests-page min-h-screen w-full bg-[#080b08] text-[#f1eee8]">
-            <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
+            <div className="w-full px-5 py-5 sm:px-8 lg:px-10 xl:px-14">
                 {/* HEADER */}
                 <header className="flex items-center justify-between">
                     <div className="flex min-w-0 items-center gap-3">
@@ -264,14 +264,9 @@ function ContactRequests() {
                         </button>
 
                         <div className="flex min-w-0 items-center gap-2">
-                            <div className="min-w-0">
-                                <h1 className="truncate text-xl font-semibold tracking-tight text-[#f1eee8] sm:text-2xl">
-                                    Contact requests
-                                </h1>
-                                <p className="mt-1 text-xs text-[#626960] sm:text-sm">
-                                    Manage the people who want to connect with you.
-                                </p>
-                            </div>
+                            <h1 className="truncate text-lg font-semibold tracking-tight text-[#f1eee8]">
+                                Contact Requests
+                            </h1>
 
                             {total > 0 && (
                                 <span className="rounded-full bg-[#ffffff]/[0.08] px-2 py-0.5 text-[10px] font-semibold text-[#c9cec5]">
@@ -283,8 +278,8 @@ function ContactRequests() {
                 </header>
 
                 {/* SEARCH */}
-                <div className="mt-8 w-full max-w-2xl">
-                    <div className="aetherion-requests-search flex h-12 items-center gap-3 rounded-2xl border border-[#ffffff]/[0.08] bg-[#111711] px-4 transition focus-within:border-[#777d72]">
+                <div className="mt-6 w-full lg:max-w-xl">
+                    <div className="flex h-10 items-center gap-3 border-b border-[#ffffff]/[0.08] px-1 transition focus-within:border-[#454644]">
                         <IoSearch className="shrink-0 text-lg text-[#697168]" />
 
                         <input
@@ -313,7 +308,7 @@ function ContactRequests() {
                 </div>
 
                 {/* CONTENT */}
-                <main className="mt-7">
+                <main className="mt-8">
                     {loading ? (
                         <LoadingState />
                     ) : error ? (
@@ -332,8 +327,12 @@ function ContactRequests() {
                             searchValue={searchInput}
                         />
                     ) : (
-                        <div className="grid gap-3">
-                            {requests.map((request) => (
+                        <div>
+                            {requests.map(
+                                (
+                                    request,
+                                    index,
+                                ) => (
                                     <RequestRow
                                         key={
                                             request._id
@@ -351,6 +350,11 @@ function ContactRequests() {
                                         onDecline={
                                             handleDecline
                                         }
+                                        isLast={
+                                            index ===
+                                            requests.length -
+                                            1
+                                        }
                                     />
                                 ),
                             )}
@@ -361,7 +365,7 @@ function ContactRequests() {
                         !error &&
                         requests.length > 0 &&
                         (page > 1 || hasMore) && (
-                            <div className="mt-6 flex items-center justify-center gap-4 border-t border-[#ffffff]/[0.06] pt-5">
+                            <div className="mt-8 flex items-center justify-center gap-4 border-t border-[#ffffff]/[0.06] pt-5">
                                 {page > 1 && (
                                     <button
                                         type="button"
@@ -417,53 +421,58 @@ function RequestRow({
     processing,
     onAccept,
     onDecline,
+    isLast,
 }) {
     const requester = request?.requester;
     const fullName = getFullName(requester);
 
     return (
-        <div className="aetherion-request-row group flex min-h-[88px] items-center gap-4 rounded-2xl border border-[#ffffff]/[0.07] bg-[#111711] px-4 py-4 transition sm:px-5">
+        <div
+            className={`group flex min-h-[68px] items-center gap-3 border-b border-[#ffffff]/[0.06] px-2 py-3 transition hover:bg-[#101010bd] ${isLast ? "border-b-0" : ""
+                }`}
+        >
             <Avatar
                 profilePic={requester?.profilePic}
                 initials={getInitials(requester)}
                 alt={fullName}
-                decoration={requester?.avatarDecoration}
-                size="sm"
+                decoration={
+                    requester?.avatarDecoration
+                }
+                size="xs"
                 avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold"
             />
 
             <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-semibold text-[#e8e5de] sm:text-base">
+                <div className="truncate text-sm font-medium text-[#e8e5de]">
                     {fullName}
                 </div>
-                <p className="mt-1 text-xs text-[#737b71]">
-                    Wants to add you as a contact
-                </p>
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
                 <button
                     type="button"
-                    onClick={() => onAccept(request._id)}
+                    onClick={() =>
+                        onAccept(request._id)
+                    }
                     disabled={processing}
-                    className="aetherion-request-accept flex h-9 items-center justify-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition disabled:cursor-wait disabled:opacity-40 sm:px-4"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-[#5af48b]/15 bg-[#5af48b]/10 text-[#5af48b] transition hover:bg-[#5af48b]/20 disabled:cursor-wait disabled:opacity-40"
                     aria-label={`Accept contact request from ${fullName}`}
                     title="Accept"
                 >
-                    <IoCheckmark className="text-base" />
-                    <span className="hidden sm:inline">Accept</span>
+                    <IoCheckmark className="text-lg" />
                 </button>
 
                 <button
                     type="button"
-                    onClick={() => onDecline(request._id)}
+                    onClick={() =>
+                        onDecline(request._id)
+                    }
                     disabled={processing}
-                    className="aetherion-request-decline flex h-9 items-center justify-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition disabled:cursor-wait disabled:opacity-40 sm:px-4"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-red-400/10 bg-red-400/5 text-[#ec5353] transition hover:bg-red-400/10 hover:text-red-500 disabled:cursor-wait disabled:opacity-40"
                     aria-label={`Decline contact request from ${fullName}`}
                     title="Decline"
                 >
-                    <IoClose className="text-base" />
-                    <span className="hidden sm:inline">Decline</span>
+                    <IoClose className="text-lg" />
                 </button>
             </div>
         </div>
@@ -472,8 +481,8 @@ function RequestRow({
 
 function LoadingState() {
     return (
-        <div className="aetherion-requests-state py-20 text-center">
-            <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#eceee3]" />
+        <div className="py-20 text-center">
+            <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#eceee3]" />
 
             <p className="mt-4 text-xs text-[#626960]">
                 Loading contact requests...
@@ -487,7 +496,7 @@ function ErrorState({
     onRetry,
 }) {
     return (
-        <div className="aetherion-requests-state py-20 text-center">
+        <div className="py-20 text-center">
             <p className="text-sm font-medium text-[#e8b4b4]">
                 {message}
             </p>
@@ -495,7 +504,7 @@ function ErrorState({
             <button
                 type="button"
                 onClick={onRetry}
-                className="aetherion-request-retry mt-4 rounded-xl px-4 py-2.5 text-xs font-semibold transition"
+                className="mt-4 rounded-lg bg-[#eef1de] px-4 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e5ff70]"
             >
                 Try Again
             </button>
@@ -508,8 +517,8 @@ function EmptyState({
     searchValue,
 }) {
     return (
-        <div className="aetherion-requests-state py-20 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#111711] text-[#697168]">
+        <div className="py-20 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#111711] text-[#697168]">
                 <IoSearch className="text-xl" />
             </div>
 
