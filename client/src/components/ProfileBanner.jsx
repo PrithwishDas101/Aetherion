@@ -18,7 +18,6 @@ const ProfileBanner = ({
     onBannerChange,
     editMode = false,
     showAction = true,
-    defaultBannerVariant = "classic",
 }) => {
     const fileInputRef = useRef(null);
     const cropAreaRef = useRef(null);
@@ -474,29 +473,7 @@ const ProfileBanner = ({
                         alt="Profile banner"
                         className="h-full w-full object-cover"
                     />
-                ) : defaultBannerVariant === "editorial" ? (
-                    <div className="aetherion-default-banner-art absolute inset-0 overflow-hidden">
-                        <div className="aetherion-default-banner-art__grid absolute inset-0" />
-                        <div className="aetherion-default-banner-art__glow absolute inset-0" />
-                        <div className="aetherion-default-banner-art__fold aetherion-default-banner-art__fold--back" />
-                        <div className="aetherion-default-banner-art__fold aetherion-default-banner-art__fold--front" />
-                        <div className="aetherion-default-banner-art__monogram">A</div>
-                        <div className="aetherion-default-banner-art__wordmark">
-                            <span>AETHERION</span>
-                            <span>CONNECTION, IN YOUR ORBIT</span>
-                        </div>
-                    </div>
                 ) : (
-                    /*
-                     * Original default banner — retained as the classic fallback.
-                     *
-                     * <>
-                     *   <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(216,244,90,0.18),transparent_28%),radial-gradient(circle_at_85%_20%,rgba(75,110,70,0.22),transparent_35%),linear-gradient(135deg,#111811,#182119_45%,#0b100c)]" />
-                     *   <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full border border-[#d8f45a]/[0.06]" />
-                     *   <div className="absolute -right-4 -top-8 h-36 w-36 rounded-full border border-[#d8f45a]/[0.04]" />
-                     *   <div className="absolute bottom-0 left-0 h-px w-full bg-white/[0.05]" />
-                     * </>
-                     */
                     <>
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(216,244,90,0.18),transparent_28%),radial-gradient(circle_at_85%_20%,rgba(75,110,70,0.22),transparent_35%),linear-gradient(135deg,#111811,#182119_45%,#0b100c)]" />
                         <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full border border-[#d8f45a]/[0.06]" />
