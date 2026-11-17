@@ -39,7 +39,7 @@ const getSearchScore = (user, query) => {
     const lastName = normalizeText(user?.lastName);
     const fullName = normalizeText(getFullName(user));
     const username = normalizeText(getUsername(user));
-    const search = normalizeText(query);
+    const search = normalizeText(query).replace(/^@/, "");
 
     if (!search) {
         return 0;
@@ -266,24 +266,35 @@ function AddContactsModal({ onClose }) {
 
     return (
         <div className="aetherion-add-contacts-modal fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 sm:p-5">
-            <div className="aetherion-add-contacts-dialog flex h-[90dvh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-[#ffffff]/[0.07] bg-[#080b08] text-[#f1eee8] shadow-2xl">
+            <div className="aetherion-add-contacts-dialog flex h-[86dvh] w-full max-w-4xl flex-col overflow-hidden rounded-[28px] border border-[#ffffff]/[0.07] bg-[#080b08] text-[#f1eee8] shadow-2xl">
                 {/* HEADER */}
-                <header className="flex h-16 shrink-0 items-center gap-3 border-b border-[#ffffff]/[0.06] px-4 sm:px-6">
-                    <button type="button" onClick={onClose} className="aetherion-button h-9 w-9 text-base" aria-label="Close Add Contacts">
-                        <span><IoArrowBack /></span>
+                <header className="flex min-h-[76px] shrink-0 items-center gap-4 border-b border-[#ffffff]/[0.06] px-5 sm:px-8">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="group flex shrink-0 items-center gap-2 rounded-xl px-2 py-2 text-sm font-medium text-[#8a9288] transition hover:bg-[#151a15] hover:text-[#f1eee8]"
+                        aria-label="Back to contacts"
+                    >
+                        <IoArrowBack className="text-lg transition-transform group-hover:-translate-x-0.5" />
+                        <span className="hidden sm:inline">Back</span>
                     </button>
 
-                    <h1 className="text-lg font-semibold tracking-tight text-[#f1eee8]">
-                        Add Contacts
-                    </h1>
+                    <div className="min-w-0">
+                        <h1 className="text-base font-semibold tracking-tight text-[#f1eee8] sm:text-lg">
+                            Add contacts
+                        </h1>
+                        <p className="mt-0.5 text-xs text-[#626960]">
+                            Find people and connect on Aetherion
+                        </p>
+                    </div>
                 </header>
 
                 {/* CONTENT */}
-                <main className="scrollbar-aetherion flex-1 overflow-y-auto px-5 py-8 sm:px-8 lg:px-12">
-                    <div className="mx-auto w-full max-w-2xl">
+                <main className="scrollbar-aetherion flex-1 overflow-y-auto px-4 py-6 sm:px-8 sm:py-8 lg:px-10">
+                    <div className="mx-auto w-full max-w-3xl">
                         {/* SEARCH */}
-                        <div className="flex h-12 items-center gap-3 rounded-xl border border-[#ffffff]/[0.08] bg-[#0d120d] px-4 transition focus-within:border-[#d8f45a]/35">
-                            <IoSearch className="shrink-0 text-lg text-[#697168]" />
+                        <div className="flex min-h-14 items-center gap-3 rounded-2xl border border-[#ffffff]/[0.09] bg-[#0d120d] px-4 sm:px-5 transition focus-within:border-[#d8f45a]/35">
+                            <IoSearch className="shrink-0 text-xl text-[#8a9288]" />
 
                             <input
                                 type="text"
@@ -293,13 +304,17 @@ function AddContactsModal({ onClose }) {
                                         event.target.value,
                                     )
                                 }
-                                placeholder="Search people by name"
-                                className="min-w-0 flex-1 bg-transparent text-sm text-[#f1eee8] outline-none placeholder:text-[#596158]"
+                                placeholder="Search by name or @username"
+                                className="min-w-0 flex-1 bg-transparent py-3 text-sm text-[#f1eee8] outline-none placeholder:text-[#596158] sm:text-[15px]"
                                 autoFocus
                             />
 
                             {searchInput && (
-                                <button type="button" onClick={() => setSearchInput("")} className="text-xs text-[#687166] transition hover:text-[#d8f45a]">
+                                <button
+                                    type="button"
+                                    onClick={() => setSearchInput("")}
+                                    className="shrink-0 rounded-lg px-2 py-1.5 text-xs font-medium text-[#8a9288] transition hover:bg-[#151a15] hover:text-[#f1eee8]"
+                                >
                                     Clear
                                 </button>
                             )}
@@ -307,29 +322,31 @@ function AddContactsModal({ onClose }) {
 
                         {/* INITIAL STATE */}
                         {!isSearching && (
-                            <div className="flex flex-col items-center py-20 text-center">
-                                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#111711] text-[#697168]">
-                                    <IoPersonAddOutline className="text-2xl" />
+                            <section className="mt-8 flex min-h-[300px] flex-col items-center justify-center rounded-3xl border border-[#ffffff]/[0.06] bg-[#0d120d] px-6 py-12 text-center sm:mt-10">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#ffffff]/[0.07] bg-[#111711] text-[#a4a59d]">
+                                    <IoPersonAddOutline className="text-[26px]" />
                                 </div>
 
-                                <h2 className="mt-5 text-base font-semibold text-[#f1eee8]">
-                                    Find someone on Aetherion
+                                <h2 className="mt-6 text-base font-semibold tracking-tight text-[#f1eee8] sm:text-lg">
+                                    Find your people
                                 </h2>
 
-                                <p className="mt-2 max-w-sm text-sm leading-6 text-[#626960]">
-                                    Search by first name, last name, or full name to find people on Aetherion.
+                                <p className="mt-2 max-w-md text-sm leading-6 text-[#8a9288]">
+                                    Search Aetherion by someone’s name or username. We’ll bring the closest matches to the top.
                                 </p>
-                            </div>
+
+                                <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                                    <span className="rounded-full border border-[#ffffff]/[0.07] bg-[#111711] px-3 py-1.5 text-[11px] font-medium text-[#a4a59d]">First or last name</span>
+                                    <span className="rounded-full border border-[#ffffff]/[0.07] bg-[#111711] px-3 py-1.5 text-[11px] font-medium text-[#a4a59d]">@username</span>
+                                </div>
+                            </section>
                         )}
 
                         {/* LOADING */}
                         {isSearching && loading && (
-                            <div className="py-16 text-center">
-                                <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#d8f45a]" />
-
-                                <p className="mt-4 text-xs text-[#626960]">
-                                    Finding people...
-                                </p>
+                            <div className="mt-8 flex min-h-40 flex-col items-center justify-center rounded-2xl border border-[#ffffff]/[0.06] bg-[#0d120d] text-center">
+                                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#d8f45a]/20 border-t-[#d8f45a]" />
+                                <p className="mt-4 text-sm text-[#8a9288]">Finding people...</p>
                             </div>
                         )}
 
@@ -337,10 +354,8 @@ function AddContactsModal({ onClose }) {
                         {isSearching &&
                             !loading &&
                             error && (
-                                <div className="py-16 text-center">
-                                    <p className="text-sm text-[#e8b4b4]">
-                                        {error}
-                                    </p>
+                                <div className="mt-8 rounded-2xl border border-[#ffffff]/[0.06] bg-[#0d120d] px-5 py-10 text-center">
+                                    <p className="text-sm text-[#e8b4b4]">{error}</p>
                                 </div>
                             )}
 
@@ -349,12 +364,18 @@ function AddContactsModal({ onClose }) {
                             !loading &&
                             !error &&
                             results.length > 0 && (
-                                <div className="mt-8">
-                                    <div className="mb-3 px-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#70786f]">
-                                        People
+                                <section className="mt-7">
+                                    <div className="mb-4 flex items-center justify-between gap-3 px-1">
+                                        <div>
+                                            <h2 className="text-sm font-semibold text-[#f1eee8]">Search results</h2>
+                                            <p className="mt-1 text-xs text-[#70786f]">Best matches appear first</p>
+                                        </div>
+                                        <span className="rounded-full border border-[#ffffff]/[0.08] bg-[#111711] px-3 py-1.5 text-[11px] font-medium tabular-nums text-[#a4a59d]">
+                                            {results.length} {results.length === 1 ? "match" : "matches"}
+                                        </span>
                                     </div>
 
-                                    <div className="overflow-hidden rounded-xl border border-[#ffffff]/[0.06]">
+                                    <div className="flex flex-col gap-2.5">
                                         {results.map(
                                             (
                                                 user,
@@ -390,7 +411,7 @@ function AddContactsModal({ onClose }) {
                                                     user._id;
 
                                                 return (
-                                                    <div key={user._id} className={`group flex min-h-[68px] items-center gap-3 bg-[#0d120d] px-4 py-3 transition hover:bg-[#121812] ${index === results.length - 1 ? "" : "border-b border-[#ffffff]/[0.06]"}`}>
+                                                    <article key={user._id} className="group flex flex-col gap-4 rounded-2xl border border-[#ffffff]/[0.07] bg-[#0d120d] px-4 py-4 transition hover:border-[#ffffff]/[0.13] hover:bg-[#121812] sm:flex-row sm:items-center sm:gap-4 sm:px-5">
                                                         {/* AVATAR */}
                                                         <button
                                                             type="button"
@@ -413,13 +434,13 @@ function AddContactsModal({ onClose }) {
                                                                     .join("")}
                                                                 alt={fullName}
                                                                 decoration={user.avatarDecoration}
-                                                                size="xs"
+                                                                size="sm"
                                                                 avatarClassName="bg-[#cacfb4] text-[#10120d] font-bold transition duration-200 group-hover/avatar:scale-[1.04]"
                                                             />
                                                         </button>
                                                         {/* USER INFO */}
                                                         <div className="min-w-0 flex-1">
-                                                            <div className="truncate text-sm font-medium text-[#e8e5de]">
+                                                            <div className="truncate text-sm font-semibold text-[#e8e5de]">
                                                                 {
                                                                     fullName
                                                                 }
@@ -436,7 +457,7 @@ function AddContactsModal({ onClose }) {
                                                         </div>
 
                                                         {/* ACTION */}
-                                                        <div className="flex shrink-0 items-center gap-2">
+                                                        <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto">
                                                             <button
                                                                 type="button"
                                                                 onClick={() =>
@@ -448,20 +469,20 @@ function AddContactsModal({ onClose }) {
                                                                     isIncomingPending ||
                                                                     isRequesting
                                                                 }
-                                                                className={`flex h-9 items-center rounded-full px-4 text-xs font-medium transition ${isAlreadyContact || isOutgoingPending || isIncomingPending
-                                                                    ? "border border-[#ffffff]/[0.08] bg-[#111711] text-[#697168]"
-                                                                    : "bg-[#d8f45a] font-semibold text-[#10120d] hover:bg-[#e5ff70]"
+                                                                className={`flex h-10 flex-1 items-center justify-center rounded-xl px-4 text-xs font-semibold transition sm:min-w-[132px] sm:flex-none ${isAlreadyContact || isOutgoingPending || isIncomingPending
+                                                                    ? "border border-[#ffffff]/[0.09] bg-[#111711] text-[#a4a59d]"
+                                                                    : "bg-[#d8f45a] text-[#10120d] hover:bg-[#e5ff70]"
                                                                     } disabled:cursor-default disabled:opacity-70`}
                                                             >
                                                                 {isAlreadyContact
-                                                                    ? "Added"
+                                                                    ? "Already added"
                                                                     : isOutgoingPending
-                                                                        ? "Requested"
+                                                                        ? "Request sent"
                                                                         : isIncomingPending
-                                                                            ? "Pending"
+                                                                            ? "Request received"
                                                                             : isRequesting
                                                                                 ? "Sending..."
-                                                                                : "Request"}
+                                                                                : "Add contact"}
                                                             </button>
 
                                                             {isAlreadyContact && (
@@ -471,7 +492,7 @@ function AddContactsModal({ onClose }) {
                                                                         handleOpenChat(user._id)
                                                                     }
                                                                     disabled={Boolean(openingChatId)}
-                                                                    className="flex h-9 w-9 items-center justify-center rounded-full text-[#8a9288] transition hover:bg-[#151a15] hover:text-[#d8f45a] disabled:cursor-default disabled:opacity-60"
+                                                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#ffffff]/[0.08] text-[#8a9288] transition hover:bg-[#151a15] hover:text-[#d8f45a] disabled:cursor-default disabled:opacity-60"
                                                                     aria-label={`Open chat with ${fullName}`}
                                                                     title={`Open chat with ${fullName}`}
                                                                 >
@@ -483,12 +504,12 @@ function AddContactsModal({ onClose }) {
                                                                 </button>
                                                             )}
                                                         </div>
-                                                    </div>
+                                                    </article>
                                                 );
                                             },
                                         )}
                                     </div>
-                                </div>
+                                </section>
                             )}
 
                         {/* NO RESULTS */}
@@ -496,17 +517,15 @@ function AddContactsModal({ onClose }) {
                             !loading &&
                             !error &&
                             results.length === 0 && (
-                                <div className="py-16 text-center">
-                                    <div className="flex justify-center text-[#697168]">
-                                        <IoSearch className="text-2xl" />
+                                <div className="mt-7 flex min-h-[260px] flex-col items-center justify-center rounded-3xl border border-[#ffffff]/[0.06] bg-[#0d120d] px-6 py-12 text-center">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#111711] text-[#8a9288]">
+                                        <IoSearch className="text-xl" />
                                     </div>
-
-                                    <h2 className="mt-4 text-sm font-semibold text-[#f1eee8]">
-                                        No people found
+                                    <h2 className="mt-5 text-sm font-semibold text-[#f1eee8]">
+                                        No matches yet
                                     </h2>
-
-                                    <p className="mt-2 text-xs text-[#626960]">
-                                        Try a different name or spelling.
+                                    <p className="mt-2 max-w-sm text-xs leading-5 text-[#8a9288]">
+                                        Try another name or username. You can search with a first name, last name, full name, or @username.
                                     </p>
                                 </div>
                             )}
