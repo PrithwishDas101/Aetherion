@@ -3251,3 +3251,10 @@ html[data-aetherion-theme="night"] .aetherion-camera-send-button {
 html[data-aetherion-theme="night"] .aetherion-camera-send-button:hover:not(:disabled) {
   background: #d3d5cc !important;
 }
+
+.aetherion-home .aetherion-message-media-picker > div > button[class*="border-[#171717]"] {
+  border-bottom-color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker > div > button:hover {
+  color: var(--home-text) !important;
+}
