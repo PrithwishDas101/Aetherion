@@ -3022,3 +3022,27 @@ html:not([data-aetherion-theme="night"]) .aetherion-add-contacts-modal {
 .aetherion-add-contacts-modal .scrollbar-aetherion::-webkit-scrollbar-thumb:hover {
   background: var(--contacts-muted);
 }
+
+
+/* Contacts menu item — muted violet hover identity, matching the other menu accents. */
+.aetherion-home header .aetherion-menu-contacts:hover,
+.aetherion-home header .aetherion-menu-contacts:focus-visible {
+  background: #f0ebf6 !important;
+  color: #6c5684 !important;
+  box-shadow: inset 2px 0 0 #b5a0cc;
+  transform: translateX(1px);
+}
+.aetherion-home header .aetherion-menu-contacts:hover > svg,
+.aetherion-home header .aetherion-menu-contacts:focus-visible > svg {
+  color: #9278b1 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-contacts:hover,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-contacts:focus-visible {
+  background: #342d3c !important;
+  color: #d0c1e0 !important;
+  box-shadow: inset 2px 0 0 #8c76a8;
+}
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-contacts:hover > svg,
+html[data-aetherion-theme="night"] .aetherion-home header .aetherion-menu-contacts:focus-visible > svg {
+  color: #b8a2d3 !important;
+}
