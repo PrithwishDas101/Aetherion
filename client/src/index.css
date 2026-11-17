@@ -2537,6 +2537,18 @@ html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page {
   --contact-avatar: #d9ddd4;
 }
 
+/* Light mode: restore readable contrast for the small metadata labels and values.
+   These utilities were authored for the dark page and were too pale on porcelain. */
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class~="text-white/35"] {
+  color: #687166 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class~="text-white/65"] {
+  color: #41483f !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class~="text-white/80"] {
+  color: #252a24 !important;
+}
+
 .aetherion-contact-profile-page > main {
   background: var(--contact-canvas);
 }
