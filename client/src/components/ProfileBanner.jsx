@@ -474,53 +474,8 @@ const ProfileBanner = ({
                         alt="Profile banner"
                         className="h-full w-full object-cover"
                     />
-                ) : defaultBannerVariant === "space-city" ? (
-                    <div className="absolute inset-0 overflow-hidden bg-[#17191b]">
-                        <svg viewBox="0 0 1600 400" preserveAspectRatio="xMidYMid slice" className="h-full w-full" role="img" aria-label="Monochrome low-poly space city with orbital planets and geometric towers">
-                            <defs>
-                                <linearGradient id="space-city-sky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#34383c"/><stop offset=".52" stopColor="#202326"/><stop offset="1" stopColor="#111315"/></linearGradient>
-                                <linearGradient id="space-city-moon" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f0f0ed"/><stop offset=".55" stopColor="#aeb2b4"/><stop offset="1" stopColor="#656a6e"/></linearGradient>
-                                <linearGradient id="space-city-tower" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#777d81"/><stop offset=".48" stopColor="#d0d2d1"/><stop offset="1" stopColor="#555b60"/></linearGradient>
-                                <linearGradient id="space-city-haze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#d9dcda" stopOpacity="0"/><stop offset="1" stopColor="#d9dcda" stopOpacity=".2"/></linearGradient>
-                            </defs>
-                            <rect width="1600" height="400" fill="url(#space-city-sky)"/>
-                            <path d="M0 250 Q230 190 440 245 T850 226 T1250 220 T1600 240 V400 H0Z" fill="url(#space-city-haze)"/>
-                            <circle cx="1180" cy="105" r="105" fill="url(#space-city-moon)" opacity=".8"/>
-                            <path d="M1040 102 Q1180 -2 1325 92 Q1185 48 1040 102Z" fill="#f0f1ef" opacity=".36"/>
-                            <ellipse cx="1180" cy="112" rx="185" ry="37" fill="none" stroke="#d9dcda" strokeWidth="10" opacity=".42" transform="rotate(-17 1180 112)"/>
-                            <ellipse cx="1180" cy="112" rx="185" ry="37" fill="none" stroke="#555b60" strokeWidth="3" opacity=".8" transform="rotate(-17 1180 112)"/>
-                            <circle cx="340" cy="78" r="53" fill="#aeb3b5" opacity=".48"/>
-                            <ellipse cx="340" cy="78" rx="92" ry="17" fill="none" stroke="#c8cccd" strokeWidth="5" opacity=".25" transform="rotate(22 340 78)"/>
-                            <g opacity=".72" fill="#c8cccd"><circle cx="175" cy="55" r="2"/><circle cx="510" cy="62" r="2"/><circle cx="890" cy="48" r="2"/><circle cx="1450" cy="55" r="2"/><circle cx="1510" cy="160" r="2"/></g>
-                            <path d="M0 315 L95 280 L155 300 L230 254 L300 292 L390 260 L465 296 L560 255 L640 286 L735 245 L830 290 L920 260 L1010 292 L1110 246 L1200 280 L1300 245 L1390 285 L1490 252 L1600 290 V400 H0Z" fill="#252a2e"/>
-                            <g stroke="#d5d8d7" strokeOpacity=".38" strokeWidth="2">
-                                <path d="M115 320 V190 L155 165 L195 190 V320Z" fill="#7c8387"/><path d="M155 165 V320 H195 V190Z" fill="#51585d"/><path d="M115 190 L155 165 L195 190 L155 208Z" fill="#c1c5c5"/>
-                                <path d="M220 320 V130 L255 108 L290 130 V320Z" fill="#a0a5a6"/><path d="M255 108 V320 H290 V130Z" fill="#5c6368"/><path d="M220 130 L255 108 L290 130 L255 151Z" fill="#d4d7d6"/>
-                                <path d="M315 320 V215 Q350 160 385 215 V320Z" fill="#858c90"/><path d="M350 177 Q385 160 385 215 V320 H350Z" fill="#4c5358"/>
-                                <path d="M430 320 V155 L470 126 L510 155 V320Z" fill="#aeb3b3"/><path d="M470 126 V320 H510 V155Z" fill="#60676c"/><path d="M430 155 L470 126 L510 155 L470 178Z" fill="#e0e2df"/>
-                                <path d="M560 320 V205 L610 170 L660 205 V320Z" fill="#7e8589"/><path d="M610 170 V320 H660 V205Z" fill="#4c5358"/><path d="M560 205 L610 170 L660 205 L610 231Z" fill="#c3c7c6"/>
-                                <path d="M720 320 V115 L770 80 L820 115 V320Z" fill="url(#space-city-tower)"/><path d="M770 80 V320 H820 V115Z" fill="#535a5f"/><path d="M720 115 L770 80 L820 115 L770 145Z" fill="#e0e2df"/>
-                                <path d="M870 320 V190 L920 150 L970 190 V320Z" fill="#8e9598"/><path d="M920 150 V320 H970 V190Z" fill="#4d555a"/><path d="M870 190 L920 150 L970 190 L920 218Z" fill="#cdd0cf"/>
-                                <path d="M1040 320 V145 L1080 118 L1120 145 V320Z" fill="#aeb3b4"/><path d="M1080 118 V320 H1120 V145Z" fill="#555d62"/><path d="M1040 145 L1080 118 L1120 145 L1080 169Z" fill="#e0e2df"/>
-                                <path d="M1200 320 V210 Q1255 135 1310 210 V320Z" fill="#92999c"/><path d="M1255 165 Q1310 135 1310 210 V320 H1255Z" fill="#555c61"/>
-                                <path d="M1370 320 V165 L1410 135 L1450 165 V320Z" fill="#9da3a5"/><path d="M1410 135 V320 H1450 V165Z" fill="#50585d"/><path d="M1370 165 L1410 135 L1450 165 L1410 188Z" fill="#dadddc"/>
-                            </g>
-                            <g fill="none" stroke="#d8dcda" strokeWidth="5" strokeOpacity=".55">
-                                <path d="M90 238 H220 M195 275 H430 M290 210 H560 M510 245 H720 M660 220 H870 M820 250 H1040 M970 220 H1200 M1120 260 H1370"/>
-                                <path d="M205 238 l-12 -12 m12 12 l-12 12 M425 275 l-12 -12 m12 12 l-12 12 M555 210 l-12 -12 m12 12 l-12 12 M865 220 l-12 -12 m12 12 l-12 12"/>
-                            </g>
-                            <g fill="none" stroke="#bfc4c4" strokeWidth="4" strokeOpacity=".65">
-                                <path d="M210 238 V320 M230 238 V320 M210 252 H230 M210 270 H230 M210 288 H230 M210 306 H230"/>
-                                <path d="M650 220 V320 M670 220 V320 M650 240 H670 M650 260 H670 M650 280 H670 M650 300 H670"/>
-                                <path d="M1030 220 V320 M1050 220 V320 M1030 240 H1050 M1030 260 H1050 M1030 280 H1050 M1030 300 H1050"/>
-                            </g>
-                            <g fill="#d8dcda" opacity=".25"><path d="M0 340 L180 320 L360 350 L540 325 L720 355 L900 325 L1080 350 L1260 320 L1440 350 L1600 330 V400 H0Z"/><path d="M0 370 L260 350 L470 380 L710 350 L950 380 L1190 350 L1400 375 L1600 355 V400 H0Z"/></g>
-                            <rect y="385" width="1600" height="15" fill="#0d0f11" opacity=".55"/>
-                        </svg>
-                    </div>
                 ) : (
                     <>
-                        {/* Original rings banner retained as the classic fallback. */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(216,244,90,0.18),transparent_28%),radial-gradient(circle_at_85%_20%,rgba(75,110,70,0.22),transparent_35%),linear-gradient(135deg,#111811,#182119_45%,#0b100c)]" />
                         <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full border border-[#d8f45a]/[0.06]" />
                         <div className="absolute -right-4 -top-8 h-36 w-36 rounded-full border border-[#d8f45a]/[0.04]" />
