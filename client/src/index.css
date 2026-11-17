@@ -2773,3 +2773,248 @@ html:not([data-aetherion-theme="night"]) .aetherion-contact-profile-page [class*
   color: var(--contact-text) !important;
 }
 
+
+
+/* Contacts page — shared styling for personal and read-only contact lists. */
+.aetherion-contacts-page {
+  --contacts-canvas: #171817;
+  --contacts-surface: #202220;
+  --contacts-raised: #242624;
+  --contacts-input: #1b1e1b;
+  --contacts-hover: #2c2e2c;
+  --contacts-border: #343733;
+  --contacts-divider: #2a2c29;
+  --contacts-text: #e9e9e3;
+  --contacts-muted: #a4a59d;
+  --contacts-subtle: #858a81;
+  --contacts-primary: #dadbd4;
+  --contacts-primary-text: #20211f;
+  --contacts-avatar: #30342e;
+  min-height: 100vh;
+  background: var(--contacts-canvas) !important;
+  color: var(--contacts-text) !important;
+}
+
+html:not([data-aetherion-theme="night"]) .aetherion-contacts-page {
+  --contacts-canvas: #f0f0ea;
+  --contacts-surface: #ffffff;
+  --contacts-raised: #eeefe8;
+  --contacts-input: #f7f8f3;
+  --contacts-hover: #e3e6dc;
+  --contacts-border: #c8cdc2;
+  --contacts-divider: #d2d6cc;
+  --contacts-text: #1d211c;
+  --contacts-muted: #555e54;
+  --contacts-subtle: #70786d;
+  --contacts-primary: #292d28;
+  --contacts-primary-text: #ffffff;
+  --contacts-avatar: #d9ddd4;
+}
+
+/* Page canvas, search field and filter control. */
+.aetherion-contacts-page [class~="bg-[#080b08]"] {
+  background-color: var(--contacts-canvas) !important;
+}
+.aetherion-contacts-page [class~="bg-[#0d120d]"] {
+  background-color: var(--contacts-input) !important;
+}
+.aetherion-contacts-page [class~="bg-[#171d17]"],
+.aetherion-contacts-page [class~="bg-[#111711]"] {
+  background-color: var(--contacts-raised) !important;
+}
+.aetherion-contacts-page [class*="border-white/"] {
+  border-color: var(--contacts-border) !important;
+}
+.aetherion-contacts-page [class*="border-b"][class*="border-white/"],
+.aetherion-contacts-page [class*="border-t"][class*="border-white/"] {
+  border-color: var(--contacts-divider) !important;
+}
+
+/* Text hierarchy. */
+.aetherion-contacts-page [class~="text-[#f1eee8]"],
+.aetherion-contacts-page [class~="text-[#e8e5de]"] {
+  color: var(--contacts-text) !important;
+}
+.aetherion-contacts-page [class~="text-[#50584f]"],
+.aetherion-contacts-page [class~="text-[#596158]"],
+.aetherion-contacts-page [class~="text-[#626960]"],
+.aetherion-contacts-page [class~="text-[#687166]"],
+.aetherion-contacts-page [class~="text-[#697168]"],
+.aetherion-contacts-page [class~="text-[#70786f]"],
+.aetherion-contacts-page [class~="text-[#737b71]"],
+.aetherion-contacts-page [class~="text-[#8a9288]"],
+.aetherion-contacts-page [class~="text-[#a8b19f]"] {
+  color: var(--contacts-muted) !important;
+}
+.aetherion-contacts-page input {
+  color: var(--contacts-text);
+}
+.aetherion-contacts-page input::placeholder {
+  color: var(--contacts-subtle) !important;
+}
+
+/* Neutral monochrome interaction states; presence indicators remain semantic. */
+.aetherion-contacts-page [class*="hover:bg-[#101010bd]"]:hover,
+.aetherion-contacts-page [class*="hover:bg-[#151a15]"]:hover,
+.aetherion-contacts-page [class*="hover:bg-[#151a16]"]:hover {
+  background-color: var(--contacts-hover) !important;
+}
+.aetherion-contacts-page [class*="hover:text-[#d8f45a]"]:hover,
+.aetherion-contacts-page [class*="hover:text-[#f1eee8]"]:hover,
+.aetherion-contacts-page [class*="hover:text-[#ecf0dd]"]:hover,
+.aetherion-contacts-page [class*="hover:text-[#d3d3cf]"]:hover {
+  color: var(--contacts-text) !important;
+}
+.aetherion-contacts-page [class~="text-[#d8f45a]"] {
+  color: var(--contacts-text) !important;
+}
+.aetherion-contacts-page [class~="bg-[#d8f45a]"],
+.aetherion-contacts-page [class*="hover:bg-[#e5ff70]"]:hover {
+  background-color: var(--contacts-primary) !important;
+  color: var(--contacts-primary-text) !important;
+}
+.aetherion-contacts-page [class*="border-[#d8f45a]"] {
+  border-color: var(--contacts-border) !important;
+}
+.aetherion-contacts-page [class*="border-t-[#d8f45a]"] {
+  border-top-color: var(--contacts-subtle) !important;
+}
+.aetherion-contacts-page [class*="border-[#d8f45a]/"] {
+  border-color: color-mix(in srgb, var(--contacts-muted) 24%, transparent) !important;
+}
+
+/* Avatar fallbacks and chat actions. */
+.aetherion-contacts-page [class~="bg-[#cacfb4]"] {
+  background-color: var(--contacts-avatar) !important;
+  color: var(--contacts-primary-text) !important;
+}
+.aetherion-contacts-page [class~="text-[#10120d]"] {
+  color: var(--contacts-primary-text) !important;
+}
+.aetherion-contacts-page button[aria-label^="Open chat with"] {
+  color: var(--contacts-muted) !important;
+}
+.aetherion-contacts-page button[aria-label^="Open chat with"]:hover {
+  background-color: var(--contacts-hover) !important;
+  color: var(--contacts-text) !important;
+}
+.aetherion-contacts-page button[aria-label="Go back"] {
+  color: var(--contacts-text) !important;
+}
+
+/* Pagination controls. */
+.aetherion-contacts-page [class*="hover:bg-[#151a15]"]:hover {
+  background-color: var(--contacts-hover) !important;
+}
+
+/* Add Contacts modal has its own scope so shared UI elsewhere is unaffected. */
+.aetherion-add-contacts-modal {
+  --contacts-canvas: #171817;
+  --contacts-surface: #202220;
+  --contacts-raised: #242624;
+  --contacts-input: #1b1e1b;
+  --contacts-hover: #2c2e2c;
+  --contacts-border: #343733;
+  --contacts-divider: #2a2c29;
+  --contacts-text: #e9e9e3;
+  --contacts-muted: #a4a59d;
+  --contacts-subtle: #858a81;
+  --contacts-primary: #dadbd4;
+  --contacts-primary-text: #20211f;
+  --contacts-avatar: #30342e;
+  color: var(--contacts-text) !important;
+  background: rgb(0 0 0 / 58%) !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-add-contacts-modal {
+  --contacts-canvas: #f0f0ea;
+  --contacts-surface: #ffffff;
+  --contacts-raised: #eeefe8;
+  --contacts-input: #f7f8f3;
+  --contacts-hover: #e3e6dc;
+  --contacts-border: #c8cdc2;
+  --contacts-divider: #d2d6cc;
+  --contacts-text: #1d211c;
+  --contacts-muted: #555e54;
+  --contacts-subtle: #70786d;
+  --contacts-primary: #292d28;
+  --contacts-primary-text: #ffffff;
+  --contacts-avatar: #d9ddd4;
+}
+
+/* Modal surfaces and separators. */
+.aetherion-add-contacts-modal .aetherion-add-contacts-dialog {
+  background-color: var(--contacts-canvas) !important;
+  border-color: var(--contacts-border) !important;
+  color: var(--contacts-text) !important;
+}
+.aetherion-add-contacts-modal [class*="border-white/"] {
+  border-color: var(--contacts-divider) !important;
+}
+.aetherion-add-contacts-modal [class~="bg-[#0d120d]"] {
+  background-color: var(--contacts-input) !important;
+}
+.aetherion-add-contacts-modal [class~="bg-[#111711]"] {
+  background-color: var(--contacts-raised) !important;
+}
+.aetherion-add-contacts-modal [class~="bg-[#cacfb4]"] {
+  background-color: var(--contacts-avatar) !important;
+  color: var(--contacts-primary-text) !important;
+}
+
+/* Modal typography and search field. */
+.aetherion-add-contacts-modal [class~="text-[#f1eee8]"],
+.aetherion-add-contacts-modal [class~="text-[#e8e5de]"] {
+  color: var(--contacts-text) !important;
+}
+.aetherion-add-contacts-modal [class~="text-[#596158]"],
+.aetherion-add-contacts-modal [class~="text-[#626960]"],
+.aetherion-add-contacts-modal [class~="text-[#687166]"],
+.aetherion-add-contacts-modal [class~="text-[#697168]"],
+.aetherion-add-contacts-modal [class~="text-[#70786f]"],
+.aetherion-add-contacts-modal [class~="text-[#8a9288]"] {
+  color: var(--contacts-muted) !important;
+}
+.aetherion-add-contacts-modal input {
+  color: var(--contacts-text);
+}
+.aetherion-add-contacts-modal input::placeholder {
+  color: var(--contacts-subtle) !important;
+}
+
+/* Search, row, request and chat hover states. */
+.aetherion-add-contacts-modal [class*="hover:bg-[#121812]"]:hover,
+.aetherion-add-contacts-modal [class*="hover:bg-[#151a15]"]:hover {
+  background-color: var(--contacts-hover) !important;
+}
+.aetherion-add-contacts-modal [class*="hover:text-[#d8f45a]"]:hover {
+  color: var(--contacts-text) !important;
+}
+.aetherion-add-contacts-modal [class~="text-[#d8f45a]"] {
+  color: var(--contacts-text) !important;
+}
+.aetherion-add-contacts-modal [class~="bg-[#d8f45a]"],
+.aetherion-add-contacts-modal [class*="hover:bg-[#e5ff70]"]:hover {
+  background-color: var(--contacts-primary) !important;
+  color: var(--contacts-primary-text) !important;
+}
+.aetherion-add-contacts-modal [class*="border-[#d8f45a]"] {
+  border-color: var(--contacts-border) !important;
+}
+.aetherion-add-contacts-modal [class*="border-t-[#d8f45a]"] {
+  border-top-color: var(--contacts-subtle) !important;
+}
+.aetherion-add-contacts-modal [class*="border-[#d8f45a]/"] {
+  border-color: color-mix(in srgb, var(--contacts-muted) 24%, transparent) !important;
+}
+.aetherion-add-contacts-modal [class*="focus-within:border-[#d8f45a]"]:focus-within {
+  border-color: var(--contacts-subtle) !important;
+}
+.aetherion-add-contacts-modal .scrollbar-aetherion {
+  scrollbar-color: var(--contacts-subtle) transparent;
+}
+.aetherion-add-contacts-modal .scrollbar-aetherion::-webkit-scrollbar-thumb {
+  background: var(--contacts-subtle);
+}
+.aetherion-add-contacts-modal .scrollbar-aetherion::-webkit-scrollbar-thumb:hover {
+  background: var(--contacts-muted);
+}
