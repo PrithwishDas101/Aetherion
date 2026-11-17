@@ -7,6 +7,7 @@ import {
   FiSun,
   FiUser,
   FiUserPlus,
+  FiUsers,
 } from "react-icons/fi";
 
 import socket from "../sockets/socket.js";
@@ -182,6 +183,11 @@ function Header() {
     navigate("/requests");
   };
 
+  const handleContactsClick = () => {
+    setShowProfileMenu(false);
+    navigate("/contacts");
+  };
+
   const handleLogout = async () => {
     setShowLogoutConfirm(false);
     setShowProfileMenu(false);
@@ -321,6 +327,16 @@ function Header() {
                       : contactRequestCount}
                   </span>
                 )}
+              </button>
+
+              {/* Contacts */}
+              <button
+                type="button"
+                onClick={handleContactsClick}
+                className="aetherion-profile-menu-item aetherion-menu-contacts mt-2 flex w-full items-center gap-3 rounded-xl bg-[#F5F5F5] px-3 py-3 text-left text-sm font-medium text-[#404040] transition active:scale-[0.98]"
+              >
+                <FiUsers className="h-[18px] w-[18px]" />
+                <span>Contacts</span>
               </button>
 
               {/* Divider */}
