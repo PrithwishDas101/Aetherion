@@ -142,7 +142,7 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
   }
 
   return (
-    <div className=" z-50 w-full overflow-hidden border border-[#E5E5E5] bg-[#FFFFFF] shadow-2xl md:absolute md:bottom-16 md:left-0 md:w-[min(360px,calc(100vw-32px))] md:rounded-2xl">
+    <div className="aetherion-message-media-picker z-50 w-full overflow-hidden border border-[#E5E5E5] bg-[#FFFFFF] shadow-2xl md:absolute md:bottom-16 md:left-0 md:w-[min(360px,calc(100vw-32px))] md:rounded-2xl">
       {/* SEARCH */}
 
       <div className="border-b border-[#E5E5E5] p-2 sm:p-3">
@@ -231,12 +231,13 @@ const MessageMediaPicker = ({ isOpen, onClose, onEmojiClick, onGifClick }) => {
                 previewConfig={{ showPreview: false }}
                 skinTonesDisabled={false}
                 lazyLoadEmojis={true}
-                theme="dark"
-                style={{
-                  background: "#FFFFFF",
-                  border: "none",
-                  borderRadius: 0,
-                }}
+                theme={
+                  document.documentElement.getAttribute("data-aetherion-theme") === "night"
+                    ? "dark"
+                    : "light"
+                }
+                className="aetherion-emoji-picker"
+                style={{ border: "none", borderRadius: 0 }}
               />
             )}
           </div>
