@@ -276,16 +276,12 @@ function AddContactsModal({ onClose }) {
                         aria-label="Back to contacts"
                     >
                         <IoArrowBack className="text-lg transition-transform group-hover:-translate-x-0.5" />
-                        <span className="hidden sm:inline">Back</span>
                     </button>
 
                     <div className="min-w-0">
                         <h1 className="text-base font-semibold tracking-tight text-[#f1eee8] sm:text-lg">
                             Add contacts
                         </h1>
-                        <p className="mt-0.5 text-xs text-[#626960]">
-                            Find people and connect on Aetherion
-                        </p>
                     </div>
                 </header>
 
