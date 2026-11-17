@@ -601,7 +601,6 @@ const ContactProfile = () => {
                             bannerUrl={profile.profileBanner}
                             editMode={false}
                             showAction={false}
-                            defaultBannerVariant="space-city"
                         />
 
                         {/* BACK BUTTON */}
