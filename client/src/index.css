@@ -3125,3 +3125,12 @@ html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class*="hover
 html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class*="hover:text-[#d8f45a]"]:hover {
   color: #1d211c !important;
 }
+
+
+/* Contact Requests row hover: subtle contrast in both themes. */
+.aetherion-requests-page .group:hover {
+  background-color: #252725 !important;
+}
+html:not([data-aetherion-theme="night"]) .aetherion-requests-page .group:hover {
+  background-color: #e5e7e0 !important;
+}
