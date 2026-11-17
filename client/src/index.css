@@ -3201,3 +3201,12 @@ html[data-aetherion-theme="night"] .aetherion-requests-page .aetherion-request-d
     transition: none !important;
   }
 }
+
+.aetherion-requests-page .aetherion-request-retry {
+  background: var(--requests-primary) !important;
+  color: var(--requests-primary-text) !important;
+}
+.aetherion-requests-page .aetherion-request-retry:hover {
+  background: var(--requests-hover) !important;
+  color: var(--requests-text) !important;
+}
