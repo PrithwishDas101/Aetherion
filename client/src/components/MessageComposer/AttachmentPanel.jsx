@@ -21,37 +21,37 @@ const AttachmentPanel = ({
     {
       label: "Camera",
       icon: FiCamera,
-      color: "#171717",
+      color: "#ff5c5c",
       onClick: onCamera,
     },
     {
       label: "Gallery",
       icon: FiImage,
-      color: "#171717",
+      color: "#4da6ff",
       onClick: onGallery,
     },
     {
       label: "Document",
       icon: FiFileText,
-      color: "#171717",
+      color: "#7f8cff",
       onClick: onDocument,
     },
     {
       label: "Poll",
       icon: FiBarChart2,
-      color: "#171717",
+      color: "#b36bff",
       onClick: onPoll,
     },
     {
       label: "Location",
       icon: FiMapPin,
-      color: "#171717",
+      color: "#ff6b6b",
       onClick: onLocation,
     },
     {
       label: "Contact",
       icon: FiUser,
-      color: "#171717",
+      color: "#3fd99b",
       onClick: onContact,
     },
   ];
@@ -65,7 +65,7 @@ const AttachmentPanel = ({
         }
       `}
     >
-      <div className="w-[250px] rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF]/95 p-2 shadow-2xl backdrop-blur-md">
+      <div className="aetherion-attachment-panel w-[250px] rounded-2xl border border-[#E5E5E5] bg-[#FFFFFF]/95 p-2 shadow-2xl backdrop-blur-md">
         <div className="grid grid-cols-3 gap-1.5 lg:grid-cols-1">
           {options.map(({ label, icon: Icon, color, onClick }, index) => (
             <button
