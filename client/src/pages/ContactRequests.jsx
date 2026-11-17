@@ -333,11 +333,7 @@ function ContactRequests() {
                         />
                     ) : (
                         <div className="grid gap-3">
-                            {requests.map(
-                                (
-                                    request,
-                                    index,
-                                ) => (
+                            {requests.map((request) => (
                                     <RequestRow
                                         key={
                                             request._id
@@ -354,11 +350,6 @@ function ContactRequests() {
                                         }
                                         onDecline={
                                             handleDecline
-                                        }
-                                        isLast={
-                                            index ===
-                                            requests.length -
-                                            1
                                         }
                                     />
                                 ),
@@ -426,7 +417,6 @@ function RequestRow({
     processing,
     onAccept,
     onDecline,
-    isLast,
 }) {
     const requester = request?.requester;
     const fullName = getFullName(requester);
@@ -505,7 +495,7 @@ function ErrorState({
             <button
                 type="button"
                 onClick={onRetry}
-                className="mt-4 rounded-lg bg-[#eef1de] px-4 py-2 text-xs font-semibold text-[#10120d] transition hover:bg-[#e5ff70]"
+                className="aetherion-request-retry mt-4 rounded-xl px-4 py-2.5 text-xs font-semibold transition"
             >
                 Try Again
             </button>
