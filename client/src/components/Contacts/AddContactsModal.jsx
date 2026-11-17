@@ -265,8 +265,8 @@ function AddContactsModal({ onClose }) {
     const isSearching = searchInput.trim().length > 0;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 sm:p-5">
-            <div className="flex h-[90dvh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-[#ffffff]/[0.07] bg-[#080b08] text-[#f1eee8] shadow-2xl">
+        <div className="aetherion-add-contacts-modal fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 sm:p-5">
+            <div className="aetherion-add-contacts-dialog flex h-[90dvh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-[#ffffff]/[0.07] bg-[#080b08] text-[#f1eee8] shadow-2xl">
                 {/* HEADER */}
                 <header className="flex h-16 shrink-0 items-center gap-3 border-b border-[#ffffff]/[0.06] px-4 sm:px-6">
                     <button type="button" onClick={onClose} className="aetherion-button h-9 w-9 text-base" aria-label="Close Add Contacts">
