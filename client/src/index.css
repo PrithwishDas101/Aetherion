@@ -3134,3 +3134,120 @@ html:not([data-aetherion-theme="night"]) .aetherion-requests-page [class*="hover
 html:not([data-aetherion-theme="night"]) .aetherion-requests-page .group:hover {
   background-color: #e5e7e0 !important;
 }
+
+
+/* Home chat finishing touches — scoped to the active chat panel. */
+html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel .group.relative.flex.w-full > div.order-1 > div.w-fit[class*="bg-[#171717]"] {
+  background: #f0f0ea !important;
+  border: 1px solid #e1e3da !important;
+  color: #20241f !important;
+  box-shadow: 0 1px 2px rgb(25 25 20 / 5%) !important;
+}
+
+/* Emoji picker: every layer follows the app appearance, including the category rail and emoji grid. */
+.aetherion-home .aetherion-message-media-picker {
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker > div {
+  border-color: var(--home-border) !important;
+}
+.aetherion-home .aetherion-message-media-picker .aetherion-emoji-picker,
+.aetherion-home .aetherion-message-media-picker .EmojiPickerReact {
+  --epr-bg-color: var(--home-surface);
+  --epr-category-label-bg-color: var(--home-raised);
+  --epr-category-label-text-color: var(--home-muted);
+  --epr-search-input-bg-color: var(--home-raised);
+  --epr-search-input-text-color: var(--home-text);
+  --epr-text-color: var(--home-text);
+  --epr-picker-border-color: var(--home-border);
+  --epr-hover-bg-color: var(--home-hover);
+  --epr-focus-bg-color: var(--home-hover);
+  background: var(--home-surface) !important;
+  border-color: var(--home-border) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker .epr-header,
+.aetherion-home .aetherion-message-media-picker .epr-body,
+.aetherion-home .aetherion-message-media-picker .epr-category-nav,
+.aetherion-home .aetherion-message-media-picker .epr-emoji-category-content,
+.aetherion-home .aetherion-message-media-picker .epr-emoji-category-label {
+  background: var(--home-surface) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker .epr-emoji-category-label {
+  background: var(--home-raised) !important;
+  color: var(--home-muted) !important;
+}
+.aetherion-home .aetherion-message-media-picker .epr-search-container input {
+  background: var(--home-raised) !important;
+  border-color: var(--home-border) !important;
+  color: var(--home-text) !important;
+}
+.aetherion-home .aetherion-message-media-picker .epr-category-nav button:hover,
+.aetherion-home .aetherion-message-media-picker .epr-emoji button:hover {
+  background: var(--home-hover) !important;
+}
+.aetherion-home .aetherion-message-media-picker button {
+  color: var(--home-text);
+}
+
+/* Attachment choices keep their recognizable icon colors while their surfaces adapt. */
+.aetherion-home .aetherion-attachment-panel {
+  background: color-mix(in srgb, var(--home-surface) 96%, transparent) !important;
+  border-color: var(--home-border) !important;
+}
+.aetherion-home .aetherion-attachment-panel button {
+  background: var(--home-raised) !important;
+  color: var(--home-muted) !important;
+}
+.aetherion-home .aetherion-attachment-panel button:hover {
+  background: var(--home-hover) !important;
+}
+.aetherion-home .aetherion-attachment-panel button > span:first-child {
+  background: var(--home-surface) !important;
+}
+.aetherion-home .aetherion-attachment-panel button > span:last-child {
+  color: var(--home-text) !important;
+}
+
+/* Camera capture footer uses inverted monochrome send controls in each appearance. */
+.aetherion-camera-send-bar {
+  background: #ffffff !important;
+  border-color: #e2e3db !important;
+  color: #20241f !important;
+}
+.aetherion-camera-recipient {
+  color: #20241f !important;
+}
+.aetherion-camera-send-status {
+  color: #70776f !important;
+}
+.aetherion-camera-send-button {
+  background: #20241f !important;
+  color: #ffffff !important;
+  border: 1px solid #20241f !important;
+}
+.aetherion-camera-send-button:hover:not(:disabled) {
+  background: #343a34 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-send-bar {
+  background: #171817 !important;
+  border-color: #343733 !important;
+  color: #e9e9e3 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-recipient {
+  color: #e9e9e3 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-send-status {
+  color: #a4a59d !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-send-button {
+  background: #e9e9e3 !important;
+  color: #20211f !important;
+  border-color: #e9e9e3 !important;
+}
+html[data-aetherion-theme="night"] .aetherion-camera-send-button:hover:not(:disabled) {
+  background: #d3d5cc !important;
+}
