@@ -56,6 +56,10 @@ function Header() {
     } catch {
       // Keep the in-memory theme working if storage is unavailable.
     }
+
+    window.dispatchEvent(
+      new CustomEvent("aetherion-theme-change", { detail: theme }),
+    );
   }, [theme]);
 
   const toggleTheme = () => setTheme((current) => current === "night" ? "warm" : "night");

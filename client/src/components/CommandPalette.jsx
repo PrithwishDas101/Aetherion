@@ -76,6 +76,7 @@ function CommandPalette() {
     }
   });
   const inputRef = useRef(null);
+  const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
 
   const closePalette = useCallback(() => {
     setIsOpen(false);
@@ -485,7 +486,7 @@ function CommandPalette() {
           <span><kbd><FiArrowUp /></kbd><kbd><FiArrowDown /></kbd> Navigate</span>
           <span><kbd><FiCornerDownLeft /></kbd> Select</span>
           <span><kbd>Esc</kbd> Close</span>
-          <span className="aetherion-command-shortcut"><FiCommand /> K</span>
+          <span className="aetherion-command-shortcut">{isMac ? <FiCommand /> : <kbd>Ctrl</kbd>} K</span>
         </footer>
       </section>
     </div>
