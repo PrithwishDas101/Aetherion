@@ -296,7 +296,7 @@ html[data-aetherion-theme="night"] .aetherion-command-enter {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .aetherion-command-overlay {
     display: none !important;
   }

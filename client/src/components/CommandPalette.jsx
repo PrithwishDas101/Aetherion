@@ -22,10 +22,10 @@ import { setSelectedChat } from "../redux/userSlice.js";
 import { startChatWithUser } from "../utils/startChat.js";
 import "./CommandPalette.css";
 
-const DESKTOP_QUERY = "(min-width: 768px) and (hover: hover) and (pointer: fine)";
+const DESKTOP_QUERY = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
 
 const getFullName = (person) =>
-  \`\${person?.firstName || ""} \${person?.lastName || ""}\`.trim();
+  `${person?.firstName || ""} ${person?.lastName || ""}`.trim();
 
 const getSearchablePersonText = (person) =>
   [
@@ -247,10 +247,10 @@ function CommandPalette() {
       })
       .slice(0, 6)
       .map((person) => ({
-        id: \`person-\${person._id}\`,
+        id: `person-${person._id}`,
         section: "People",
         label: getFullName(person) || person.username || "Aetherion user",
-        description: person.username ? \`@\${person.username}\` : person.email || "Open conversation",
+        description: person.username ? `@${person.username}` : person.email || "Open conversation",
         person,
         icon: FiUser,
         onSelect: () => openPerson(person),
@@ -275,11 +275,11 @@ function CommandPalette() {
       .filter((item) => item.searchable.includes(normalizedQuery))
       .slice(0, 5)
       .map((item) => ({
-        id: \`conversation-\${item.chat._id}\`,
+        id: `conversation-${item.chat._id}`,
         section: "Conversations",
         label: item.label,
         description: item.members
-          .map((member) => member.username ? \`@\${member.username}\` : "")
+          .map((member) => member.username ? `@${member.username}` : "")
           .filter(Boolean)
           .join(" · ") || "Jump back into this chat",
         icon: FiMessageCircle,
@@ -374,7 +374,7 @@ function CommandPalette() {
     if (!isOpen || activeIndex < 0) return;
 
     document
-      .getElementById(\`aetherion-command-result-\${activeIndex}\`)
+      .getElementById(`aetherion-command-result-${activeIndex}`)
       ?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, isOpen]);
 
@@ -407,7 +407,7 @@ function CommandPalette() {
             aria-label="Search commands and people"
             aria-activedescendant={
               flatResults.length
-                ? \`aetherion-command-result-\${activeIndex}\`
+                ? `aetherion-command-result-${activeIndex}`
                 : undefined
             }
             autoComplete="off"
@@ -435,11 +435,11 @@ function CommandPalette() {
                 return (
                   <button
                     type="button"
-                    id={\`aetherion-command-result-\${index}\`}
+                    id={`aetherion-command-result-${index}`}
                     key={result.id}
                     role="option"
                     aria-selected={selected}
-                    className={\`aetherion-command-result\${selected ? " is-active" : ""}\`}
+                    className={`aetherion-command-result${selected ? " is-active" : ""}`}
                     onMouseEnter={() => setActiveIndex(index)}
                     onClick={() => selectResult(result)}
                   >
