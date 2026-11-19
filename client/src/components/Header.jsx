@@ -39,6 +39,17 @@ function Header() {
   const profileMenuRef = useRef(null);
 
   useEffect(() => {
+    const syncTheme = (event) => {
+      if (event.detail === "warm" || event.detail === "night") {
+        setTheme(event.detail);
+      }
+    };
+
+    window.addEventListener("aetherion-theme-change", syncTheme);
+    return () => window.removeEventListener("aetherion-theme-change", syncTheme);
+  }, []);
+
+  useEffect(() => {
     document.documentElement.dataset.aetherionTheme = theme;
     try {
       localStorage.setItem("aetherion-auth-theme", theme);

@@ -1,0 +1,314 @@
+.aetherion-command-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: min(16vh, 128px) 24px 24px;
+  background: rgb(17 20 17 / 48%);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.aetherion-command-panel {
+  display: flex;
+  width: min(100%, 650px);
+  max-height: min(640px, 72vh);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #d4d8ce;
+  border-radius: 18px;
+  background: #f7f8f3;
+  color: #20241f;
+  box-shadow: 0 28px 90px rgb(0 0 0 / 25%);
+  animation: aetherion-command-enter 150ms ease-out;
+}
+
+.aetherion-command-search {
+  display: flex;
+  min-height: 66px;
+  align-items: center;
+  gap: 13px;
+  padding: 0 18px;
+  border-bottom: 1px solid #dfe3d9;
+}
+
+.aetherion-command-search-icon {
+  flex: 0 0 auto;
+  color: #687568;
+  font-size: 19px;
+}
+
+.aetherion-command-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #20241f;
+  font-size: 15px;
+}
+
+.aetherion-command-search input::placeholder {
+  color: #8a9187;
+}
+
+.aetherion-command-close {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #747c72;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.aetherion-command-close:hover {
+  background: #e8ebe3;
+  color: #242a23;
+}
+
+.aetherion-command-results {
+  min-height: 100px;
+  overflow-y: auto;
+  padding: 9px 10px 12px;
+}
+
+.aetherion-command-section + .aetherion-command-section {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e3e6de;
+}
+
+.aetherion-command-section-title {
+  padding: 7px 10px 6px;
+  color: #7a8478;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.aetherion-command-result {
+  display: flex;
+  width: 100%;
+  min-height: 49px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 6px 10px;
+  text-align: left;
+  color: #30362f;
+  transition: background 100ms ease, border-color 100ms ease;
+}
+
+.aetherion-command-result.is-active {
+  border-color: #dce2d7;
+  background: #e9ede5;
+}
+
+.aetherion-command-result-icon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dfe3d9;
+  border-radius: 9px;
+  background: #f1f3ed;
+  color: #5e6c5d;
+  font-size: 15px;
+}
+
+.aetherion-command-avatar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border: 1px solid #dfe3d9;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.aetherion-command-result-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.aetherion-command-result-label {
+  overflow: hidden;
+  color: #252b24;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aetherion-command-result-description {
+  overflow: hidden;
+  color: #788174;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aetherion-command-enter {
+  flex: 0 0 auto;
+  color: #7c897a;
+  font-size: 14px;
+}
+
+.aetherion-command-empty {
+  display: flex;
+  min-height: 142px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #596355;
+  font-size: 13px;
+}
+
+.aetherion-command-empty span + span {
+  color: #8a9187;
+  font-size: 11px;
+}
+
+.aetherion-command-footer {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 18px;
+  border-top: 1px solid #dfe3d9;
+  padding: 0 15px;
+  color: #7b8479;
+  font-size: 10px;
+}
+
+.aetherion-command-footer > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.aetherion-command-footer kbd {
+  display: inline-flex;
+  min-width: 19px;
+  height: 19px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d7dbd2;
+  border-radius: 5px;
+  background: #f0f2ec;
+  color: #687267;
+  font-size: 10px;
+}
+
+.aetherion-command-footer kbd svg {
+  width: 11px;
+  height: 11px;
+}
+
+.aetherion-command-shortcut {
+  margin-left: auto;
+  gap: 4px !important;
+  color: #838b7f;
+}
+
+.aetherion-command-shortcut svg {
+  width: 12px;
+  height: 12px;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-panel {
+  border-color: #373d36;
+  background: #202420;
+  color: #e9e9e3;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-search,
+html[data-aetherion-theme="night"] .aetherion-command-section + .aetherion-command-section,
+html[data-aetherion-theme="night"] .aetherion-command-footer {
+  border-color: #343a33;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-search-icon,
+html[data-aetherion-theme="night"] .aetherion-command-result-icon {
+  color: #a9b4a5;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-search input {
+  color: #eceee8;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-search input::placeholder,
+html[data-aetherion-theme="night"] .aetherion-command-section-title,
+html[data-aetherion-theme="night"] .aetherion-command-result-description,
+html[data-aetherion-theme="night"] .aetherion-command-footer,
+html[data-aetherion-theme="night"] .aetherion-command-empty,
+html[data-aetherion-theme="night"] .aetherion-command-empty span + span {
+  color: #929b8e;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-close {
+  color: #a4ad9f;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-close:hover {
+  background: #303730;
+  color: #f0f1eb;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-result {
+  color: #e2e6dd;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-result.is-active {
+  border-color: #414a40;
+  background: #2b332b;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-result-icon,
+html[data-aetherion-theme="night"] .aetherion-command-footer kbd {
+  border-color: #3c443b;
+  background: #292f29;
+  color: #b3bdad;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-result-label {
+  color: #edf0e8;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-enter {
+  color: #b4c2b0;
+}
+
+@keyframes aetherion-command-enter {
+  from { opacity: 0; transform: translateY(-7px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 767px) {
+  .aetherion-command-overlay {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aetherion-command-panel {
+    animation: none;
+  }
+
+  .aetherion-command-result,
+  .aetherion-command-close {
+    transition: none;
+  }
+}
