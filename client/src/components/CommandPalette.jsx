@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   FiArrowDown,
   FiArrowUp,
@@ -23,6 +23,14 @@ import { startChatWithUser } from "../utils/startChat.js";
 import "./CommandPalette.css";
 
 const DESKTOP_QUERY = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
+
+const hasActiveSession = () => {
+  try {
+    return Boolean(localStorage.getItem("token"));
+  } catch {
+    return false;
+  }
+};
 
 const getFullName = (person) =>
   `${person?.firstName || ""} ${person?.lastName || ""}`.trim();
@@ -53,6 +61,7 @@ const getOtherMembers = (chat, currentUserId, allUsers) =>
 function CommandPalette() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { user, allUsers, allChats } = useSelector((state) => state.userReducer);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -315,7 +324,7 @@ function CommandPalette() {
   );
 
   useEffect(() => {
-    if (!user?._id || !isDesktop) {
+    if (!user?._id || !hasActiveSession() || !isDesktop || pathname === "/login" || pathname === "/signup") {
       setIsOpen(false);
       return undefined;
     }
@@ -364,6 +373,7 @@ function CommandPalette() {
     isOpen,
     selectResult,
     user?._id,
+    pathname,
   ]);
 
   useEffect(() => {
@@ -378,7 +388,7 @@ function CommandPalette() {
       ?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, isOpen]);
 
-  if (!isDesktop || !isOpen || !user?._id) return null;
+  if (!isDesktop || !isOpen || !user?._id || !hasActiveSession() || pathname === "/login" || pathname === "/signup") return null;
 
   let resultIndex = 0;
 
