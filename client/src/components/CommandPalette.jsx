@@ -174,8 +174,8 @@ function CommandPalette() {
     {
       id: "home",
       section: "Navigation",
-      label: "Go to Home",
-      description: "Open your conversations",
+      label: "Home",
+      description: "Your conversations",
       keywords: ["home", "chats", "messages", "conversations"],
       icon: FiHome,
       onSelect: () => navigate("/"),
@@ -183,8 +183,8 @@ function CommandPalette() {
     {
       id: "profile",
       section: "Navigation",
-      label: "Open Profile",
-      description: "View your Aetherion profile",
+      label: "Profile",
+      description: "Your account",
       keywords: ["profile", "account", "me"],
       icon: FiUser,
       onSelect: () => navigate("/profile"),
@@ -192,8 +192,8 @@ function CommandPalette() {
     {
       id: "contacts",
       section: "Navigation",
-      label: "Open Contacts",
-      description: "Browse your connections",
+      label: "Contacts",
+      description: "Your connections",
       keywords: ["contacts", "people", "connections"],
       icon: FiUsers,
       onSelect: () => navigate("/contacts"),
@@ -201,8 +201,8 @@ function CommandPalette() {
     {
       id: "requests",
       section: "Navigation",
-      label: "Open Requests",
-      description: "Review contact requests",
+      label: "Requests",
+      description: "Incoming invitations",
       keywords: ["requests", "invites", "pending"],
       icon: FiUserPlus,
       onSelect: () => navigate("/requests"),
@@ -210,8 +210,8 @@ function CommandPalette() {
     {
       id: "add-contact",
       section: "Quick actions",
-      label: "Add Contact",
-      description: "Find someone new on Aetherion",
+      label: "Add contact",
+      description: "Find someone on Aetherion",
       keywords: ["add", "contact", "person", "invite", "find"],
       icon: FiUserPlus,
       onSelect: () => navigate("/contacts", { state: { openAddContacts: true } }),
@@ -219,8 +219,8 @@ function CommandPalette() {
     {
       id: "edit-profile",
       section: "Quick actions",
-      label: "Edit Profile",
-      description: "Update your personal details",
+      label: "Edit profile",
+      description: "Update your details",
       keywords: ["edit", "profile", "details", "account"],
       icon: FiEdit3,
       onSelect: () => navigate("/profile/edit"),
@@ -228,8 +228,8 @@ function CommandPalette() {
     {
       id: "theme",
       section: "Quick actions",
-      label: theme === "night" ? "Switch to Light Mode" : "Switch to Dark Mode",
-      description: "Change Aetherion's appearance",
+      label: theme === "night" ? "Light appearance" : "Dark appearance",
+      description: "Change the way Aetherion looks",
       keywords: ["theme", "appearance", "light", "dark", "mode"],
       icon: theme === "night" ? FiSun : FiMoon,
       onSelect: () => applyTheme(theme === "night" ? "warm" : "night"),
@@ -414,7 +414,7 @@ function CommandPalette() {
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search pages, actions, people..."
+            placeholder="Search Aetherion"
             aria-label="Search commands and people"
             aria-activedescendant={
               flatResults.length
@@ -486,7 +486,7 @@ function CommandPalette() {
           <span><kbd><FiArrowUp /></kbd><kbd><FiArrowDown /></kbd> Navigate</span>
           <span><kbd><FiCornerDownLeft /></kbd> Select</span>
           <span><kbd>Esc</kbd> Close</span>
-          <span className="aetherion-command-shortcut">{isMac ? <FiCommand /> : <kbd>Ctrl</kbd>} K</span>
+          <span className="aetherion-command-shortcut">{isMac ? <FiCommand /> : <kbd>Ctrl</kbd>}<kbd>K</kbd></span>
         </footer>
       </section>
     </div>
