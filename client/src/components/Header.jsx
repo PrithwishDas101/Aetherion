@@ -39,12 +39,27 @@ function Header() {
   const profileMenuRef = useRef(null);
 
   useEffect(() => {
+    const syncTheme = (event) => {
+      if (event.detail === "warm" || event.detail === "night") {
+        setTheme(event.detail);
+      }
+    };
+
+    window.addEventListener("aetherion-theme-change", syncTheme);
+    return () => window.removeEventListener("aetherion-theme-change", syncTheme);
+  }, []);
+
+  useEffect(() => {
     document.documentElement.dataset.aetherionTheme = theme;
     try {
       localStorage.setItem("aetherion-auth-theme", theme);
     } catch {
       // Keep the in-memory theme working if storage is unavailable.
     }
+
+    window.dispatchEvent(
+      new CustomEvent("aetherion-theme-change", { detail: theme }),
+    );
   }, [theme]);
 
   const toggleTheme = () => setTheme((current) => current === "night" ? "warm" : "night");
