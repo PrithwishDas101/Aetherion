@@ -465,11 +465,8 @@ function CommandPalette() {
                         <Icon aria-hidden="true" />
                       </span>
                     )}
-                    <span className="aetherion-command-result-copy">
-                      <span className="aetherion-command-result-label">{result.label}</span>
-                      <span className="aetherion-command-result-description">{result.description}</span>
-                    </span>
-                    {selected && <FiCornerDownLeft className="aetherion-command-enter" aria-hidden="true" />}
+                    <span className="aetherion-command-result-label">{result.label}</span>
+                    <span className="aetherion-command-result-description">{result.description}</span>
                   </button>
                 );
               })}
