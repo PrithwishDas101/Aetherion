@@ -402,18 +402,22 @@ function CommandPalette() {
       }}
     >
       <section
-        className={`flex max-h-[min(680px,74vh)] w-full max-w-[680px] flex-col overflow-hidden rounded-[24px] border backdrop-blur-2xl backdrop-saturate-150 shadow-[0_32px_100px_rgba(0,0,0,0.24),0_8px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.55)] motion-safe:animate-palette-panel-in motion-reduce:animate-none ${
+        className={`flex max-h-[min(680px,74vh)] w-full max-w-[680px] flex-col overflow-hidden rounded-[16px] border backdrop-blur-2xl backdrop-saturate-150 shadow-[0_32px_100px_rgba(0,0,0,0.24),0_8px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.55)] motion-safe:animate-palette-panel-in motion-reduce:animate-none ${
           isNight
-            ? "border-white/10 bg-[#252a24]/85 text-[#f1f2ec] shadow-[0_32px_100px_rgba(0,0,0,0.48),0_8px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.07)]"
-            : "border-white/75 bg-[#fafbf7]/85 text-[#20241f]"
+            ? "border-[#485044]/90 bg-[#20251f]/92 text-[#f1f2ec] shadow-[0_32px_100px_rgba(0,0,0,0.48),0_8px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.07)]"
+            : "border-[#c8cdc2]/90 bg-[#f5f6f0]/90 text-[#20241f]"
         }`}
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
       >
-        <div className={`flex min-h-[76px] items-center gap-4 border-b px-6 ${
+        <div className={`flex min-h-[28px] items-center justify-between border-b px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] ${
           isNight ? "border-white/[0.08]" : "border-[#252c22]/[0.08]"
         }`}>
+          <span className="inline-flex items-center gap-2"><span className={`h-1.5 w-1.5 rounded-full ${isNight ? "bg-[#a6b89b] shadow-[0_0_8px_rgba(166,184,155,0.65)]" : "bg-[#71866b]"}`} /> Aetherion <span className={isNight ? "text-white/25" : "text-black/25"}>/</span> Command</span>
+          <span className={isNight ? "text-[#778272]" : "text-[#92998d]"}>Global Search&nbsp;&nbsp;·&nbsp;&nbsp;01</span>
+        </div>
+        <div className={`flex min-h-[68px] items-center gap-4 border-b px-5 ${isNight ? "border-white/[0.10]" : "border-[#c8cdc2]/75"}`}>
           <FiSearch
             className={`h-[21px] w-[21px] shrink-0 ${
               isNight ? "text-[#aab5a5]" : "text-[#737d70]"
@@ -457,7 +461,7 @@ function CommandPalette() {
         <div className="min-h-[120px] overflow-y-auto overscroll-contain px-3 pb-3 pt-3">
           {sections.length ? sections.map((section, sectionIndex) => (
             <div className={`rounded-xl ${sectionIndex > 0 ? `mt-3 border-t pt-3 ${isNight ? "border-white/[0.08]" : "border-[#252c22]/[0.07]"}` : ""}`} key={section.label}>
-              <p className={`px-3 pb-2 pt-1 font-sans text-[10px] font-semibold uppercase tracking-[0.14em] ${
+              <p className={`px-3 pb-2 pt-1 font-sans font-mono text-[9px] font-semibold uppercase tracking-[0.18em] ${
                 isNight ? "text-[#899486]" : "text-[#899185]"
               }`}>
                 {section.label}
@@ -474,14 +478,14 @@ function CommandPalette() {
                     key={result.id}
                     role="option"
                     aria-selected={selected}
-                    className={`group flex min-h-[54px] w-full items-center gap-3 rounded-[13px] border px-3 text-left transition-[background-color,border-color,transform,box-shadow] duration-150 ease-out active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b9a85] ${
+                    className={`group flex min-h-[54px] w-full items-center gap-3 rounded-[7px] border px-3 text-left transition-[background-color,border-color,transform,box-shadow] duration-150 ease-out active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b9a85] ${
                       selected
                         ? isNight
-                          ? "border-[#53604f]/70 bg-[#394338]/90 shadow-[0_2px_8px_rgba(0,0,0,0.16)]"
-                          : "border-[#d8e0d4] bg-[#e9eee6] shadow-[0_2px_8px_rgba(37,48,34,0.06)]"
+                          ? "border-[#74836d] bg-[#30392e]/95 shadow-[inset_3px_0_0_#a6b89b,0_2px_8px_rgba(0,0,0,0.16)]"
+                          : "border-[#aebba7] bg-[#e8ede4] shadow-[inset_3px_0_0_#71866b,0_2px_8px_rgba(37,48,34,0.06)]"
                         : isNight
-                          ? "border-transparent hover:bg-white/[0.045]"
-                          : "border-transparent hover:bg-[#e9ede6]/75"
+                          ? "border-[#ffffff]/[0.035] hover:border-white/[0.13] hover:bg-white/[0.045]"
+                          : "border-[#c8cdc2]/55 hover:border-[#aebba7] hover:bg-[#e9ede6]/75"
                     }`}
                     onMouseEnter={() => setActiveIndex(index)}
                     onClick={() => selectResult(result)}
@@ -496,7 +500,7 @@ function CommandPalette() {
                       />
                     ) : (
                       <span
-                        className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[11px] border transition-colors duration-150 ${
+                        className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[7px] border transition-colors duration-150 ${
                           selected
                             ? isNight
                               ? "border-white/10 bg-white/[0.07] text-[#d9e2d3]"
@@ -562,7 +566,7 @@ function CommandPalette() {
             : "border-[#252c22]/[0.07] bg-white/35 text-[#858e81]"
         }`}>
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-            <kbd className={`inline-flex h-[20px] min-w-[20px] items-center justify-center rounded-md border px-1 shadow-sm ${
+            <kbd className={`inline-flex h-[20px] min-w-[20px] items-center justify-center rounded-[4px] border px-1 shadow-sm ${
               isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"
             }`}><FiArrowUp className="h-3 w-3" /></kbd>
             <kbd className={`inline-flex h-[20px] min-w-[20px] items-center justify-center rounded-md border px-1 shadow-sm ${
