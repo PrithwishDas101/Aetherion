@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   FiLogOut,
   FiMoon,
+  FiSearch,
   FiSun,
   FiUser,
   FiUserPlus,

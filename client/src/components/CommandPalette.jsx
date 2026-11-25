@@ -75,12 +75,30 @@ function CommandPalette() {
     }
   });
   const inputRef = useRef(null);
+  const dialogRef = useRef(null);
+  const previousFocusRef = useRef(null);
   const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
+
+  const openPalette = useCallback(() => {
+    previousFocusRef.current = document.activeElement;
+    setQuery("");
+    setActiveIndex(0);
+    setIsOpen(true);
+  }, []);
 
   const closePalette = useCallback(() => {
     setIsOpen(false);
     setQuery("");
     setActiveIndex(0);
+
+    window.requestAnimationFrame(() => {
+      const previousFocus = previousFocusRef.current;
+      if (previousFocus?.isConnected && previousFocus.getClientRects().length) {
+        previousFocus.focus();
+      } else {
+        document.querySelector('[aria-label="Open profile menu"]')?.focus();
+      }
+    });
   }, []);
 
   const applyTheme = useCallback((nextTheme) => {
@@ -163,16 +181,14 @@ function CommandPalette() {
         return;
       }
 
-      setQuery("");
-      setActiveIndex(0);
-      setIsOpen(true);
+      openPalette();
     };
 
     window.addEventListener("aetherion-open-command-palette", handleOpenPalette);
     return () => {
       window.removeEventListener("aetherion-open-command-palette", handleOpenPalette);
     };
-  }, [isDesktop, pathname, user?._id]);
+  }, [isDesktop, openPalette, pathname, user?._id]);
 
   useEffect(() => {
     const syncTheme = (event) => {
@@ -190,6 +206,17 @@ function CommandPalette() {
 
     const frame = window.requestAnimationFrame(() => inputRef.current?.focus());
     return () => window.cancelAnimationFrame(frame);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
   }, [isOpen]);
 
   const actions = useMemo(() => [
@@ -360,9 +387,7 @@ function CommandPalette() {
 
       if (isPaletteShortcut) {
         event.preventDefault();
-        setQuery("");
-        setActiveIndex(0);
-        setIsOpen(true);
+        openPalette();
         return;
       }
 
@@ -373,10 +398,30 @@ function CommandPalette() {
         closePalette();
       } else if (event.key === "ArrowDown" && flatResults.length) {
         event.preventDefault();
-        setActiveIndex((current) => Math.min(current + 1, flatResults.length - 1));
+        setActiveIndex((current) => (current + 1) % flatResults.length);
       } else if (event.key === "ArrowUp" && flatResults.length) {
         event.preventDefault();
-        setActiveIndex((current) => Math.max(current - 1, 0));
+        setActiveIndex((current) => (current - 1 + flatResults.length) % flatResults.length);
+      } else if (event.key === "Home" && flatResults.length) {
+        event.preventDefault();
+        setActiveIndex(0);
+      } else if (event.key === "End" && flatResults.length) {
+        event.preventDefault();
+        setActiveIndex(flatResults.length - 1);
+      } else if (event.key === "Tab") {
+        const focusable = dialogRef.current?.querySelectorAll(
+          'input:not([disabled]), button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        );
+        if (!focusable?.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       } else if (event.key === "Enter") {
         const selected = flatResults[activeIndex];
         if (selected) {
@@ -395,6 +440,7 @@ function CommandPalette() {
     isDesktop,
     isOpen,
     selectResult,
+    openPalette,
     user?._id,
     pathname,
   ]);
@@ -430,15 +476,17 @@ function CommandPalette() {
             ? "border-[#343733]/90 bg-[#202220]/96 text-[#e9e9e3] shadow-[0_20px_60px_rgba(0,0,0,0.32),0_3px_12px_rgba(0,0,0,0.12)]"
             : "border-[#c8cdc2]/90 bg-[#f7f8f3]/96 text-[#1d211c]"
         }`}
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Command palette"
+        aria-labelledby="aetherion-command-title"
+        aria-describedby="aetherion-command-description"
       >
         <div className={`flex min-h-[34px] items-center justify-between border-b px-5 font-sans text-[10px] font-semibold tracking-[0.08em] ${
           isNight ? "border-[#343733]/80" : "border-[#d2d6cc]/80"
         }`}>
-          <span className="inline-flex items-center gap-2"><span className={`h-1.5 w-1.5 rounded-full ${isNight ? "bg-[#a6b89b] shadow-[0_0_8px_rgba(166,184,155,0.65)]" : "bg-[#71866b]"}`} /> Aetherion <span className={isNight ? "text-white/25" : "text-black/25"}>/</span> Quick search</span>
-          <span className={isNight ? "text-[#778272]" : "text-[#92998d]"}>Search commands and people</span>
+          <span id="aetherion-command-title" className="inline-flex items-center gap-2"><span className={`h-1.5 w-1.5 rounded-full ${isNight ? "bg-[#a6b89b] shadow-[0_0_8px_rgba(166,184,155,0.65)]" : "bg-[#71866b]"}`} /> Aetherion <span className={isNight ? "text-white/25" : "text-black/25"}>/</span> Quick search</span>
+          <span id="aetherion-command-description" className={isNight ? "text-[#778272]" : "text-[#92998d]"}>Pages, people, conversations & actions</span>
         </div>
         <div className={`flex min-h-[66px] items-center gap-3 border-b px-5 ${isNight ? "border-[#343733]" : "border-[#d2d6cc]"}`}>
           <FiSearch
@@ -452,7 +500,7 @@ function CommandPalette() {
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search Aetherion"
+            placeholder="Search pages, people, conversations…"
             aria-label="Search commands and people"
             aria-activedescendant={
               flatResults.length
@@ -467,6 +515,24 @@ function CommandPalette() {
                 : "text-[#20241f] placeholder:text-[#92998e]"
             }`}
           />
+          {query.trim() && (
+            <button
+              type="button"
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b9a85] ${
+                isNight
+                  ? "text-[#a7b0a2] hover:bg-white/[0.08] hover:text-white"
+                  : "text-[#858d81] hover:bg-black/[0.06] hover:text-[#252b24]"
+              }`}
+              onClick={() => {
+                setQuery("");
+                inputRef.current?.focus();
+              }}
+              aria-label="Clear search"
+              title="Clear search"
+            >
+              <FiX className="h-[15px] w-[15px]" />
+            </button>
+          )}
           <button
             type="button"
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition duration-150 hover:rotate-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b9a85] ${
@@ -481,9 +547,21 @@ function CommandPalette() {
           </button>
         </div>
 
-        <div className="aetherion-command-palette-scrollbar min-h-[120px] overflow-y-auto overscroll-contain px-3 pb-3 pt-3">
+        <div
+          className="aetherion-command-palette-scrollbar min-h-[120px] overflow-y-auto overscroll-contain px-3 pb-3 pt-3"
+          role="listbox"
+          aria-label="Search results"
+        >
+          <span className="sr-only" aria-live="polite">
+            {flatResults.length} {flatResults.length === 1 ? "result" : "results"}
+          </span>
           {sections.length ? sections.map((section, sectionIndex) => (
-            <div className={`${sectionIndex > 0 ? `mt-2 border-t pt-2 ${isNight ? "border-[#343733]/70" : "border-[#d2d6cc]/70"}` : ""}`} key={section.label}>
+            <div
+              className={`${sectionIndex > 0 ? `mt-2 border-t pt-2 ${isNight ? "border-[#343733]/70" : "border-[#d2d6cc]/70"}` : ""}`}
+              key={section.label}
+              role="group"
+              aria-label={section.label}
+            >
               <p className={`px-3 pb-2 pt-1 font-sans text-[10px] font-semibold tracking-[0.06em] ${
                 isNight ? "text-[#a4a59d]" : "text-[#70786d]"
               }`}>
@@ -579,6 +657,20 @@ function CommandPalette() {
               }`}>
                 Try a different name or command.
               </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  inputRef.current?.focus();
+                }}
+                className={`mt-2 rounded-lg px-3 py-1.5 font-sans text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b9a85] ${
+                  isNight
+                    ? "text-[#c2cbbb] hover:bg-white/[0.07]"
+                    : "text-[#52654f] hover:bg-[#e9ede5]"
+                }`}
+              >
+                Clear search
+              </button>
             </div>
           )}
         </div>
@@ -596,6 +688,10 @@ function CommandPalette() {
               isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"
             }`}><FiArrowDown className="h-3 w-3" /></kbd>
             Navigate
+          </span>
+          <span className="hidden items-center gap-1 whitespace-nowrap xl:inline-flex">
+            <kbd className={`inline-flex h-[20px] items-center rounded-md border px-1.5 ${isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"}`}>Home</kbd>
+            <kbd className={`inline-flex h-[20px] items-center rounded-md border px-1.5 ${isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"}`}>End</kbd>
           </span>
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
             <kbd className={`inline-flex h-[20px] min-w-[20px] items-center justify-center rounded-md border px-1 shadow-sm ${
