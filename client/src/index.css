@@ -3303,3 +3303,44 @@ html:not([data-aetherion-theme="night"]) .aetherion-home .aetherion-chat-panel b
   color: #555e54 !important;
   background: transparent !important;
 }
+
+
+/* Command palette scrollbar — restrained sage/porcelain treatment in both themes. */
+.aetherion-command-palette-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #c2c9bb transparent;
+  scrollbar-gutter: stable;
+}
+
+.aetherion-command-palette-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.aetherion-command-palette-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.aetherion-command-palette-scrollbar::-webkit-scrollbar-thumb {
+  background: #c2c9bb;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+.aetherion-command-palette-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #929c8d;
+  background-clip: content-box;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-palette-scrollbar {
+  scrollbar-color: #596057 transparent;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-palette-scrollbar::-webkit-scrollbar-thumb {
+  background: #596057;
+}
+
+html[data-aetherion-theme="night"] .aetherion-command-palette-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #788273;
+  background-clip: content-box;
+}

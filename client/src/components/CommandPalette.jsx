@@ -152,6 +152,29 @@ function CommandPalette() {
   }, []);
 
   useEffect(() => {
+    const handleOpenPalette = () => {
+      if (
+        !isDesktop ||
+        !user?._id ||
+        !hasActiveSession() ||
+        pathname === "/login" ||
+        pathname === "/signup"
+      ) {
+        return;
+      }
+
+      setQuery("");
+      setActiveIndex(0);
+      setIsOpen(true);
+    };
+
+    window.addEventListener("aetherion-open-command-palette", handleOpenPalette);
+    return () => {
+      window.removeEventListener("aetherion-open-command-palette", handleOpenPalette);
+    };
+  }, [isDesktop, pathname, user?._id]);
+
+  useEffect(() => {
     const syncTheme = (event) => {
       if (event.detail === "warm" || event.detail === "night") {
         setTheme(event.detail);
@@ -458,7 +481,7 @@ function CommandPalette() {
           </button>
         </div>
 
-        <div className="min-h-[120px] overflow-y-auto overscroll-contain px-3 pb-3 pt-3">
+        <div className="aetherion-command-palette-scrollbar min-h-[120px] overflow-y-auto overscroll-contain px-3 pb-3 pt-3">
           {sections.length ? sections.map((section, sectionIndex) => (
             <div className={`${sectionIndex > 0 ? `mt-2 border-t pt-2 ${isNight ? "border-[#343733]/70" : "border-[#d2d6cc]/70"}` : ""}`} key={section.label}>
               <p className={`px-3 pb-2 pt-1 font-sans text-[10px] font-semibold tracking-[0.06em] ${

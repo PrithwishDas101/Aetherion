@@ -38,6 +38,8 @@ function Header() {
 
   const profileMenuRef = useRef(null);
 
+  const commandShortcut = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘ K" : "Ctrl K";
+
   useEffect(() => {
     const syncTheme = (event) => {
       if (event.detail === "warm" || event.detail === "night") {
@@ -203,6 +205,11 @@ function Header() {
     navigate("/contacts");
   };
 
+  const handleCommandPaletteClick = () => {
+    setShowProfileMenu(false);
+    window.dispatchEvent(new CustomEvent("aetherion-open-command-palette"));
+  };
+
   const handleLogout = async () => {
     setShowLogoutConfirm(false);
     setShowProfileMenu(false);
@@ -296,6 +303,26 @@ function Header() {
                   </p>
                 </div>
               </div>
+
+              {/* Desktop command palette shortcut */}
+              <button
+                type="button"
+                role="menuitem"
+                onClick={handleCommandPaletteClick}
+                className="aetherion-profile-menu-item aetherion-menu-search mt-2 hidden w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition active:scale-[0.98] lg:flex"
+                aria-label={`Open quick search with ${commandShortcut}`}
+              >
+                <FiSearch className="h-[18px] w-[18px] shrink-0" />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span>Quick search</span>
+                  <span className="mt-0.5 text-[11px] font-normal opacity-70">
+                    Pages, people & conversations
+                  </span>
+                </span>
+                <kbd className="rounded-md border border-current/15 bg-black/[0.035] px-1.5 py-1 text-[10px] font-semibold tracking-wide opacity-75">
+                  {commandShortcut}
+                </kbd>
+              </button>
 
               {/* Theme preference */}
               <button
