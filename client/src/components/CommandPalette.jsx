@@ -501,7 +501,11 @@ function CommandPalette() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search pages, people, conversations…"
-            aria-label="Search commands and people"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="aetherion-command-results"
+            aria-autocomplete="list"
+            aria-label="Search commands, people and conversations"
             aria-activedescendant={
               flatResults.length
                 ? `aetherion-command-result-${activeIndex}`
@@ -547,14 +551,15 @@ function CommandPalette() {
           </button>
         </div>
 
+        <span className="sr-only" aria-live="polite">
+          {flatResults.length} {flatResults.length === 1 ? "result" : "results"}
+        </span>
         <div
+          id="aetherion-command-results"
           className="aetherion-command-palette-scrollbar min-h-[120px] overflow-y-auto overscroll-contain px-3 pb-3 pt-3"
           role="listbox"
           aria-label="Search results"
         >
-          <span className="sr-only" aria-live="polite">
-            {flatResults.length} {flatResults.length === 1 ? "result" : "results"}
-          </span>
           {sections.length ? sections.map((section, sectionIndex) => (
             <div
               className={`${sectionIndex > 0 ? `mt-2 border-t pt-2 ${isNight ? "border-[#343733]/70" : "border-[#d2d6cc]/70"}` : ""}`}
