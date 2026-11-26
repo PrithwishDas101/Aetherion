@@ -2,9 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  FiArrowDown,
-  FiArrowUp,
-  FiCommand,
   FiCornerDownLeft,
   FiEdit3,
   FiHome,
@@ -464,91 +461,104 @@ function CommandPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-start justify-center bg-[#171b16]/20 px-6 pb-8 pt-[clamp(4.5rem,14vh,8rem)] backdrop-blur-md motion-safe:animate-palette-overlay-in motion-reduce:animate-none"
+      className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto bg-[#171b16]/25 px-4 pb-8 pt-[clamp(4rem,12vh,7rem)] backdrop-blur-[5px] motion-safe:animate-palette-overlay-in motion-reduce:animate-none sm:px-6"
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) closePalette();
       }}
     >
       <section
-        className={`flex max-h-[min(680px,74vh)] w-full max-w-[680px] flex-col overflow-hidden rounded-2xl border backdrop-blur-xl shadow-[0_20px_60px_rgba(29,33,28,0.14),0_3px_12px_rgba(29,33,28,0.05)] motion-safe:animate-palette-panel-in motion-reduce:animate-none ${
-          isNight
-            ? "border-[#343733]/90 bg-[#202220]/96 text-[#e9e9e3] shadow-[0_20px_60px_rgba(0,0,0,0.32),0_3px_12px_rgba(0,0,0,0.12)]"
-            : "border-[#c8cdc2]/90 bg-[#f7f8f3]/96 text-[#1d211c]"
-        }`}
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="aetherion-command-title"
         aria-describedby="aetherion-command-description"
+        className={`relative flex max-h-[min(680px,78vh)] w-full max-w-[640px] flex-col overflow-hidden rounded-[20px] border font-sans shadow-[0_28px_90px_rgba(24,30,23,0.22),0_4px_16px_rgba(24,30,23,0.08)] ring-1 ring-black/[0.025] motion-safe:animate-palette-panel-in motion-reduce:animate-none ${
+          isNight
+            ? "border-[#3a4038] bg-[#20231f] text-[#e9ece5] shadow-[0_28px_90px_rgba(0,0,0,0.48),0_4px_16px_rgba(0,0,0,0.2)] ring-white/[0.035]"
+            : "border-[#d5dbd0] bg-[#fbfcf8] text-[#242a22]"
+        }`}
       >
-        <div className={`flex min-h-[34px] items-center justify-between border-b px-5 font-sans text-[10px] font-semibold tracking-[0.08em] ${
-          isNight ? "border-[#343733]/80" : "border-[#d2d6cc]/80"
+        <header className={`flex items-center justify-between px-5 pb-3 pt-4 sm:px-6 ${
+          isNight ? "text-[#a9b2a3]" : "text-[#788273]"
         }`}>
-          <span id="aetherion-command-title" className="inline-flex items-center gap-2"><span className={`h-1.5 w-1.5 rounded-full ${isNight ? "bg-[#a6b89b] shadow-[0_0_8px_rgba(166,184,155,0.65)]" : "bg-[#71866b]"}`} /> Aetherion <span className={isNight ? "text-white/25" : "text-black/25"}>/</span> Quick search</span>
-          <span id="aetherion-command-description" className={isNight ? "text-[#778272]" : "text-[#92998d]"}>Pages, people, conversations & actions</span>
-        </div>
-        <div className={`flex min-h-[66px] items-center gap-3 border-b px-5 ${isNight ? "border-[#343733]" : "border-[#d2d6cc]"}`}>
-          <FiSearch
-            className={`h-[21px] w-[21px] shrink-0 ${
-              isNight ? "text-[#a4a99e]" : "text-[#70786d]"
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${
+              isNight ? "bg-[#30382e] text-[#c5d2bd]" : "bg-[#edf1e9] text-[#65745f]"
+            }`}>
+              <FiSearch className="h-3.5 w-3.5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <p id="aetherion-command-title" className={`text-[11px] font-semibold uppercase tracking-[0.12em] ${
+                isNight ? "text-[#d4dbce]" : "text-[#465142]"
+              }`}>Quick search</p>
+              <p id="aetherion-command-description" className="mt-0.5 truncate text-[10px]">
+                Find a page, person or conversation
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={closePalette}
+            aria-label="Close quick search"
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91a187] ${
+              isNight ? "text-[#9ba594] hover:bg-white/[0.07] hover:text-[#edf1e8]" : "text-[#858e80] hover:bg-[#edf0e9] hover:text-[#30382e]"
             }`}
-            aria-hidden="true"
-          />
+          >
+            <FiX className="h-4 w-4" />
+          </button>
+        </header>
+
+        <div className={`mx-4 flex min-h-[58px] items-center gap-3 rounded-xl border px-4 transition-colors sm:mx-5 ${
+          isNight
+            ? "border-[#41483e] bg-[#191c19] focus-within:border-[#74856d] focus-within:ring-2 focus-within:ring-[#74856d]/15"
+            : "border-[#dce2d7] bg-white focus-within:border-[#9aa991] focus-within:ring-2 focus-within:ring-[#9aa991]/20"
+        }`}>
+          <FiSearch className={`h-[18px] w-[18px] shrink-0 ${
+            isNight ? "text-[#a6b19d]" : "text-[#7b8874]"
+          }`} aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search pages, people, conversations…"
+            placeholder="Search anything..."
             role="combobox"
             aria-expanded="true"
             aria-controls="aetherion-command-results"
             aria-autocomplete="list"
             aria-label="Search commands, people and conversations"
-            aria-activedescendant={
-              flatResults.length
-                ? `aetherion-command-result-${activeIndex}`
-                : undefined
-            }
+            aria-activedescendant={flatResults.length ? `aetherion-command-result-${activeIndex}` : undefined}
             autoComplete="off"
             spellCheck="false"
-            className={`min-w-0 flex-1 bg-transparent font-sans text-[17px] font-medium tracking-[-0.025em] outline-none placeholder:font-normal ${
-              isNight
-                ? "text-[#e9e9e3] placeholder:text-[#858b80]"
-                : "text-[#20241f] placeholder:text-[#92998e]"
+            className={`min-w-0 flex-1 bg-transparent py-3 text-[14px] font-medium tracking-[-0.01em] outline-none placeholder:font-normal ${
+              isNight ? "text-[#edf0e8] placeholder:text-[#737d70]" : "text-[#293027] placeholder:text-[#9aa294]"
             }`}
           />
           {query.trim() && (
             <button
               type="button"
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b9a85] ${
-                isNight
-                  ? "text-[#a7b0a2] hover:bg-white/[0.08] hover:text-white"
-                  : "text-[#858d81] hover:bg-black/[0.06] hover:text-[#252b24]"
-              }`}
-              onClick={() => {
-                setQuery("");
-                inputRef.current?.focus();
-              }}
+              onClick={() => { setQuery(""); inputRef.current?.focus(); }}
               aria-label="Clear search"
-              title="Clear search"
+              className={`rounded-md px-2 py-1 text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#91a187] ${
+                isNight ? "text-[#a5ae9d] hover:bg-white/[0.07]" : "text-[#788273] hover:bg-[#edf1e9]"
+              }`}
             >
-              <FiX className="h-[15px] w-[15px]" />
+              Clear
             </button>
           )}
-          <button
-            type="button"
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition duration-150 hover:rotate-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b9a85] ${
-              isNight
-                ? "text-[#a7b0a2] hover:bg-white/[0.08] hover:text-white"
-                : "text-[#858d81] hover:bg-black/[0.06] hover:text-[#252b24]"
-            }`}
-            onClick={closePalette}
-            aria-label="Close command palette"
-          >
-            <FiX className="h-[17px] w-[17px]" />
-          </button>
+          <kbd className={`hidden rounded-md border px-2 py-1 text-[10px] font-medium sm:inline-flex ${
+            isNight ? "border-[#3b4239] bg-[#252a24] text-[#9ca695]" : "border-[#e1e6dd] bg-[#f7f9f4] text-[#879080]"
+          }`}>{isMac ? "⌘" : "Ctrl"} K</kbd>
+        </div>
+
+        <div className="flex items-center justify-between px-5 pb-2 pt-4 sm:px-6">
+          <span className={`text-[10px] font-semibold uppercase tracking-[0.11em] ${
+            isNight ? "text-[#8e9987]" : "text-[#879080]"
+          }`}>{normalizedQuery ? "Search results" : "Explore"}</span>
+          <span className={`text-[10px] tabular-nums ${
+            isNight ? "text-[#778172]" : "text-[#9aa293]"
+          }`}>{flatResults.length} {flatResults.length === 1 ? "result" : "results"}</span>
         </div>
 
         <span className="sr-only" aria-live="polite">
@@ -556,169 +566,113 @@ function CommandPalette() {
         </span>
         <div
           id="aetherion-command-results"
-          className="aetherion-command-palette-scrollbar min-h-[120px] overflow-y-auto overscroll-contain px-3 pb-3 pt-3"
           role="listbox"
           aria-label="Search results"
+          className="aetherion-command-palette-scrollbar min-h-[120px] overflow-y-auto overscroll-contain px-3 pb-3 pt-1 sm:px-4"
         >
-          {sections.length ? sections.map((section, sectionIndex) => (
-            <div
-              className={`${sectionIndex > 0 ? `mt-2 border-t pt-2 ${isNight ? "border-[#343733]/70" : "border-[#d2d6cc]/70"}` : ""}`}
-              key={section.label}
-              role="group"
-              aria-label={section.label}
-            >
-              <p className={`px-3 pb-2 pt-1 font-sans text-[10px] font-semibold tracking-[0.06em] ${
-                isNight ? "text-[#a4a59d]" : "text-[#70786d]"
-              }`}>
-                {section.label}
-              </p>
-              {section.items.map((result) => {
-                const index = resultIndex++;
-                const Icon = result.icon;
-                const selected = index === activeIndex;
-
-                return (
-                  <button
-                    type="button"
-                    id={`aetherion-command-result-${index}`}
-                    key={result.id}
-                    role="option"
-                    aria-selected={selected}
-                    className={`group flex min-h-[54px] w-full items-center gap-3 rounded-lg px-3 text-left transition-[background-color,transform] duration-150 ease-out active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b9a85] ${
-                      selected
-                        ? isNight
-                          ? "bg-[#2c332a] shadow-[inset_2px_0_0_#a6b89b]"
-                           : "bg-[#e9ede5] shadow-[inset_2px_0_0_#71866b]"
-                        : isNight
-                          ? "hover:bg-white/[0.045]"
-                          : "hover:bg-[#eeefe8]/80"
-                    }`}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onClick={() => selectResult(result)}
-                  >
-                    {result.person?.profilePic ? (
-                      <img
-                        src={result.person.profilePic}
-                        alt=""
-                        className={`h-[34px] w-[34px] shrink-0 rounded-full border object-cover ${
-                          isNight ? "border-white/15" : "border-[#dfe4da]"
-                        }`}
-                      />
-                    ) : (
-                      <span
-                        className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg transition-colors duration-150 ${
+          {sections.length ? sections.map((section) => (
+            <div className="pb-2" key={section.label} role="group" aria-label={section.label}>
+              <p className={`px-2 pb-1.5 pt-2 text-[10px] font-medium tracking-[0.015em] ${
+                isNight ? "text-[#788373]" : "text-[#929b8c]"
+              }`}>{section.label}</p>
+              <div className="space-y-0.5">
+                {section.items.map((result) => {
+                  const index = resultIndex++;
+                  const Icon = result.icon;
+                  const selected = index === activeIndex;
+                  return (
+                    <button
+                      type="button"
+                      id={`aetherion-command-result-${index}`}
+                      key={result.id}
+                      role="option"
+                      aria-selected={selected}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={() => selectResult(result)}
+                      className={`group flex min-h-[48px] w-full items-center gap-3 rounded-xl px-2.5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#91a187] ${
+                        selected
+                          ? isNight
+                            ? "bg-[#30392d] text-[#eef2e9] shadow-[inset_2px_0_0_#9aaa8e]"
+                            : "bg-[#edf2e9] text-[#283126] shadow-[inset_2px_0_0_#87977e]"
+                          : isNight
+                            ? "text-[#d7ddd1] hover:bg-white/[0.045]"
+                            : "text-[#394235] hover:bg-[#f0f3ed]"
+                      }`}
+                    >
+                      {result.person?.profilePic ? (
+                        <img
+                          src={result.person.profilePic}
+                          alt=""
+                          className={`h-8 w-8 shrink-0 rounded-full border object-cover ${
+                            isNight ? "border-white/10" : "border-[#dce3d7]"
+                          }`}
+                        />
+                      ) : (
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
                           selected
-                            ? isNight
-                              ? "bg-white/[0.07] text-[#d9e2d3]"
-                              : "bg-white/80 text-[#52654f]"
-                            : isNight
-                              ? "bg-white/[0.045] text-[#a4a59d]"
-                              : "bg-[#eeefe8] text-[#555e54]"
-                        }`}
-                      >
-                        <Icon className="h-[16px] w-[16px]" aria-hidden="true" />
+                            ? isNight ? "bg-[#3b4737] text-[#d4dfcb]" : "bg-white/80 text-[#607259]"
+                            : isNight ? "bg-[#292e28] text-[#9ba694]" : "bg-[#f0f3ed] text-[#788572]"
+                        }`}>
+                          <Icon className="h-[15px] w-[15px]" aria-hidden="true" />
+                        </span>
+                      )}
+                      <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                        <span className="min-w-0 truncate text-[12px] font-medium tracking-[-0.005em]">{result.label}</span>
+                        <span className={`max-w-[45%] shrink-0 truncate text-right text-[10px] ${
+                          isNight ? "text-[#8d9886]" : "text-[#929b8d]"
+                        }`}>{result.description}</span>
                       </span>
-                    )}
-                    <span className="flex min-w-0 flex-1 items-center justify-between gap-4">
-                      <span className={`truncate font-sans text-[13px] font-semibold tracking-[-0.01em] ${
-                        isNight ? "text-[#edf0e8]" : "text-[#2a3028]"
-                      }`}>
-                        {result.label}
-                      </span>
-                      <span className={`max-w-[48%] truncate text-right font-sans text-[11px] font-medium ${
-                        isNight ? "text-[#929d8e]" : "text-[#899185]"
-                      }`}>
-                        {result.description}
-                      </span>
-                    </span>
-                    {selected && (
-                      <FiCornerDownLeft
-                        className={`h-[14px] w-[14px] shrink-0 ${
-                          isNight ? "text-[#b7c4b0]" : "text-[#7b8976]"
-                        }`}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </button>
-                );
-              })}
+                      {selected && <FiCornerDownLeft className={`h-3.5 w-3.5 shrink-0 ${
+                        isNight ? "text-[#b9c8ae]" : "text-[#778b6e]"
+                      }`} aria-hidden="true" />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )) : (
-            <div className="flex min-h-[190px] flex-col items-center justify-center gap-2 text-center">
-              <span className={`flex h-11 w-11 items-center justify-center rounded-xl border ${
-                isNight
-                  ? "border-[#343733]/80 bg-[#242624] text-[#a4a59d]"
-                  : "border-[#d2d6cc]/80 bg-[#eeefe8] text-[#70786d]"
-              }`}>
-                <FiSearch className="h-[18px] w-[18px]" />
-              </span>
-              <span className={`pt-1 font-sans text-[13px] font-semibold ${
-                isNight ? "text-[#e2e7dc]" : "text-[#525c4e]"
-              }`}>
-                No results found
-              </span>
-              <span className={`font-sans text-[11px] ${
-                isNight ? "text-[#899486]" : "text-[#92998e]"
-              }`}>
-                Try a different name or command.
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setQuery("");
-                  inputRef.current?.focus();
-                }}
-                className={`mt-2 rounded-lg px-3 py-1.5 font-sans text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b9a85] ${
-                  isNight
-                    ? "text-[#c2cbbb] hover:bg-white/[0.07]"
-                    : "text-[#52654f] hover:bg-[#e9ede5]"
-                }`}
-              >
-                Clear search
-              </button>
+            <div className="flex min-h-[190px] flex-col items-center justify-center px-4 text-center">
+              <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                isNight ? "bg-[#2a3028] text-[#a4b099]" : "bg-[#edf2e9] text-[#788a70]"
+              }`}><FiSearch className="h-4 w-4" /></span>
+              <p className={`mt-3 text-[12px] font-semibold ${
+                isNight ? "text-[#e1e7dc]" : "text-[#485342]"
+              }`}>Nothing matches that search</p>
+              <p className={`mt-1 text-[10px] ${
+                isNight ? "text-[#84907d]" : "text-[#929b8c]"
+              }`}>Try another name or search term.</p>
             </div>
           )}
         </div>
 
-        <footer className={`flex min-h-[48px] items-center gap-4 border-t px-5 font-sans text-[10px] font-medium ${
-          isNight
-            ? "border-[#343733]/80 bg-[#1b1e1b]/55 text-[#a4a59d]"
-            : "border-[#d2d6cc]/80 bg-[#eeefe8]/65 text-[#70786d]"
+        <footer className={`flex min-h-[42px] flex-wrap items-center gap-x-4 gap-y-2 border-t px-5 py-2 text-[10px] sm:px-6 ${
+          isNight ? "border-[#343a32] bg-[#1c201c] text-[#929d8a]" : "border-[#e3e8df] bg-[#f7f9f4] text-[#879180]"
         }`}>
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-            <kbd className={`inline-flex h-[20px] min-w-[20px] items-center justify-center rounded-md border px-1 ${
-              isNight ? "border-[#343733] bg-[#242624] text-[#a4a59d]" : "border-[#c8cdc2] bg-[#f7f8f3] text-[#555e54]"
-            }`}><FiArrowUp className="h-3 w-3" /></kbd>
-            <kbd className={`inline-flex h-[20px] min-w-[20px] items-center justify-center rounded-md border px-1 ${
-              isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"
-            }`}><FiArrowDown className="h-3 w-3" /></kbd>
+          <span className="inline-flex items-center gap-1.5">
+            <kbd className={`rounded border px-1.5 py-0.5 ${
+              isNight ? "border-[#3a4238] bg-[#252a24] text-[#b2bca9]" : "border-[#e0e6dc] bg-white text-[#788572]"
+            }`}>↑</kbd>
+            <kbd className={`rounded border px-1.5 py-0.5 ${
+              isNight ? "border-[#3a4238] bg-[#252a24] text-[#b2bca9]" : "border-[#e0e6dc] bg-white text-[#788572]"
+            }`}>↓</kbd>
             Navigate
           </span>
-          <span className="hidden items-center gap-1 whitespace-nowrap xl:inline-flex">
-            <kbd className={`inline-flex h-[20px] items-center rounded-md border px-1.5 ${isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"}`}>Home</kbd>
-            <kbd className={`inline-flex h-[20px] items-center rounded-md border px-1.5 ${isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"}`}>End</kbd>
-          </span>
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-            <kbd className={`inline-flex h-[20px] min-w-[20px] items-center justify-center rounded-md border px-1 shadow-sm ${
-              isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"
-            }`}><FiCornerDownLeft className="h-3 w-3" /></kbd>
+          <span className="inline-flex items-center gap-1.5">
+            <kbd className={`rounded border px-1.5 py-0.5 ${
+              isNight ? "border-[#3a4238] bg-[#252a24] text-[#b2bca9]" : "border-[#e0e6dc] bg-white text-[#788572]"
+            }`}>↵</kbd>
             Select
           </span>
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-            <kbd className={`inline-flex h-[20px] items-center justify-center rounded-md border px-1.5 ${
-              isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"
+          <span className="inline-flex items-center gap-1.5">
+            <kbd className={`rounded border px-1.5 py-0.5 ${
+              isNight ? "border-[#3a4238] bg-[#252a24] text-[#b2bca9]" : "border-[#e0e6dc] bg-white text-[#788572]"
             }`}>Esc</kbd>
             Close
           </span>
-          <span className="ml-auto inline-flex items-center gap-1 whitespace-nowrap">
-            {isMac ? <FiCommand className="h-3 w-3" /> : (
-              <kbd className={`inline-flex h-[20px] items-center justify-center rounded-md border px-1.5 shadow-sm ${
-                isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"
-              }`}>Ctrl</kbd>
-            )}
-            <kbd className={`inline-flex h-[20px] items-center justify-center rounded-md border px-1.5 shadow-sm ${
-              isNight ? "border-white/10 bg-white/[0.05] text-[#c2cbbb]" : "border-[#dfe3d9] bg-white/70 text-[#687265]"
-            }`}>K</kbd>
+          <span className="ml-auto hidden items-center gap-1.5 sm:inline-flex">
+            Search across Aetherion
+            <span className={`h-1 w-1 rounded-full ${isNight ? "bg-[#84927b]" : "bg-[#a2b197]"}`} />
+            {isMac ? "⌘ K" : "Ctrl K"}
           </span>
         </footer>
       </section>
