@@ -75,7 +75,7 @@ const ReplyMessage = ({
     "Message";
 
   const secondaryTextClass = isMyMessage
-    ? "text-[var(--home-control-text)]/75"
+    ? "text-current/75"
     : "text-[var(--home-muted)]";
 
   return (
@@ -91,7 +91,7 @@ const ReplyMessage = ({
         {/* SENDER */}
         <p
           className={`mb-1 text-[11px] font-semibold tracking-tight ${isMyMessage
-              ? "text-[var(--home-control-text)]"
+              ? "text-current"
               : "text-[var(--home-text)]"
             }`}
         >
