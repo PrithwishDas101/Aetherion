@@ -41,6 +41,13 @@ const MessageBubble = ({
   const messageTime = formatMessageTime(message.createdAt);
   const canEdit = isMyMessage && message.type === "text" && !message.deletedForEveryone;
   const canReact = !message.deletedForEveryone;
+  const myReaction = message.reactions?.find(
+    (reaction) => String(reaction.userId?._id || reaction.userId) === String(currentUserId),
+  )?.emoji;
+  const reactionCounts = message.reactions?.reduce((groups, reaction) => {
+    groups[reaction.emoji] = (groups[reaction.emoji] || 0) + 1;
+    return groups;
+  }, {}) || {};
   const startLongPress = (event) => {
     if (event.pointerType !== "touch") return;
     clearTimeout(longPressTimer.current);
@@ -175,7 +182,7 @@ const MessageBubble = ({
           <button
             type="button"
             onClick={() => onReply(message)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#737373] opacity-0 transition hover:bg-[#171717]/10 hover:text-[#171717] group-hover:opacity-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--home-muted)] opacity-0 transition duration-150 hover:bg-[var(--home-hover)] hover:text-[var(--home-text)] group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#879b82]"
             aria-label="Reply to message"
           >
             <FiCornerUpRight className="text-lg" />
@@ -228,7 +235,10 @@ const MessageBubble = ({
           )}
 
           {message.deletedForEveryone && (
-            <p className="px-1 py-1 text-sm italic opacity-65">This message was deleted</p>
+            <p className="flex items-center gap-2 px-1 py-1.5 text-xs italic opacity-70">
+              <FiTrash2 className="shrink-0" />
+              This message was deleted
+            </p>
           )}
 
           {/* DOCUMENT MESSAGE */}
@@ -444,7 +454,15 @@ const MessageBubble = ({
             !isContact && (
               <div className="whitespace-pre-wrap break-words">
                 {isEditing ? (
-                  <div className="min-w-[220px] space-y-2">
+                  <div className="min-w-[220px] space-y-2.5 rounded-xl border border-current/10 bg-white/10 p-2.5 shadow-sm backdrop-blur-sm">
+                    <div className="flex items-center justify-between gap-3 px-0.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.13em] opacity-75">
+                        Editing message
+                      </span>
+                      <span className="text-[10px] tabular-nums opacity-55">
+                        {editText.length}/5000
+                      </span>
+                    </div>
                     <textarea
                       autoFocus
                       value={editText}
@@ -458,18 +476,40 @@ const MessageBubble = ({
                       }}
                       maxLength={5000}
                       rows={Math.min(5, Math.max(2, editText.split("\n").length))}
-                      className="w-full resize-y rounded-lg border border-[#c8cdc2] bg-white p-2 text-sm text-[#1d211c] outline-none focus:border-[#8b9786]"
+                      className="max-h-36 min-h-[68px] w-full resize-y rounded-lg border border-[var(--home-border)] bg-[var(--home-surface)] px-3 py-2.5 text-sm leading-relaxed text-[var(--home-text)] shadow-inner outline-none transition placeholder:text-[var(--home-muted)] focus:border-[#879b82] focus:ring-2 focus:ring-[#879b82]/15"
                       aria-label="Edit message"
                     />
-                    <div className="flex justify-end gap-2">
-                      <button type="button" onClick={() => setIsEditing(false)} className="rounded-lg px-3 py-1.5 text-xs text-current/75">Cancel</button>
-                      <button type="button" onClick={saveEdit} disabled={!editText.trim()} className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-[#1d211c] disabled:opacity-50">Save</button>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="hidden text-[10px] leading-tight opacity-60 sm:inline">
+                        Enter saves · Shift + Enter for a new line
+                      </span>
+                      <div className="ml-auto flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditing(false)}
+                          className="rounded-lg px-3 py-2 text-xs font-medium text-current/75 transition hover:bg-white/10"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={saveEdit}
+                          disabled={!editText.trim()}
+                          className="rounded-lg bg-[var(--home-surface)] px-3.5 py-2 text-xs font-semibold text-[var(--home-text)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-45"
+                        >
+                          Save
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ) : (
                   <>
                     {message.text}
-                    {message.editedAt && <span className="ml-1 text-[10px] italic opacity-60">Edited</span>}
+                    {message.editedAt && (
+                      <span className="ml-1.5 inline-flex rounded-full border border-current/15 px-1.5 py-0.5 align-middle text-[9px] font-medium not-italic opacity-65">
+                        edited
+                      </span>
+                    )}
                   </>
                 )}
               </div>
@@ -512,16 +552,28 @@ const MessageBubble = ({
         </div>
       </div>
 
-      {message.reactions?.length > 0 && !message.deletedForEveryone && (
-        <div className={`absolute bottom-0 flex flex-wrap gap-1 ${isMyMessage ? "right-12" : "left-12"} translate-y-1/2`}>
-          {Object.entries(message.reactions.reduce((groups, reaction) => {
-            groups[reaction.emoji] = (groups[reaction.emoji] || 0) + 1;
-            return groups;
-          }, {})).map(([emoji, count]) => (
-            <button key={emoji} type="button" onClick={() => onReact?.(message, emoji)}
-              className="rounded-full border border-[#c8cdc2] bg-white px-2 py-0.5 text-xs text-[#1d211c] shadow-sm"
-              aria-label={`${emoji} reaction, ${count} total`}>{emoji} {count}</button>
-          ))}
+      {Object.keys(reactionCounts).length > 0 && !message.deletedForEveryone && (
+        <div className={`absolute bottom-0 z-20 flex max-w-[min(82vw,24rem)] flex-wrap gap-1.5 ${isMyMessage ? "right-12" : "left-12"} translate-y-1/2`}>
+          {Object.entries(reactionCounts).map(([emoji, count]) => {
+            const isMine = myReaction === emoji;
+            return (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => onReact?.(message, emoji)}
+                aria-pressed={isMine}
+                aria-label={`${emoji} reaction, ${count} total${isMine ? ", selected by you" : ""}`}
+                className={`inline-flex min-h-7 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium shadow-[0_3px_12px_rgba(0,0,0,0.08)] transition duration-150 hover:-translate-y-0.5 hover:shadow-md active:scale-95 ${
+                  isMine
+                    ? "border-[#879b82] bg-[var(--home-selected)] text-[var(--home-text)]"
+                    : "border-[var(--home-border)] bg-[var(--home-surface)] text-[var(--home-text)] hover:bg-[var(--home-hover)]"
+                }`}
+              >
+                <span className="text-sm leading-none">{emoji}</span>
+                <span className="text-[10px] tabular-nums text-[var(--home-muted)]">{count}</span>
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -539,7 +591,7 @@ const MessageBubble = ({
           <button
             type="button"
             onClick={() => onReply(message)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#737373] opacity-0 transition hover:bg-[#171717]/10 hover:text-[#171717] group-hover:opacity-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--home-muted)] opacity-0 transition duration-150 hover:bg-[var(--home-hover)] hover:text-[var(--home-text)] group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#879b82]"
             aria-label="Reply to message"
           >
             <FiCornerUpLeft className="text-lg" />
