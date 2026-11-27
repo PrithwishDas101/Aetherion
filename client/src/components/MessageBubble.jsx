@@ -6,6 +6,7 @@ import {
   FiCornerUpRight,
   FiFileText,
   FiPlay,
+  FiTrash2,
 } from "react-icons/fi";
 
 import { formatMessageTime } from "../utils/messageDate.js";
