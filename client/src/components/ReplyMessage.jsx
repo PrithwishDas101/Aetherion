@@ -14,7 +14,7 @@ const ReplyMessage = ({
     replyTo.deletedFor?.some((id) => String(id) === String(currentUserId))
   ) {
     return (
-      <button type="button" onClick={onClick} className="mb-2 block w-full rounded-lg border-l-4 border-[#8b9786] bg-black/5 px-3 py-2 text-left text-xs italic opacity-70">
+      <button type="button" onClick={onClick} className="mb-2 block w-full rounded-xl border border-[var(--home-border)] border-l-[3px] border-l-[#879b82] bg-[var(--home-raised)] px-3 py-2.5 text-left text-xs italic text-[var(--home-muted)] opacity-80 shadow-sm transition hover:bg-[var(--home-hover)]">
         This message was deleted
       </button>
     );
@@ -75,24 +75,24 @@ const ReplyMessage = ({
     "Message";
 
   const secondaryTextClass = isMyMessage
-    ? "text-[#F5F5F5]"
-    : "text-[#737373]";
+    ? "text-[var(--home-control-text)]/75"
+    : "text-[var(--home-muted)]";
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`mb-2 block w-full overflow-hidden rounded-lg border-l-4 text-left transition active:scale-[0.99] ${isMyMessage
-          ? "border-[#E5E5E5] bg-[#171717]/35 hover:bg-[#171717]/45"
-          : "border-[#171717]/50 bg-[#FFFFFF] hover:bg-[#F5F5F5]"
+      className={`mb-2 block w-full overflow-hidden rounded-xl border border-[var(--home-border)] border-l-[3px] border-l-[#879b82] text-left shadow-sm transition duration-150 hover:-translate-y-px active:scale-[0.99] ${isMyMessage
+          ? "bg-white/10 hover:bg-white/[0.14]"
+          : "bg-[var(--home-raised)] hover:bg-[var(--home-hover)]"
         }`}
     >
       <div className="px-3 pb-1.5 pt-1.5">
         {/* SENDER */}
         <p
-          className={`mb-1 text-xs font-semibold ${isMyMessage
-              ? "text-[#FFFFFF]"
-              : "text-[#171717]"
+          className={`mb-1 text-[11px] font-semibold tracking-tight ${isMyMessage
+              ? "text-[var(--home-control-text)]"
+              : "text-[var(--home-text)]"
             }`}
         >
           {senderName}
