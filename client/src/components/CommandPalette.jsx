@@ -152,7 +152,7 @@ function CommandPalette() {
   const selectResult = useCallback((result) => {
     if (!result) return;
 
-    closePalette();
+    if (!result.keepOpen) closePalette();
     result.onSelect();
   }, [closePalette]);
 
@@ -278,6 +278,7 @@ function CommandPalette() {
       description: "Change the way Aetherion looks",
       keywords: ["theme", "appearance", "light", "dark", "mode"],
       icon: theme === "night" ? FiSun : FiMoon,
+      keepOpen: true,
       onSelect: () => applyTheme(theme === "night" ? "warm" : "night"),
     },
   ], [applyTheme, navigate, theme]);
