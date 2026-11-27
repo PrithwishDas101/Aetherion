@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+    useLocation,
     useNavigate,
     useParams,
 } from "react-router-dom";
@@ -94,6 +95,7 @@ const sortContacts = (contacts) => {
 
 function Contacts() {
     const navigate = useNavigate();
+    const location = useLocation();
     const dispatch = useDispatch();
 
     const { userId } = useParams();
@@ -119,6 +121,15 @@ function Contacts() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [showAddContacts, setShowAddContacts] = useState(false);
+
+    useEffect(() => {
+        if (!isOwnContacts || !location.state?.openAddContacts) {
+            return;
+        }
+
+        setShowAddContacts(true);
+        navigate(location.pathname, { replace: true });
+    }, [isOwnContacts, location.key, location.pathname, location.state, navigate]);
 
     useEffect(() => {
         let cancelled = false;
