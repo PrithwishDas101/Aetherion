@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { IoCheckmark, IoCheckmarkDone, IoTimeOutline } from "react-icons/io5";
 
 import {
@@ -16,6 +17,7 @@ import LocationMessage from "./Location/LocationMessage.jsx";
 import ContactMessage from "./Contacts/ContactMessage.jsx";
 
 import useSwipeToReply from "../Hooks/useSwipeToReply.js";
+import MessageActions from "./MessageActions.jsx";
 
 const MessageBubble = ({
   message,
@@ -28,8 +30,32 @@ const MessageBubble = ({
   isHighlighted,
   currentUserId,
   otherUserName,
+  onEdit,
+  onDelete,
+  onReact,
 }) => {
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(message.text || "");
+  const longPressTimer = useRef(null);
   const messageTime = formatMessageTime(message.createdAt);
+  const canEdit = isMyMessage && message.type === "text" && !message.deletedForEveryone;
+  const canReact = !message.deletedForEveryone;
+  const startLongPress = (event) => {
+    if (event.pointerType !== "touch") return;
+    clearTimeout(longPressTimer.current);
+    longPressTimer.current = setTimeout(() => setActionsOpen(true), 550);
+  };
+  const cancelLongPress = () => clearTimeout(longPressTimer.current);
+  useEffect(() => () => clearTimeout(longPressTimer.current), []);
+  const saveEdit = () => {
+    if (!editText.trim() || editText.trim() === (message.text || "")) {
+      setIsEditing(false);
+      return;
+    }
+    onEdit?.(message, editText.trim());
+    setIsEditing(false);
+  };
 
   // MESSAGE TYPES
   const isGif = message.type === "gif" && !!message.mediaUrl;
@@ -42,28 +68,7 @@ const MessageBubble = ({
 
   const isMedia = isGif || isImage || isVideo;
 
-  // DOCUMENT HELPERS
-  const getDocumentName = () => {
-    return message.document?.name || "Document";
-  };
-
-  const getDocumentExtension = () => {
-    const fileName = getDocumentName();
-
-    const parts = fileName.split(".");
-
-    if (parts.length < 2) {
-      return "FILE";
-    }
-
-    const extension = parts.pop();
-
-    if (!extension) {
-      return "FILE";
-    }
-
-    return extension.toUpperCase();
-  };
+  const getDocumentName = () => message.document?.name || "Document";
 
   const formatFileSize = (bytes) => {
     if (!bytes || Number.isNaN(bytes)) {
@@ -148,7 +153,15 @@ const MessageBubble = ({
 
   return (
     <div
-      className={`group relative flex w-full items-center gap-2 overflow-hidden rounded-xl transition-all duration-300 ${isMyMessage
+      onPointerDown={startLongPress}
+      onPointerUp={cancelLongPress}
+      onPointerCancel={cancelLongPress}
+      onPointerMove={cancelLongPress}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        setActionsOpen(true);
+      }}
+      className={`group relative flex w-full items-center gap-2 rounded-xl transition-all duration-300 ${isMyMessage
         ? "justify-end"
         : "justify-start"
         } ${isHighlighted
@@ -214,8 +227,12 @@ const MessageBubble = ({
             />
           )}
 
+          {message.deletedForEveryone && (
+            <p className="px-1 py-1 text-sm italic opacity-65">This message was deleted</p>
+          )}
+
           {/* DOCUMENT MESSAGE */}
-          {isDocument ? (
+          {!message.deletedForEveryone && isDocument ? (
             <div
               role="button"
               tabIndex={
@@ -263,7 +280,7 @@ const MessageBubble = ({
           ) : null}
 
           {/* POLL MESSAGE */}
-          {isPoll ? (
+          {!message.deletedForEveryone && isPoll ? (
             <PollMessage
               poll={message.poll}
               isMyMessage={isMyMessage}
@@ -273,7 +290,7 @@ const MessageBubble = ({
           ) : null}
 
           {/* LOCATION MESSAGE */}
-          {isLocation ? (
+          {!message.deletedForEveryone && isLocation ? (
             <LocationMessage
               message={message}
               isOwn={isMyMessage}
@@ -281,7 +298,7 @@ const MessageBubble = ({
           ) : null}
 
           {/* CONTACT MESSAGE */}
-          {isContact ? (
+          {!message.deletedForEveryone && isContact ? (
             <ContactMessage
               contact={message.contact}
               onChat={onChat}
@@ -289,7 +306,7 @@ const MessageBubble = ({
           ) : null}
 
           {/* IMAGE / GIF / VIDEO MESSAGE */}
-          {isMedia ? (
+          {!message.deletedForEveryone && isMedia ? (
             <div
               className={`overflow-hidden rounded-xl ${isImage &&
                 message.text?.trim()
@@ -420,13 +437,41 @@ const MessageBubble = ({
           ) : null}
 
           {/* TEXT MESSAGE */}
-          {!isMedia &&
+          {!message.deletedForEveryone && !isMedia &&
             !isDocument &&
             !isPoll &&
             !isLocation &&
             !isContact && (
               <div className="whitespace-pre-wrap break-words">
-                {message.text}
+                {isEditing ? (
+                  <div className="min-w-[220px] space-y-2">
+                    <textarea
+                      autoFocus
+                      value={editText}
+                      onChange={(event) => setEditText(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" && !event.shiftKey) {
+                          event.preventDefault();
+                          saveEdit();
+                        }
+                        if (event.key === "Escape") setIsEditing(false);
+                      }}
+                      maxLength={5000}
+                      rows={Math.min(5, Math.max(2, editText.split("\n").length))}
+                      className="w-full resize-y rounded-lg border border-[#c8cdc2] bg-white p-2 text-sm text-[#1d211c] outline-none focus:border-[#8b9786]"
+                      aria-label="Edit message"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button type="button" onClick={() => setIsEditing(false)} className="rounded-lg px-3 py-1.5 text-xs text-current/75">Cancel</button>
+                      <button type="button" onClick={saveEdit} disabled={!editText.trim()} className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-[#1d211c] disabled:opacity-50">Save</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {message.text}
+                    {message.editedAt && <span className="ml-1 text-[10px] italic opacity-60">Edited</span>}
+                  </>
+                )}
               </div>
             )}
 
@@ -465,6 +510,27 @@ const MessageBubble = ({
               ))}
           </div>
         </div>
+      </div>
+
+      {message.reactions?.length > 0 && !message.deletedForEveryone && (
+        <div className={`absolute bottom-0 flex flex-wrap gap-1 ${isMyMessage ? "right-12" : "left-12"} translate-y-1/2`}>
+          {Object.entries(message.reactions.reduce((groups, reaction) => {
+            groups[reaction.emoji] = (groups[reaction.emoji] || 0) + 1;
+            return groups;
+          }, {})).map(([emoji, count]) => (
+            <button key={emoji} type="button" onClick={() => onReact?.(message, emoji)}
+              className="rounded-full border border-[#c8cdc2] bg-white px-2 py-0.5 text-xs text-[#1d211c] shadow-sm"
+              aria-label={`${emoji} reaction, ${count} total`}>{emoji} {count}</button>
+          ))}
+        </div>
+      )}
+
+      <div className="absolute right-0 top-0 z-30">
+        <MessageActions message={message} isMyMessage={isMyMessage} canEdit={canEdit} canReact={canReact}
+          onReply={() => onReply(message)} onEdit={() => setIsEditing(true)}
+          onDelete={(scope) => onDelete?.(message, scope)}
+          onReact={(emoji) => onReact?.(message, emoji)}
+          open={actionsOpen} onOpenChange={setActionsOpen} />
       </div>
 
       {/* REPLY BUTTON — SENT MESSAGE */}

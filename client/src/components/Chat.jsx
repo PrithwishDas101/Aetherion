@@ -10,6 +10,9 @@ import {
   createMessage,
   createMediaMessage,
   getAllMessages,
+  editMessage as updateMessage,
+  deleteMessage as removeMessage,
+  reactToMessage as toggleMessageReaction,
 } from "../apiCalls/messageApi.js";
 import {
   createPoll,
@@ -51,6 +54,7 @@ import PresenceIcon from "./PresenceIcon.jsx";
 
 import {
   sendMessage as emitSendMessage,
+  sendMessageChanged,
   sendTyping,
   sendStopTyping,
   sendPollUpdate
@@ -1113,6 +1117,54 @@ const Chat = ({ socket }) => {
     }
   };
 
+
+  // MESSAGE INTERACTIONS
+  const handleEditMessage = async (selectedMessage, nextText) => {
+    const response = await updateMessage(selectedMessage._id, nextText);
+    if (!response?.success || !response.data) {
+      toast.error(response?.message || "Could not edit this message.");
+      return;
+    }
+    setAllMessages((previous) => previous.map((item) =>
+      String(item._id) === String(selectedMessage._id) ? response.data : item
+    ));
+    updateLastMessagePreview(response.data);
+    sendMessageChanged(socket, { messageId: selectedMessage._id, chatId: selectedChat?._id, action: "edit" });
+  };
+
+  const handleDeleteMessage = async (selectedMessage, scope) => {
+    const response = await removeMessage(selectedMessage._id, scope);
+    if (!response?.success) {
+      toast.error(response?.message || "Could not delete this message.");
+      return;
+    }
+    if (scope === "me") {
+      updateLastMessagePreview(response.data);
+      setAllMessages((previous) => previous.filter((item) => String(item._id) !== String(selectedMessage._id)));
+      toast.success("Message deleted for you.");
+      return;
+    }
+    setAllMessages((previous) => previous.map((item) =>
+      String(item._id) === String(selectedMessage._id) ? response.data : item
+    ));
+    updateLastMessagePreview(response.data);
+    sendMessageChanged(socket, { messageId: selectedMessage._id, chatId: selectedChat?._id, action: "delete-everyone" });
+    toast.success("Message deleted for everyone.");
+  };
+
+  const handleReactToMessage = async (selectedMessage, emoji) => {
+    const response = await toggleMessageReaction(selectedMessage._id, emoji);
+    if (!response?.success || !response.data) {
+      toast.error(response?.message || "Could not update reaction.");
+      return;
+    }
+    setAllMessages((previous) => previous.map((item) =>
+      String(item._id) === String(selectedMessage._id) ? response.data : item
+    ));
+    updateLastMessagePreview(response.data);
+    sendMessageChanged(socket, { messageId: selectedMessage._id, chatId: selectedChat?._id, action: "reaction" });
+  };
+
   // REPLY
   const startReply = (selectedMessage) => {
     setReplyingTo(selectedMessage);
@@ -1220,16 +1272,17 @@ const Chat = ({ socket }) => {
     dispatch(setAllChats(updatedChats));
   };
 
-  const updateChatWithoutReordering = (updatedChat) => {
-    if (!updatedChat) {
+  const updateLastMessagePreview = (updatedMessage, chatId = selectedChat?._id) => {
+    const targetChat = (allChats || []).find(
+      (chat) => String(chat._id) === String(chatId),
+    );
+    if (String(targetChat?.lastMessage?._id || targetChat?.lastMessage) !== String(updatedMessage?._id)) {
       return;
     }
 
+    const updatedChat = { ...targetChat, lastMessage: updatedMessage };
     updateChatListOnly(updatedChat);
-
-    // This helper is only for updates that are intentionally tied to the
-    // currently selected chat. Background work must use updateChatListOnly.
-    if (String(selectedChat?._id) === String(updatedChat._id)) {
+    if (String(selectedChat?._id) === String(chatId)) {
       dispatch(setSelectedChat(updatedChat));
     }
   };
@@ -2003,7 +2056,7 @@ const Chat = ({ socket }) => {
     isClearingUnreadRef.current = false;
 
     dividerVisibleRef.current = false;
-    setDividerVisible(false);
+    // firstNewMessageId is reset below, so a stale divider cannot render.
 
     initialUnreadCountRef.current = unreadMessageCount;
 
@@ -2295,6 +2348,19 @@ const Chat = ({ socket }) => {
     return registerSocketListeners(socket, {
       onReceiveMessage: handleReceiveMessage,
     });
+  }, [socket, selectedChat?._id]);
+
+  // SOCKET: MESSAGE EDIT / DELETE / REACTION
+  useEffect(() => {
+    const handleMessageChanged = (data) => {
+      if (!data?.message?._id || !data.chatId) return;
+      if (String(data.chatId) === String(selectedChat?._id)) {
+        setAllMessages((previous) => previous.map((item) =>
+          String(item._id) === String(data.message._id) ? data.message : item
+        ));
+      }
+    };
+    return registerSocketListeners(socket, { onMessageChanged: handleMessageChanged });
   }, [socket, selectedChat?._id]);
 
   // SOCKET: MESSAGES READ
@@ -2597,6 +2663,9 @@ const Chat = ({ socket }) => {
                   isMyMessage={isMyMessage}
                   onReply={startReply}
                   onReplyClick={scrollToMessage}
+                  onEdit={handleEditMessage}
+                  onDelete={handleDeleteMessage}
+                  onReact={handleReactToMessage}
                   onMediaClick={openMediaViewer}
                   onPollVote={handlePollVote}
                   onChat={handleContactChat}

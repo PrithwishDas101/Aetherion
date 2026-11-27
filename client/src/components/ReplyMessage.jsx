@@ -8,8 +8,16 @@ const ReplyMessage = ({
   otherUserName,
   onClick,
 }) => {
-  if (!replyTo) {
-    return null;
+  if (!replyTo) return null;
+  if (
+    replyTo.deletedForEveryone ||
+    replyTo.deletedFor?.some((id) => String(id) === String(currentUserId))
+  ) {
+    return (
+      <button type="button" onClick={onClick} className="mb-2 block w-full rounded-lg border-l-4 border-[#8b9786] bg-black/5 px-3 py-2 text-left text-xs italic opacity-70">
+        This message was deleted
+      </button>
+    );
   }
 
   const replySenderId =

@@ -1,6 +1,7 @@
 const EVENT_LIMITS = Object.freeze({
   "send-message": { max: 30, windowMs: 10 * 1000 },
   "poll-updated": { max: 20, windowMs: 10 * 1000 },
+  "message-changed": { max: 40, windowMs: 10 * 1000 },
   typing: { max: 20, windowMs: 10 * 1000 },
   "stop-typing": { max: 20, windowMs: 10 * 1000 },
   "messages-read": { max: 30, windowMs: 10 * 1000 },

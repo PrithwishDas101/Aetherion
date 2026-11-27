@@ -50,7 +50,7 @@ const registerSocketHandlers = (io, eventLimiter = socketEventLimiter) => {
         })
           .populate({
             path: "replyTo",
-            select: "text sender type mediaUrl document poll location contact",
+            select: "text sender type mediaUrl document poll location contact deletedForEveryone editedAt deletedFor",
           })
           .populate("poll");
 
@@ -81,6 +81,31 @@ const registerSocketHandlers = (io, eventLimiter = socketEventLimiter) => {
         });
       } catch (error) {
         logSafeError("Socket send-message", error, { userId, event: "send-message" });
+      }
+    });
+
+    socket.on("message-changed", async ({ messageId, chatId, action } = {}) => {
+      try {
+        if (!mongoose.Types.ObjectId.isValid(messageId) || !mongoose.Types.ObjectId.isValid(chatId) ||
+          !["edit", "delete-everyone", "reaction"].includes(action) ||
+          !eventLimiter.allow(userId, "message-changed")) return;
+        const authorizedChat = await getChatForUser(chatId, userId);
+        if (!authorizedChat) return;
+        const message = await Message.findOne({ _id: messageId, chatId: authorizedChat._id })
+          .populate({
+            path: "replyTo",
+            select: "text sender type mediaUrl document poll location contact deletedForEveryone editedAt deletedFor",
+          })
+          .populate("poll");
+        if (!message || (message.deletedForEveryone && action !== "delete-everyone")) return;
+        if (action !== "reaction" && String(message.sender) !== userId) return;
+        authorizedChat.members.forEach((memberId) => {
+          if (String(memberId) !== userId) {
+            socket.to(String(memberId)).emit("message-changed", { chatId: String(authorizedChat._id), message });
+          }
+        });
+      } catch (error) {
+        logSafeError("Socket message-changed", error, { userId, event: "message-changed" });
       }
     });
 
