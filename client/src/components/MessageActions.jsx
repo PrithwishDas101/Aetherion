@@ -4,7 +4,7 @@ import {
   FiCopy,
   FiCornerUpLeft,
   FiEdit2,
-  FiMoreHorizontal,
+  FiMoreVertical,
   FiTrash2,
   FiX,
 } from "react-icons/fi";
@@ -79,9 +79,9 @@ const MessageActions = ({
         aria-label="Message actions"
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--home-border)] bg-[var(--home-surface)]/95 text-[var(--home-muted)] shadow-[0_2px_10px_rgba(0,0,0,0.08)] backdrop-blur-md transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--home-hover)] hover:text-[var(--home-text)] hover:shadow-[0_5px_16px_rgba(0,0,0,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#879b82] md:h-8 md:w-8 md:opacity-0 md:shadow-sm md:group-hover:opacity-100 md:focus-visible:opacity-100"
+        className={`flex h-7 w-7 items-center justify-center rounded-full transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#879b82] ${isMyMessage ? "bg-white/10 text-white/75 hover:bg-white/20 hover:text-white" : "bg-black/[0.045] text-black/55 hover:bg-black/10 hover:text-black/80"} md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100`}
       >
-        <FiMoreHorizontal className="text-lg" />
+        <FiMoreVertical className="text-base" />
       </button>
 
       {open && (
