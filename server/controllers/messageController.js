@@ -556,10 +556,18 @@ export const reactToMessage = async (req, res) => {
     if (!message || message.deletedForEveryone) return res.status(404).json({ success: false, message: "Message not found." });
     const chat = await Chat.findOne({ _id: message.chatId, members: req.user.userId });
     if (!chat) return res.status(404).json({ success: false, message: "Message not found." });
-    const index = message.reactions.findIndex((reaction) => String(reaction.userId) === String(req.user.userId));
+    // Older message documents may not have a reactions array yet.
+    if (!Array.isArray(message.reactions)) message.reactions = [];
+    const reactingUserId = String(req.user.userId);
+    const index = message.reactions.findIndex((reaction) =>
+      String(reaction.userId?._id || reaction.userId) === reactingUserId
+    );
     if (index >= 0) {
-      if (message.reactions[index].emoji === emoji) message.reactions.splice(index, 1);
-      else message.reactions[index].emoji = emoji;
+      if (message.reactions[index].emoji === emoji) {
+        message.reactions.splice(index, 1);
+      } else {
+        message.reactions[index].emoji = emoji;
+      }
     } else {
       message.reactions.push({ userId: req.user.userId, emoji });
     }
