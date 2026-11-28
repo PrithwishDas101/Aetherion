@@ -67,6 +67,11 @@ export const reactToMessage = async (messageId, emoji) => {
     const response = await axiosInstance.post(`/api/v1/message/${messageId}/reaction`, { emoji });
     return response.data;
   } catch (error) {
-    return getApiErrorResponse(error, "Could not update reaction. Please try again.");
+    return getApiErrorResponse(
+      error,
+      error.response
+        ? `Reaction request failed (HTTP ${error.response.status}).`
+        : "Could not reach the Aetherion API. Check the server URL and connection.",
+    );
   }
 };
