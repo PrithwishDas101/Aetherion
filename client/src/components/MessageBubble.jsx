@@ -193,7 +193,7 @@ const MessageBubble = ({
 
       {/* SWIPEABLE MESSAGE */}
       <div
-        className={`order-1 touch-pan-y ${isDocument
+        className={`relative order-1 touch-pan-y ${isDocument
           ? "max-w-[62%]"
           : isPoll || isLocation || isContact
             ? "max-w-[90%]"
@@ -551,6 +551,23 @@ const MessageBubble = ({
               ))}
           </div>
         </div>
+
+        {!message.deletedForEveryone && (
+          <div className="absolute right-1 top-1 z-30">
+            <MessageActions
+              message={message}
+              isMyMessage={isMyMessage}
+              canEdit={canEdit}
+              canReact={canReact}
+              onReply={() => onReply(message)}
+              onEdit={() => setIsEditing(true)}
+              onDelete={(scope) => onDelete?.(message, scope)}
+              onReact={(emoji) => onReact?.(message, emoji)}
+              open={actionsOpen}
+              onOpenChange={setActionsOpen}
+            />
+          </div>
+        )}
       </div>
 
       {Object.keys(reactionCounts).length > 0 && !message.deletedForEveryone && (
@@ -577,14 +594,6 @@ const MessageBubble = ({
           })}
         </div>
       )}
-
-      <div className="absolute right-0 top-0 z-30">
-        <MessageActions message={message} isMyMessage={isMyMessage} canEdit={canEdit} canReact={canReact}
-          onReply={() => onReply(message)} onEdit={() => setIsEditing(true)}
-          onDelete={(scope) => onDelete?.(message, scope)}
-          onReact={(emoji) => onReact?.(message, emoji)}
-          open={actionsOpen} onOpenChange={setActionsOpen} />
-      </div>
 
       {/* REPLY BUTTON — SENT MESSAGE */}
       {isMyMessage && (
