@@ -382,7 +382,7 @@ export const sendMessage = async (req, res) => {
 
     await savedMessage.populate({
       path: "replyTo",
-      select: "text sender type mediaUrl document poll location contact",
+      select: "text sender type mediaUrl document poll location contact deletedForEveryone editedAt deletedFor",
     });
 
     await updatedChat.populate("members");
@@ -432,10 +432,11 @@ export const getAllMessages = async (req, res) => {
 
     const messages = await Message.find({
       chatId,
+      deletedFor: { $ne: req.user.userId },
     })
       .populate({
         path: "replyTo",
-        select: "text sender type mediaUrl document poll location contact",
+        select: "text sender type mediaUrl document poll location contact deletedForEveryone editedAt deletedFor",
       })
       .populate({
         path: "poll",
@@ -462,5 +463,122 @@ export const getAllMessages = async (req, res) => {
       success: false,
       message: "Internal server error.",
     });
+  }
+};
+
+
+// EDIT A MESSAGE
+export const editMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const { text } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).json({ success: false, message: "Invalid message ID." });
+    if (typeof text !== "string" || !text.trim() || text.trim().length > 5000) {
+      return res.status(400).json({ success: false, message: "Message text must be between 1 and 5000 characters." });
+    }
+    const message = await Message.findOne({
+      _id: messageId, sender: req.user.userId, deletedForEveryone: { $ne: true },
+      deletedFor: { $ne: req.user.userId }, type: "text",
+    });
+    if (!message) return res.status(404).json({ success: false, message: "Message not found or cannot be edited." });
+    const chat = await Chat.findOne({ _id: message.chatId, members: req.user.userId });
+    if (!chat) return res.status(404).json({ success: false, message: "Message not found." });
+    message.text = text.trim();
+    message.editedAt = new Date();
+    await message.save();
+    await message.populate({
+      path: "replyTo",
+      select: "text sender type mediaUrl document poll location contact deletedForEveryone editedAt deletedFor",
+    });
+    return res.status(200).json({ success: true, message: "Message updated.", data: message });
+  } catch (error) {
+    logSafeError("Edit message", error, { messageId: req.params?.messageId });
+    return res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
+// DELETE A MESSAGE FOR ONE USER OR EVERYONE
+export const deleteMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const { scope } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).json({ success: false, message: "Invalid message ID." });
+    if (!["me", "everyone"].includes(scope)) return res.status(400).json({ success: false, message: "Invalid deletion scope." });
+    const message = await Message.findById(messageId);
+    if (!message) return res.status(404).json({ success: false, message: "Message not found." });
+    const chat = await Chat.findOne({ _id: message.chatId, members: req.user.userId });
+    if (!chat) return res.status(404).json({ success: false, message: "Message not found." });
+    if (message.deletedForEveryone && scope === "everyone") {
+      return res.status(200).json({ success: true, data: message });
+    }
+
+    if (scope === "everyone") {
+      if (String(message.sender) !== String(req.user.userId)) {
+        return res.status(403).json({ success: false, message: "You can only delete your own messages for everyone." });
+      }
+      message.deletedForEveryone = true;
+      message.deletedAt = new Date();
+      message.text = "";
+      message.mediaUrl = null;
+      message.document = undefined;
+      message.location = undefined;
+      message.contact = undefined;
+      message.poll = null;
+      message.reactions = [];
+    } else if (!message.deletedFor.some((id) => String(id) === String(req.user.userId))) {
+      message.deletedFor.push(req.user.userId);
+    }
+    await message.save();
+    await message.populate({
+      path: "replyTo",
+      select: "text sender type mediaUrl document poll location contact deletedForEveryone editedAt deletedFor",
+    });
+    return res.status(200).json({
+      success: true,
+      message: scope === "everyone" ? "Message deleted for everyone." : "Message deleted for you.",
+      data: message,
+    });
+  } catch (error) {
+    logSafeError("Delete message", error, { messageId: req.params?.messageId });
+    return res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
+// ADD, CHANGE OR REMOVE A REACTION (ONE REACTION PER USER PER MESSAGE)
+export const reactToMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const { emoji } = req.body;
+    const allowedEmojis = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "🎉"];
+    if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).json({ success: false, message: "Invalid message ID." });
+    if (typeof emoji !== "string" || !allowedEmojis.includes(emoji)) return res.status(400).json({ success: false, message: "Unsupported reaction." });
+    const message = await Message.findById(messageId);
+    if (!message || message.deletedForEveryone) return res.status(404).json({ success: false, message: "Message not found." });
+    const chat = await Chat.findOne({ _id: message.chatId, members: req.user.userId });
+    if (!chat) return res.status(404).json({ success: false, message: "Message not found." });
+    // Older message documents may not have a reactions array yet.
+    if (!Array.isArray(message.reactions)) message.reactions = [];
+    const reactingUserId = String(req.user.userId);
+    const index = message.reactions.findIndex((reaction) =>
+      String(reaction.userId?._id || reaction.userId) === reactingUserId
+    );
+    if (index >= 0) {
+      if (message.reactions[index].emoji === emoji) {
+        message.reactions.splice(index, 1);
+      } else {
+        message.reactions[index].emoji = emoji;
+      }
+    } else {
+      message.reactions.push({ userId: req.user.userId, emoji });
+    }
+    await message.save();
+    await message.populate({
+      path: "replyTo",
+      select: "text sender type mediaUrl document poll location contact deletedForEveryone editedAt deletedFor",
+    });
+    return res.status(200).json({ success: true, message: "Reaction updated.", data: message });
+  } catch (error) {
+    logSafeError("React to message", error, { messageId: req.params?.messageId });
+    return res.status(500).json({ success: false, message: "Internal server error." });
   }
 };

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { IoCheckmark, IoCheckmarkDone, IoTimeOutline } from "react-icons/io5";
 
 import {
@@ -5,6 +6,7 @@ import {
   FiCornerUpRight,
   FiFileText,
   FiPlay,
+  FiTrash2,
 } from "react-icons/fi";
 
 import { formatMessageTime } from "../utils/messageDate.js";
@@ -16,6 +18,7 @@ import LocationMessage from "./Location/LocationMessage.jsx";
 import ContactMessage from "./Contacts/ContactMessage.jsx";
 
 import useSwipeToReply from "../Hooks/useSwipeToReply.js";
+import MessageActions from "./MessageActions.jsx";
 
 const MessageBubble = ({
   message,
@@ -28,8 +31,39 @@ const MessageBubble = ({
   isHighlighted,
   currentUserId,
   otherUserName,
+  onEdit,
+  onDelete,
+  onReact,
 }) => {
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(message.text || "");
+  const longPressTimer = useRef(null);
   const messageTime = formatMessageTime(message.createdAt);
+  const canEdit = isMyMessage && message.type === "text" && !message.deletedForEveryone;
+  const canReact = !message.deletedForEveryone;
+  const myReaction = message.reactions?.find(
+    (reaction) => String(reaction.userId?._id || reaction.userId) === String(currentUserId),
+  )?.emoji;
+  const reactionCounts = message.reactions?.reduce((groups, reaction) => {
+    groups[reaction.emoji] = (groups[reaction.emoji] || 0) + 1;
+    return groups;
+  }, {}) || {};
+  const startLongPress = (event) => {
+    if (event.pointerType !== "touch") return;
+    clearTimeout(longPressTimer.current);
+    longPressTimer.current = setTimeout(() => setActionsOpen(true), 550);
+  };
+  const cancelLongPress = () => clearTimeout(longPressTimer.current);
+  useEffect(() => () => clearTimeout(longPressTimer.current), []);
+  const saveEdit = () => {
+    if (!editText.trim() || editText.trim() === (message.text || "")) {
+      setIsEditing(false);
+      return;
+    }
+    onEdit?.(message, editText.trim());
+    setIsEditing(false);
+  };
 
   // MESSAGE TYPES
   const isGif = message.type === "gif" && !!message.mediaUrl;
@@ -42,28 +76,7 @@ const MessageBubble = ({
 
   const isMedia = isGif || isImage || isVideo;
 
-  // DOCUMENT HELPERS
-  const getDocumentName = () => {
-    return message.document?.name || "Document";
-  };
-
-  const getDocumentExtension = () => {
-    const fileName = getDocumentName();
-
-    const parts = fileName.split(".");
-
-    if (parts.length < 2) {
-      return "FILE";
-    }
-
-    const extension = parts.pop();
-
-    if (!extension) {
-      return "FILE";
-    }
-
-    return extension.toUpperCase();
-  };
+  const getDocumentName = () => message.document?.name || "Document";
 
   const formatFileSize = (bytes) => {
     if (!bytes || Number.isNaN(bytes)) {
@@ -148,7 +161,15 @@ const MessageBubble = ({
 
   return (
     <div
-      className={`group relative flex w-full items-center gap-2 overflow-hidden rounded-xl transition-all duration-300 ${isMyMessage
+      onPointerDown={startLongPress}
+      onPointerUp={cancelLongPress}
+      onPointerCancel={cancelLongPress}
+      onPointerMove={cancelLongPress}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        setActionsOpen(true);
+      }}
+      className={`group relative flex w-full items-center gap-2 rounded-xl transition-all duration-300 ${isMyMessage
         ? "justify-end"
         : "justify-start"
         } ${isHighlighted
@@ -162,7 +183,7 @@ const MessageBubble = ({
           <button
             type="button"
             onClick={() => onReply(message)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#737373] opacity-0 transition hover:bg-[#171717]/10 hover:text-[#171717] group-hover:opacity-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--home-muted)] opacity-0 transition duration-150 hover:bg-[var(--home-hover)] hover:text-[var(--home-text)] group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#879b82]"
             aria-label="Reply to message"
           >
             <FiCornerUpRight className="text-lg" />
@@ -172,7 +193,7 @@ const MessageBubble = ({
 
       {/* SWIPEABLE MESSAGE */}
       <div
-        className={`order-1 touch-pan-y ${isDocument
+        className={`relative order-1 touch-pan-y ${isDocument
           ? "max-w-[62%]"
           : isPoll || isLocation || isContact
             ? "max-w-[90%]"
@@ -192,7 +213,7 @@ const MessageBubble = ({
         }}
       >
         <div
-          className={`w-fit max-w-full break-words ${isMedia ||
+          className={`relative w-fit max-w-full break-words ${isMedia ||
             isPoll ||
             isLocation || 
             isContact
@@ -214,8 +235,15 @@ const MessageBubble = ({
             />
           )}
 
+          {message.deletedForEveryone && (
+            <p className="flex items-center gap-2 px-1 py-1.5 text-xs italic opacity-70">
+              <FiTrash2 className="shrink-0" />
+              This message was deleted
+            </p>
+          )}
+
           {/* DOCUMENT MESSAGE */}
-          {isDocument ? (
+          {!message.deletedForEveryone && isDocument ? (
             <div
               role="button"
               tabIndex={
@@ -263,7 +291,7 @@ const MessageBubble = ({
           ) : null}
 
           {/* POLL MESSAGE */}
-          {isPoll ? (
+          {!message.deletedForEveryone && isPoll ? (
             <PollMessage
               poll={message.poll}
               isMyMessage={isMyMessage}
@@ -273,7 +301,7 @@ const MessageBubble = ({
           ) : null}
 
           {/* LOCATION MESSAGE */}
-          {isLocation ? (
+          {!message.deletedForEveryone && isLocation ? (
             <LocationMessage
               message={message}
               isOwn={isMyMessage}
@@ -281,7 +309,7 @@ const MessageBubble = ({
           ) : null}
 
           {/* CONTACT MESSAGE */}
-          {isContact ? (
+          {!message.deletedForEveryone && isContact ? (
             <ContactMessage
               contact={message.contact}
               onChat={onChat}
@@ -289,7 +317,7 @@ const MessageBubble = ({
           ) : null}
 
           {/* IMAGE / GIF / VIDEO MESSAGE */}
-          {isMedia ? (
+          {!message.deletedForEveryone && isMedia ? (
             <div
               className={`overflow-hidden rounded-xl ${isImage &&
                 message.text?.trim()
@@ -420,13 +448,71 @@ const MessageBubble = ({
           ) : null}
 
           {/* TEXT MESSAGE */}
-          {!isMedia &&
+          {!message.deletedForEveryone && !isMedia &&
             !isDocument &&
             !isPoll &&
             !isLocation &&
             !isContact && (
               <div className="whitespace-pre-wrap break-words">
-                {message.text}
+                {isEditing ? (
+                  <div className="min-w-[220px] space-y-2.5 rounded-xl border border-current/10 bg-white/10 p-2.5 shadow-sm backdrop-blur-sm">
+                    <div className="flex items-center justify-between gap-3 px-0.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.13em] opacity-75">
+                        Editing message
+                      </span>
+                      <span className="text-[10px] tabular-nums opacity-55">
+                        {editText.length}/5000
+                      </span>
+                    </div>
+                    <textarea
+                      autoFocus
+                      value={editText}
+                      onChange={(event) => setEditText(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" && !event.shiftKey) {
+                          event.preventDefault();
+                          saveEdit();
+                        }
+                        if (event.key === "Escape") setIsEditing(false);
+                      }}
+                      maxLength={5000}
+                      rows={Math.min(5, Math.max(2, editText.split("\n").length))}
+                      className="max-h-36 min-h-[68px] w-full resize-y rounded-lg border border-[var(--home-border)] bg-[var(--home-surface)] px-3 py-2.5 text-sm leading-relaxed text-[var(--home-text)] shadow-inner outline-none transition placeholder:text-[var(--home-muted)] focus:border-[#879b82] focus:ring-2 focus:ring-[#879b82]/15"
+                      aria-label="Edit message"
+                    />
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="hidden text-[10px] leading-tight opacity-60 sm:inline">
+                        Enter saves · Shift + Enter for a new line
+                      </span>
+                      <div className="ml-auto flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditing(false)}
+                          className="rounded-lg px-3 py-2 text-xs font-medium text-current/75 transition hover:bg-white/10"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={saveEdit}
+                          disabled={!editText.trim()}
+                          className="rounded-lg bg-[var(--home-surface)] px-3.5 py-2 text-xs font-semibold text-[var(--home-text)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-45"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {message.text}
+                    {message.editedAt && (
+                      <span className="ml-1.5 inline-flex rounded-full border border-current/15 px-1.5 py-0.5 align-middle text-[9px] font-medium not-italic opacity-65">
+                        edited
+                      </span>
+                    )}
+                  </>
+                )}
               </div>
             )}
 
@@ -464,8 +550,50 @@ const MessageBubble = ({
                 <IoCheckmark className="text-sm text-[#525252]" />
               ))}
           </div>
+          {!message.deletedForEveryone && (
+            <div className="absolute right-1 top-1 z-30">
+              <MessageActions
+                message={message}
+                isMyMessage={isMyMessage}
+                canEdit={canEdit}
+                canReact={canReact}
+                onReply={() => onReply(message)}
+                onEdit={() => setIsEditing(true)}
+                onDelete={(scope) => onDelete?.(message, scope)}
+                onReact={(emoji) => onReact?.(message, emoji)}
+                open={actionsOpen}
+                onOpenChange={setActionsOpen}
+              />
+            </div>
+          )}
         </div>
+
       </div>
+
+      {Object.keys(reactionCounts).length > 0 && !message.deletedForEveryone && (
+        <div className={`absolute bottom-0 z-20 flex max-w-[min(82vw,24rem)] flex-nowrap gap-1.5 overflow-x-auto ${isMyMessage ? "right-12" : "left-12"} translate-y-1/2`}>
+          {Object.entries(reactionCounts).map(([emoji, count]) => {
+            const isMine = myReaction === emoji;
+            return (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => onReact?.(message, emoji)}
+                aria-pressed={isMine}
+                aria-label={`${emoji} reaction, ${count} total${isMine ? ", selected by you" : ""}`}
+                className={`inline-flex min-h-7 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium shadow-[0_3px_12px_rgba(0,0,0,0.08)] transition duration-150 hover:-translate-y-0.5 hover:shadow-md active:scale-95 ${
+                  isMine
+                    ? "border-[#879b82] bg-[var(--home-selected)] text-[var(--home-text)]"
+                    : "border-[var(--home-border)] bg-[var(--home-surface)] text-[var(--home-text)] hover:bg-[var(--home-hover)]"
+                }`}
+              >
+                <span className="text-sm leading-none">{emoji}</span>
+                <span className="text-[10px] tabular-nums text-[var(--home-muted)]">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* REPLY BUTTON — SENT MESSAGE */}
       {isMyMessage && (
@@ -473,7 +601,7 @@ const MessageBubble = ({
           <button
             type="button"
             onClick={() => onReply(message)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#737373] opacity-0 transition hover:bg-[#171717]/10 hover:text-[#171717] group-hover:opacity-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--home-muted)] opacity-0 transition duration-150 hover:bg-[var(--home-hover)] hover:text-[var(--home-text)] group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#879b82]"
             aria-label="Reply to message"
           >
             <FiCornerUpLeft className="text-lg" />

@@ -132,6 +132,15 @@ const messageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    editedAt: { type: Date, default: null },
+    deletedForEveryone: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
+    deletedFor: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    reactions: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+      emoji: { type: String, enum: ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "🎉"], required: true },
+    }],
   },
   {
     timestamps: true,

@@ -1,0 +1,36 @@
+name: Message interactions checks
+
+on:
+  pull_request:
+    paths:
+      - "client/**"
+      - "server/**"
+      - ".github/workflows/message-interactions.yml"
+
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci --prefix client
+      - run: npx eslint src/components/MessageActions.jsx src/components/MessageBubble.jsx src/components/ReplyMessage.jsx src/components/UserList.jsx src/apiCalls/messageApi.js src/sockets/socketEmitters.js src/sockets/socketListeners.js
+        working-directory: client
+      - run: npm run build
+        working-directory: client
+
+  server-interactions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci --prefix server
+      - run: node server/tests/security/sec17-message-interactions-smoke.mjs

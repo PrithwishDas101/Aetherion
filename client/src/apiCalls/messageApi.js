@@ -1,4 +1,4 @@
-import { axiosInstance } from "./index.js";
+import { axiosInstance, getApiErrorResponse } from "./index.js";
 
 // SEND MESSAGE
 export const createMessage = async (message) => {
@@ -39,5 +39,39 @@ export const getAllMessages = async (chatId, config = {}) => {
     return response.data;
   } catch (error) {
     return error.response?.data;
+  }
+};
+
+
+// MESSAGE INTERACTIONS
+export const editMessage = async (messageId, text) => {
+  try {
+    const response = await axiosInstance.patch(`/api/v1/message/${messageId}`, { text });
+    return response.data;
+  } catch (error) {
+    return error.response?.data;
+  }
+};
+
+export const deleteMessage = async (messageId, scope) => {
+  try {
+    const response = await axiosInstance.delete(`/api/v1/message/${messageId}`, { data: { scope } });
+    return response.data;
+  } catch (error) {
+    return error.response?.data;
+  }
+};
+
+export const reactToMessage = async (messageId, emoji) => {
+  try {
+    const response = await axiosInstance.post(`/api/v1/message/${messageId}/reaction`, { emoji });
+    return response.data;
+  } catch (error) {
+    return getApiErrorResponse(
+      error,
+      error.response
+        ? `Reaction request failed (HTTP ${error.response.status}).`
+        : "Could not reach the Aetherion API. Check the server URL and connection.",
+    );
   }
 };

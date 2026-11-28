@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import toast from "react-hot-toast";
-
 import {
   IoCheckmark,
   IoCheckmarkDone,
@@ -15,7 +13,6 @@ import {
   IoPersonOutline
 } from "react-icons/io5";
 
-import { createChat } from "../apiCalls/chatApi.js";
 import { startChatWithUser } from "../utils/startChat.js";
 import { setAllChats, setSelectedChat } from "../redux/userSlice.js";
 import store from "../redux/store.js";
@@ -24,7 +21,6 @@ import { formatChatPreviewTime } from "../utils/messageDate.js";
 import Avatar from "./Avatar.jsx";
 import {
   getEffectivePresenceStatus,
-  PRESENCE_STATUS,
 } from "../utils/presenceStatus.js";
 import PresenceIcon from "./PresenceIcon.jsx";
 
@@ -70,8 +66,35 @@ function UserList({ searchKey, socket }) {
       dispatch(setAllChats(updatedChats));
     };
 
+    const handleMessageChanged = (data) => {
+      if (!data?.message?._id || !data?.chatId) return;
+
+      const state = store.getState().userReducer;
+      const existingChats = state.allChats || [];
+      const updatedChats = existingChats.map((chat) => {
+        const lastMessageId = chat.lastMessage?._id || chat.lastMessage;
+        if (
+          String(chat._id) !== String(data.chatId) ||
+          String(lastMessageId) !== String(data.message._id)
+        ) return chat;
+        return { ...chat, lastMessage: data.message };
+      });
+
+      dispatch(setAllChats(updatedChats));
+
+      const activeChat = state.selectedChat;
+      const activeLastMessageId = activeChat?.lastMessage?._id || activeChat?.lastMessage;
+      if (
+        String(activeChat?._id) === String(data.chatId) &&
+        String(activeLastMessageId) === String(data.message._id)
+      ) {
+        dispatch(setSelectedChat({ ...activeChat, lastMessage: data.message }));
+      }
+    };
+
     return registerSocketListeners(socket, {
       onReceiveMessage: handleReceiveMessage,
+      onMessageChanged: handleMessageChanged,
     });
   }, [socket, dispatch]);
 
@@ -192,6 +215,11 @@ function UserList({ searchKey, socket }) {
           const lastMessage = userChat?.lastMessage;
           const lastMessageType = lastMessage?.type;
           const lastMessageText = lastMessage?.text?.trim() || "";
+          const lastMessageDeletedForMe = lastMessage?.deletedFor?.some(
+            (id) => String(id) === String(currentUser?._id),
+          );
+          const lastMessageDeleted =
+            !!lastMessage?.deletedForEveryone || lastMessageDeletedForMe;
 
           const lastMessageTime = formatChatPreviewTime(lastMessage?.createdAt);
 
@@ -299,6 +327,7 @@ function UserList({ searchKey, socket }) {
 
                       {userChat &&
                         lastMessage?._id &&
+                        !lastMessageDeleted &&
                         isLastMessageMine &&
                         (lastMessage?.read ? (
                           <IoCheckmarkDone className="shrink-0 text-sm text-[#737373]" />
@@ -321,6 +350,10 @@ function UserList({ searchKey, socket }) {
                           <span className="truncate">typing...</span>
                         ) : !userChat ? (
                           <span className="truncate">{user.email}</span>
+                        ) : lastMessageDeleted ? (
+                          <span className="truncate italic">
+                            {lastMessage?.deletedForEveryone ? "This message was deleted" : "Deleted for you"}
+                          </span>
                         ) : lastMessageType === "gif" ? (
                           <span className="truncate">GIF</span>
                         ) : lastMessageType === "image" ? (

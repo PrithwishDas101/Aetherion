@@ -18,6 +18,11 @@ const sendMessage = (socket, { message, chat, members }) => {
   });
 };
 
+const sendMessageChanged = (socket, { messageId, chatId, action }) => {
+  if (!socket || !messageId || !chatId || !action) return;
+  socket.emit("message-changed", { messageId, chatId, action });
+};
+
 const sendTyping = (socket, { sender, chatId, members }) => {
   if (!socket) {
     return;
@@ -63,4 +68,4 @@ const sendPollUpdate = (socket, { poll, chatId, sender, members }) => {
   });
 };
 
-export { joinRoom, sendMessage, sendTyping, sendStopTyping, getPresence, sendPollUpdate };
+export { joinRoom, sendMessage, sendMessageChanged, sendTyping, sendStopTyping, getPresence, sendPollUpdate };
