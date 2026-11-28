@@ -189,14 +189,14 @@ const MessageActions = ({
                     <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--home-muted)]">
                       Quick reaction
                     </p>
-                    <div className="grid grid-cols-8 gap-1">
+                    <div className="flex w-full flex-nowrap gap-1.5 overflow-x-auto pb-1">
                       {REACTIONS.map((emoji) => (
                         <button
                           key={emoji}
                           type="button"
                           onClick={() => choose(() => onReact(emoji))}
                           aria-label={`React with ${emoji}`}
-                          className="flex h-10 min-w-0 items-center justify-center rounded-xl bg-[var(--home-raised)] text-lg transition duration-150 hover:-translate-y-0.5 hover:bg-[var(--home-hover)] hover:shadow-sm active:scale-90"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--home-raised)] text-lg transition duration-150 hover:-translate-y-0.5 hover:bg-[var(--home-hover)] hover:shadow-sm active:scale-90"
                         >
                           {emoji}
                         </button>
@@ -206,6 +206,17 @@ const MessageActions = ({
                 )}
 
                 <div className="space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(true)}
+                    className="group flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left text-sm font-semibold text-red-600 transition duration-150 hover:bg-red-500/[0.07] active:scale-[0.99]"
+                  >
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-600">
+                      <FiTrash2 />
+                    </span>
+                    <span>Delete message</span>
+                  </button>
+
                   <button type="button" onClick={() => choose(onReply)} className={menuItemClass}>
                     <span className={iconClass}><FiCornerUpLeft /></span>
                     <span>Reply</span>
@@ -228,16 +239,6 @@ const MessageActions = ({
                     </button>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={() => setConfirmDelete(true)}
-                    className="group flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left text-sm font-medium text-red-600 transition duration-150 hover:bg-red-500/[0.07] active:scale-[0.99]"
-                  >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-600">
-                      <FiTrash2 />
-                    </span>
-                    <span>Delete message</span>
-                  </button>
                 </div>
               </div>
             )}
