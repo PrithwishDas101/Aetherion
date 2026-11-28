@@ -213,7 +213,7 @@ const MessageBubble = ({
         }}
       >
         <div
-          className={`w-fit max-w-full break-words ${isMedia ||
+          className={`relative w-fit max-w-full break-words ${isMedia ||
             isPoll ||
             isLocation || 
             isContact
@@ -550,28 +550,28 @@ const MessageBubble = ({
                 <IoCheckmark className="text-sm text-[#525252]" />
               ))}
           </div>
+          {!message.deletedForEveryone && (
+            <div className="absolute right-1 top-1 z-30">
+              <MessageActions
+                message={message}
+                isMyMessage={isMyMessage}
+                canEdit={canEdit}
+                canReact={canReact}
+                onReply={() => onReply(message)}
+                onEdit={() => setIsEditing(true)}
+                onDelete={(scope) => onDelete?.(message, scope)}
+                onReact={(emoji) => onReact?.(message, emoji)}
+                open={actionsOpen}
+                onOpenChange={setActionsOpen}
+              />
+            </div>
+          )}
         </div>
 
-        {!message.deletedForEveryone && (
-          <div className="absolute right-1 top-1 z-30">
-            <MessageActions
-              message={message}
-              isMyMessage={isMyMessage}
-              canEdit={canEdit}
-              canReact={canReact}
-              onReply={() => onReply(message)}
-              onEdit={() => setIsEditing(true)}
-              onDelete={(scope) => onDelete?.(message, scope)}
-              onReact={(emoji) => onReact?.(message, emoji)}
-              open={actionsOpen}
-              onOpenChange={setActionsOpen}
-            />
-          </div>
-        )}
       </div>
 
       {Object.keys(reactionCounts).length > 0 && !message.deletedForEveryone && (
-        <div className={`absolute bottom-0 z-20 flex max-w-[min(82vw,24rem)] flex-wrap gap-1.5 ${isMyMessage ? "right-12" : "left-12"} translate-y-1/2`}>
+        <div className={`absolute bottom-0 z-20 flex max-w-[min(82vw,24rem)] flex-nowrap gap-1.5 overflow-x-auto ${isMyMessage ? "right-12" : "left-12"} translate-y-1/2`}>
           {Object.entries(reactionCounts).map(([emoji, count]) => {
             const isMine = myReaction === emoji;
             return (
