@@ -1,4 +1,4 @@
-import { axiosInstance } from "./index.js";
+import { axiosInstance, getApiErrorResponse } from "./index.js";
 
 // SEND MESSAGE
 export const createMessage = async (message) => {
@@ -67,6 +67,6 @@ export const reactToMessage = async (messageId, emoji) => {
     const response = await axiosInstance.post(`/api/v1/message/${messageId}/reaction`, { emoji });
     return response.data;
   } catch (error) {
-    return error.response?.data;
+    return getApiErrorResponse(error, "Could not update reaction. Please try again.");
   }
 };
