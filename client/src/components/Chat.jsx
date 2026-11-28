@@ -1155,7 +1155,7 @@ const Chat = ({ socket }) => {
   const handleReactToMessage = async (selectedMessage, emoji) => {
     const response = await toggleMessageReaction(selectedMessage._id, emoji);
     if (!response?.success || !response.data) {
-      toast.error(response?.message || "Could not update reaction.");
+      toast.error(response?.message || (response?.status ? `Reaction request failed (HTTP ${response.status}).` : "Could not reach the Aetherion API."));
       return;
     }
     setAllMessages((previous) => previous.map((item) =>
